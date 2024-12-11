@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public float speed = 5f; // Velocidad de movimiento del jugador
+    public float sprintSpeed = 8f; // Velocidad de sprint
     public float gravity = -9.81f; // Gravedad
     public float jumpHeight = 1.5f; // Altura del salto
 
@@ -30,11 +31,31 @@ public class PlayerController : MonoBehaviour
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
-        Vector3 move = transform.right * x + transform.forward * z;
-        controller.Move(move * speed * Time.deltaTime);
+        // Direccionar el movimiento hacia la dirección de la cámara
+        Vector3 forward = Camera.main.transform.forward;
+        Vector3 right = Camera.main.transform.right;
+
+        forward.y = 0f;
+        right.y = 0f;
+        forward.Normalize();
+        right.Normalize();
+
+        Vector3 move = right * x + forward * z;
+
+        // Determinar si se está haciendo sprint solo hacia adelante
+        float currentSpeed = (Input.GetKey(KeyCode.LeftShift) && z > 0) ? sprintSpeed : speed;
+
+        controller.Move(move * currentSpeed * Time.deltaTime);
+
+        // Rotar el jugador hacia la dirección de movimiento si avanza
+        if (move.magnitude > 0 && z > 0)
+        {
+            Quaternion toRotation = Quaternion.LookRotation(forward);
+            transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, Time.deltaTime * 10f);
+        }
 
         // Salto
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
@@ -44,4 +65,3 @@ public class PlayerController : MonoBehaviour
         controller.Move(velocity * Time.deltaTime);
     }
 }
-
