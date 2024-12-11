@@ -31,7 +31,6 @@ public class PlayerController : MonoBehaviour
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
-        // Direccionar el movimiento hacia la dirección de la cámara
         Vector3 forward = Camera.main.transform.forward;
         Vector3 right = Camera.main.transform.right;
 
@@ -42,20 +41,18 @@ public class PlayerController : MonoBehaviour
 
         Vector3 move = right * x + forward * z;
 
-        // Determinar si se está haciendo sprint solo hacia adelante
         float currentSpeed = speed;
         if (z > 0 && Input.GetKey(KeyCode.LeftShift))
         {
             currentSpeed = sprintSpeed;
         }
-        else if (z < 0) // Reducir la velocidad al moverse hacia atrás
+        else if (z < 0) 
         {
             currentSpeed *= 0.7f; // Ajustar factor de reducción según necesidad
         }
 
         controller.Move(move * currentSpeed * Time.deltaTime);
 
-        // Rotar el jugador constantemente hacia la dirección de la cámara
         Quaternion toRotation = Quaternion.LookRotation(forward);
         transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, Time.deltaTime * 10f);
 
