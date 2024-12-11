@@ -43,16 +43,21 @@ public class PlayerController : MonoBehaviour
         Vector3 move = right * x + forward * z;
 
         // Determinar si se está haciendo sprint solo hacia adelante
-        float currentSpeed = (Input.GetKey(KeyCode.LeftShift) && z > 0) ? sprintSpeed : speed;
+        float currentSpeed = speed;
+        if (z > 0 && Input.GetKey(KeyCode.LeftShift))
+        {
+            currentSpeed = sprintSpeed;
+        }
+        else if (z < 0) // Reducir la velocidad al moverse hacia atrás
+        {
+            currentSpeed *= 0.7f; // Ajustar factor de reducción según necesidad
+        }
 
         controller.Move(move * currentSpeed * Time.deltaTime);
 
-        // Rotar el jugador hacia la dirección de movimiento si avanza
-        if (move.magnitude > 0 && z > 0)
-        {
-            Quaternion toRotation = Quaternion.LookRotation(forward);
-            transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, Time.deltaTime * 10f);
-        }
+        // Rotar el jugador constantemente hacia la dirección de la cámara
+        Quaternion toRotation = Quaternion.LookRotation(forward);
+        transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, Time.deltaTime * 10f);
 
         // Salto
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
