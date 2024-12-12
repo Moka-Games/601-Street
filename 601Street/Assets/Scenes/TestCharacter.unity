@@ -131,7 +131,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 43511160}
-  m_Layer: 4
+  m_Layer: 3
   m_Name: LookAt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -537,7 +537,7 @@ GameObject:
   m_Component:
   - component: {fileID: 354349529}
   - component: {fileID: 354349530}
-  m_Layer: 4
+  m_Layer: 3
   m_Name: Groundcheck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -914,9 +914,9 @@ GameObject:
   - component: {fileID: 683574374}
   - component: {fileID: 683574372}
   - component: {fileID: 683574373}
-  m_Layer: 4
+  m_Layer: 3
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1049,7 +1049,7 @@ Transform:
   m_GameObject: {fileID: 683574371}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.21, y: 0.81, z: 1.68}
+  m_LocalPosition: {x: 4.21, y: 0.717, z: 1.68}
   m_LocalScale: {x: 1, y: 1.369576, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2420,7 +2420,7 @@ Transform:
   m_GameObject: {fileID: 1548823048}
   serializedVersion: 2
   m_LocalRotation: {x: 0.2949096, y: 0.000000028477416, z: -0.00000000878916, w: 0.95552516}
-  m_LocalPosition: {x: -5.393734, y: 10.426459, z: -9.679767}
+  m_LocalPosition: {x: -5.393734, y: 10.33346, z: -9.679767}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3285,7 +3285,7 @@ Transform:
   m_GameObject: {fileID: 2022504740}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.97939235, z: -0, w: -0.20196699}
-  m_LocalPosition: {x: -5.393734, y: 10.426459, z: -9.679767}
+  m_LocalPosition: {x: -5.393734, y: 10.33346, z: -9.679767}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
