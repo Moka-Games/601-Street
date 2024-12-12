@@ -1,20 +1,18 @@
 using UnityEngine;
-using TMPro; // Importar la biblioteca para TextMeshPro
-using UnityEngine.UI; // Importar para botones y UI
+using TMPro;
+using UnityEngine.UI;
 using System.Collections;
 
 public class Dice_Manager : MonoBehaviour
 {
-    // Referencia al componente TextMeshPro para mostrar el resultado
     [SerializeField] private TMP_Text diceResultText;
-    [SerializeField] private TMP_Text difficultyClass;
+    [SerializeField] private TMP_Text difficultyClassText;
 
-    // Referencia a la imagen que rotará
     [SerializeField] private Image diceImage;
 
-    public int minNumber;
+    public int difficultyClass;
 
-    private bool canThrow = true; // Bandera para controlar si el dado puede lanzarse
+    private bool canThrow = true;
 
     public bool bonus_1_activated;
     public bool bonus_2_activated;
@@ -34,34 +32,15 @@ public class Dice_Manager : MonoBehaviour
     private int bonus_2 = 3;
     private int bonus_3 = 4;
 
+    public GameObject FAIL;
+
     private void Start()
     {
-        difficultyClass.text = "" + minNumber;
+        difficultyClassText.text = "" + difficultyClass;
 
-        if (bonus_1_activated)
-        {
-            bonus_1_Object.SetActive(true);
-        }
-        else
-        {
-            bonus_1_Object.SetActive(false);
-        }
-        if (bonus_2_activated)
-        {
-            bonus_2_Object.SetActive(true);
-        }
-        else
-        {
-            bonus_2_Object.SetActive(false);
-        }
-        if (bonus_3_activated)
-        {
-            bonus_3_Object.SetActive(true);
-        }
-        else
-        {
-            bonus_3_Object.SetActive(false);
-        }
+        bonus_1_Object.SetActive(bonus_1_activated);
+        bonus_2_Object.SetActive(bonus_2_activated);
+        bonus_3_Object.SetActive(bonus_3_activated);
     }
 
     public void OnRollDiceButtonClicked()
@@ -74,37 +53,30 @@ public class Dice_Manager : MonoBehaviour
 
     private IEnumerator RollDiceSequence()
     {
-        canThrow = false; // Desactivar la capacidad de lanzar el dado
+        canThrow = false;
 
-        // Mostrar números aleatorios durante 2 segundos
         float elapsedTime = 0f;
         while (elapsedTime < 2f)
         {
             if (diceResultText != null)
             {
-                int randomValue = Random.Range(1, 7);
+                int randomValue = Random.Range(1, 20);
                 diceResultText.text = "" + randomValue;
             }
 
             if (diceImage != null)
             {
-                // Rotar la imagen gradualmente
-                diceImage.transform.Rotate(0f, 0f, -36f); // Rotar 36 grados cada 0.1 segundos
+                diceImage.transform.Rotate(0f, 0f, -36f);
             }
 
             elapsedTime += 0.1f;
             yield return new WaitForSeconds(0.1f);
         }
 
-        // Generar el resultado final
-        int result = Random.Range(1, 7);
+        int result = Random.Range(1, 20);
+        int totalResult = result;
 
         Debug.Log("Dado lanzado: " + result);
-
-        if (result < minNumber)
-        {
-            Debug.Log("El resultado es menor que 6.");
-        }
 
         if (diceResultText != null)
         {
@@ -115,25 +87,41 @@ public class Dice_Manager : MonoBehaviour
             Debug.LogWarning("No se ha asignado un componente TMP_Text para mostrar el resultado del dado.");
         }
 
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(1f);
 
-        if (diceResultText != null && bonus_1_activated)
+        if (bonus_1_activated)
         {
-            diceResultText.text = "" + (result + bonus_1);
+            totalResult += bonus_1;
+            diceResultText.text = "" + totalResult;
             popUp_Bonus_1.SetActive(true);
         }
-        if (diceResultText != null && bonus_2_activated)
+        if (bonus_2_activated)
         {
-            diceResultText.text = "" + (result + bonus_2);
+            totalResult += bonus_2;
+            diceResultText.text = "" + totalResult;
             popUp_Bonus_2.SetActive(true);
         }
-        if (diceResultText != null && bonus_3_activated)
+        if (bonus_3_activated)
         {
-            diceResultText.text = "" + (result + bonus_3);
+            totalResult += bonus_3;
+            diceResultText.text = "" + totalResult;
             popUp_Bonus_3.SetActive(true);
         }
 
-        canThrow = true; // Reactivar la capacidad de lanzar el dado
+        // Verificar si el resultado total es menor que la dificultad
+        if (totalResult < difficultyClass)
+        {
+            FAIL.SetActive(true);
+        }
+        else
+        {
+            FAIL.SetActive(false);
+            Debug.Log("Success: Resultado igual o mayor a la dificultad.");
+        }
+
+        yield return new WaitForSeconds(1);
+
+        canThrow = true;
     }
 
     private int Bonus(int bonus)
