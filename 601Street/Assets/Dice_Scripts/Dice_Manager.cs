@@ -1,4 +1,3 @@
-// DiceManager.cs
 using System;
 using System.Collections;
 using UnityEngine;
@@ -12,6 +11,10 @@ public class Dice_Manager : MonoBehaviour
     [SerializeField] private GameObject continueButton;
     [SerializeField] private GameObject rollButton;
     [SerializeField] private GameObject diceObject;
+
+    [Header("Success/Fail Feedback")]
+    [SerializeField] private GameObject failObject;
+    [SerializeField] private GameObject successObject;
 
     [Header("Bonus Indicators")]
     [SerializeField] private GameObject bonus1Object;
@@ -38,9 +41,10 @@ public class Dice_Manager : MonoBehaviour
 
     public Action<bool> OnRollComplete;
 
+    public GameObject diceInferface;
+
     private void Start()
     {
-        // Set bonus indicators visibility
         bonus1Object.SetActive(bonus1Activated);
         bonus2Object.SetActive(bonus2Activated);
         bonus3Object.SetActive(bonus3Activated);
@@ -73,7 +77,7 @@ public class Dice_Manager : MonoBehaviour
         canRoll = false;
         rollButton.SetActive(false);
 
-        // Start dice rotation and randomizing display
+        // "Animación" Dado
         float rotationTime = 2f;
         float elapsedTime = 0f;
 
@@ -88,14 +92,14 @@ public class Dice_Manager : MonoBehaviour
             yield return null;
         }
 
-        // Finalize the roll
+        // Acabar la tirada
         baseRoll = UnityEngine.Random.Range(1, 21);
         diceResultText.text = baseRoll.ToString();
         totalRoll = baseRoll;
 
         yield return new WaitForSeconds(1f);
 
-        // Apply bonuses
+        // Aplicar Bonuses
         if (bonus1Activated)
         {
             totalRoll += bonus1;
@@ -122,13 +126,33 @@ public class Dice_Manager : MonoBehaviour
 
         diceResultText.text = totalRoll.ToString();
 
-        // Check success
+        // Comprobar resultado
         bool isSuccess = totalRoll >= difficultyClass;
         failPopup.SetActive(!isSuccess);
         OnRollComplete?.Invoke(isSuccess);
 
+        if(totalRoll >= difficultyClass)
+        {
+            successObject.SetActive(true );
+            Debug.Log("Exito");
+        }
+        else
+        {
+            failObject.SetActive(true);
+            Debug.Log("Fail");
+        }
+        
+
+
         continueButton.SetActive(true);
         canRoll = true;
+    }
+
+    public void Continue()
+    {
+        diceInferface.SetActive(false);
+        continueButton.SetActive(false);
+        ResetUI();
     }
 
     public void ResetUI()
@@ -138,6 +162,9 @@ public class Dice_Manager : MonoBehaviour
         failPopup.SetActive(false);
         continueButton.SetActive(false);
         rollButton.SetActive(false);
+
+        successObject.SetActive(false);
+        failObject.SetActive(false);
 
         bonus1Popup.SetActive(false);
         bonus2Popup.SetActive(false);

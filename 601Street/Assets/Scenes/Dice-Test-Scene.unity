@@ -291,6 +291,8 @@ MonoBehaviour:
   continueButton: {fileID: 127698320}
   rollButton: {fileID: 931018498}
   diceObject: {fileID: 426959690}
+  failObject: {fileID: 876864633}
+  successObject: {fileID: 2051862821}
   bonus1Object: {fileID: 1889759951}
   bonus2Object: {fileID: 145005794}
   bonus3Object: {fileID: 1311011843}
@@ -300,6 +302,7 @@ MonoBehaviour:
   bonus1Activated: 0
   bonus2Activated: 0
   bonus3Activated: 1
+  diceInferface: {fileID: 535546548}
 --- !u!4 &120743079
 Transform:
   m_ObjectHideFlags: 0
@@ -2930,7 +2933,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1869146273}
         m_TargetAssemblyTypeName: DialogueManager, Assembly-CSharp
         m_MethodName: SelectOption
-        m_Mode: 3
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3421,7 +3424,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1869146273}
         m_TargetAssemblyTypeName: DialogueManager, Assembly-CSharp
         m_MethodName: SelectOption
-        m_Mode: 3
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3729,16 +3732,6 @@ MonoBehaviour:
   diceManager: {fileID: 120743078}
   diceInterface: {fileID: 535546548}
   dialogueInterface: {fileID: 243988469}
-  dialogueOptions:
-  - OptionText: Option 1
-    SuccessOutcome: 
-    FailOutcome: 
-  - OptionText: Option 2
-    SuccessOutcome: 
-    FailOutcome: 
-  - OptionText: Option 3
-    SuccessOutcome: 
-    FailOutcome: 
   failObject: {fileID: 876864633}
   sucessObject: {fileID: 2051862821}
 --- !u!1 &1882846100
@@ -4208,7 +4201,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1869146273}
         m_TargetAssemblyTypeName: DialogueManager, Assembly-CSharp
         m_MethodName: SelectOption
-        m_Mode: 3
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
