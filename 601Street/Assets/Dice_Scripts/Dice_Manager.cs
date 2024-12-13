@@ -1,131 +1,146 @@
+// DiceManager.cs
+using System;
+using System.Collections;
 using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
-using System.Collections;
 
 public class Dice_Manager : MonoBehaviour
 {
     [SerializeField] private TMP_Text diceResultText;
     [SerializeField] private TMP_Text difficultyClassText;
+    [SerializeField] private GameObject failPopup;
+    [SerializeField] private GameObject continueButton;
+    [SerializeField] private GameObject rollButton;
+    [SerializeField] private GameObject diceObject;
 
-    [SerializeField] private Image diceImage;
+    [Header("Bonus Indicators")]
+    [SerializeField] private GameObject bonus1Object;
+    [SerializeField] private GameObject bonus2Object;
+    [SerializeField] private GameObject bonus3Object;
 
-    public int difficultyClass;
+    [Header("Bonus Pop-Ups")]
+    [SerializeField] private GameObject bonus1Popup;
+    [SerializeField] private GameObject bonus2Popup;
+    [SerializeField] private GameObject bonus3Popup;
 
-    private bool canThrow = true;
+    public bool bonus1Activated;
+    public bool bonus2Activated;
+    public bool bonus3Activated;
 
-    public bool bonus_1_activated;
-    public bool bonus_2_activated;
-    public bool bonus_3_activated;
+    private int bonus1 = 2;
+    private int bonus2 = 3;
+    private int bonus3 = 4;
 
-    [Header("Indicadores Bonus")]
-    public GameObject bonus_1_Object;
-    public GameObject bonus_2_Object;
-    public GameObject bonus_3_Object;
+    private int baseRoll;
+    private int totalRoll;
+    private bool canRoll = true;
+    private int currentDifficultyClass;
 
-    [Header("Pop-Up's")]
-    public GameObject popUp_Bonus_1;
-    public GameObject popUp_Bonus_2;
-    public GameObject popUp_Bonus_3;
-
-    private int bonus_1 = 2;
-    private int bonus_2 = 3;
-    private int bonus_3 = 4;
-
-    public GameObject FAIL;
+    public Action<bool> OnRollComplete;
 
     private void Start()
     {
-        difficultyClassText.text = "" + difficultyClass;
+        // Set bonus indicators visibility
+        bonus1Object.SetActive(bonus1Activated);
+        bonus2Object.SetActive(bonus2Activated);
+        bonus3Object.SetActive(bonus3Activated);
 
-        bonus_1_Object.SetActive(bonus_1_activated);
-        bonus_2_Object.SetActive(bonus_2_activated);
-        bonus_3_Object.SetActive(bonus_3_activated);
+        ResetUI();
     }
 
-    public void OnRollDiceButtonClicked()
+    public void SetDifficultyClass(int difficultyClass)
     {
-        if (canThrow)
+        currentDifficultyClass = difficultyClass;
+        difficultyClassText.text = difficultyClass.ToString();
+        rollButton.SetActive(true);
+    }
+
+    public void OnRollButtonClicked()
+    {
+        if (canRoll)
         {
-            StartCoroutine(RollDiceSequence());
+            RollDice(currentDifficultyClass);
         }
     }
 
-    private IEnumerator RollDiceSequence()
+    private void RollDice(int difficultyClass)
     {
-        canThrow = false;
+        StartCoroutine(RollDiceSequence(difficultyClass));
+    }
 
+    private IEnumerator RollDiceSequence(int difficultyClass)
+    {
+        canRoll = false;
+        rollButton.SetActive(false);
+
+        // Start dice rotation and randomizing display
+        float rotationTime = 2f;
         float elapsedTime = 0f;
-        while (elapsedTime < 2f)
+
+        while (elapsedTime < rotationTime)
         {
-            if (diceResultText != null)
-            {
-                int randomValue = Random.Range(1, 20);
-                diceResultText.text = "" + randomValue;
-            }
+            elapsedTime += Time.deltaTime;
+            diceObject.transform.Rotate(Vector3.back, 360 * Time.deltaTime / rotationTime);
 
-            if (diceImage != null)
-            {
-                diceImage.transform.Rotate(0f, 0f, -36f);
-            }
+            int randomRoll = UnityEngine.Random.Range(1, 21);
+            diceResultText.text = randomRoll.ToString();
 
-            elapsedTime += 0.1f;
-            yield return new WaitForSeconds(0.1f);
+            yield return null;
         }
 
-        int result = Random.Range(1, 20);
-        int totalResult = result;
-
-        Debug.Log("Dado lanzado: " + result);
-
-        if (diceResultText != null)
-        {
-            diceResultText.text = "" + result;
-        }
-        else
-        {
-            Debug.LogWarning("No se ha asignado un componente TMP_Text para mostrar el resultado del dado.");
-        }
+        // Finalize the roll
+        baseRoll = UnityEngine.Random.Range(1, 21);
+        diceResultText.text = baseRoll.ToString();
+        totalRoll = baseRoll;
 
         yield return new WaitForSeconds(1f);
 
-        if (bonus_1_activated)
+        // Apply bonuses
+        if (bonus1Activated)
         {
-            totalResult += bonus_1;
-            diceResultText.text = "" + totalResult;
-            popUp_Bonus_1.SetActive(true);
-        }
-        if (bonus_2_activated)
-        {
-            totalResult += bonus_2;
-            diceResultText.text = "" + totalResult;
-            popUp_Bonus_2.SetActive(true);
-        }
-        if (bonus_3_activated)
-        {
-            totalResult += bonus_3;
-            diceResultText.text = "" + totalResult;
-            popUp_Bonus_3.SetActive(true);
+            totalRoll += bonus1;
+            bonus1Popup.SetActive(true);
+            yield return new WaitForSeconds(0.5f);
+            bonus1Popup.SetActive(false);
         }
 
-        // Verificar si el resultado total es menor que la dificultad
-        if (totalResult < difficultyClass)
+        if (bonus2Activated)
         {
-            FAIL.SetActive(true);
-        }
-        else
-        {
-            FAIL.SetActive(false);
-            Debug.Log("Success: Resultado igual o mayor a la dificultad.");
+            totalRoll += bonus2;
+            bonus2Popup.SetActive(true);
+            yield return new WaitForSeconds(0.5f);
+            bonus2Popup.SetActive(false);
         }
 
-        yield return new WaitForSeconds(1);
+        if (bonus3Activated)
+        {
+            totalRoll += bonus3;
+            bonus3Popup.SetActive(true);
+            yield return new WaitForSeconds(0.5f);
+            bonus3Popup.SetActive(false);
+        }
 
-        canThrow = true;
+        diceResultText.text = totalRoll.ToString();
+
+        // Check success
+        bool isSuccess = totalRoll >= difficultyClass;
+        failPopup.SetActive(!isSuccess);
+        OnRollComplete?.Invoke(isSuccess);
+
+        continueButton.SetActive(true);
+        canRoll = true;
     }
 
-    private int Bonus(int bonus)
+    public void ResetUI()
     {
-        return bonus;
+        diceResultText.text = "";
+        difficultyClassText.text = "";
+        failPopup.SetActive(false);
+        continueButton.SetActive(false);
+        rollButton.SetActive(false);
+
+        bonus1Popup.SetActive(false);
+        bonus2Popup.SetActive(false);
+        bonus3Popup.SetActive(false);
     }
 }
