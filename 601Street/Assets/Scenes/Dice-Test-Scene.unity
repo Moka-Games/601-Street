@@ -285,6 +285,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: beb70643c7227e845a85dea71dbaf998, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  diceInferface: {fileID: 535546548}
   diceResultText: {fileID: 171857963}
   difficultyClassText: {fileID: 244055067}
   failPopup: {fileID: 876864633}
@@ -300,9 +301,8 @@ MonoBehaviour:
   bonus2Popup: {fileID: 1773063196}
   bonus3Popup: {fileID: 364974928}
   bonus1Activated: 0
-  bonus2Activated: 0
-  bonus3Activated: 1
-  diceInferface: {fileID: 535546548}
+  bonus2Activated: 1
+  bonus3Activated: 0
 --- !u!4 &120743079
 Transform:
   m_ObjectHideFlags: 0

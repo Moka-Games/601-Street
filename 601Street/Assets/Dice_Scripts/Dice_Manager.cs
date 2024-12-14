@@ -5,6 +5,12 @@ using TMPro;
 
 public class Dice_Manager : MonoBehaviour
 {
+    [Header("Dice Interface")]
+    public GameObject diceInferface;
+
+
+    [Header("Interface Objects")]
+
     [SerializeField] private TMP_Text diceResultText;
     [SerializeField] private TMP_Text difficultyClassText;
     [SerializeField] private GameObject failPopup;
@@ -41,7 +47,6 @@ public class Dice_Manager : MonoBehaviour
 
     public Action<bool> OnRollComplete;
 
-    public GameObject diceInferface;
 
     private void Start()
     {
