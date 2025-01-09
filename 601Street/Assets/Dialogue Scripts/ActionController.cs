@@ -11,7 +11,10 @@ public class ActionController : MonoBehaviour
 
     void Start()
     {
-        ActionController.Instance.RegisterAction("SayHi", SayHi);
+        //Aquí registro acciones, las cuales pueden estar declaradas en el propio script o en un ajeno
+        //En este caso "SayHi" es el ID que le damos a la acción
+        //Si ponemos este ID en el valor actionID del scriptable object de la "DialogueOption", se realizará esa acción al acabar la conversación
+        ActionController.Instance.RegisterAction("SayHi", DialogueManager.Instance.RandomFunction);
         ActionController.Instance.RegisterAction("SayBye", SayBye);
     }
     void Awake()

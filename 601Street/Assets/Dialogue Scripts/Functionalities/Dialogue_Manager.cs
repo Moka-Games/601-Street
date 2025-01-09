@@ -258,6 +258,11 @@ public class DialogueManager : MonoBehaviour
             Next_bubble.SetActive(true);
         }
     }
+
+    public void RandomFunction()
+    {
+        print("I like cucumbers");
+    }
 }
 
 [System.Serializable]
