@@ -3,14 +3,8 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using Cinemachine;
+using Unity.VisualScripting;
 
-[System.Serializable]
-public class Dialogue
-{
-    public string speakerName;
-    [TextArea(4, 4)]
-    public string content;
-}
 
 public class DialogueManager : MonoBehaviour
 {
@@ -20,6 +14,7 @@ public class DialogueManager : MonoBehaviour
     public TMP_Text speakerNameText;
     public TMP_Text contentText;
     public TypewriterEffect typewriterEffect;
+    public GameObject Next_bubble;
 
     public GameObject optionsUI;
     public Button[] optionButtons;
@@ -36,14 +31,12 @@ public class DialogueManager : MonoBehaviour
     public GameObject npc_2;
     public GameObject npc_3;
 
-    public CinemachineVirtualCamera virtualCamera;
-
-    [Header("Dice Protoype Interface Variables")]
+    /*[Header("Dice Protoype Interface Variables")]
     [SerializeField] private Dice_Manager diceManager;
     [SerializeField] private GameObject diceInterface;
     [SerializeField] private GameObject dialogueInterface;
     public GameObject failObject;
-    public GameObject sucessObject;
+    public GameObject sucessObject;*/
 
 
     void Awake()
@@ -60,8 +53,8 @@ public class DialogueManager : MonoBehaviour
 
     void Start()
     {
-        failObject.SetActive(false);
-        sucessObject.SetActive(false);
+        //failObject.SetActive(false);
+        //sucessObject.SetActive(false);
 
         if (dialogueUI != null)
         {
@@ -70,6 +63,10 @@ public class DialogueManager : MonoBehaviour
         if (optionsUI != null)
         {
             optionsUI.SetActive(false);
+        }
+        if (Next_bubble != null)
+        {
+            Next_bubble.SetActive(false);
         }
     }
 
@@ -86,9 +83,15 @@ public class DialogueManager : MonoBehaviour
                         typewriterEffect.StopTyping();
                     }
                     isTyping = false;
+                    // Ya no activamos Next_bubble aquí, ya que es una interrupción manual
                 }
                 else
                 {
+                    // Desactivamos Next_bubble al pasar al siguiente diálogo
+                    if (Next_bubble != null)
+                    {
+                        Next_bubble.SetActive(false);
+                    }
                     NextDialogue();
                 }
             }
@@ -114,21 +117,12 @@ public class DialogueManager : MonoBehaviour
         {
             optionsUI.SetActive(false);
         }
+        if (Next_bubble != null)
+        {
+            Next_bubble.SetActive(false);
+        }
 
-        if (currentNPC.npcId == 1)
-        {
-            virtualCamera.LookAt = npc_1.transform;
-        }
-        if (currentNPC.npcId == 2)
-        {
-            virtualCamera.LookAt = npc_2.transform;
-        }
-        if (currentNPC.npcId == 3)
-        {
-            virtualCamera.LookAt = npc_3.transform;
-        }
         ShowDialogue();
-
     }
 
     public void ShowDialogue()
@@ -141,6 +135,10 @@ public class DialogueManager : MonoBehaviour
                 speakerNameText.text = currentDialogue.speakerName;
             }
             isTyping = true;
+            if (Next_bubble != null)
+            {
+                Next_bubble.SetActive(false);
+            }
             if (typewriterEffect != null)
             {
                 typewriterEffect.StartTyping(currentDialogue.content, currentNPC);
@@ -151,7 +149,6 @@ public class DialogueManager : MonoBehaviour
             ShowOptions();
         }
     }
-
 
 
 
@@ -197,6 +194,7 @@ public class DialogueManager : MonoBehaviour
 
     public void NextDialogue()
     {
+        Debug.Log("Next Dialogue");
         if (currentConversation != null && currentDialogueIndex < currentConversation.dialogues.Length - 1)
         {
             currentDialogueIndex++;
@@ -227,16 +225,33 @@ public class DialogueManager : MonoBehaviour
             {
                 onConversationEndHouse.Invoke();
             }
-            virtualCamera.LookAt = null;
         }
 
         Debug.Log("Conversación finalizada");
     }
 
-    public void SelectOption()
+    /* public void SelectOption()
+     {
+         dialogueInterface.SetActive(false);
+         diceInterface.SetActive(true);
+         diceManager.ResetUI();
+     }*/
+
+    public void OnTypingComplete()
     {
-        dialogueInterface.SetActive(false);
-        diceInterface.SetActive(true);
-        diceManager.ResetUI();
+        isTyping = false;
+        if (Next_bubble != null)
+        {
+            Next_bubble.SetActive(true);
+        }
     }
 }
+
+[System.Serializable]
+public class Dialogue
+{
+    public string speakerName;
+    [TextArea(4, 4)]
+    public string content;
+}
+

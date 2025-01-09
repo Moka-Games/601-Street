@@ -9,13 +9,14 @@ public class TypewriterEffect : MonoBehaviour
     private TextMeshProUGUI textComponent;
     private Coroutine typingCoroutine;
     private string processedText = "";
-
     private NPC currentNPC;
+    private DialogueManager dialogueManager;
 
     void Awake()
     {
         textComponent = GetComponent<TextMeshProUGUI>();
         letterDelay = defaultLetterDelay;
+        dialogueManager = FindAnyObjectByType<DialogueManager>();
     }
 
     public void StartTyping(string textToWrite, NPC npc)
@@ -58,11 +59,16 @@ public class TypewriterEffect : MonoBehaviour
                     continue;
                 }
             }
-
             textComponent.text += textToWrite[index];
             processedText += textToWrite[index];
             index++;
             yield return new WaitForSeconds(letterDelay);
+        }
+
+        // Llamamos a OnTypingComplete cuando termine de escribir todo el texto
+        if (dialogueManager != null)
+        {
+            dialogueManager.OnTypingComplete();
         }
     }
 
@@ -73,7 +79,6 @@ public class TypewriterEffect : MonoBehaviour
         {
             string action = parts[0].Trim();
             string parameter = parts[1].Trim();
-
             switch (action)
             {
                 case "speed":
