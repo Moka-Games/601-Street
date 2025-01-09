@@ -14,7 +14,7 @@ public class NPC : MonoBehaviour
     private bool InteractionEnded = false;
 
     public UnityEvent onObjectDelivered;
-
+    
     private void Awake()
     {
         animator = GetComponent<Animator>();

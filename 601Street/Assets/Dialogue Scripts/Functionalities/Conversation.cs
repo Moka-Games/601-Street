@@ -1,6 +1,7 @@
+using UnityEngine.Events;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Conversation", menuName = "Dialogue/Conversation")]
+[CreateAssetMenu(fileName = "NewConversation", menuName = "Dialogue/Conversation")]
 public class Conversation : ScriptableObject
 {
     public Dialogue[] dialogues;

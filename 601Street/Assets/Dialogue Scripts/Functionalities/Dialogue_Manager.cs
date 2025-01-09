@@ -83,11 +83,9 @@ public class DialogueManager : MonoBehaviour
                         typewriterEffect.StopTyping();
                     }
                     isTyping = false;
-                    // Ya no activamos Next_bubble aquí, ya que es una interrupción manual
                 }
                 else
                 {
-                    // Desactivamos Next_bubble al pasar al siguiente diálogo
                     if (Next_bubble != null)
                     {
                         Next_bubble.SetActive(false);
@@ -187,10 +185,25 @@ public class DialogueManager : MonoBehaviour
     {
         if (currentConversation != null && optionIndex < currentConversation.dialogueOptions.Length)
         {
-            Conversation nextConversation = currentConversation.dialogueOptions[optionIndex].nextDialogue;
-            StartConversation(nextConversation, currentNPC);
+            DialogueOption selectedOption = currentConversation.dialogueOptions[optionIndex];
+
+            if (!string.IsNullOrEmpty(selectedOption.actionId))
+            {
+                ActionController.Instance.InvokeAction(selectedOption.actionId);
+            }
+
+            Conversation nextConversation = selectedOption.nextDialogue;
+            if (nextConversation != null)
+            {
+                StartConversation(nextConversation, currentNPC);
+            }
+            else
+            {
+                EndConversation();
+            }
         }
     }
+
 
     public void NextDialogue()
     {
@@ -254,4 +267,3 @@ public class Dialogue
     [TextArea(4, 4)]
     public string content;
 }
-
