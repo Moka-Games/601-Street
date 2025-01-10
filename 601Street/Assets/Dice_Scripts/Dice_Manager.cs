@@ -50,11 +50,19 @@ public class Dice_Manager : MonoBehaviour
 
     private void Start()
     {
+        diceInferface.SetActive(false);
+
+
         bonus1Object.SetActive(bonus1Activated);
         bonus2Object.SetActive(bonus2Activated);
         bonus3Object.SetActive(bonus3Activated);
 
         ResetUI();
+    }
+
+    private void FixedUpdate()
+    {
+        SetDifficultyClass(currentDifficultyClass);
     }
 
     public void SetDifficultyClass(int difficultyClass)

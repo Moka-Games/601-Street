@@ -8,6 +8,8 @@ public class DialogueOption : ScriptableObject
 {
     public string optionText;
     public Conversation nextDialogue;
-    public string actionId; 
+    public string actionId;
+    public int difficultyClass;
+    public bool requiresDiceRoll;
 
 }

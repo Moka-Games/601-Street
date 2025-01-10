@@ -31,12 +31,12 @@ public class DialogueManager : MonoBehaviour
     public GameObject npc_2;
     public GameObject npc_3;
 
-    /*[Header("Dice Protoype Interface Variables")]
+    [Header("Dice Protoype Interface Variables")]
     [SerializeField] private Dice_Manager diceManager;
     [SerializeField] private GameObject diceInterface;
     [SerializeField] private GameObject dialogueInterface;
     public GameObject failObject;
-    public GameObject sucessObject;*/
+    public GameObject sucessObject;
 
 
     void Awake()
@@ -53,8 +53,8 @@ public class DialogueManager : MonoBehaviour
 
     void Start()
     {
-        //failObject.SetActive(false);
-        //sucessObject.SetActive(false);
+        failObject.SetActive(false);
+        sucessObject.SetActive(false);
 
         if (dialogueUI != null)
         {
@@ -189,8 +189,22 @@ public class DialogueManager : MonoBehaviour
 
             if (!string.IsNullOrEmpty(selectedOption.actionId))
             {
-                //Aquí es donde invokamos una acción en base al actionID de contenga el scriptable object que hayamos usado para esta opción de diálogo
-                ActionController.Instance.InvokeAction(selectedOption.actionId);
+                if (selectedOption.requiresDiceRoll)
+                {
+                    // Configurar lógica de tirada de dados
+                    SelectDiceOption();
+                    diceManager.SetDifficultyClass(selectedOption.difficultyClass);
+
+                    diceManager.OnRollComplete = (isSuccess) =>
+                    {
+                        ActionController.Instance.InvokeAction(selectedOption.actionId, isSuccess);
+                    };
+                }
+                else
+                {
+                    // Ejecutar acción estándar
+                    ActionController.Instance.InvokeAction(selectedOption.actionId);
+                }
             }
 
             Conversation nextConversation = selectedOption.nextDialogue;
@@ -204,6 +218,7 @@ public class DialogueManager : MonoBehaviour
             }
         }
     }
+
 
 
     public void NextDialogue()
@@ -241,12 +256,12 @@ public class DialogueManager : MonoBehaviour
         Debug.Log("Conversación finalizada");
     }
 
-    /* public void SelectOption()
-     {
-         dialogueInterface.SetActive(false);
-         diceInterface.SetActive(true);
-         diceManager.ResetUI();
-     }*/
+    public void SelectDiceOption()
+    {
+        dialogueInterface.SetActive(false);
+        diceInterface.SetActive(true);
+        diceManager.ResetUI();
+    }
 
     public void OnTypingComplete()
     {

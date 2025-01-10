@@ -14,8 +14,14 @@ public class ActionController : MonoBehaviour
         //Aquí registro acciones, las cuales pueden estar declaradas en el propio script o en un ajeno
         //En este caso "SayHi" es el ID que le damos a la acción
         //Si ponemos este ID en el valor actionID del scriptable object de la "DialogueOption", se realizará esa acción al acabar la conversación
+
         ActionController.Instance.RegisterAction("SayHi", DialogueManager.Instance.RandomFunction);
-        ActionController.Instance.RegisterAction("SayBye", SayBye);
+
+        //En caso de que se haya configurado una DialogueOption con requiresDiceRoll, y el actionId esté referenciado en una dialogueOption
+        //esta acción pasará a actuar como receptor, y hará diferentes acciones dependiendo del valor que el dado devuelva ("Éxito" o "Fallo")
+
+        //Ejemplo : 
+        
     }
     void Awake()
     {
@@ -41,24 +47,46 @@ public class ActionController : MonoBehaviour
         }
     }
 
-    public void InvokeAction(string actionId)
+    public void InvokeAction(string actionId, bool? isSuccess = null)
     {
         if (actionMap.TryGetValue(actionId, out var action))
         {
-            action?.Invoke();
+            // Acciones estándar (sin tirada de dado)
+            if (!isSuccess.HasValue)
+            {
+                action?.Invoke();
+            }
+            else
+            {
+                // Evaluar éxito o fallo basado en el resultado del dado
+                if (isSuccess.Value)
+                {
+                    Debug.Log($"Action Success for ID: {actionId}");
+                    OnActionSuccess(actionId);
+                }
+                else
+                {
+                    Debug.Log($"Action Fail for ID: {actionId}");
+                    OnActionFail(actionId);
+                }
+            }
         }
         else
         {
-            Debug.LogWarning($"No action found for ID {actionId}");
+            Debug.LogWarning($"No action registered for ID: {actionId}");
         }
     }
 
-    public void SayHi()
+    // Acción en caso de éxito
+    private void OnActionSuccess(string actionId)
     {
-        print("Hi");
+        Debug.Log($"Performing success-specific action for {actionId}");
     }
-    public void SayBye()
+
+    // Acción en caso de fallo
+    private void OnActionFail(string actionId)
     {
-        print("Bye");
+        Debug.Log($"Performing fail-specific action for {actionId}");
     }
+
 }
