@@ -38,6 +38,9 @@ public class DialogueManager : MonoBehaviour
     public GameObject failObject;
     public GameObject sucessObject;
 
+    private bool? diceRollResult = null; // Almacena el resultado de la tirada de dado
+    private int selectedOptionIndex = -1; // Almacenará el índice de la opción seleccionada
+
 
     void Awake()
     {
@@ -164,7 +167,7 @@ public class DialogueManager : MonoBehaviour
                 if (i < currentConversation.dialogueOptions.Length)
                 {
                     optionButtons[i].gameObject.SetActive(true);
-                    optionButtons[i].GetComponentInChildren<TMP_Text>().text = currentConversation.dialogueOptions[i].optionText; // Aquí se usa optionText
+                    optionButtons[i].GetComponentInChildren<TMP_Text>().text = currentConversation.dialogueOptions[i].optionText;
                     int optionIndex = i;
                     optionButtons[i].onClick.RemoveAllListeners();
                     optionButtons[i].onClick.AddListener(() => SelectOption(optionIndex));
@@ -183,31 +186,34 @@ public class DialogueManager : MonoBehaviour
 
     public void SelectOption(int optionIndex)
     {
+        // Guardamos el índice de la opción seleccionada
+        selectedOptionIndex = optionIndex;
+
         if (currentConversation != null && optionIndex < currentConversation.dialogueOptions.Length)
         {
             DialogueOption selectedOption = currentConversation.dialogueOptions[optionIndex];
 
             if (!string.IsNullOrEmpty(selectedOption.actionId))
             {
-                if (selectedOption.requiresDiceRoll) // Aquí se usa requiresDiceRoll
+                if (selectedOption.requiresDiceRoll)
                 {
-                    // Configurar lógica de tirada de dados
                     SelectDiceOption();
-                    diceManager.SetDifficultyClass(selectedOption.difficultyClass); // Aquí se usa difficultyClass
+                    diceManager.SetDifficultyClass(selectedOption.difficultyClass);
 
                     diceManager.OnRollComplete = (isSuccess) =>
                     {
-                        ActionController.Instance.InvokeAction(selectedOption.actionId, isSuccess); // Aquí se usa actionId
+                        diceRollResult = isSuccess;  // Guardar el resultado del dado
                     };
                 }
                 else
                 {
                     // Ejecutar acción estándar
-                    ActionController.Instance.InvokeAction(selectedOption.actionId); // Aquí se usa actionId
+                    ActionController.Instance.InvokeAction(selectedOption.actionId);
                 }
             }
 
-            Conversation nextConversation = selectedOption.nextDialogue; // Aquí se usa nextDialogue
+            // Guardamos la referencia de la próxima conversación
+            Conversation nextConversation = selectedOption.nextDialogue;
             if (nextConversation != null)
             {
                 StartConversation(nextConversation, currentNPC);
@@ -218,8 +224,6 @@ public class DialogueManager : MonoBehaviour
             }
         }
     }
-
-
 
 
     public void NextDialogue()
@@ -276,6 +280,27 @@ public class DialogueManager : MonoBehaviour
     public void RandomFunction()
     {
         print("I like cucumbers");
+    }
+
+    public void OnDiceRollCompleteButtonPressed()
+    {
+        // Verificar si se ha seleccionado una opción y si hay un resultado de dado
+        if (selectedOptionIndex != -1 && diceRollResult.HasValue && currentConversation != null && selectedOptionIndex < currentConversation.dialogueOptions.Length)
+        {
+            DialogueOption selectedOption = currentConversation.dialogueOptions[selectedOptionIndex];
+
+            // Ejecutamos la acción basada en el resultado del dado
+            ActionController.Instance.InvokeAction(selectedOption.actionId, diceRollResult.Value);
+
+            diceRollResult = null;
+            selectedOptionIndex = -1;  
+        }
+        else
+        {
+            Debug.LogWarning("No dice roll result available or no option selected.");
+        }
+
+        diceInterface.SetActive(false);
     }
 }
 

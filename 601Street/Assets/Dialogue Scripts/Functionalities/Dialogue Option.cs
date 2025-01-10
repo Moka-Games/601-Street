@@ -8,6 +8,7 @@ public class DialogueOption
     public bool requiresDiceRoll;      // Determina si se requiere una tirada de dado
     public int difficultyClass;        // Clase de dificultad para la tirada de dado
     public Conversation nextDialogue;  // El siguiente diálogo o conversación que se inicia después de seleccionar esta opción
+    public bool? isSuccess = null;
 
     // Constructor
     public DialogueOption(string optionText, string actionId, bool requiresDiceRoll, int difficultyClass, Conversation nextDialogue)

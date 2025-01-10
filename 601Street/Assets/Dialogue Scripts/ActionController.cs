@@ -8,8 +8,6 @@ public class ActionController : MonoBehaviour
 
     private Dictionary<string, DialogueAction> actionMap = new Dictionary<string, DialogueAction>();
 
-
-
     void Start()
     {
         //DESCRIPCIÓN FUNCIONALIDAD

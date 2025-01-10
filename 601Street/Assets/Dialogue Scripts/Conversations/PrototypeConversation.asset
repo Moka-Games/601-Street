@@ -14,23 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dialogues:
   - speakerName: Pipo
-    content: Hola! me llamo Pipo y tengo retraso mental, espero que tengas un dia
-      estupendo.
+    content: Hola! me llamo Pipo, mis mayores enemigos son la Florida y el estado
+      de israel
   - speakerName: Pipo
     content: Adios!
   dialogueOptions:
   - optionText: Option_1
-    actionId: OpenChest
+    actionId: Option_1
     requiresDiceRoll: 1
     difficultyClass: 5
     nextDialogue: {fileID: 0}
   - optionText: Option 2
     actionId: Option_2
     requiresDiceRoll: 1
-    difficultyClass: 0
+    difficultyClass: 15
     nextDialogue: {fileID: 0}
   - optionText: Option 3
     actionId: Option_3
     requiresDiceRoll: 1
-    difficultyClass: 0
+    difficultyClass: 20
     nextDialogue: {fileID: 0}

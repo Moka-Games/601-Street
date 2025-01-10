@@ -60,11 +60,6 @@ public class Dice_Manager : MonoBehaviour
         ResetUI();
     }
 
-    private void FixedUpdate()
-    {
-        SetDifficultyClass(currentDifficultyClass);
-    }
-
     public void SetDifficultyClass(int difficultyClass)
     {
         currentDifficultyClass = difficultyClass;
