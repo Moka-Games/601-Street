@@ -25,8 +25,8 @@ public class DialogueManager : MonoBehaviour
     public bool isTyping = false;
 
     public UnityEvent onConversationEnd;
-    public UnityEvent onConversationEndHouse;
 
+    //Por si hay hasta 3 NPCs (Aún no es escalable obviamente)
     public GameObject npc_1;
     public GameObject npc_2;
     public GameObject npc_3;
@@ -189,6 +189,7 @@ public class DialogueManager : MonoBehaviour
 
             if (!string.IsNullOrEmpty(selectedOption.actionId))
             {
+                //Aquí es donde invokamos una acción en base al actionID de contenga el scriptable object que hayamos usado para esta opción de diálogo
                 ActionController.Instance.InvokeAction(selectedOption.actionId);
             }
 
@@ -234,10 +235,7 @@ public class DialogueManager : MonoBehaviour
             currentNPC.SetInteracted();
             currentNPC.InvokeOnConversationEnd();
             onConversationEnd.Invoke();
-            if (currentNPC.npcId == 2)
-            {
-                onConversationEndHouse.Invoke();
-            }
+            
         }
 
         Debug.Log("Conversación finalizada");
