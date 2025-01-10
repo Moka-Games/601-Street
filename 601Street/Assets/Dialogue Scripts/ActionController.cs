@@ -20,9 +20,9 @@ public class ActionController : MonoBehaviour
         //
 
         RegisterAction("Option_1", new DialogueAction(
-        () => Debug.Log("Opción 1 respuesta estandard"),
-        () => Debug.Log("Opción 1 respuesta de éxito"),
-        () => Debug.Log("Opción 1 respuesta de fallo")
+        () => Actions_Script.Option1_Action1(),
+        () => Actions_Script.Option2_Action2(),
+        () => Actions_Script.Option3_Action3()
     ));
 
         RegisterAction("Option_2", new DialogueAction(
@@ -85,5 +85,4 @@ public class ActionController : MonoBehaviour
             Debug.LogWarning($"No action registered for ID: {actionId}");
         }
     }
-
 }
