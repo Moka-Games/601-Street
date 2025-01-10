@@ -19,6 +19,18 @@ MonoBehaviour:
   - speakerName: Pipo
     content: Adios!
   dialogueOptions:
-  - {fileID: 11400000, guid: aa80955200bf7e4448569e2ae77fc65f, type: 2}
-  - {fileID: 11400000, guid: e98b264db5dea2b4ab0cd1d917c9d7ad, type: 2}
-  - {fileID: 11400000, guid: 51e07ee5f28c1b74d80bb6b9dcbbd4b2, type: 2}
+  - optionText: Option_1
+    actionId: OpenChest
+    requiresDiceRoll: 1
+    difficultyClass: 5
+    nextDialogue: {fileID: 0}
+  - optionText: Option 2
+    actionId: Option_2
+    requiresDiceRoll: 1
+    difficultyClass: 0
+    nextDialogue: {fileID: 0}
+  - optionText: Option 3
+    actionId: Option_3
+    requiresDiceRoll: 1
+    difficultyClass: 0
+    nextDialogue: {fileID: 0}

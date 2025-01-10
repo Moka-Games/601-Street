@@ -6,22 +6,38 @@ public class ActionController : MonoBehaviour
 {
     public static ActionController Instance { get; private set; }
 
-    private Dictionary<string, Action> actionMap = new Dictionary<string, Action>();
+    private Dictionary<string, DialogueAction> actionMap = new Dictionary<string, DialogueAction>();
+
 
 
     void Start()
     {
-        //Aquí registro acciones, las cuales pueden estar declaradas en el propio script o en un ajeno
-        //En este caso "SayHi" es el ID que le damos a la acción
-        //Si ponemos este ID en el valor actionID del scriptable object de la "DialogueOption", se realizará esa acción al acabar la conversación
+        //DESCRIPCIÓN FUNCIONALIDAD
+        // 
+        //Se registración acciones según los parámtros 1. Acción Estandard, 2.Acción cuando el dado devuelve éxito
+        //3. Acción cuando el dado devuelve fallo
+        //En este caso ("Opcion_1" es el actionID que le damos a nuestra acción, de forma que si configuramos nuestra
+        //Dialogue Option con este Id se realizará una de las 3 acciones dependiendo del contexto
+        //
+        //
 
-        ActionController.Instance.RegisterAction("SayHi", DialogueManager.Instance.RandomFunction);
+        RegisterAction("Option_1", new DialogueAction(
+        () => Debug.Log("Opción 1 respuesta estandard"),
+        () => Debug.Log("Opción 1 respuesta de éxito"),
+        () => Debug.Log("Opción 1 respuesta de fallo")
+    ));
 
-        //En caso de que se haya configurado una DialogueOption con requiresDiceRoll, y el actionId esté referenciado en una dialogueOption
-        //esta acción pasará a actuar como receptor, y hará diferentes acciones dependiendo del valor que el dado devuelva ("Éxito" o "Fallo")
+        RegisterAction("Option_2", new DialogueAction(
+            () => Debug.Log("Opción 2 respuesta estandard"),
+            () => Debug.Log("Opción 2 respuesta de éxito"),
+            () => Debug.Log("Opción 2 respuesta de fallo")
+        ));
+        RegisterAction("Option_3", new DialogueAction(
+            () => Debug.Log("Opción 3 respuesta estandard"),
+            () => Debug.Log("Opción 3 respuesta de éxito"),
+            () => Debug.Log("Opción 3 respuesta de fallo")
+        ));
 
-        //Ejemplo : 
-        
     }
     void Awake()
     {
@@ -35,15 +51,16 @@ public class ActionController : MonoBehaviour
         }
     }
 
-    public void RegisterAction(string actionId, Action action)
+    public void RegisterAction(string actionId, DialogueAction action)
     {
         if (!actionMap.ContainsKey(actionId))
         {
             actionMap[actionId] = action;
+            Debug.Log($"Action registered: {actionId}");
         }
         else
         {
-            Debug.LogWarning($"Action with ID {actionId} already registered.");
+            Debug.LogWarning($"Action already registered for ID: {actionId}");
         }
     }
 
@@ -51,42 +68,24 @@ public class ActionController : MonoBehaviour
     {
         if (actionMap.TryGetValue(actionId, out var action))
         {
-            // Acciones estándar (sin tirada de dado)
-            if (!isSuccess.HasValue)
+            // Ejecuta la acción dependiendo del éxito o fracaso
+            if (isSuccess == true)
             {
-                action?.Invoke();
+                action.Execute(isSuccess); // Acción para éxito
+            }
+            else if (isSuccess == false)
+            {
+                action.Execute(isSuccess); // Acción para fallo
             }
             else
             {
-                // Evaluar éxito o fallo basado en el resultado del dado
-                if (isSuccess.Value)
-                {
-                    Debug.Log($"Action Success for ID: {actionId}");
-                    OnActionSuccess(actionId);
-                }
-                else
-                {
-                    Debug.Log($"Action Fail for ID: {actionId}");
-                    OnActionFail(actionId);
-                }
+                action.Execute(); // Acción predeterminada (si no se tira el dado)
             }
         }
         else
         {
             Debug.LogWarning($"No action registered for ID: {actionId}");
         }
-    }
-
-    // Acción en caso de éxito
-    private void OnActionSuccess(string actionId)
-    {
-        Debug.Log($"Performing success-specific action for {actionId}");
-    }
-
-    // Acción en caso de fallo
-    private void OnActionFail(string actionId)
-    {
-        Debug.Log($"Performing fail-specific action for {actionId}");
     }
 
 }

@@ -164,7 +164,7 @@ public class DialogueManager : MonoBehaviour
                 if (i < currentConversation.dialogueOptions.Length)
                 {
                     optionButtons[i].gameObject.SetActive(true);
-                    optionButtons[i].GetComponentInChildren<TMP_Text>().text = currentConversation.dialogueOptions[i].optionText;
+                    optionButtons[i].GetComponentInChildren<TMP_Text>().text = currentConversation.dialogueOptions[i].optionText; // Aquí se usa optionText
                     int optionIndex = i;
                     optionButtons[i].onClick.RemoveAllListeners();
                     optionButtons[i].onClick.AddListener(() => SelectOption(optionIndex));
@@ -189,25 +189,25 @@ public class DialogueManager : MonoBehaviour
 
             if (!string.IsNullOrEmpty(selectedOption.actionId))
             {
-                if (selectedOption.requiresDiceRoll)
+                if (selectedOption.requiresDiceRoll) // Aquí se usa requiresDiceRoll
                 {
                     // Configurar lógica de tirada de dados
                     SelectDiceOption();
-                    diceManager.SetDifficultyClass(selectedOption.difficultyClass);
+                    diceManager.SetDifficultyClass(selectedOption.difficultyClass); // Aquí se usa difficultyClass
 
                     diceManager.OnRollComplete = (isSuccess) =>
                     {
-                        ActionController.Instance.InvokeAction(selectedOption.actionId, isSuccess);
+                        ActionController.Instance.InvokeAction(selectedOption.actionId, isSuccess); // Aquí se usa actionId
                     };
                 }
                 else
                 {
                     // Ejecutar acción estándar
-                    ActionController.Instance.InvokeAction(selectedOption.actionId);
+                    ActionController.Instance.InvokeAction(selectedOption.actionId); // Aquí se usa actionId
                 }
             }
 
-            Conversation nextConversation = selectedOption.nextDialogue;
+            Conversation nextConversation = selectedOption.nextDialogue; // Aquí se usa nextDialogue
             if (nextConversation != null)
             {
                 StartConversation(nextConversation, currentNPC);
@@ -218,6 +218,7 @@ public class DialogueManager : MonoBehaviour
             }
         }
     }
+
 
 
 
