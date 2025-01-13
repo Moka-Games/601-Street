@@ -20,9 +20,9 @@ public class ActionController : MonoBehaviour
         //
 
         RegisterAction("Option_1", new DialogueAction(
-        () => Actions_Script.Option1_Action1(),
-        () => Actions_Script.Option2_Action2(),
-        () => Actions_Script.Option3_Action3()
+        () => Actions_Script.Instance.Option1_Action1(),
+        () => Actions_Script.Instance.Option2_Action2(),
+        () => Actions_Script.Instance.Option3_Action3()
     ));
 
         RegisterAction("Option_2", new DialogueAction(
