@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Events;
+
 
 public class LockPick : MonoBehaviour
 {
@@ -28,6 +30,8 @@ public class LockPick : MonoBehaviour
     private float keyPressTime = 0;
 
     private bool movePick = true;
+
+    public UnityEvent OnUnlocked;
 
     void Start()
     {
@@ -76,7 +80,7 @@ public class LockPick : MonoBehaviour
             if (eulerAngle < unlockRange.y && eulerAngle > unlockRange.x)
             {
                 Debug.Log("Unlocked!");
-                newLock();
+                OnUnlocked.Invoke();
 
                 movePick = true;
                 keyPressTime = 0;
@@ -111,4 +115,5 @@ public class LockPick : MonoBehaviour
             difficultyText.text = "Fácil";
         }
     }
+
 }
