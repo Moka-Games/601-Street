@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class LockPick : MonoBehaviour
 {
@@ -11,8 +13,13 @@ public class LockPick : MonoBehaviour
     public float maxAngle = 90;
     public float lockSpeed = 10;
 
-    [Range(1,25)]
+    [Range(1, 25)]
     public float lockRange = 10;
+    // Representa la dificultad de la cerradura
+    // O lo que es lo mismo
+    // El rango de tolerancia para el desbloqueo
+
+    public TMP_Text difficultyText; 
 
     private float eulerAngle;
     private float unlockAngle;
@@ -22,18 +29,16 @@ public class LockPick : MonoBehaviour
 
     private bool movePick = true;
 
-    // Start is called before the first frame update
     void Start()
     {
         newLock();
     }
 
-    // Update is called once per frame
     void Update()
     {
         transform.localPosition = pickPosition.position;
 
-        if(movePick)
+        if (movePick)
         {
             Vector3 dir = Input.mousePosition - cam.WorldToScreenPoint(transform.position);
 
@@ -48,12 +53,12 @@ public class LockPick : MonoBehaviour
             transform.rotation = rotateTo;
         }
 
-        if(Input.GetKeyDown(KeyCode.D))
+        if (Input.GetKeyDown(KeyCode.D))
         {
             movePick = false;
             keyPressTime = 1;
         }
-        if(Input.GetKeyUp(KeyCode.D))
+        if (Input.GetKeyUp(KeyCode.D))
         {
             movePick = true;
             keyPressTime = 0;
@@ -63,10 +68,10 @@ public class LockPick : MonoBehaviour
         float lockRotation = ((percentage / 100) * maxAngle) * keyPressTime;
         float maxRotation = (percentage / 100) * maxAngle;
 
-        float lockLerp = Mathf.Lerp(innerLock.eulerAngles.z, lockRotation, Time.deltaTime * lockSpeed);
+        float lockLerp = Mathf.LerpAngle(innerLock.eulerAngles.z, lockRotation, Time.deltaTime * lockSpeed);
         innerLock.eulerAngles = new Vector3(0, 0, lockLerp);
 
-        if(lockLerp >= maxRotation -1)
+        if (lockLerp >= maxRotation - 1)
         {
             if (eulerAngle < unlockRange.y && eulerAngle > unlockRange.x)
             {
@@ -88,5 +93,22 @@ public class LockPick : MonoBehaviour
     {
         unlockAngle = Random.Range(-maxAngle + lockRange, maxAngle - lockRange);
         unlockRange = new Vector2(unlockAngle - lockRange, unlockAngle + lockRange);
+        UpdateDifficultyText(); 
+    }
+
+    void UpdateDifficultyText()
+    {
+        if (lockRange <= 10)
+        {
+            difficultyText.text = "Dificil";
+        }
+        else if (lockRange > 10 && lockRange <= 15)
+        {
+            difficultyText.text = "Medio";
+        }
+        else if (lockRange > 15 && lockRange <= 25)
+        {
+            difficultyText.text = "Fácil";
+        }
     }
 }
