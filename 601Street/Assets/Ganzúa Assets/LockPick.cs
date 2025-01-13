@@ -53,12 +53,12 @@ public class LockPick : MonoBehaviour
             transform.rotation = rotateTo;
         }
 
-        if (Input.GetKeyDown(KeyCode.D))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             movePick = false;
             keyPressTime = 1;
         }
-        if (Input.GetKeyUp(KeyCode.D))
+        if (Input.GetKeyUp(KeyCode.E))
         {
             movePick = true;
             keyPressTime = 0;
