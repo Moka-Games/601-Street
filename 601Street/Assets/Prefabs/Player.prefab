@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7637152430803431070}
   - component: {fileID: 5886342011672503638}
   - component: {fileID: -769256562157994135}
+  - component: {fileID: 4884764826485700294}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -170,6 +171,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rightShoulder_Camera: {fileID: 0}
   leftShoulder_Camera: {fileID: 0}
+--- !u!114 &4884764826485700294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5831046738247469719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cacb25102a1c27439989f90350db046, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  telefonoUI: {fileID: 0}
+  telefonoHUD: {fileID: 0}
+  feedbackSlider: {fileID: 0}
+  tiempoRequerido: 1
 --- !u!1 &6173944713735241332
 GameObject:
   m_ObjectHideFlags: 0
