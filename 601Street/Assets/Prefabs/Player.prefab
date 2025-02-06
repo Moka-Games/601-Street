@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3115345725258227943}
   - component: {fileID: 7637152430803431070}
   - component: {fileID: 5886342011672503638}
+  - component: {fileID: -769256562157994135}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -108,7 +109,7 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 1
+  m_Height: 1.8
   m_Radius: 0.5
   m_SlopeLimit: 45
   m_StepOffset: 0.3
@@ -155,6 +156,20 @@ CapsuleCollider:
   m_Height: 1.9999999
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-769256562157994135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5831046738247469719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f13a092d716a3884eae03adf66bbef24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rightShoulder_Camera: {fileID: 0}
+  leftShoulder_Camera: {fileID: 0}
 --- !u!1 &6173944713735241332
 GameObject:
   m_ObjectHideFlags: 0
