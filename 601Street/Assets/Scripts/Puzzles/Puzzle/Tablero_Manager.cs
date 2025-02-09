@@ -22,7 +22,7 @@ public class Tablero_Manager : MonoBehaviour
         Debug.Log("Casillas registradas en el tablero:");
         foreach (Vector2 pos in casillasPosiciones)
         {
-            Debug.Log(pos);
+            Debug.Log($"Casilla en posición: {pos}");
         }
     }
 

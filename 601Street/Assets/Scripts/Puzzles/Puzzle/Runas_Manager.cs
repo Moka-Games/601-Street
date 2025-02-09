@@ -10,9 +10,10 @@ public class Runas_Manager : MonoBehaviour
     [System.Serializable]
     public class PiecePair
     {
-        public Vector2 position1;
-        public Vector2 position2;
+        public Vector2 position1; // Posición de la primera pieza
+        public Vector2 position2; // Posición de la segunda pieza
         public bool isMissingPiece; // Si es true, falta la segunda pieza
+        public GameObject prefab; // Prefab para ambas piezas del par
     }
 
     public List<PiecePair> piecePairs = new List<PiecePair>(); 
@@ -39,29 +40,48 @@ public class Runas_Manager : MonoBehaviour
         {
             Debug.Log($"Generando par en posiciones: {pair.position1} y {pair.position2}");
 
-            SpawnPiece(pair.position1);
+            // Verificar si las posiciones existen en el tablero
+            if (!tablero.CasillaExiste(pair.position1, 0.01f))
+            {
+                Debug.LogWarning($"Posición {pair.position1} no es válida en el tablero.");
+            }
+            if (!pair.isMissingPiece && !tablero.CasillaExiste(pair.position2, 0.01f))
+            {
+                Debug.LogWarning($"Posición {pair.position2} no es válida en el tablero.");
+            }
 
+            // Instanciar la primera pieza
+            SpawnPiece(pair.position1, pair.prefab);
+
+            // Instanciar la segunda pieza si no falta
             if (!pair.isMissingPiece)
             {
-                SpawnPiece(pair.position2);
+                SpawnPiece(pair.position2, pair.prefab);
             }
         }
     }
-
-    void SpawnPiece(Vector2 position)
+    void SpawnPiece(Vector2 position, GameObject prefab)
     {
-        Debug.Log($"Verificando posición: {position}");
+        if (tablero == null)
+        {
+            Debug.LogError("Tablero_Manager no asignado en Runas_Manager");
+            return;
+        }
+
+        // Verificar si la posición es válida en el tablero
         if (!tablero.CasillaExiste(position, 0.01f))
         {
             Debug.LogWarning($"Posición {position} no es válida en el tablero.");
             return;
         }
 
+        // Verificar si ya existe una pieza en esa posición
         if (!placedPieces.ContainsKey(position))
         {
-            GameObject newPiece = Instantiate(piecePrefab, new Vector3(position.x, position.y, 0), Quaternion.identity, piecesParent);
+            // Instanciar la pieza
+            GameObject newPiece = Instantiate(prefab, new Vector3(position.x, position.y, 0), Quaternion.identity, piecesParent);
             placedPieces.Add(position, newPiece);
-            Debug.Log($"Pieza instanciada en {position}");
+            Debug.Log($"Pieza instanciada en {position} con prefab {prefab.name}");
         }
         else
         {
