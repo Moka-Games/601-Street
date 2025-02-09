@@ -7,7 +7,6 @@ public class PlayerController : MonoBehaviour
     public float speed = 5f;
     public float sprintSpeed = 8f;
     public float gravity = -9.81f;
-    public float jumpHeight = 1.5f;
 
     private Vector3 velocity;
 
