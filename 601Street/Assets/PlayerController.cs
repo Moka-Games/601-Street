@@ -4,44 +4,101 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float speed = 5f; // Velocidad de movimiento del jugador
-    public float gravity = -9.81f; // Gravedad
-    public float jumpHeight = 1.5f; // Altura del salto
+    public float speed = 5f;
+    public float sprintSpeed = 8f;
+    public float gravity = -9.81f;
+    public float jumpHeight = 1.5f;
 
-    private Vector3 velocity; // Almacena la velocidad actual del jugador
-    private bool isGrounded; // Indica si el jugador está en el suelo
+    private Vector3 velocity;
 
-    public CharacterController controller; // Referencia al componente CharacterController
-    public Transform groundCheck; // Objeto que detecta si el jugador está en el suelo
-    public float groundDistance = 0.4f; // Distancia para comprobar si el jugador toca el suelo
-    public LayerMask groundMask; // Capa para identificar el suelo
+    public CharacterController controller;
 
-    void Update()
+    private Animator animator;
+
+    private bool forwardPressed = false; 
+    private bool horizontalPressedAfterForward = false; 
+
+    void Start()
     {
-        // Verifica si el jugador está en el suelo
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-
-        if (isGrounded && velocity.y < 0)
+        animator = GetComponent<Animator>();
+        if (animator == null)
         {
-            velocity.y = -2f; // Estabiliza la gravedad cuando está en el suelo
+            Debug.LogWarning("Falta por asignar el animator");
         }
+    }
 
-        // Movimiento horizontal
+    void FixedUpdate()
+    {
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
-        Vector3 move = transform.right * x + transform.forward * z;
-        controller.Move(move * speed * Time.deltaTime);
+        Vector3 forward = Camera.main.transform.forward;
+        Vector3 right = Camera.main.transform.right;
 
-        // Salto
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        forward.y = 0f;
+        right.y = 0f;
+        forward.Normalize();
+        right.Normalize();
+
+        Vector3 move = right * x + forward * z;
+
+        float currentSpeed = speed;
+        if (z > 0 && Input.GetKey(KeyCode.LeftShift) && x == 0)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            currentSpeed = sprintSpeed;
+        }
+        else if (z < 0)
+        {
+            currentSpeed *= 0.7f;
         }
 
-        // Aplicar gravedad
+        controller.Move(move * currentSpeed * Time.deltaTime);
+
+        HandleRotation(x, z, move, forward);
+
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
     }
-}
 
+    private void HandleRotation(float x, float z, Vector3 move, Vector3 forward)
+    {
+        if (z > 0)
+        {
+            if (!forwardPressed)
+            {
+                forwardPressed = true; 
+                horizontalPressedAfterForward = false; 
+            }
+
+            if (x != 0 && forwardPressed)
+            {
+                horizontalPressedAfterForward = true; 
+            }
+
+            if (forwardPressed && horizontalPressedAfterForward)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(move);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+            }
+            else if (x == 0)
+            {
+                Quaternion toRotation = Quaternion.LookRotation(forward);
+                transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, Time.deltaTime * 10f);
+            }
+        }
+        else
+        {
+            if (z == 0)
+            {
+                forwardPressed = false; 
+                horizontalPressedAfterForward = false; 
+            }
+
+            if (x == 0)
+            {
+                Quaternion toRotation = Quaternion.LookRotation(forward);
+                transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, Time.deltaTime * 10f);
+            }
+        }
+    }
+}
