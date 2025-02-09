@@ -13,17 +13,11 @@ public class Tablero_Manager : MonoBehaviour
     }
 
     public List<CasillaData> casillasDefinidas = new List<CasillaData>(); // Lista de posiciones de las casillas
-    private List<Vector2> casillasPosiciones = new List<Vector2>(); // Lista interna de posiciones
+    public List<Vector2> casillasPosiciones = new List<Vector2>(); // Lista interna de posiciones
 
     void Start()
     {
         GenerarTablero();
-
-        Debug.Log("Casillas registradas en el tablero:");
-        foreach (Vector2 pos in casillasPosiciones)
-        {
-            Debug.Log($"Casilla en posición: {pos}");
-        }
     }
 
     void GenerarTablero()
