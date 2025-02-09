@@ -62,8 +62,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4952048292024640424}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.27854127, y: 0.18298577, z: -0.054148972, w: 0.9412752}
-  m_LocalPosition: {x: 42.540733, y: 25.81646, z: -28.652458}
+  m_LocalRotation: {x: 0, y: 0.97939235, z: 0, w: -0.20196699}
+  m_LocalPosition: {x: -4.649269, y: 10.9764595, z: -9.672461}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -254,6 +254,21 @@ PrefabInstance:
       propertyPath: m_TrackedObjectOffset.x
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1149950866661850070, guid: 9dac58f45c07b3746b9efd81aa516e96,
+        type: 3}
+      propertyPath: m_Damping
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1149950866661850070, guid: 9dac58f45c07b3746b9efd81aa516e96,
+        type: 3}
+      propertyPath: m_CameraRadius
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1149950866661850070, guid: 9dac58f45c07b3746b9efd81aa516e96,
+        type: 3}
+      propertyPath: m_DampingWhenOccluded
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1764399170353934030, guid: 9dac58f45c07b3746b9efd81aa516e96,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -419,6 +434,11 @@ PrefabInstance:
       propertyPath: m_Rigs.Array.data[2]
       value: 
       objectReference: {fileID: 4912072829362237431}
+    - target: {fileID: 4236621807912733428, guid: 9dac58f45c07b3746b9efd81aa516e96,
+        type: 3}
+      propertyPath: m_Orbits.Array.data[2].m_Height
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 4395339747713394932, guid: 9dac58f45c07b3746b9efd81aa516e96,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -682,6 +702,21 @@ PrefabInstance:
       propertyPath: m_TrackedObjectOffset.x
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 1149950866661850070, guid: 9dac58f45c07b3746b9efd81aa516e96,
+        type: 3}
+      propertyPath: m_Damping
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1149950866661850070, guid: 9dac58f45c07b3746b9efd81aa516e96,
+        type: 3}
+      propertyPath: m_CameraRadius
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1149950866661850070, guid: 9dac58f45c07b3746b9efd81aa516e96,
+        type: 3}
+      propertyPath: m_DampingWhenOccluded
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1764399170353934030, guid: 9dac58f45c07b3746b9efd81aa516e96,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -847,6 +882,11 @@ PrefabInstance:
       propertyPath: m_Rigs.Array.data[2]
       value: 
       objectReference: {fileID: 3336940288626467672}
+    - target: {fileID: 4236621807912733428, guid: 9dac58f45c07b3746b9efd81aa516e96,
+        type: 3}
+      propertyPath: m_Orbits.Array.data[2].m_Height
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 4395339747713394932, guid: 9dac58f45c07b3746b9efd81aa516e96,
         type: 3}
       propertyPath: m_LocalPosition.x
