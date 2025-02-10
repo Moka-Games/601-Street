@@ -1,6 +1,4 @@
 using Cinemachine;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Shoulder_Swap : MonoBehaviour
@@ -8,86 +6,110 @@ public class Shoulder_Swap : MonoBehaviour
     public CinemachineFreeLook rightShoulder_Camera;
     public CinemachineFreeLook leftShoulder_Camera;
 
-    private bool rightShoulder_IsActive = false;
-    private bool leftShoulder_IsActive = false;
+    private bool isRightShoulderActive = true;
 
-    void Start()
+    private void Start()
     {
-        rightShoulder_IsActive = true;
         InitializeCamera();
     }
 
-    void Update()
+    private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            if (rightShoulder_IsActive)
-            {
-                print("Enabling Left Shoulder Camera...");
-                Enable_LeftShoulder_Camera();
-                rightShoulder_IsActive = false;
-            }
-            else if (leftShoulder_IsActive)
-            {
-                print("Enabling Right Shoulder Camera...");
-                Enable_RightShoulder_Camera();
-                leftShoulder_IsActive = false;
-            }
-            else
-            {
-                Debug.LogError("Ningún bool en true");
-            }
+            SwapShoulders();
         }
+
+        // Sincronizar la rotación de las cámaras
+        SyncCameraRotation();
     }
 
-    public void Enable_LeftShoulder_Camera()
+    private void SwapShoulders()
     {
-        SetCameraPriority(11, leftShoulder_Camera);
-        SetCameraPriority(10, rightShoulder_Camera);
-        leftShoulder_IsActive = true;
+        isRightShoulderActive = !isRightShoulderActive;
 
-        AdjustTrackedObjectOffset(leftShoulder_Camera, -0.75f);
-    }
-
-    public void Enable_RightShoulder_Camera()
-    {
-        SetCameraPriority(11, rightShoulder_Camera);
-        SetCameraPriority(10, leftShoulder_Camera);
-        rightShoulder_IsActive = true;
-
-        AdjustTrackedObjectOffset(rightShoulder_Camera, 0.75f);
-    }
-
-    public void InitializeCamera()
-    {
-        if (rightShoulder_IsActive && rightShoulder_Camera != null)
+        if (isRightShoulderActive)
         {
+            print("Enabling Right Shoulder Camera...");
             Enable_RightShoulder_Camera();
-        }
-        else if (leftShoulder_IsActive && leftShoulder_Camera != null)
-        {
-            Enable_LeftShoulder_Camera();
         }
         else
         {
-            Debug.LogError("Ninguna cámara añadida al inspector");
+            print("Enabling Left Shoulder Camera...");
+            Enable_LeftShoulder_Camera();
         }
     }
 
-    public void SetCameraPriority(int priority, CinemachineFreeLook camera)
+    private void Enable_LeftShoulder_Camera()
     {
-        camera.Priority = priority;
+        AdjustTrackedObjectOffset(leftShoulder_Camera, -0.75f);
+        AdjustTrackedObjectOffset(rightShoulder_Camera, -0.75f);
+        SetCameraPriority(11, leftShoulder_Camera);
+        SetCameraPriority(10, rightShoulder_Camera);
+    }
+
+    private void Enable_RightShoulder_Camera()
+    {
+        AdjustTrackedObjectOffset(leftShoulder_Camera, 0.75f);
+        AdjustTrackedObjectOffset(rightShoulder_Camera, 0.75f);
+        SetCameraPriority(11, rightShoulder_Camera);
+        SetCameraPriority(10, leftShoulder_Camera);
+    }
+
+    private void InitializeCamera()
+    {
+        if (rightShoulder_Camera == null || leftShoulder_Camera == null)
+        {
+            Debug.LogError("Ninguna cámara añadida al inspector");
+            return;
+        }
+
+        if (isRightShoulderActive)
+        {
+            Enable_RightShoulder_Camera();
+        }
+        else
+        {
+            Enable_LeftShoulder_Camera();
+        }
+    }
+
+    private void SyncCameraRotation()
+    {
+        if (isRightShoulderActive)
+        {
+            CopyCameraRotation(rightShoulder_Camera, leftShoulder_Camera);
+        }
+        else
+        {
+            CopyCameraRotation(leftShoulder_Camera, rightShoulder_Camera);
+        }
+    }
+
+    private void CopyCameraRotation(CinemachineFreeLook source, CinemachineFreeLook target)
+    {
+        target.m_XAxis.Value = source.m_XAxis.Value;
+        target.m_YAxis.Value = source.m_YAxis.Value;
     }
 
     private void AdjustTrackedObjectOffset(CinemachineFreeLook camera, float offsetX)
     {
         if (camera != null)
         {
-            CinemachineComposer composer = camera.GetRig(1).GetCinemachineComponent<CinemachineComposer>();
-            if (composer != null)
+            // Ajustar el offset para todos los rigs
+            for (int i = 0; i < 3; i++)
             {
-                composer.m_TrackedObjectOffset.x = offsetX;
+                var composer = camera.GetRig(i).GetCinemachineComponent<CinemachineComposer>();
+                if (composer != null)
+                {
+                    composer.m_TrackedObjectOffset.x = offsetX;
+                }
             }
         }
+    }
+
+    private void SetCameraPriority(int priority, CinemachineFreeLook camera)
+    {
+        camera.Priority = priority;
     }
 }
