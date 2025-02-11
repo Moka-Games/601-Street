@@ -6,7 +6,7 @@ public class LaberintoController : MonoBehaviour
 {
     [SerializeField] private int rotationSpeed; 
 
-    void Update()
+    void LateUpdate()
     {
         float rotationX = 0f;
         float rotationZ = 0f;
