@@ -17,7 +17,7 @@ public class LockPick : MonoBehaviour
 
     [Range(1, 25)]
     public float lockRange = 10;
-    // Representa la dificultad de la cerradura
+    // Representa la dificultad de la cerraduraasdasd
     // O lo que es lo mismo
     // El rango de tolerancia para el desbloqueo
 
