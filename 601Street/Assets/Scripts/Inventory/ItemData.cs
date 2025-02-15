@@ -14,6 +14,4 @@ public class ItemData : ScriptableObject
     public ItemType itemType;
 
     public Sprite inventoryImage;
-    public GameObject itemFeedback;
-
 }
