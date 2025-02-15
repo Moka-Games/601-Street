@@ -6,13 +6,21 @@ public class Inventory_Interactor : MonoBehaviour
     public LayerMask interactableLayer;
     private RaycastHit hitInfo;
 
-    private Inventory_Item currentItem;  
+    private GameObject lastInteractableObject;
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            InteractWithObject();
+            if (lastInteractableObject != null)
+            {
+                lastInteractableObject.SetActive(false);
+                lastInteractableObject = null;
+            }
+            else
+            {
+                InteractWithObject();
+            }
         }
     }
 
@@ -26,47 +34,21 @@ public class Inventory_Interactor : MonoBehaviour
 
             if (item != null && item.itemData != null)
             {
-                if (currentItem != null && currentItem != item)
+                if (item.interactableObject != null)
                 {
-                    DeactivateCurrentItem();
+                    item.interactableObject.SetActive(true);
+                    lastInteractableObject = item.interactableObject;
                 }
-
-                if (currentItem != item)
-                {
-                    ActivateItem(item);
-                }
-                else
-                {
-                    DeactivateCurrentItem();
-                }
+                Inventory_Manager.Instance.AddItem(item.itemData, item.onItemClick);
+                Destroy(item.gameObject);
             }
-        }
-    }
-
-    private void ActivateItem(Inventory_Item item)
-    {
-        currentItem = item;
-        if (item.interactableObject != null)
-        {
-            item.interactableObject.SetActive(true);  
-        }
-        Inventory_Manager.Instance.AddItem(item.itemData, item.onItemClick);
-    }
-
-    private void DeactivateCurrentItem()
-    {
-        if (currentItem != null && currentItem.interactableObject != null)
-        {
-            currentItem.interactableObject.SetActive(false);  
-            Inventory_Manager.Instance.DisplayPopUp(currentItem.itemData.itemName);  
-            currentItem = null; 
         }
     }
 
     private void OnDrawGizmos()
     {
         Ray ray = new Ray(transform.position, transform.forward);
-        Gizmos.color = Color.red;  
-        Gizmos.DrawRay(ray.origin, ray.direction * interactionRange);  
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(ray.origin, ray.direction * interactionRange);
     }
 }
