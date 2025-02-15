@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events; // Necesario para usar UnityEvent
 
 [CreateAssetMenu(fileName = "New Item", menuName = "Inventory/Item")]
 public class ItemData : ScriptableObject
@@ -14,4 +15,5 @@ public class ItemData : ScriptableObject
 
     public Sprite inventoryImage;
     public GameObject noteContent; // Solo se usa si es una nota
+
 }

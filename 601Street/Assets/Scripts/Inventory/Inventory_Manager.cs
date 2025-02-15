@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Necesario para usar TMP_Text
+using TMPro;
+using UnityEngine.Events;
 
 public class Inventory_Manager : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class Inventory_Manager : MonoBehaviour
     public GameObject objectTemplate;
 
     private List<ItemData> inventoryItems = new List<ItemData>();
+    private Dictionary<ItemData, UnityEvent> itemEvents = new Dictionary<ItemData, UnityEvent>();
 
     private bool inventoryOpened = false;
 
@@ -54,9 +56,10 @@ public class Inventory_Manager : MonoBehaviour
         }
     }
 
-    public void AddItem(ItemData item)
+    public void AddItem(ItemData item, UnityEvent onItemClick)
     {
         inventoryItems.Add(item);
+        itemEvents[item] = onItemClick; // Guardar el evento asociado al ítem
         InstantiateItemInUI(item);
     }
 
@@ -93,7 +96,24 @@ public class Inventory_Manager : MonoBehaviour
             Debug.LogError("No se encontró un componente TMP_Text en los hijos de: " + newItemUI.name);
         }
 
+        // Configurar el botón para que active el evento onItemClick
+        Button itemButton = newItemUI.GetComponent<Button>();
+        if (itemButton != null)
+        {
+            // Asignar el evento onItemClick del ItemData al botón
+            itemButton.onClick.AddListener(() => itemEvents[item].Invoke());
+        }
+        else
+        {
+            Debug.LogError("El objeto instanciado no tiene un componente Button: " + newItemUI.name);
+        }
+
         // Activar el objeto de UI
         newItemUI.SetActive(true);
+    }
+
+    public void RandomFunction()
+    {
+        print("Yow");
     }
 }

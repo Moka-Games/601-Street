@@ -1,8 +1,12 @@
 using UnityEngine;
+using UnityEngine.Events; // Necesario para usar UnityEvent
 
 public class Inventory_Item : MonoBehaviour
 {
     public ItemData itemData;
+
+    // Evento que se activará al hacer clic en el ítem en el inventario
+    public UnityEvent onItemClick;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -10,15 +14,8 @@ public class Inventory_Item : MonoBehaviour
         {
             if (itemData != null)
             {
-                if (Inventory_Manager.Instance != null)
-                {
-                    Inventory_Manager.Instance.AddItem(itemData);
-                    Destroy(gameObject);
-                }
-                else
-                {
-                    Debug.LogError("Inventory_Manager.Instance is null.");
-                }
+                Inventory_Manager.Instance.AddItem(itemData, onItemClick);
+                Destroy(gameObject); // Simulamos la recolección eliminando el objeto de la escena
             }
             else
             {
@@ -26,5 +23,4 @@ public class Inventory_Item : MonoBehaviour
             }
         }
     }
-
 }
