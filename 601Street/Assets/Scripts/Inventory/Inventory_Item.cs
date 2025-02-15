@@ -9,6 +9,5 @@ public class Inventory_Item : MonoBehaviour
     [Header("Función Item Recogido")]
     public UnityEvent onItemClick;
 
-    // Objeto que se activa y desactiva al interactuar
     public GameObject interactableObject;
 }

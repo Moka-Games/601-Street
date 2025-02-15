@@ -7,6 +7,7 @@ public class Inventory_Interactor : MonoBehaviour
     private RaycastHit hitInfo;
 
     private GameObject lastInteractableObject;
+    private string lastItemName; // Guardamos el nombre del último objeto
 
     private void Update()
     {
@@ -15,6 +16,7 @@ public class Inventory_Interactor : MonoBehaviour
             if (lastInteractableObject != null)
             {
                 lastInteractableObject.SetActive(false);
+                Inventory_Manager.Instance.DisplayPopUp(lastItemName); // Muestra el popup con el nombre del último objeto
                 lastInteractableObject = null;
             }
             else
@@ -34,11 +36,14 @@ public class Inventory_Interactor : MonoBehaviour
 
             if (item != null && item.itemData != null)
             {
+                lastItemName = item.itemData.itemName; // Guardamos el nombre antes de destruirlo
+
                 if (item.interactableObject != null)
                 {
                     item.interactableObject.SetActive(true);
                     lastInteractableObject = item.interactableObject;
                 }
+
                 Inventory_Manager.Instance.AddItem(item.itemData, item.onItemClick);
                 Destroy(item.gameObject);
             }
