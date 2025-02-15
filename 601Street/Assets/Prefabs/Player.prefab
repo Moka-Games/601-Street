@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3115345725258227943}
   - component: {fileID: 7637152430803431070}
   - component: {fileID: 5886342011672503638}
+  - component: {fileID: 297787153583136723}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -63,6 +64,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -103,7 +107,6 @@ CharacterController:
     serializedVersion: 2
     m_Bits: 8
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -153,6 +156,18 @@ CapsuleCollider:
   m_Height: 1.9999999
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &297787153583136723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5831046738247469719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f2a52a7bf08a4345ae8f41d7ad27045, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6424756049886318420
 GameObject:
   m_ObjectHideFlags: 0
