@@ -1,8 +1,8 @@
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Events; // Necesario para usar UnityEvent
 using TMPro;
-using UnityEngine.Events;
+using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class Inventory_Manager : MonoBehaviour
 {
@@ -16,10 +16,16 @@ public class Inventory_Manager : MonoBehaviour
     public GameObject noteTemplate;
     public GameObject objectTemplate;
 
+    // Referencias al Pop-Up
+    public GameObject popUpParent;  // El objeto que activa el pop-up
+    public TMP_Text popUpText;      // El texto que se actualizará en el Pop-Up
+
     private List<ItemData> inventoryItems = new List<ItemData>();
     private Dictionary<ItemData, UnityEvent> itemEvents = new Dictionary<ItemData, UnityEvent>();
 
     private bool inventoryOpened = false;
+    private float popUpDuration = 4.5f; // Duración antes de desactivar el Pop-Up
+    private float lastPickUpTime = -100f; // Para saber el tiempo de la última recolección
 
     private void Awake()
     {
@@ -37,6 +43,7 @@ public class Inventory_Manager : MonoBehaviour
     private void Start()
     {
         InventoryInterface.SetActive(false);
+        popUpParent.SetActive(false); // Aseguramos que el Pop-Up esté inactivo al inicio
     }
 
     private void Update()
@@ -54,6 +61,12 @@ public class Inventory_Manager : MonoBehaviour
                 inventoryOpened = false;
             }
         }
+
+        // Si el Pop-Up está activo y ha pasado el tiempo, desactivarlo
+        if (popUpParent.activeSelf && Time.time - lastPickUpTime >= popUpDuration)
+        {
+            popUpParent.SetActive(false);
+        }
     }
 
     public void AddItem(ItemData item, UnityEvent onItemClick)
@@ -61,6 +74,9 @@ public class Inventory_Manager : MonoBehaviour
         inventoryItems.Add(item);
         itemEvents[item] = onItemClick; // Guardar el evento asociado al ítem
         InstantiateItemInUI(item);
+
+        // Mostrar el Pop-Up con el nombre del ítem recogido
+        DisplayPopUp(item.itemName);
     }
 
     private void InstantiateItemInUI(ItemData item)
@@ -112,8 +128,15 @@ public class Inventory_Manager : MonoBehaviour
         newItemUI.SetActive(true);
     }
 
-    public void RandomFunction()
+    private void DisplayPopUp(string itemName)
     {
-        print("Yow");
+        // Activar el Pop-Up
+        popUpParent.SetActive(true);
+
+        // Actualizar el texto del Pop-Up con el nombre del ítem + " añadido"
+        popUpText.text = itemName + " añadido";
+
+        // Actualizar el tiempo de la última recolección
+        lastPickUpTime = Time.time;
     }
 }
