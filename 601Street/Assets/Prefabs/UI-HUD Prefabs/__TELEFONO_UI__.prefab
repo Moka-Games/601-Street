@@ -4829,7 +4829,31 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 459629815741097088}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6576910263419854515}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1898787481604222953}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
 --- !u!1 &7951812136130059981
 GameObject:
   m_ObjectHideFlags: 0
@@ -5288,8 +5312,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e91c9a69227740b41966e6eace12198b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Telefono_UI: {fileID: 7711650432661613993}
   Telefono_HUD: {fileID: 3296909824996090666}
+  Telefono_UI: {fileID: 7711650432661613993}
   Apps: {fileID: 6576910263419854515}
   Ecos: {fileID: 3951581091364284090}
   Contactos: {fileID: 1898787481604222953}

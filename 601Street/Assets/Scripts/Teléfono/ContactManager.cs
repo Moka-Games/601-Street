@@ -33,8 +33,8 @@ public class ContactManager : MonoBehaviour
             AddContactToUI(contact);
         }
 
-        SetContactActionByID(1, () => telefonoManager.ClosePhone());
-        SetContactActionByID(2, () => telefonoManager.OpenApps());
+        SetContactActionByID(1, () => telefonoManager.MostrarPensamientoDeseado());
+        SetContactActionByID(2, () => telefonoManager.ClosePhone());
         SetContactActionByID(3, () => telefonoManager.OpenApps());
     }
 

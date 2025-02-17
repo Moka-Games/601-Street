@@ -16,6 +16,15 @@ public class Telefono_Manager : MonoBehaviour
     // Se declara para poder desactivar todas las interfaces al mismo tiempo
     public GameObject Interfaces;
 
+    [Header("Referencias Acciones Individuales")]
+    public Pensamiento pensamiento;
+
+    private Pensamientos_Manager pensamientos_Manager;
+
+    private void Start()
+    {
+        pensamientos_Manager = FindAnyObjectByType<Pensamientos_Manager>();
+    }
     public void OpenApps()
     {
         Apps.SetActive(true);
@@ -30,5 +39,11 @@ public class Telefono_Manager : MonoBehaviour
     {
         Telefono_UI.SetActive(false);
         Telefono_HUD.SetActive(true);
+    }
+
+    public void MostrarPensamientoDeseado()
+    {
+        Telefono_UI.SetActive(false);
+        pensamientos_Manager.MostrarPensamiento(pensamiento.pensamientoPrincipal);
     }
 }

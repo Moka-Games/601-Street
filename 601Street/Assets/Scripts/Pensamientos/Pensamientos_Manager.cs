@@ -41,7 +41,7 @@ public class Pensamientos_Manager : MonoBehaviour
         }
     }
 
-    private void MostrarPensamiento(string texto)
+    public void MostrarPensamiento(string texto)
     {
         pensamientoText.text = texto;
         pensamientoUI.SetActive(true); 
