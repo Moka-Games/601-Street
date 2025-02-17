@@ -12,11 +12,12 @@ GameObject:
   - component: {fileID: 991128773227115779}
   - component: {fileID: 8732281323800787471}
   - component: {fileID: 3115345725258227943}
-  - component: {fileID: 7637152430803431070}
   - component: {fileID: 5886342011672503638}
+  - component: {fileID: 7637152430803431070}
   - component: {fileID: 297787153583136723}
   - component: {fileID: 3754790435304779438}
   - component: {fileID: 8407419777404134908}
+  - component: {fileID: 4678181675161628757}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -119,22 +120,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &7637152430803431070
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5831046738247469719}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61a59884b4a156e4198ad1054baafe68, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 3.5
-  sprintSpeed: 5
-  gravity: -9.8
-  controller: {fileID: 3115345725258227943}
 --- !u!136 &5886342011672503638
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -158,6 +143,22 @@ CapsuleCollider:
   m_Height: 1.9999999
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7637152430803431070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5831046738247469719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61a59884b4a156e4198ad1054baafe68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 3.5
+  sprintSpeed: 5
+  gravity: -9.8
+  controller: {fileID: 3115345725258227943}
 --- !u!114 &297787153583136723
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -203,6 +204,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SceneName: 
+--- !u!114 &4678181675161628757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5831046738247469719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cacb25102a1c27439989f90350db046, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  telefonoUI: {fileID: 0}
+  telefonoHUD: {fileID: 0}
+  feedbackSlider: {fileID: 0}
+  tiempoRequerido: 1
 --- !u!1 &6424756049886318420
 GameObject:
   m_ObjectHideFlags: 0
