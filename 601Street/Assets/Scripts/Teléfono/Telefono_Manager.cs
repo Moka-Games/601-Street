@@ -24,6 +24,7 @@ public class Telefono_Manager : MonoBehaviour
     private void Start()
     {
         pensamientos_Manager = FindAnyObjectByType<Pensamientos_Manager>();
+        Apps.SetActive(true);
     }
     public void OpenApps()
     {
@@ -44,6 +45,7 @@ public class Telefono_Manager : MonoBehaviour
     public void MostrarPensamientoDeseado()
     {
         Telefono_UI.SetActive(false);
+        Telefono_HUD.SetActive(true);
         pensamientos_Manager.MostrarPensamiento(pensamiento.pensamientoPrincipal);
     }
 }
