@@ -9,6 +9,8 @@ public class Inventory_Interactor : MonoBehaviour
     private GameObject lastInteractableObject;
     private string lastItemName; // Guardamos el nombre del último objeto
 
+    public bool canInteract = false;
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.E))
@@ -32,6 +34,7 @@ public class Inventory_Interactor : MonoBehaviour
 
         if (Physics.Raycast(ray, out hitInfo, interactionRange, interactableLayer))
         {
+            canInteract = true;
             Inventory_Item item = hitInfo.collider.GetComponent<Inventory_Item>();
 
             if (item != null && item.itemData != null)
@@ -48,6 +51,10 @@ public class Inventory_Interactor : MonoBehaviour
                 Destroy(item.gameObject);
             }
         }
+        else
+        {
+            canInteract = false;
+        }
     }
 
     private void OnDrawGizmos()
@@ -56,4 +63,10 @@ public class Inventory_Interactor : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawRay(ray.origin, ray.direction * interactionRange);
     }
+
+    public void IsInteratable(bool value)
+    {
+        canInteract = value;
+    }
+
 }
