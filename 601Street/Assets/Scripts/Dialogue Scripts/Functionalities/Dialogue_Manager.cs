@@ -26,11 +26,6 @@ public class DialogueManager : MonoBehaviour
 
     public UnityEvent onConversationEnd;
 
-    //Por si hay hasta 3 NPCs (Aún no es escalable obviamente)
-    public GameObject npc_1;
-    public GameObject npc_2;
-    public GameObject npc_3;
-
     [Header("Dice Protoype Interface Variables")]
     [SerializeField] private Dice_Manager diceManager;
     [SerializeField] private GameObject diceInterface;

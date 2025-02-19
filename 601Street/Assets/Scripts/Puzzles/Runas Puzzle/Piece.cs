@@ -11,7 +11,7 @@ public class Piece : MonoBehaviour
     void Start()
     {
         // Obtener la referencia al Path_Drawer
-        pathDrawer = FindObjectOfType<Path_Drawer>();
+        pathDrawer = FindAnyObjectByType<Path_Drawer>();
     }
 
     void OnMouseDown()
