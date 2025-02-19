@@ -1,59 +1,68 @@
 using UnityEngine;
-
 public class Inventory_Interactor : MonoBehaviour
 {
     public float interactionRange = 5f;
     public LayerMask interactableLayer;
     private RaycastHit hitInfo;
-
     private GameObject lastInteractableObject;
-    private string lastItemName; // Guardamos el nombre del último objeto
-
+    private string lastItemName;
     public bool canInteract = false;
+    private Inventory_Item currentInteractableItem;
+    [Header("Tecla para Interactuar")]
+    
+    public KeyCode inputKey_to_Interact;
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (lastInteractableObject != null)
         {
-            if (lastInteractableObject != null)
+            if (Input.GetKeyDown(inputKey_to_Interact))
             {
                 lastInteractableObject.SetActive(false);
-                Inventory_Manager.Instance.DisplayPopUp(lastItemName); // Muestra el popup con el nombre del último objeto
+                Inventory_Manager.Instance.DisplayPopUp(lastItemName);
                 lastInteractableObject = null;
             }
-            else
+        }
+        else
+        {
+            CheckForInteractable();
+
+            if (Input.GetKeyDown(inputKey_to_Interact) && canInteract)
             {
                 InteractWithObject();
             }
         }
     }
 
-    private void InteractWithObject()
+    private void CheckForInteractable()
     {
         Ray ray = new Ray(transform.position, transform.forward);
-
         if (Physics.Raycast(ray, out hitInfo, interactionRange, interactableLayer))
         {
-            canInteract = true;
-            Inventory_Item item = hitInfo.collider.GetComponent<Inventory_Item>();
-
-            if (item != null && item.itemData != null)
-            {
-                lastItemName = item.itemData.itemName; // Guardamos el nombre antes de destruirlo
-
-                if (item.interactableObject != null)
-                {
-                    item.interactableObject.SetActive(true);
-                    lastInteractableObject = item.interactableObject;
-                }
-
-                Inventory_Manager.Instance.AddItem(item.itemData, item.onItemClick);
-                Destroy(item.gameObject);
-            }
+            currentInteractableItem = hitInfo.collider.GetComponent<Inventory_Item>();
+            canInteract = currentInteractableItem != null && currentInteractableItem.itemData != null;
         }
         else
         {
             canInteract = false;
+            currentInteractableItem = null;
+        }
+    }
+
+    private void InteractWithObject()
+    {
+        if (currentInteractableItem != null && canInteract)
+        {
+            lastItemName = currentInteractableItem.itemData.itemName;
+
+            if (currentInteractableItem.interactableObject != null)
+            {
+                currentInteractableItem.interactableObject.SetActive(true);
+                lastInteractableObject = currentInteractableItem.interactableObject;
+            }
+
+            Inventory_Manager.Instance.AddItem(currentInteractableItem.itemData, currentInteractableItem.onItemClick);
+            Destroy(currentInteractableItem.gameObject);
         }
     }
 
@@ -68,5 +77,4 @@ public class Inventory_Interactor : MonoBehaviour
     {
         canInteract = value;
     }
-
 }
