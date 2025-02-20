@@ -36,7 +36,7 @@ public class GameSceneManager : MonoBehaviour
         {
             persistentSceneLoaded = true;
             FindPlayerInPersistentScene();
-            LoadScene("PruebaConPersistente_2");
+            LoadScene("Colegio");
         }
         else
         {
@@ -47,7 +47,7 @@ public class GameSceneManager : MonoBehaviour
                 {
                     persistentSceneLoaded = true;
                     FindPlayerInPersistentScene();
-                    LoadScene("PruebaConPersistente_2");
+                    LoadScene("Colegio");
                 };
             }
             else
