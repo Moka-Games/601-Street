@@ -32,29 +32,31 @@ public class GameSceneManager : MonoBehaviour
         instance = this;
         DontDestroyOnLoad(gameObject);
 
-        // Verificamos y cargamos la PersistentScene si no está cargada
-        if (!persistentSceneLoaded)
+        if (SceneManager.GetActiveScene().name == "PersistentScene")
         {
-            LoadPersistentScene();
-        }
-    }
-
-    private void LoadPersistentScene()
-    {
-        Scene persistentScene = SceneManager.GetSceneByName("PersistentScene");
-        if (!persistentScene.isLoaded)
-        {
-            SceneManager.LoadSceneAsync("PersistentScene", LoadSceneMode.Additive).completed += (asyncOperation) =>
-            {
-                persistentSceneLoaded = true;
-                FindPlayerInPersistentScene();
-            };
+            persistentSceneLoaded = true;
+            FindPlayerInPersistentScene();
+            LoadScene("PruebaConPersistent");
         }
         else
         {
-            FindPlayerInPersistentScene();
+            Scene persistentScene = SceneManager.GetSceneByName("PersistentScene");
+            if (!persistentScene.isLoaded)
+            {
+                SceneManager.LoadSceneAsync("PersistentScene", LoadSceneMode.Additive).completed += (asyncOperation) =>
+                {
+                    persistentSceneLoaded = true;
+                    FindPlayerInPersistentScene();
+                    LoadScene("PruebaConPersistent");
+                };
+            }
+            else
+            {
+                FindPlayerInPersistentScene();
+            }
         }
     }
+
 
     private void FindPlayerInPersistentScene()
     {
@@ -67,10 +69,11 @@ public class GameSceneManager : MonoBehaviour
 
     public void LoadScene(string sceneName)
     {
+        if (currentSceneName == sceneName) return;  // Evitamos cargar infinitamente la misma escena
+
         currentSceneName = sceneName;
 
-        SceneManager.sceneLoaded += OnSceneLoaded;  // Suscribimos a la carga de la nueva escena
-
+        SceneManager.sceneLoaded += OnSceneLoaded;
         SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
     }
 
@@ -79,35 +82,37 @@ public class GameSceneManager : MonoBehaviour
         if (scene.name == currentSceneName)
         {
             StartCoroutine(MovePlayerToSpawnPointWithDelay());
-            SceneManager.sceneLoaded -= OnSceneLoaded;  // Desuscribirnos después de que se cargue la escena
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
     }
 
-
-
     private IEnumerator MovePlayerToSpawnPointWithDelay()
     {
-        Debug.Log("Esperando para mover al jugador...");
-        yield return new WaitForSeconds(0.1f); // Pequeño retraso para asegurar que la escena esté lista
-        Debug.Log("Esperado, ahora buscando el punto de spawn");
+        // Espera hasta que la nueva escena esté completamente cargada
+        yield return new WaitUntil(() => SceneManager.GetSceneByName(currentSceneName).isLoaded);
 
-        // Buscar el punto de spawn en todas las escenas cargadas
-        GameObject spawnPoint = FindObjectInAllScenes("Player_InitialPosition");
-
-        if (spawnPoint != null)
-        {
-            Debug.Log("Punto de spawn encontrado en la posición: " + spawnPoint.transform.position);
-        }
-        else
-        {
-            Debug.LogError("No se encontró el punto de spawn en ninguna escena");
-        }
+        // Ahora que la nueva escena está cargada, buscamos el punto de spawn en esta escena
+        GameObject spawnPoint = GameObject.Find("Player_InitialPosition");
 
         if (spawnPoint != null && currentPlayer != null)
         {
-            currentPlayer.transform.position = spawnPoint.transform.position;
-            currentPlayer.transform.rotation = spawnPoint.transform.rotation;
-            Debug.Log("Jugador movido al punto de spawn");
+            // Mover al jugador a la posición del punto de spawn
+            PlayerController playerController = currentPlayer.GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                // Desactivamos el CharacterController temporalmente para mover al jugador
+                playerController.controller.enabled = false;
+                currentPlayer.transform.position = spawnPoint.transform.position;
+                currentPlayer.transform.rotation = spawnPoint.transform.rotation;
+                // Volvemos a activar el CharacterController después de moverlo
+                playerController.controller.enabled = true;
+
+                Debug.Log("Jugador movido al punto de spawn en la nueva escena.");
+            }
+            else
+            {
+                Debug.LogError("No se encontró el PlayerController en el jugador!");
+            }
         }
         else
         {
@@ -116,24 +121,23 @@ public class GameSceneManager : MonoBehaviour
     }
 
 
+
+
     private GameObject FindObjectInAllScenes(string objectName)
     {
         for (int i = 0; i < SceneManager.sceneCount; i++)
         {
             Scene scene = SceneManager.GetSceneAt(i);
-            Debug.Log("Escena cargada: " + scene.name);  // Añadir un debug aquí para ver qué escenas están cargadas
             foreach (GameObject obj in scene.GetRootGameObjects())
             {
                 if (obj.name == objectName)
                 {
-                    Debug.Log($"Encontrado {objectName} en la escena {scene.name}");
                     return obj;
                 }
             }
         }
         return null;
     }
-
 
     private void UnloadPreviousScene()
     {

@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -14,8 +13,8 @@ public class PlayerController : MonoBehaviour
 
     private Animator animator;
 
-    private bool forwardPressed = false; 
-    private bool horizontalPressedAfterForward = false; 
+    private bool forwardPressed = false;
+    private bool horizontalPressedAfterForward = false;
 
     void Start()
     {
@@ -65,13 +64,13 @@ public class PlayerController : MonoBehaviour
         {
             if (!forwardPressed)
             {
-                forwardPressed = true; 
-                horizontalPressedAfterForward = false; 
+                forwardPressed = true;
+                horizontalPressedAfterForward = false;
             }
 
             if (x != 0 && forwardPressed)
             {
-                horizontalPressedAfterForward = true; 
+                horizontalPressedAfterForward = true;
             }
 
             if (forwardPressed && horizontalPressedAfterForward)
@@ -89,8 +88,8 @@ public class PlayerController : MonoBehaviour
         {
             if (z == 0)
             {
-                forwardPressed = false; 
-                horizontalPressedAfterForward = false; 
+                forwardPressed = false;
+                horizontalPressedAfterForward = false;
             }
 
             if (x == 0)
@@ -98,6 +97,23 @@ public class PlayerController : MonoBehaviour
                 Quaternion toRotation = Quaternion.LookRotation(forward);
                 transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, Time.deltaTime * 10f);
             }
+        }
+    }
+
+    // Método para reposicionar al jugador (ahora se invoca desde el GameSceneManager)
+    public void Respawn(Vector3 spawnPosition, Quaternion spawnRotation)
+    {
+        if (controller != null)
+        {
+            controller.enabled = false;  // Deshabilitar el CharacterController antes de mover
+            transform.position = spawnPosition;  // Mover al punto de spawn
+            transform.rotation = spawnRotation;  // También puedes rotar si es necesario
+            controller.enabled = true;  // Volver a habilitar el CharacterController
+            Debug.Log("Jugador movido al punto de spawn");
+        }
+        else
+        {
+            Debug.LogError("No se encontró 'CharacterController'!");
         }
     }
 }
