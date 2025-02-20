@@ -28,23 +28,12 @@ public class GameManager : MonoBehaviour
         fadeManager = FindAnyObjectByType<FadeManager>();
 
         StartGame();
-    }
-
-    IEnumerator ActivateCameraWithDelay(float delay)
-    {
-        camera_Reference.FreezeCamera();
-
-        yield return new WaitForSeconds(delay);
-
-        camera_Reference.UnfreezeCamera();
-    }
-
-    
+    }    
 
     public void StartGame()
     {
         gameStarted = true;
-        StartCoroutine(ActivateCameraWithDelay(2.5f));
+        StartCoroutine(InitialCameraFreeze(1.75f));
         fadeManager.BlackScreenIntoFadeOut(2f);
     }
 
@@ -53,4 +42,14 @@ public class GameManager : MonoBehaviour
         gameStarted = false;
     }
 
+   IEnumerator InitialCameraFreeze(float duration)
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        camera_Reference.FreezeCamera();
+
+        yield return new WaitForSeconds(duration);
+
+        camera_Reference.UnfreezeCamera();
+    }
 }
