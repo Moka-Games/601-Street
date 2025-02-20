@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class FadeManager : MonoBehaviour
 {
     public static FadeManager Instance;
-    public Image targetImage; // Variable pública para asignar el objeto Image
+    public Image targetImage; 
 
     private void Awake()
     {
