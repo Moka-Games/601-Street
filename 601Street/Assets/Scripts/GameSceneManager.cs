@@ -36,7 +36,7 @@ public class GameSceneManager : MonoBehaviour
         {
             persistentSceneLoaded = true;
             FindPlayerInPersistentScene();
-            LoadScene("PruebaConPersistent");
+            LoadScene("PruebaConPersistente_2");
         }
         else
         {
@@ -47,7 +47,7 @@ public class GameSceneManager : MonoBehaviour
                 {
                     persistentSceneLoaded = true;
                     FindPlayerInPersistentScene();
-                    LoadScene("PruebaConPersistent");
+                    LoadScene("PruebaConPersistente_2");
                 };
             }
             else
@@ -69,7 +69,7 @@ public class GameSceneManager : MonoBehaviour
 
     public void LoadScene(string sceneName)
     {
-        if (currentSceneName == sceneName) return;  // Evitamos cargar infinitamente la misma escena
+        if (currentSceneName == sceneName) return;  
 
         currentSceneName = sceneName;
 
@@ -88,23 +88,18 @@ public class GameSceneManager : MonoBehaviour
 
     private IEnumerator MovePlayerToSpawnPointWithDelay()
     {
-        // Espera hasta que la nueva escena esté completamente cargada
         yield return new WaitUntil(() => SceneManager.GetSceneByName(currentSceneName).isLoaded);
 
-        // Ahora que la nueva escena está cargada, buscamos el punto de spawn en esta escena
         GameObject spawnPoint = GameObject.Find("Player_InitialPosition");
 
         if (spawnPoint != null && currentPlayer != null)
         {
-            // Mover al jugador a la posición del punto de spawn
             PlayerController playerController = currentPlayer.GetComponent<PlayerController>();
             if (playerController != null)
             {
-                // Desactivamos el CharacterController temporalmente para mover al jugador
                 playerController.controller.enabled = false;
                 currentPlayer.transform.position = spawnPoint.transform.position;
                 currentPlayer.transform.rotation = spawnPoint.transform.rotation;
-                // Volvemos a activar el CharacterController después de moverlo
                 playerController.controller.enabled = true;
 
                 Debug.Log("Jugador movido al punto de spawn en la nueva escena.");

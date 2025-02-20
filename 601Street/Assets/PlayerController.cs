@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -100,15 +101,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Método para reposicionar al jugador (ahora se invoca desde el GameSceneManager)
     public void Respawn(Vector3 spawnPosition, Quaternion spawnRotation)
     {
         if (controller != null)
         {
-            controller.enabled = false;  // Deshabilitar el CharacterController antes de mover
-            transform.position = spawnPosition;  // Mover al punto de spawn
-            transform.rotation = spawnRotation;  // También puedes rotar si es necesario
-            controller.enabled = true;  // Volver a habilitar el CharacterController
+            controller.enabled = false;  
+            transform.position = spawnPosition;  
+            transform.rotation = spawnRotation;  
+            controller.enabled = true;  
             Debug.Log("Jugador movido al punto de spawn");
         }
         else
