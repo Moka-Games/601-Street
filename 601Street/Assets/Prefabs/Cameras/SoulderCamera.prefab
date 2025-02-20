@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5328540266262194570}
+  - component: {fileID: 7668417065697781188}
   m_Layer: 0
   m_Name: SoulderCamera
   m_TagString: Untagged
@@ -33,6 +34,19 @@ Transform:
   - {fileID: 2691415738208649849}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7668417065697781188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 384377331363478202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a436506af40ae2446921b04e0df6b84e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  freeLookCamera: {fileID: 571450271917270595}
 --- !u!1 &1545126609547444719
 GameObject:
   m_ObjectHideFlags: 0
@@ -92,7 +106,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 3.45, z: -1.75}
+  m_FollowOffset: {x: 0, y: 3.159438, z: -2.6067936}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -346,8 +360,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4952048292024640424}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.10770874, y: 0.22816563, z: -0.025405884, w: 0.9673127}
-  m_LocalPosition: {x: 42.302925, y: 24.63646, z: -29.855503}
+  m_LocalRotation: {x: 0.1376122, y: 0.15947513, z: -0.022455327, w: 0.9773057}
+  m_LocalPosition: {x: -8.847639, y: 11.949145, z: -11.186146}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -628,7 +642,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 3.45, z: -1.75}
+  m_FollowOffset: {x: 0, y: 3.159438, z: -2.6067936}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -755,7 +769,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 3.45, z: -1.75}
+  m_FollowOffset: {x: 0, y: 3.159438, z: -2.6067936}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -899,7 +913,7 @@ MonoBehaviour:
         m_Calls: []
   m_LegacyBlendHint: 0
   m_YAxis:
-    Value: 1
+    Value: 0.74
     m_SpeedMode: 0
     m_MaxSpeed: 2.5
     m_AccelTime: 0.2

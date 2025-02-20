@@ -18,6 +18,7 @@ public class GameSceneManager : MonoBehaviour
     }
 
     private GameObject currentPlayer;
+    private Camera_Script currentCamera;
     private string currentSceneName;
     private bool persistentSceneLoaded = false;
 
@@ -35,7 +36,7 @@ public class GameSceneManager : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "PersistentScene")
         {
             persistentSceneLoaded = true;
-            FindPlayerInPersistentScene();
+            FindPlayerAndCameraInPersistentScene();
             LoadScene("Colegio");
         }
         else
@@ -46,30 +47,39 @@ public class GameSceneManager : MonoBehaviour
                 SceneManager.LoadSceneAsync("PersistentScene", LoadSceneMode.Additive).completed += (asyncOperation) =>
                 {
                     persistentSceneLoaded = true;
-                    FindPlayerInPersistentScene();
+                    FindPlayerAndCameraInPersistentScene();
                     LoadScene("Colegio");
                 };
             }
             else
             {
-                FindPlayerInPersistentScene();
+                FindPlayerAndCameraInPersistentScene();
             }
         }
     }
 
-
-    private void FindPlayerInPersistentScene()
+    private void FindPlayerAndCameraInPersistentScene()
     {
         currentPlayer = GameObject.FindGameObjectWithTag("Player");
         if (currentPlayer == null)
         {
             Debug.LogError("No se encontró el jugador en la escena persistente!");
         }
+
+        GameObject cameraObject = FindAnyObjectByType<Camera_Script>()?.gameObject;
+        if (cameraObject != null)
+        {
+            currentCamera = cameraObject.GetComponent<Camera_Script>();
+        }
+        else
+        {
+            Debug.LogError("No se encontró la cámara en la escena persistente!");
+        }
     }
 
     public void LoadScene(string sceneName)
     {
-        if (currentSceneName == sceneName) return;  
+        if (currentSceneName == sceneName) return;
 
         currentSceneName = sceneName;
 
@@ -81,25 +91,26 @@ public class GameSceneManager : MonoBehaviour
     {
         if (scene.name == currentSceneName)
         {
-            StartCoroutine(MovePlayerToSpawnPointWithDelay());
+            StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
             SceneManager.sceneLoaded -= OnSceneLoaded;
         }
     }
 
-    private IEnumerator MovePlayerToSpawnPointWithDelay()
+    private IEnumerator MovePlayerAndCameraToSpawnPointWithDelay()
     {
         yield return new WaitUntil(() => SceneManager.GetSceneByName(currentSceneName).isLoaded);
 
-        GameObject spawnPoint = GameObject.Find("Player_InitialPosition");
+        GameObject playerSpawnPoint = FindObjectInAllScenes("Player_InitialPosition");
+        GameObject cameraSpawnPoint = FindObjectInAllScenes("Camera_InitialPosition");
 
-        if (spawnPoint != null && currentPlayer != null)
+        if (playerSpawnPoint != null && currentPlayer != null)
         {
             PlayerController playerController = currentPlayer.GetComponent<PlayerController>();
             if (playerController != null)
             {
                 playerController.controller.enabled = false;
-                currentPlayer.transform.position = spawnPoint.transform.position;
-                currentPlayer.transform.rotation = spawnPoint.transform.rotation;
+                currentPlayer.transform.position = playerSpawnPoint.transform.position;
+                currentPlayer.transform.rotation = playerSpawnPoint.transform.rotation;
                 playerController.controller.enabled = true;
 
                 Debug.Log("Jugador movido al punto de spawn en la nueva escena.");
@@ -113,10 +124,19 @@ public class GameSceneManager : MonoBehaviour
         {
             Debug.LogError($"No se encontró 'Player_InitialPosition' o el jugador en la escena {currentSceneName}!");
         }
+
+        if (cameraSpawnPoint != null && currentCamera != null)
+        {
+            currentCamera.transform.position = cameraSpawnPoint.transform.position;
+            currentCamera.transform.rotation = cameraSpawnPoint.transform.rotation;
+
+            Debug.Log("Cámara movida al punto de spawn en la nueva escena.");
+        }
+        else
+        {
+            Debug.LogError($"No se encontró 'Camera_InitialPosition' o la cámara en la escena {currentSceneName}!");
+        }
     }
-
-
-
 
     private GameObject FindObjectInAllScenes(string objectName)
     {

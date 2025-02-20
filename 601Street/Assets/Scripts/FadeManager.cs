@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class FadeManager : MonoBehaviour
 {
     public static FadeManager Instance;
-    public Image targetImage; 
+    public Image targetImage;
 
     private void Awake()
     {
@@ -36,6 +36,30 @@ public class FadeManager : MonoBehaviour
         if (targetImage != null)
         {
             StartCoroutine(FadeImageRoutine(targetImage, 1f, 0f, duration));
+        }
+        else
+        {
+            Debug.LogWarning("FadeManager: targetImage no está asignado.");
+        }
+    }
+
+    public void BlackScreenIntoFadeOut(float duration)
+    {
+        StartCoroutine(BlackScreenForDuration(duration));
+    }
+    public IEnumerator BlackScreenForDuration(float duration)
+    {
+        if (targetImage != null)
+        {
+            // Poner la imagen completamente negra inmediatamente
+            Color color = targetImage.color;
+            targetImage.color = new Color(color.r, color.g, color.b, 1f);
+
+            // Esperar el tiempo especificado
+            yield return new WaitForSeconds(duration);
+
+            // Realizar Fade-Out después de la espera
+            FadeOut(1f);
         }
         else
         {
