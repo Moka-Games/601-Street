@@ -33,11 +33,12 @@ public class GameSceneManager : MonoBehaviour
         instance = this;
         DontDestroyOnLoad(gameObject);
 
-        if (SceneManager.GetActiveScene().name == "PersistentScene")
+        string activeSceneName = SceneManager.GetActiveScene().name;
+
+        if (activeSceneName == "PersistentScene")
         {
             persistentSceneLoaded = true;
             FindPlayerAndCameraInPersistentScene();
-            LoadScene("Colegio");
         }
         else
         {
@@ -48,12 +49,14 @@ public class GameSceneManager : MonoBehaviour
                 {
                     persistentSceneLoaded = true;
                     FindPlayerAndCameraInPersistentScene();
-                    LoadScene("Colegio");
+                    LoadScene(activeSceneName); // Carga la escena desde donde se presionó Play
                 };
             }
             else
             {
+                persistentSceneLoaded = true;
                 FindPlayerAndCameraInPersistentScene();
+                LoadScene(activeSceneName);
             }
         }
     }
