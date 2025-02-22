@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
@@ -11,7 +11,7 @@ public class GameSceneManager : MonoBehaviour
         {
             if (instance == null)
             {
-                Debug.LogError("GameSceneManager no est· inicializado!");
+                Debug.LogError("GameSceneManager no est√° inicializado!");
             }
             return instance;
         }
@@ -45,18 +45,25 @@ public class GameSceneManager : MonoBehaviour
             Scene persistentScene = SceneManager.GetSceneByName("PersistentScene");
             if (!persistentScene.isLoaded)
             {
+                // Primero, guardamos la referencia a la escena actual
+                Scene initialScene = SceneManager.GetActiveScene();
+
                 SceneManager.LoadSceneAsync("PersistentScene", LoadSceneMode.Additive).completed += (asyncOperation) =>
                 {
                     persistentSceneLoaded = true;
                     FindPlayerAndCameraInPersistentScene();
-                    LoadScene(activeSceneName); // Carga la escena desde donde se presionÛ Play
+
+                    // Solo establecemos la escena actual, no la cargamos de nuevo
+                    currentSceneName = initialScene.name;
+                    StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
                 };
             }
             else
             {
                 persistentSceneLoaded = true;
                 FindPlayerAndCameraInPersistentScene();
-                LoadScene(activeSceneName);
+                currentSceneName = activeSceneName;
+                StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
             }
         }
     }
@@ -66,7 +73,7 @@ public class GameSceneManager : MonoBehaviour
         currentPlayer = GameObject.FindGameObjectWithTag("Player");
         if (currentPlayer == null)
         {
-            Debug.LogError("No se encontrÛ el jugador en la escena persistente!");
+            Debug.LogError("No se encontr√≥ el jugador en la escena persistente!");
         }
 
         GameObject cameraObject = FindAnyObjectByType<Camera_Script>()?.gameObject;
@@ -76,7 +83,7 @@ public class GameSceneManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("No se encontrÛ la c·mara en la escena persistente!");
+            Debug.LogError("No se encontr√≥ la c√°mara en la escena persistente!");
         }
     }
 
@@ -84,8 +91,13 @@ public class GameSceneManager : MonoBehaviour
     {
         if (currentSceneName == sceneName) return;
 
-        currentSceneName = sceneName;
+        // Descargar la escena actual antes de cargar la nueva
+        if (!string.IsNullOrEmpty(currentSceneName))
+        {
+            SceneManager.UnloadSceneAsync(currentSceneName);
+        }
 
+        currentSceneName = sceneName;
         SceneManager.sceneLoaded += OnSceneLoaded;
         SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
     }
@@ -120,12 +132,12 @@ public class GameSceneManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError("No se encontrÛ el PlayerController en el jugador!");
+                Debug.LogError("No se encontr√≥ el PlayerController en el jugador!");
             }
         }
         else
         {
-            Debug.LogError($"No se encontrÛ 'Player_InitialPosition' o el jugador en la escena {currentSceneName}!");
+            Debug.LogError($"No se encontr√≥ 'Player_InitialPosition' o el jugador en la escena {currentSceneName}!");
         }
 
         if (cameraSpawnPoint != null && currentCamera != null)
@@ -133,11 +145,11 @@ public class GameSceneManager : MonoBehaviour
             currentCamera.transform.position = cameraSpawnPoint.transform.position;
             currentCamera.transform.rotation = cameraSpawnPoint.transform.rotation;
 
-            Debug.Log("C·mara movida al punto de spawn en la nueva escena.");
+            Debug.Log("C√°mara movida al punto de spawn en la nueva escena.");
         }
         else
         {
-            Debug.LogError($"No se encontrÛ 'Camera_InitialPosition' o la c·mara en la escena {currentSceneName}!");
+            Debug.LogError($"No se encontr√≥ 'Camera_InitialPosition' o la c√°mara en la escena {currentSceneName}!");
         }
     }
 
@@ -155,18 +167,5 @@ public class GameSceneManager : MonoBehaviour
             }
         }
         return null;
-    }
-
-    private void UnloadPreviousScene()
-    {
-        int countLoaded = SceneManager.sceneCount;
-        for (int i = 0; i < countLoaded; i++)
-        {
-            Scene scene = SceneManager.GetSceneAt(i);
-            if (!scene.name.Equals("PersistentScene") && !scene.name.Equals(currentSceneName))
-            {
-                SceneManager.UnloadSceneAsync(scene);
-            }
-        }
     }
 }
