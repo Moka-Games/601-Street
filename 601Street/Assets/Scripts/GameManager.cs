@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
         fadeManager = FindAnyObjectByType<FadeManager>();
 
         StartGame();
-    }    
+    }
 
     public void StartGame()
     {
@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
     }
 
    IEnumerator InitialCameraFreeze(float duration)
-    {
+   {
         yield return new WaitForSeconds(0.2f);
 
         camera_Reference.FreezeCamera();
@@ -51,5 +51,5 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(duration);
 
         camera_Reference.UnfreezeCamera();
-    }
+   }
 }

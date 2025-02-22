@@ -42,7 +42,6 @@ public class Inventory_Item_Feedback : MonoBehaviour
         }
         else if(!playerOnRange)
         {
-            print("player not on range");
             positional_Feedback.SetActive(false);
         }
     }
@@ -52,6 +51,7 @@ public class Inventory_Item_Feedback : MonoBehaviour
         if(other.CompareTag("Player"))
         {
             playerOnRange = true;
+            print("Player on range");
         }
     }
 
@@ -60,6 +60,7 @@ public class Inventory_Item_Feedback : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerOnRange = false;
+            print("Player out of range");
         }
     }
 }
