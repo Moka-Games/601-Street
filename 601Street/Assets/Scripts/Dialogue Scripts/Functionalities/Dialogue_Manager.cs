@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using Cinemachine;
 using Unity.VisualScripting;
+using System.Collections;
 
 
 public class DialogueManager : MonoBehaviour
@@ -33,9 +34,18 @@ public class DialogueManager : MonoBehaviour
     public GameObject failObject;
     public GameObject sucessObject;
 
-    private bool? diceRollResult = null; // Almacena el resultado de la tirada de dado
-    private int selectedOptionIndex = -1; // Almacenará el índice de la opción seleccionada
+    private bool? diceRollResult = null;
+    private int selectedOptionIndex = -1;
 
+    [Header("Cinemachine Camera")]
+    [SerializeField] private CinemachineFreeLook freeLookCamera;
+    [SerializeField] private Transform playerLookAtTarget; // El objetivo de LookAt del jugador
+    private Transform npcLookAtTarget;
+
+    [Header("Camera Transition Settings")]
+    [SerializeField] private float transitionDuration = 1.0f; // Duración de la transición
+    private Transform currentLookAtTarget; // Objetivo actual de LookAt
+    private Coroutine transitionCoroutine;
 
     void Awake()
     {
@@ -105,6 +115,18 @@ public class DialogueManager : MonoBehaviour
         currentConversation = conversation;
         currentNPC = npc;
         currentDialogueIndex = 0;
+
+        // Cambiar el LookAt de la cámara al NPC con transición suave
+        npcLookAtTarget = currentNPC.transform.Find("LookAt");
+        if (npcLookAtTarget != null && freeLookCamera != null)
+        {
+            if (transitionCoroutine != null)
+            {
+                StopCoroutine(transitionCoroutine); // Detener la transición actual si hay una en curso
+            }
+            transitionCoroutine = StartCoroutine(ChangeLookAtTarget(npcLookAtTarget));
+        }
+
         if (dialogueUI != null)
         {
             dialogueUI.SetActive(true);
@@ -250,12 +272,20 @@ public class DialogueManager : MonoBehaviour
             currentNPC.SetInteracted();
             currentNPC.InvokeOnConversationEnd();
             onConversationEnd.Invoke();
-            
+        }
+
+        // Restaurar el LookAt de la cámara al jugador con transición suave
+        if (freeLookCamera != null && playerLookAtTarget != null)
+        {
+            if (transitionCoroutine != null)
+            {
+                StopCoroutine(transitionCoroutine); // Detener la transición actual si hay una en curso
+            }
+            transitionCoroutine = StartCoroutine(ChangeLookAtTarget(playerLookAtTarget));
         }
 
         Debug.Log("Conversación finalizada");
     }
-
     public void SelectDiceOption()
     {
         dialogueInterface.SetActive(false);
@@ -297,6 +327,48 @@ public class DialogueManager : MonoBehaviour
 
         diceInterface.SetActive(false);
     }
+
+    private IEnumerator ChangeLookAtTarget(Transform newTarget)
+    {
+        if (freeLookCamera == null || newTarget == null)
+        {
+            yield break;
+        }
+
+        // Crear un objeto temporal para la transición
+        GameObject tempTarget = new GameObject("TempLookAtTarget");
+        tempTarget.transform.position = freeLookCamera.LookAt.position; // Posición inicial
+        freeLookCamera.LookAt = tempTarget.transform;
+
+        float elapsedTime = 0f;
+        Vector3 initialPosition = tempTarget.transform.position;
+
+        while (elapsedTime < transitionDuration)
+        {
+            if (newTarget == null)
+            {
+                Destroy(tempTarget); // Limpiar el objeto temporal
+                yield break;
+            }
+
+            // Interpolar suavemente entre la posición inicial y la del nuevo objetivo
+            tempTarget.transform.position = Vector3.Lerp(
+                initialPosition,
+                newTarget.position,
+                elapsedTime / transitionDuration
+            );
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Asignar el nuevo objetivo final
+        freeLookCamera.LookAt = newTarget;
+
+        // Destruir el objeto temporal
+        Destroy(tempTarget);
+    }
+
 }
 
 [System.Serializable]

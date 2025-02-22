@@ -18,6 +18,8 @@ GameObject:
   - component: {fileID: 3754790435304779438}
   - component: {fileID: 8407419777404134908}
   - component: {fileID: 4678181675161628757}
+  - component: {fileID: 7680374519244501293}
+  - component: {fileID: 469594727604519882}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -229,6 +231,34 @@ MonoBehaviour:
   telefonoHUD: {fileID: 0}
   feedbackSlider: {fileID: 0}
   tiempoRequerido: 1
+--- !u!114 &7680374519244501293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5831046738247469719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89e9c3cdc3eb15849856af55fdc56cdf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  empatia: 0
+  persuasion: 0
+  intimidacion: 0
+--- !u!114 &469594727604519882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5831046738247469719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c50b911b7b9ec6343b2ab805812c67f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cordura: 0
 --- !u!1 &6424756049886318420
 GameObject:
   m_ObjectHideFlags: 0

@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         gameStarted = true;
-        StartCoroutine(InitialCameraFreeze(1.75f));
+        StartCoroutine(InitialCameraFreeze(2.05f));
         fadeManager.BlackScreenIntoFadeOut(2f);
     }
 
