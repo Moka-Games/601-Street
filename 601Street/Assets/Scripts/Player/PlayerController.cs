@@ -7,15 +7,18 @@ public class PlayerController : MonoBehaviour
     public float speed = 5f;
     public float sprintSpeed = 8f;
     public float gravity = -9.81f;
+    public float rotationSpeed = 5f; // Reducida para hacer la rotación más suave
 
     private Vector3 velocity;
-
     public CharacterController controller;
-
     private Animator animator;
 
     private bool forwardPressed = false;
     private bool horizontalPressedAfterForward = false;
+    private bool wasMovingForwardAndHorizontal = false;
+    private Quaternion targetRotation;
+    private bool isTransitioning = false;
+    private float currentRotationSpeed;
 
     void Start()
     {
@@ -24,6 +27,8 @@ public class PlayerController : MonoBehaviour
         {
             Debug.LogWarning("Falta por asignar el animator");
         }
+        targetRotation = transform.rotation;
+        currentRotationSpeed = rotationSpeed;
     }
 
     void FixedUpdate()
@@ -67,37 +72,59 @@ public class PlayerController : MonoBehaviour
             {
                 forwardPressed = true;
                 horizontalPressedAfterForward = false;
+                wasMovingForwardAndHorizontal = false;
+                isTransitioning = true;
+                currentRotationSpeed = rotationSpeed * 0.5f; // Más lento al iniciar el movimiento
             }
 
-            if (x != 0 && forwardPressed)
+            if (x != 0)
             {
                 horizontalPressedAfterForward = true;
+                wasMovingForwardAndHorizontal = true;
+                targetRotation = Quaternion.LookRotation(move);
+                currentRotationSpeed = Mathf.Lerp(currentRotationSpeed, rotationSpeed, Time.deltaTime);
             }
-
-            if (forwardPressed && horizontalPressedAfterForward)
+            else
             {
-                Quaternion targetRotation = Quaternion.LookRotation(move);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
-            }
-            else if (x == 0)
-            {
-                Quaternion toRotation = Quaternion.LookRotation(forward);
-                transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, Time.deltaTime * 10f);
+                targetRotation = Quaternion.LookRotation(forward);
+                horizontalPressedAfterForward = false;
+                currentRotationSpeed = Mathf.Lerp(currentRotationSpeed, rotationSpeed, Time.deltaTime);
             }
         }
         else
         {
             if (z == 0)
             {
-                forwardPressed = false;
-                horizontalPressedAfterForward = false;
-            }
+                if (wasMovingForwardAndHorizontal && x != 0)
+                {
+                    if (!isTransitioning)
+                    {
+                        isTransitioning = true;
+                        currentRotationSpeed = rotationSpeed * 0.3f; // Más lento durante la transición
+                    }
+                    targetRotation = Quaternion.LookRotation(forward);
+                }
+                else if (x == 0)
+                {
+                    forwardPressed = false;
+                    horizontalPressedAfterForward = false;
+                    wasMovingForwardAndHorizontal = false;
+                    targetRotation = Quaternion.LookRotation(forward);
+                    currentRotationSpeed = rotationSpeed;
+                }
 
-            if (x == 0)
-            {
-                Quaternion toRotation = Quaternion.LookRotation(forward);
-                transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, Time.deltaTime * 10f);
+                currentRotationSpeed = Mathf.Lerp(currentRotationSpeed, rotationSpeed, Time.deltaTime);
             }
+        }
+
+        // Aplicar la rotación de forma suave
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * currentRotationSpeed);
+
+        // Comprobar si hemos llegado cerca de la rotación objetivo
+        if (Quaternion.Angle(transform.rotation, targetRotation) < 0.1f)
+        {
+            isTransitioning = false;
+            currentRotationSpeed = rotationSpeed;
         }
     }
 
@@ -105,10 +132,10 @@ public class PlayerController : MonoBehaviour
     {
         if (controller != null)
         {
-            controller.enabled = false;  
-            transform.position = spawnPosition;  
-            transform.rotation = spawnRotation;  
-            controller.enabled = true;  
+            controller.enabled = false;
+            transform.position = spawnPosition;
+            transform.rotation = spawnRotation;
+            controller.enabled = true;
             Debug.Log("Jugador movido al punto de spawn");
         }
         else
