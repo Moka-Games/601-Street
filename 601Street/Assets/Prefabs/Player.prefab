@@ -155,10 +155,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61a59884b4a156e4198ad1054baafe68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 3.5
+  baseSpeed: 4
   sprintSpeed: 5
+  backwardsSpeedMultiplier: 0.6
   gravity: -9.8
-  controller: {fileID: 3115345725258227943}
+  movementThreshold: 0.1
+  baseRotationSpeed: 5
+  initialRotationMultiplier: 0.5
+  transitionRotationMultiplier: 0.3
+  diagonalRotationAngle: 45
+  rotationThreshold: 0.1
+  characterController: {fileID: 0}
 --- !u!114 &297787153583136723
 MonoBehaviour:
   m_ObjectHideFlags: 0

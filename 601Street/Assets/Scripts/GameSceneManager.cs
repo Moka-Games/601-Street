@@ -123,10 +123,10 @@ public class GameSceneManager : MonoBehaviour
             PlayerController playerController = currentPlayer.GetComponent<PlayerController>();
             if (playerController != null)
             {
-                playerController.controller.enabled = false;
+                playerController.SetMovementEnabled(false);
                 currentPlayer.transform.position = playerSpawnPoint.transform.position;
                 currentPlayer.transform.rotation = playerSpawnPoint.transform.rotation;
-                playerController.controller.enabled = true;
+                playerController.SetMovementEnabled(true);
 
                 Debug.Log("Jugador movido al punto de spawn en la nueva escena.");
             }
@@ -152,7 +152,6 @@ public class GameSceneManager : MonoBehaviour
             Debug.LogError($"No se encontró 'Camera_InitialPosition' o la cámara en la escena {currentSceneName}!");
         }
     }
-
     private GameObject FindObjectInAllScenes(string objectName)
     {
         for (int i = 0; i < SceneManager.sceneCount; i++)

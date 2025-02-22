@@ -2,95 +2,315 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float speed = 5f;
-    public float sprintSpeed = 8f;
-    public float gravity = -9.81f;
-    public float rotationSpeed = 5f;
+    [Header("Movement Settings")]
+    [SerializeField] private float baseSpeed = 5f;
+    [SerializeField] private float sprintSpeed = 8f;
+    [SerializeField] private float backwardsSpeedMultiplier = 0.7f;
+    [SerializeField] private float gravity = -9.81f;
+    [SerializeField] private float movementThreshold = 0.1f;
 
-    private Vector3 velocity;
-    public CharacterController controller;
+    [Header("Rotation Settings")]
+    [SerializeField] private float baseRotationSpeed = 5f;
+    [SerializeField] private float initialRotationMultiplier = 0.5f;
+    [SerializeField] private float transitionRotationMultiplier = 0.3f;
+    [SerializeField] private float diagonalRotationAngle = 45f;
+    [SerializeField] private float rotationThreshold = 0.1f;
+
+    [Header("Required Components")]
+    [SerializeField] private CharacterController characterController;
+
+    private MovementState movementState;
+    private RotationState rotationState;
+    private Camera mainCamera;
     private Animator animator;
 
-    private bool isMoving = false;
-    private Quaternion targetRotation;
-    private float currentRotationSpeed;
-
-    void Start()
+    private struct MovementState
     {
-        animator = GetComponent<Animator>();
-        if (animator == null)
-        {
-            Debug.LogWarning("Falta por asignar el animator");
-        }
-        targetRotation = transform.rotation;
-        currentRotationSpeed = rotationSpeed;
+        public Vector3 Velocity;
+        public Vector3 MoveDirection;
+        public bool IsMoving;
+        public float CurrentSpeed;
     }
 
-    void Update()
+    private struct RotationState
     {
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
+        public bool ForwardPressed;
+        public bool HorizontalPressedAfterForward;
+        public bool WasMovingForwardAndHorizontal;
+        public bool IsTransitioning;
+        public float CurrentRotationSpeed;
+        public Quaternion TargetRotation;
+    }
 
-        Vector3 forward = Camera.main.transform.forward;
-        Vector3 right = Camera.main.transform.right;
+    private void Awake()
+    {
+        InitializeComponents();
+        InitializeStates();
+    }
+
+    private void InitializeComponents()
+    {
+        mainCamera = Camera.main;
+        animator = GetComponent<Animator>();
+
+        if (!characterController) characterController = GetComponent<CharacterController>();
+        if (!characterController) Debug.LogError($"CharacterController not found on {gameObject.name}!");
+        if (!animator) Debug.LogWarning($"Animator not assigned on {gameObject.name}");
+    }
+
+    private void InitializeStates()
+    {
+        movementState = new MovementState
+        {
+            Velocity = Vector3.zero,
+            MoveDirection = Vector3.zero,
+            IsMoving = false,
+            CurrentSpeed = baseSpeed
+        };
+
+        rotationState = new RotationState
+        {
+            ForwardPressed = false,
+            HorizontalPressedAfterForward = false,
+            WasMovingForwardAndHorizontal = false,
+            IsTransitioning = false,
+            CurrentRotationSpeed = baseRotationSpeed,
+            TargetRotation = transform.rotation
+        };
+    }
+
+    private void FixedUpdate()
+    {
+        Vector2 input = GetMovementInput();
+        UpdateMovement(input);
+        UpdateRotation(input);
+        ApplyGravity();
+    }
+
+    private Vector2 GetMovementInput()
+    {
+        return new Vector2(
+            Input.GetAxis("Horizontal"),
+            Input.GetAxis("Vertical")
+        );
+    }
+
+    private void UpdateMovement(Vector2 input)
+    {
+        (Vector3 forward, Vector3 right) = GetCameraDirections();
+
+        movementState.MoveDirection = CalculateMoveDirection(input, forward, right);
+        movementState.IsMoving = movementState.MoveDirection.magnitude > movementThreshold;
+        movementState.CurrentSpeed = CalculateCurrentSpeed(input.y);
+
+        if (movementState.IsMoving)
+        {
+            characterController.Move(movementState.MoveDirection * movementState.CurrentSpeed * Time.deltaTime);
+        }
+    }
+
+    private (Vector3 forward, Vector3 right) GetCameraDirections()
+    {
+        Vector3 forward = mainCamera.transform.forward;
+        Vector3 right = mainCamera.transform.right;
 
         forward.y = 0f;
         right.y = 0f;
+
+        return (forward.normalized, right.normalized);
+    }
+
+    private Vector3 CalculateMoveDirection(Vector2 input, Vector3 forward, Vector3 right)
+    {
+        Vector3 direction = right * input.x;
+
+        if (input.y > 0)
+        {
+            direction += forward * input.y;
+        }
+        else if (input.y < 0)
+        {
+            direction += -forward * Mathf.Abs(input.y);
+        }
+
+        return direction;
+    }
+
+    private float CalculateCurrentSpeed(float verticalInput)
+    {
+        if (verticalInput > 0 && Input.GetKey(KeyCode.LeftShift) && Mathf.Approximately(Input.GetAxis("Horizontal"), 0))
+        {
+            return sprintSpeed;
+        }
+        else if (verticalInput < 0)
+        {
+            return baseSpeed * backwardsSpeedMultiplier;
+        }
+        return baseSpeed;
+    }
+
+    private void UpdateRotation(Vector2 input)
+    {
+        if (!movementState.IsMoving)
+        {
+            rotationState.TargetRotation = transform.rotation;
+            return;
+        }
+
+        HandleRotationStates(input);
+        ApplyRotation();
+        CheckRotationCompletion();
+    }
+
+    private void HandleRotationStates(Vector2 input)
+    {
+        if (input.y != 0)
+        {
+            HandleVerticalRotation(input);
+        }
+        else
+        {
+            HandleHorizontalOnlyRotation(input.x);
+        }
+    }
+
+    private void HandleVerticalRotation(Vector2 input)
+    {
+        if (!rotationState.ForwardPressed)
+        {
+            InitializeForwardMovement();
+        }
+
+        if (input.x != 0)
+        {
+            HandleDiagonalMovement(input);
+        }
+        else
+        {
+            HandleStraightMovement(input.y);
+        }
+    }
+
+    private void InitializeForwardMovement()
+    {
+        rotationState.ForwardPressed = true;
+        rotationState.HorizontalPressedAfterForward = false;
+        rotationState.WasMovingForwardAndHorizontal = false;
+        rotationState.IsTransitioning = true;
+        rotationState.CurrentRotationSpeed = baseRotationSpeed * initialRotationMultiplier;
+    }
+
+    private void HandleDiagonalMovement(Vector2 input)
+    {
+        rotationState.HorizontalPressedAfterForward = true;
+        rotationState.WasMovingForwardAndHorizontal = true;
+
+        Vector3 forward = mainCamera.transform.forward;
+        forward.y = 0;
         forward.Normalize();
-        right.Normalize();
 
-        Vector3 move = right * x + forward * z;
-
-        if (move.magnitude > 0.1f)
+        if (input.y < 0)
         {
-            isMoving = true;
-            HandleMovement(move, forward);
+            rotationState.TargetRotation = Quaternion.LookRotation(forward);
+            rotationState.TargetRotation *= Quaternion.Euler(0, -diagonalRotationAngle * Mathf.Sign(input.x), 0);
         }
         else
         {
-            isMoving = false;
+            Vector3 rotatedDirection = Quaternion.Euler(0, diagonalRotationAngle * Mathf.Sign(input.x), 0) * forward;
+            rotationState.TargetRotation = Quaternion.LookRotation(rotatedDirection);
         }
 
-        HandleRotation(x, z, move, forward);
-
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+        rotationState.CurrentRotationSpeed = Mathf.Lerp(rotationState.CurrentRotationSpeed, baseRotationSpeed, Time.deltaTime);
     }
 
-    private void HandleMovement(Vector3 move, Vector3 forward)
+    private void HandleStraightMovement(float verticalInput)
     {
-        float currentSpeed = speed;
-        if (Input.GetKey(KeyCode.LeftShift))
+        Vector3 forward = mainCamera.transform.forward;
+        forward.y = 0;
+        forward.Normalize();
+
+        rotationState.TargetRotation = Quaternion.LookRotation(forward);
+        rotationState.HorizontalPressedAfterForward = false;
+        rotationState.CurrentRotationSpeed = Mathf.Lerp(rotationState.CurrentRotationSpeed, baseRotationSpeed, Time.deltaTime);
+    }
+
+    private void HandleHorizontalOnlyRotation(float horizontalInput)
+    {
+        if (rotationState.WasMovingForwardAndHorizontal && horizontalInput != 0)
         {
-            currentSpeed = sprintSpeed;
+            if (!rotationState.IsTransitioning)
+            {
+                rotationState.IsTransitioning = true;
+                rotationState.CurrentRotationSpeed = baseRotationSpeed * transitionRotationMultiplier;
+            }
+            Vector3 forward = mainCamera.transform.forward;
+            forward.y = 0;
+            forward.Normalize();
+            rotationState.TargetRotation = Quaternion.LookRotation(forward);
+        }
+        else if (horizontalInput == 0)
+        {
+            ResetMovementState();
         }
 
-        controller.Move(move.normalized * currentSpeed * Time.deltaTime);
+        rotationState.CurrentRotationSpeed = Mathf.Lerp(rotationState.CurrentRotationSpeed, baseRotationSpeed, Time.deltaTime);
     }
 
-    private void HandleRotation(float x, float z, Vector3 move, Vector3 forward)
+    private void ResetMovementState()
     {
-        if (isMoving)
+        rotationState.ForwardPressed = false;
+        rotationState.HorizontalPressedAfterForward = false;
+        rotationState.WasMovingForwardAndHorizontal = false;
+
+        Vector3 forward = mainCamera.transform.forward;
+        forward.y = 0;
+        forward.Normalize();
+        rotationState.TargetRotation = Quaternion.LookRotation(forward);
+        rotationState.CurrentRotationSpeed = baseRotationSpeed;
+    }
+
+    private void ApplyRotation()
+    {
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            rotationState.TargetRotation,
+            Time.deltaTime * rotationState.CurrentRotationSpeed
+        );
+    }
+
+    private void CheckRotationCompletion()
+    {
+        if (Quaternion.Angle(transform.rotation, rotationState.TargetRotation) < rotationThreshold)
         {
-            targetRotation = Quaternion.LookRotation(move);
-            currentRotationSpeed = rotationSpeed;
+            rotationState.IsTransitioning = false;
+            rotationState.CurrentRotationSpeed = baseRotationSpeed;
+        }
+    }
+
+    private void ApplyGravity()
+    {
+        movementState.Velocity.y += gravity * Time.deltaTime;
+        characterController.Move(movementState.Velocity * Time.deltaTime);
+    }
+    public void SetMovementEnabled(bool enabled)
+    {
+        if (characterController != null)
+        {
+            characterController.enabled = enabled;
         }
         else
         {
-            targetRotation = transform.rotation;
+            Debug.LogError($"CharacterController not found on {gameObject.name}!");
         }
-
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * currentRotationSpeed);
     }
-
     public void Respawn(Vector3 spawnPosition, Quaternion spawnRotation)
     {
-        if (controller != null)
+        if (characterController != null)
         {
-            controller.enabled = false;
+            characterController.enabled = false;
             transform.position = spawnPosition;
             transform.rotation = spawnRotation;
-            controller.enabled = true;
+            characterController.enabled = true;
             Debug.Log("Jugador movido al punto de spawn");
         }
         else
