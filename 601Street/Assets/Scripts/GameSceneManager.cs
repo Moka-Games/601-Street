@@ -45,7 +45,7 @@ public class GameSceneManager : MonoBehaviour
             Scene persistentScene = SceneManager.GetSceneByName("PersistentScene");
             if (!persistentScene.isLoaded)
             {
-                // Primero, guardamos la referencia a la escena actual
+                // Se guarda la referencia de la escena actual
                 Scene initialScene = SceneManager.GetActiveScene();
 
                 SceneManager.LoadSceneAsync("PersistentScene", LoadSceneMode.Additive).completed += (asyncOperation) =>
@@ -53,7 +53,7 @@ public class GameSceneManager : MonoBehaviour
                     persistentSceneLoaded = true;
                     FindPlayerAndCameraInPersistentScene();
 
-                    // Solo establecemos la escena actual, no la cargamos de nuevo
+                    // En vez de cargar de nuevo la escena actual, solo la establecemos
                     currentSceneName = initialScene.name;
                     StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
                 };
@@ -91,7 +91,7 @@ public class GameSceneManager : MonoBehaviour
     {
         if (currentSceneName == sceneName) return;
 
-        // Descargar la escena actual antes de cargar la nueva
+        // Hay descargar la escena actual antes de cargar la nueva
         if (!string.IsNullOrEmpty(currentSceneName))
         {
             SceneManager.UnloadSceneAsync(currentSceneName);

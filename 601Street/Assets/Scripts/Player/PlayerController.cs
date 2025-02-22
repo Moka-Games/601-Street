@@ -1,23 +1,18 @@
-using UnityEditor;
 using UnityEngine;
-using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
     public float speed = 5f;
     public float sprintSpeed = 8f;
     public float gravity = -9.81f;
-    public float rotationSpeed = 5f; // Reducida para hacer la rotación más suave
+    public float rotationSpeed = 5f;
 
     private Vector3 velocity;
     public CharacterController controller;
     private Animator animator;
 
-    private bool forwardPressed = false;
-    private bool horizontalPressedAfterForward = false;
-    private bool wasMovingForwardAndHorizontal = false;
+    private bool isMoving = false;
     private Quaternion targetRotation;
-    private bool isTransitioning = false;
     private float currentRotationSpeed;
 
     void Start()
@@ -31,7 +26,7 @@ public class PlayerController : MonoBehaviour
         currentRotationSpeed = rotationSpeed;
     }
 
-    void FixedUpdate()
+    void Update()
     {
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
@@ -46,17 +41,15 @@ public class PlayerController : MonoBehaviour
 
         Vector3 move = right * x + forward * z;
 
-        float currentSpeed = speed;
-        if (z > 0 && Input.GetKey(KeyCode.LeftShift) && x == 0)
+        if (move.magnitude > 0.1f)
         {
-            currentSpeed = sprintSpeed;
+            isMoving = true;
+            HandleMovement(move, forward);
         }
-        else if (z < 0)
+        else
         {
-            currentSpeed *= 0.7f;
+            isMoving = false;
         }
-
-        controller.Move(move * currentSpeed * Time.deltaTime);
 
         HandleRotation(x, z, move, forward);
 
@@ -64,68 +57,30 @@ public class PlayerController : MonoBehaviour
         controller.Move(velocity * Time.deltaTime);
     }
 
+    private void HandleMovement(Vector3 move, Vector3 forward)
+    {
+        float currentSpeed = speed;
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            currentSpeed = sprintSpeed;
+        }
+
+        controller.Move(move.normalized * currentSpeed * Time.deltaTime);
+    }
+
     private void HandleRotation(float x, float z, Vector3 move, Vector3 forward)
     {
-        if (z > 0)
+        if (isMoving)
         {
-            if (!forwardPressed)
-            {
-                forwardPressed = true;
-                horizontalPressedAfterForward = false;
-                wasMovingForwardAndHorizontal = false;
-                isTransitioning = true;
-                currentRotationSpeed = rotationSpeed * 0.5f; // Más lento al iniciar el movimiento
-            }
-
-            if (x != 0)
-            {
-                horizontalPressedAfterForward = true;
-                wasMovingForwardAndHorizontal = true;
-                targetRotation = Quaternion.LookRotation(move);
-                currentRotationSpeed = Mathf.Lerp(currentRotationSpeed, rotationSpeed, Time.deltaTime);
-            }
-            else
-            {
-                targetRotation = Quaternion.LookRotation(forward);
-                horizontalPressedAfterForward = false;
-                currentRotationSpeed = Mathf.Lerp(currentRotationSpeed, rotationSpeed, Time.deltaTime);
-            }
+            targetRotation = Quaternion.LookRotation(move);
+            currentRotationSpeed = rotationSpeed;
         }
         else
         {
-            if (z == 0)
-            {
-                if (wasMovingForwardAndHorizontal && x != 0)
-                {
-                    if (!isTransitioning)
-                    {
-                        isTransitioning = true;
-                        currentRotationSpeed = rotationSpeed * 0.3f; // Más lento durante la transición
-                    }
-                    targetRotation = Quaternion.LookRotation(forward);
-                }
-                else if (x == 0)
-                {
-                    forwardPressed = false;
-                    horizontalPressedAfterForward = false;
-                    wasMovingForwardAndHorizontal = false;
-                    targetRotation = Quaternion.LookRotation(forward);
-                    currentRotationSpeed = rotationSpeed;
-                }
-
-                currentRotationSpeed = Mathf.Lerp(currentRotationSpeed, rotationSpeed, Time.deltaTime);
-            }
+            targetRotation = transform.rotation;
         }
 
-        // Aplicar la rotación de forma suave
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * currentRotationSpeed);
-
-        // Comprobar si hemos llegado cerca de la rotación objetivo
-        if (Quaternion.Angle(transform.rotation, targetRotation) < 0.1f)
-        {
-            isTransitioning = false;
-            currentRotationSpeed = rotationSpeed;
-        }
     }
 
     public void Respawn(Vector3 spawnPosition, Quaternion spawnRotation)
