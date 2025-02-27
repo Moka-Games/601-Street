@@ -31,7 +31,7 @@ public class Personalidad_Script : MonoBehaviour
     {
         if(Input.GetKeyUp(KeyCode.E))
         {
-            Debug.Log(CheckEmpatia());
+            //Debug.Log(CheckEmpatia());
         }
     }
     public void AumentoEmpatia(int aumento)
