@@ -1,4 +1,7 @@
 using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
+
 public class Inventory_Interactor : MonoBehaviour
 {
     public float interactionRange = 5f;
@@ -7,10 +10,13 @@ public class Inventory_Interactor : MonoBehaviour
     private GameObject lastInteractableObject;
     private string lastItemName;
     public bool canInteract = false;
-    private Inventory_Item currentInteractableItem;
+    [HideInInspector] public Inventory_Item currentInteractableItem;
+
     [Header("Tecla para Interactuar")]
-    
     public KeyCode inputKey_to_Interact;
+
+    // Diccionario para registrar si un objeto ya mostró su pop-up
+    private Dictionary<GameObject, bool> popUpShown = new Dictionary<GameObject, bool>();
 
     private void Update()
     {
@@ -18,9 +24,7 @@ public class Inventory_Interactor : MonoBehaviour
         {
             if (Input.GetKeyDown(inputKey_to_Interact))
             {
-                lastInteractableObject.SetActive(false);
-                Inventory_Manager.Instance.DisplayPopUp(lastItemName);
-                lastInteractableObject = null;
+                DeactivateObject();
             }
         }
         else
@@ -57,13 +61,58 @@ public class Inventory_Interactor : MonoBehaviour
 
             if (currentInteractableItem.interactableObject != null)
             {
-                currentInteractableItem.interactableObject.SetActive(true);
                 lastInteractableObject = currentInteractableItem.interactableObject;
+                lastInteractableObject.SetActive(true);
+
+                // Buscar y asignar la función al botón de cerrar
+                AssignButtonFunction(lastInteractableObject);
             }
 
             Inventory_Manager.Instance.AddItem(currentInteractableItem.itemData, currentInteractableItem.onItemClick);
             Destroy(currentInteractableItem.gameObject);
         }
+    }
+
+    private void AssignButtonFunction(GameObject parentObject)
+    {
+        // Buscar el botón en el objeto interactuable, incluso si está desactivado
+        Button closeButton = FindButtonInChildren(parentObject, "Close_Interacted_Button");
+
+        if (closeButton != null)
+        {
+            // Añadir la función sin eliminar las ya existentes
+            closeButton.onClick.AddListener(DeactivateObject);
+        }
+    }
+
+    private Button FindButtonInChildren(GameObject parent, string buttonName)
+    {
+        Transform[] allChildren = parent.GetComponentsInChildren<Transform>(true); // Buscar en hijos, incluyendo inactivos
+        foreach (Transform child in allChildren)
+        {
+            if (child.name == buttonName)
+            {
+                return child.GetComponent<Button>();
+            }
+        }
+        return null;
+    }
+
+
+    public void DeactivateObject()
+    {
+        if (lastInteractableObject == null) return;
+
+        lastInteractableObject.SetActive(false);
+
+        // Mostrar el pop-up solo la primera vez que se desactiva
+        if (!popUpShown.ContainsKey(lastInteractableObject) || !popUpShown[lastInteractableObject])
+        {
+            Inventory_Manager.Instance.DisplayPopUp(lastItemName);
+            popUpShown[lastInteractableObject] = true;
+        }
+
+        lastInteractableObject = null;
     }
 
     private void OnDrawGizmos()
