@@ -40,7 +40,7 @@ public class Telefono_Manager : MonoBehaviour
         Telefono_UI.SetActive(false);
         Telefono_HUD.SetActive(true);
 
-        Pensamiento pensamientoID1 = pensamientos_Manager.GetPensamientoByID(1);
+        /*Pensamiento pensamientoID1 = pensamientos_Manager.GetPensamientoByID(1);
         if (pensamientoID1 != null)
         {
             pensamientos_Manager.MostrarPensamiento(pensamientoID1.pensamientoPrincipal);
@@ -48,6 +48,6 @@ public class Telefono_Manager : MonoBehaviour
         else
         {
             Debug.LogWarning("No se encontró el pensamiento con ID 1");
-        }
+        }*/
     }
 }

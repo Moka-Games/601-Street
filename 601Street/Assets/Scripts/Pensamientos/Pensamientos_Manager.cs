@@ -1,25 +1,56 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.SceneManagement;
+
 public class Pensamientos_Manager : MonoBehaviour
 {
+    public static Pensamientos_Manager Instance;
+
     public GameObject pensamientoUI;
     public TMP_Text pensamientoText;
-    public bool pensamientoInicial;
-    public string pensamientoInicioTexto;
     private Coroutine pensamientoSecundarioCoroutine;
     private Pensamiento pensamientoActual;
-
     private Pensamiento[] todosPensamientos;
+
+    public EscenaConfig[] configuracionesPorEscena;
+    private EscenaConfig configActual;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+    }
 
     private void Start()
     {
-        todosPensamientos = Object.FindObjectsByType<Pensamiento>(FindObjectsSortMode.None);
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        ConfigurarParaEscena(SceneManager.GetActiveScene().name);
+    }
+
+    private void OnSceneLoaded(Scene escena, LoadSceneMode modo)
+    {
+        ConfigurarParaEscena(escena.name);
+    }
+
+    private void ConfigurarParaEscena(string nombreEscena)
+    {
+        configActual = System.Array.Find(configuracionesPorEscena, c => c.nombreEscena == nombreEscena);
 
         pensamientoUI.SetActive(false);
-        if (pensamientoInicial)
+        todosPensamientos = Object.FindObjectsByType<Pensamiento>(FindObjectsSortMode.None);
+
+        if (configActual != null && configActual.activarPensamientoInicial)
         {
-            MostrarPensamiento(pensamientoInicioTexto);
+            MostrarPensamiento(configActual.pensamientoInicioTexto);
         }
     }
 
@@ -32,7 +63,7 @@ public class Pensamientos_Manager : MonoBehaviour
 
         foreach (Pensamiento pensamiento in todosPensamientos)
         {
-            if (pensamiento.Id == id)  
+            if (pensamiento.Id == id)
             {
                 return pensamiento;
             }
@@ -79,4 +110,19 @@ public class Pensamientos_Manager : MonoBehaviour
             yield return new WaitForSeconds(60);
         }
     }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+
+}
+
+[System.Serializable]
+public class EscenaConfig
+{
+    public string nombreEscena;
+    public bool activarPensamientoInicial;
+    public string pensamientoInicioTexto;
 }

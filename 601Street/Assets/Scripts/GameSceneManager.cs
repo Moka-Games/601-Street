@@ -22,6 +22,14 @@ public class GameSceneManager : MonoBehaviour
     private string currentSceneName;
     private bool persistentSceneLoaded = false;
 
+    [Header("Configuración de Transiciones")]
+    [SerializeField] private float fadeInDuration = 1.0f;
+    [SerializeField] private float fadeOutDuration = 1.0f;
+    [SerializeField] private float blackScreenDuration = 0.5f;
+
+    private FadeManager fadeManager;
+    private bool isTransitioning = false;
+
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -39,22 +47,31 @@ public class GameSceneManager : MonoBehaviour
         {
             persistentSceneLoaded = true;
             FindPlayerAndCameraInPersistentScene();
+            FindFadeManager();
         }
         else
         {
             Scene persistentScene = SceneManager.GetSceneByName("PersistentScene");
             if (!persistentScene.isLoaded)
             {
-                // Se guarda la referencia de la escena actual
                 Scene initialScene = SceneManager.GetActiveScene();
 
                 SceneManager.LoadSceneAsync("PersistentScene", LoadSceneMode.Additive).completed += (asyncOperation) =>
                 {
                     persistentSceneLoaded = true;
                     FindPlayerAndCameraInPersistentScene();
+                    FindFadeManager();
 
-                    // En vez de cargar de nuevo la escena actual, solo la establecemos
                     currentSceneName = initialScene.name;
+                    // Desactivamos el movimiento del jugador inicialmente
+                    DisablePlayerMovement();
+                    // Iniciamos con un fadeOut al cargar por primera vez
+                    if (fadeManager != null)
+                    {
+                        fadeManager.BlackScreenIntoFadeOut(fadeOutDuration);
+                        // Suscribimos al evento de finalización de fadeOut
+                        fadeManager.OnFadeOutComplete += EnablePlayerMovementAfterFade;
+                    }
                     StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
                 };
             }
@@ -62,9 +79,37 @@ public class GameSceneManager : MonoBehaviour
             {
                 persistentSceneLoaded = true;
                 FindPlayerAndCameraInPersistentScene();
+                FindFadeManager();
                 currentSceneName = activeSceneName;
+                // Desactivamos el movimiento del jugador inicialmente
+                DisablePlayerMovement();
+                // Iniciamos con un fadeOut al cargar por primera vez
+                if (fadeManager != null)
+                {
+                    fadeManager.BlackScreenIntoFadeOut(fadeOutDuration);
+                    // Suscribimos al evento de finalización de fadeOut
+                    fadeManager.OnFadeOutComplete += EnablePlayerMovementAfterFade;
+                }
                 StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
             }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Limpiamos los eventos suscritos
+        if (fadeManager != null)
+        {
+            fadeManager.OnFadeOutComplete -= EnablePlayerMovementAfterFade;
+        }
+    }
+
+    private void FindFadeManager()
+    {
+        fadeManager = FindAnyObjectByType<FadeManager>();
+        if (fadeManager == null)
+        {
+            Debug.LogError("No se encontró el FadeManager en la escena persistente!");
         }
     }
 
@@ -89,25 +134,105 @@ public class GameSceneManager : MonoBehaviour
 
     public void LoadScene(string sceneName)
     {
-        if (currentSceneName == sceneName) return;
+        if (currentSceneName == sceneName || isTransitioning) return;
 
-        // Hay descargar la escena actual antes de cargar la nueva
-        if (!string.IsNullOrEmpty(currentSceneName))
-        {
-            SceneManager.UnloadSceneAsync(currentSceneName);
-        }
-
-        currentSceneName = sceneName;
-        SceneManager.sceneLoaded += OnSceneLoaded;
-        SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+        StartCoroutine(LoadSceneWithTransition(sceneName));
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    private IEnumerator LoadSceneWithTransition(string sceneName)
     {
-        if (scene.name == currentSceneName)
+        isTransitioning = true;
+
+        // Desactivamos el controlador del jugador durante la transición
+        DisablePlayerMovement();
+
+        // Congelamos la cámara durante la transición
+        if (currentCamera != null)
         {
-            StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
-            SceneManager.sceneLoaded -= OnSceneLoaded;
+            currentCamera.FreezeCamera();
+        }
+
+        // Nos aseguramos de desuscribir cualquier evento previo
+        if (fadeManager != null)
+        {
+            fadeManager.OnFadeOutComplete -= EnablePlayerMovementAfterFade;
+        }
+
+        // Realizamos el fade in (a negro)
+        if (fadeManager != null)
+        {
+            fadeManager.FadeIn(fadeInDuration);
+            yield return new WaitForSeconds(fadeInDuration);
+        }
+
+        // Descargamos la escena actual
+        if (!string.IsNullOrEmpty(currentSceneName))
+        {
+            AsyncOperation unloadOperation = SceneManager.UnloadSceneAsync(currentSceneName);
+            yield return unloadOperation;
+        }
+
+        // Mantenemos la pantalla en negro por un momento
+        yield return new WaitForSeconds(blackScreenDuration);
+
+        // Cargamos la nueva escena
+        currentSceneName = sceneName;
+        AsyncOperation loadOperation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+
+        // Esperamos a que la escena esté completamente cargada
+        yield return loadOperation;
+
+        // Movemos al jugador y la cámara a los puntos de spawn
+        yield return StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
+
+        // Realizamos el fade out (de negro a transparente)
+        if (fadeManager != null)
+        {
+            // Suscribimos al evento de finalización de fadeOut para reactivar el movimiento
+            fadeManager.OnFadeOutComplete += EnablePlayerMovementAfterFade;
+            fadeManager.FadeOut(fadeOutDuration);
+
+            // No esperamos aquí, el evento se encargará de activar el movimiento
+        }
+
+        // Descongelamos la cámara
+        if (currentCamera != null)
+        {
+            currentCamera.UnfreezeCamera();
+        }
+
+        isTransitioning = false;
+    }
+
+    private void DisablePlayerMovement()
+    {
+        if (currentPlayer != null)
+        {
+            PlayerController playerController = currentPlayer.GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.SetMovementEnabled(false);
+                Debug.Log("Movimiento del jugador desactivado durante transición");
+            }
+        }
+    }
+
+    private void EnablePlayerMovementAfterFade()
+    {
+        if (currentPlayer != null)
+        {
+            PlayerController playerController = currentPlayer.GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.SetMovementEnabled(true);
+                Debug.Log("Movimiento del jugador reactivado después del fade");
+            }
+        }
+
+        // Desuscribimos el evento para evitar múltiples activaciones
+        if (fadeManager != null)
+        {
+            fadeManager.OnFadeOutComplete -= EnablePlayerMovementAfterFade;
         }
     }
 
@@ -120,20 +245,17 @@ public class GameSceneManager : MonoBehaviour
 
         if (playerSpawnPoint != null && currentPlayer != null)
         {
+            // Aseguramos que el movimiento está desactivado durante el posicionamiento
             PlayerController playerController = currentPlayer.GetComponent<PlayerController>();
             if (playerController != null)
             {
                 playerController.SetMovementEnabled(false);
-                currentPlayer.transform.position = playerSpawnPoint.transform.position;
-                currentPlayer.transform.rotation = playerSpawnPoint.transform.rotation;
-                playerController.SetMovementEnabled(true);
+            }
 
-                Debug.Log("Jugador movido al punto de spawn en la nueva escena.");
-            }
-            else
-            {
-                Debug.LogError("No se encontró el PlayerController en el jugador!");
-            }
+            currentPlayer.transform.position = playerSpawnPoint.transform.position;
+            currentPlayer.transform.rotation = playerSpawnPoint.transform.rotation;
+
+            Debug.Log("Jugador movido al punto de spawn en la nueva escena.");
         }
         else
         {
@@ -152,6 +274,7 @@ public class GameSceneManager : MonoBehaviour
             Debug.LogError($"No se encontró 'Camera_InitialPosition' o la cámara en la escena {currentSceneName}!");
         }
     }
+
     private GameObject FindObjectInAllScenes(string objectName)
     {
         for (int i = 0; i < SceneManager.sceneCount; i++)

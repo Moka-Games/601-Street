@@ -27,6 +27,7 @@ public class Inventory_Item_Feedback : MonoBehaviour
     {
         // Buscar referencias automáticamente
         inventory_Interactor = FindAnyObjectByType<Inventory_Interactor>();
+        visualParent = GameObject.Find("Inventory_Item_Feedback");
         mainCamera = Camera.main;
 
         // Buscar el HUD Canvas por nombre
@@ -45,7 +46,6 @@ public class Inventory_Item_Feedback : MonoBehaviour
                 }
             }
 
-            // Guardar el RectTransform del canvas
             canvasRectTransform = hudCanvas.GetComponent<RectTransform>();
             if (canvasRectTransform == null)
             {
@@ -57,11 +57,10 @@ public class Inventory_Item_Feedback : MonoBehaviour
         else
         {
             Debug.LogError("No se encontró objeto con nombre 'HUD'");
-            enabled = false; // Deshabilitar este script
+            enabled = false; 
             return;
         }
 
-        // Buscar los prefabs de indicadores en la escena
         GameObject nearItemFeedbackOriginal = GameObject.Find("Near_Item_Feedback");
         GameObject inputFeedbackOriginal = GameObject.Find("Input_Feedback");
 
