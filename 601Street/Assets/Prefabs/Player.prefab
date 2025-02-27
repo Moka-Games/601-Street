@@ -14,12 +14,12 @@ GameObject:
   - component: {fileID: 3115345725258227943}
   - component: {fileID: 5886342011672503638}
   - component: {fileID: 7637152430803431070}
-  - component: {fileID: 297787153583136723}
   - component: {fileID: 3754790435304779438}
   - component: {fileID: 8407419777404134908}
   - component: {fileID: 4678181675161628757}
   - component: {fileID: 7680374519244501293}
   - component: {fileID: 469594727604519882}
+  - component: {fileID: 297787153583136723}
   - component: {fileID: 1840182962850762622}
   m_Layer: 3
   m_Name: Player
@@ -169,24 +169,6 @@ MonoBehaviour:
   diagonalRotationAngle: 45
   rotationThreshold: 0.1
   characterController: {fileID: 0}
---- !u!114 &297787153583136723
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5831046738247469719}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f2a52a7bf08a4345ae8f41d7ad27045, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionRange: 3
-  interactableLayer:
-    serializedVersion: 2
-    m_Bits: 0
-  canInteract: 0
-  inputKey_to_Interact: 101
 --- !u!114 &3754790435304779438
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -260,6 +242,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cordura: 0
+--- !u!114 &297787153583136723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5831046738247469719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f2a52a7bf08a4345ae8f41d7ad27045, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactionRange: 3
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  canInteract: 0
+  currentInteractableItem: {fileID: 0}
+  inputKey_to_Interact: 101
 --- !u!114 &1840182962850762622
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,10 +275,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionRange: 2
   interactionKey: 101
-  cameraTransform: {fileID: 0}
   interactableLayer:
     serializedVersion: 2
     m_Bits: 64
+  showDebugRay: 1
+  debugRayColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1 &6424756049886318420
 GameObject:
   m_ObjectHideFlags: 0
