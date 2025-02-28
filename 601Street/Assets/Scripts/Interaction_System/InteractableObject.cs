@@ -28,6 +28,11 @@ public class InteractableObject : MonoBehaviour, IInteractable
     [Header("Configuración de Indicadores")]
     [SerializeField] private float edgeOffset = 50f; // Distancia desde el borde de la pantalla
 
+    // Referencias a los prefabs originales (templates)
+    private static GameObject rangeIndicatorTemplate;
+    private static GameObject interactIndicatorTemplate;
+    private static bool templatesInitialized = false;
+
     private bool playerOnRange = false;
     private bool isInitialized = false;
 
@@ -70,42 +75,121 @@ public class InteractableObject : MonoBehaviour, IInteractable
             }
         }
 
-        InitializeFeedback();
+        // Inicializar las plantillas solo una vez para todos los objetos interactuables
+        InitializeTemplates();
+
+        // Crear indicadores específicos para esta instancia
+        CreateFeedbackIndicators();
+
+        isInitialized = true;
     }
 
-    private void InitializeFeedback()
+    private void InitializeTemplates()
     {
-        // Buscar los objetos de feedback en la escena
-        rangeIndicator = GameObject.Find("Near_Interactable_Item_Feedback");
-        interactIndicator = GameObject.Find("Input_Interactable_Feedback");
+        // Si ya se inicializaron las plantillas, no hacerlo nuevamente
+        if (templatesInitialized)
+            return;
 
-        if (rangeIndicator == null || interactIndicator == null)
+        // Buscar los objetos originales solo una vez
+        GameObject originalRangeIndicator = GameObject.Find("Near_Interactable_Item_Feedback");
+        GameObject originalInteractIndicator = GameObject.Find("Input_Interactable_Feedback");
+
+        if (originalRangeIndicator == null)
         {
-            Debug.LogError("No se encontraron los objetos de feedback en la escena.");
+            Debug.LogError("No se encontró objeto con nombre 'Near_Interactable_Item_Feedback'");
             enabled = false;
             return;
         }
 
-        // Obtener los RectTransforms
+        if (originalInteractIndicator == null)
+        {
+            Debug.LogError("No se encontró objeto con nombre 'Input_Interactable_Feedback'");
+            enabled = false;
+            return;
+        }
+
+        // Guardar los originales como plantillas
+        rangeIndicatorTemplate = originalRangeIndicator;
+        interactIndicatorTemplate = originalInteractIndicator;
+
+        // Desactivar los originales para que no se muestren en la escena
+        rangeIndicatorTemplate.SetActive(false);
+        interactIndicatorTemplate.SetActive(false);
+
+        // Marcar como inicializado
+        templatesInitialized = true;
+        Debug.Log("Plantillas de feedback inicializadas");
+    }
+
+    private void CreateFeedbackIndicators()
+    {
+        // Verificar que las plantillas existan
+        if (rangeIndicatorTemplate == null || interactIndicatorTemplate == null)
+        {
+            Debug.LogError("Las plantillas de feedback no se han inicializado correctamente");
+            return;
+        }
+
+        // Encontrar el canvas para instanciar los indicadores
+        if (hudCanvas == null)
+        {
+            GameObject hudObj = GameObject.Find("HUD");
+            if (hudObj != null)
+            {
+                hudCanvas = hudObj.GetComponent<Canvas>();
+                if (hudCanvas == null)
+                {
+                    hudCanvas = hudObj.GetComponentInChildren<Canvas>();
+                }
+            }
+
+            if (hudCanvas == null)
+            {
+                Debug.LogError("No se pudo encontrar el Canvas HUD");
+                return;
+            }
+        }
+
+        // Instanciar los indicadores como hijos del canvas
+        rangeIndicator = Instantiate(rangeIndicatorTemplate, hudCanvas.transform);
+        interactIndicator = Instantiate(interactIndicatorTemplate, hudCanvas.transform);
+
+        // Asegurarse de que tengan los nombres correctos para identificarlos
+        rangeIndicator.name = "RangeIndicator_" + gameObject.name + "_" + GetInstanceID();
+        interactIndicator.name = "InteractIndicator_" + gameObject.name + "_" + GetInstanceID();
+
+        // Obtener sus RectTransforms
         rangeIndicatorRect = rangeIndicator.GetComponent<RectTransform>();
         interactIndicatorRect = interactIndicator.GetComponent<RectTransform>();
 
-        // Si no tienen RectTransform, intentar encontrarlos en sus hijos
+        // Si los indicadores no tienen RectTransform, intentar encontrarlo en sus hijos
         if (rangeIndicatorRect == null)
         {
             rangeIndicatorRect = rangeIndicator.GetComponentInChildren<RectTransform>();
+            if (rangeIndicatorRect == null)
+            {
+                Debug.LogError("No se pudo encontrar RectTransform para el indicador de rango");
+                enabled = false;
+                return;
+            }
         }
 
         if (interactIndicatorRect == null)
         {
             interactIndicatorRect = interactIndicator.GetComponentInChildren<RectTransform>();
+            if (interactIndicatorRect == null)
+            {
+                Debug.LogError("No se pudo encontrar RectTransform para el indicador de interacción");
+                enabled = false;
+                return;
+            }
         }
 
-        // Desactivar los indicadores al inicio
+        // Inicialmente desactivados
         rangeIndicator.SetActive(false);
         interactIndicator.SetActive(false);
 
-        isInitialized = true;
+        Debug.Log("Indicadores de feedback creados para " + gameObject.name);
     }
 
     public virtual void Interact()
