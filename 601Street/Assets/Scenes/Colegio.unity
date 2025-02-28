@@ -26900,8 +26900,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  onInteracted:
+    m_PersistentCalls:
+      m_Calls: []
   rangeIndicator: {fileID: 0}
   interactIndicator: {fileID: 0}
+  objectInteracted: 0
 --- !u!43 &839812516
 Mesh:
   m_ObjectHideFlags: 0

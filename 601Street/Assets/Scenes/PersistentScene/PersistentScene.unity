@@ -700,7 +700,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &714190693
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1853,6 +1853,12 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1524181018}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1524181021 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6897246829007206051, guid: 36a03b43277491040a00cc349d560a74,
+    type: 3}
+  m_PrefabInstance: {fileID: 1524181018}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1539481033
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2088,7 +2094,6 @@ GameObject:
   - component: {fileID: 1566979291}
   - component: {fileID: 1566979290}
   - component: {fileID: 1566979289}
-  - component: {fileID: 1566979292}
   m_Layer: 0
   m_Name: Interaction_Feedback_Test
   m_TagString: Untagged
@@ -2179,20 +2184,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!114 &1566979292
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1566979287}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 129589a3f50f9e546b6ace2eecb6728f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionPromptPanel: {fileID: 240378000}
-  interactionPromptText: {fileID: 1510855644}
 --- !u!1001 &1588404275
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2798,6 +2789,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1942858743}
+  - component: {fileID: 1942858744}
   m_Layer: 0
   m_Name: UI/HUD
   m_TagString: Untagged
@@ -2826,6 +2818,20 @@ Transform:
   - {fileID: 1566979288}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1942858744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942858742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 915f1437f021df845825c80310c50793, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventoryItemFeedback: {fileID: 1524181021}
+  interactableItemFeedback: {fileID: 714190692}
 --- !u!224 &2000895169 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5333302690238951813, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
