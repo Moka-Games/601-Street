@@ -6,7 +6,6 @@ using Cinemachine;
 using Unity.VisualScripting;
 using System.Collections;
 
-
 public class DialogueManager : MonoBehaviour
 {
     public static DialogueManager Instance { get; private set; }
@@ -38,14 +37,7 @@ public class DialogueManager : MonoBehaviour
     private int selectedOptionIndex = -1;
 
     [Header("Cinemachine Camera")]
-    [SerializeField] private CinemachineFreeLook freeLookCamera;
-    [SerializeField] private Transform playerLookAtTarget; // El objetivo de LookAt del jugador
-    private Transform npcLookAtTarget;
-
-    [Header("Camera Transition Settings")]
-    [SerializeField] private float transitionDuration = 1.0f; // Duración de la transición
-    private Transform currentLookAtTarget; // Objetivo actual de LookAt
-    private Coroutine transitionCoroutine;
+    private Camera_Script cameraScript;
 
     void Awake()
     {
@@ -61,6 +53,8 @@ public class DialogueManager : MonoBehaviour
 
     void Start()
     {
+        cameraScript = FindAnyObjectByType<Camera_Script>();
+
         failObject.SetActive(false);
         sucessObject.SetActive(false);
 
@@ -117,14 +111,10 @@ public class DialogueManager : MonoBehaviour
         currentDialogueIndex = 0;
 
         // Cambiar el LookAt de la cámara al NPC con transición suave
-        npcLookAtTarget = currentNPC.transform.Find("LookAt");
-        if (npcLookAtTarget != null && freeLookCamera != null)
+        Transform npcLookAtTarget = currentNPC.transform.Find("LookAt");
+        if (npcLookAtTarget != null && cameraScript != null)
         {
-            if (transitionCoroutine != null)
-            {
-                StopCoroutine(transitionCoroutine); // Detener la transición actual si hay una en curso
-            }
-            transitionCoroutine = StartCoroutine(ChangeLookAtTarget(npcLookAtTarget));
+            cameraScript.ChangeLookAtTarget(npcLookAtTarget);
         }
 
         if (dialogueUI != null)
@@ -167,8 +157,6 @@ public class DialogueManager : MonoBehaviour
             ShowOptions();
         }
     }
-
-
 
     public void ShowOptions()
     {
@@ -242,7 +230,6 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-
     public void NextDialogue()
     {
         Debug.Log("Next Dialogue");
@@ -275,17 +262,14 @@ public class DialogueManager : MonoBehaviour
         }
 
         // Restaurar el LookAt de la cámara al jugador con transición suave
-        if (freeLookCamera != null && playerLookAtTarget != null)
+        if (cameraScript != null)
         {
-            if (transitionCoroutine != null)
-            {
-                StopCoroutine(transitionCoroutine); // Detener la transición actual si hay una en curso
-            }
-            transitionCoroutine = StartCoroutine(ChangeLookAtTarget(playerLookAtTarget));
+            cameraScript.ChangeLookAtTarget(cameraScript.playerLookAtTarget);
         }
 
         Debug.Log("Conversación finalizada");
     }
+
     public void SelectDiceOption()
     {
         dialogueInterface.SetActive(false);
@@ -318,7 +302,7 @@ public class DialogueManager : MonoBehaviour
             ActionController.Instance.InvokeAction(selectedOption.actionId, diceRollResult.Value);
 
             diceRollResult = null;
-            selectedOptionIndex = -1;  
+            selectedOptionIndex = -1;
         }
         else
         {
@@ -327,48 +311,6 @@ public class DialogueManager : MonoBehaviour
 
         diceInterface.SetActive(false);
     }
-
-    private IEnumerator ChangeLookAtTarget(Transform newTarget)
-    {
-        if (freeLookCamera == null || newTarget == null)
-        {
-            yield break;
-        }
-
-        // Crear un objeto temporal para la transición
-        GameObject tempTarget = new GameObject("TempLookAtTarget");
-        tempTarget.transform.position = freeLookCamera.LookAt.position; // Posición inicial
-        freeLookCamera.LookAt = tempTarget.transform;
-
-        float elapsedTime = 0f;
-        Vector3 initialPosition = tempTarget.transform.position;
-
-        while (elapsedTime < transitionDuration)
-        {
-            if (newTarget == null)
-            {
-                Destroy(tempTarget); // Limpiar el objeto temporal
-                yield break;
-            }
-
-            // Interpolar suavemente entre la posición inicial y la del nuevo objetivo
-            tempTarget.transform.position = Vector3.Lerp(
-                initialPosition,
-                newTarget.position,
-                elapsedTime / transitionDuration
-            );
-
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        // Asignar el nuevo objetivo final
-        freeLookCamera.LookAt = newTarget;
-
-        // Destruir el objeto temporal
-        Destroy(tempTarget);
-    }
-
 }
 
 [System.Serializable]

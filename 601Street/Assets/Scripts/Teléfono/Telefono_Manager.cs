@@ -40,7 +40,10 @@ public class Telefono_Manager : MonoBehaviour
         Telefono_UI.SetActive(false);
         Telefono_HUD.SetActive(true);
 
-        /*Pensamiento pensamientoID1 = pensamientos_Manager.GetPensamientoByID(1);
+        ///También se puede obtener un pensamiento de la escena por Id
+        ///Cada pensamiento tiene un ID configurado en su clase, se puede
+        ///ver en el inspector del pensamiento que hay instanciado en la escena
+        Pensamiento pensamientoID1 = pensamientos_Manager.GetPensamientoByID(1);
         if (pensamientoID1 != null)
         {
             pensamientos_Manager.MostrarPensamiento(pensamientoID1.pensamientoPrincipal);
@@ -48,6 +51,6 @@ public class Telefono_Manager : MonoBehaviour
         else
         {
             Debug.LogWarning("No se encontró el pensamiento con ID 1");
-        }*/
+        }
     }
 }
