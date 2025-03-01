@@ -2,8 +2,6 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.Events;
-using Cinemachine;
-using Unity.VisualScripting;
 using System.Collections;
 
 public class DialogueManager : MonoBehaviour

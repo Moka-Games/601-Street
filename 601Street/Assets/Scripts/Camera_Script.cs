@@ -83,6 +83,7 @@ public class Camera_Script : MonoBehaviour
 
     public void ChangeLookAtTarget(Transform newTarget, float transitionDuration = 1.0f)
     {
+        print("Realizando cambio de LookAt");
         if (transitionCoroutine != null)
         {
             StopCoroutine(transitionCoroutine); // Detener la transición actual si hay una en curso
