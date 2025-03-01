@@ -9,6 +9,7 @@ public class Eco_Callejon : MonoBehaviour
 
     public Transform ecoLookAt;
     public string pensamientoNyssa;
+    public string pensamientoNyssaPostInteracción;
 
     private Pensamientos_Manager pensamientosManager;
     private PlayerController playerController;
@@ -108,6 +109,8 @@ public class Eco_Callejon : MonoBehaviour
         imagenEco.SetActive(false);
         callejonCamera.enabled=false;
         playerCamera.enabled=true;
+
+        pensamientosManager.MostrarPensamiento(pensamientoNyssaPostInteracción);
     }
 
 }

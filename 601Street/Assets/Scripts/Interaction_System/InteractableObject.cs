@@ -45,7 +45,9 @@ public class InteractableObject : MonoBehaviour, IInteractable
     private RectTransform canvasRectTransform;
 
     public bool objectInteracted = false;
-
+    private float enterTime;
+    private bool isExiting = false;
+    private float exitTime = 0f;
     private void Start()
     {
         // Crear y configurar el SphereCollider
@@ -216,32 +218,27 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
     private void Update()
     {
-        if (!isInitialized) return;
-
-        if (playerOnRange)
+        if (!isInitialized || !playerOnRange)
         {
-            UpdateIndicatorPosition();
-
-            // Verificar si el jugador puede interactuar con este objeto específico
-            if (CanInteract())
-            {
-                rangeIndicator.SetActive(false);
-                interactIndicator.SetActive(true);
-            }
-            else
-            {
-                rangeIndicator.SetActive(true);
-                interactIndicator.SetActive(false);
-            }
+            // Si no está inicializado o el jugador no está en rango, asegurarse que todo está desactivado
+            if (rangeIndicator != null) rangeIndicator.SetActive(false);
+            if (interactIndicator != null) interactIndicator.SetActive(false);
+            return;
         }
-        else
+
+        // Actualizar la posición de los indicadores en la pantalla
+        UpdateIndicatorPosition();
+
+        // Verificar si el jugador puede interactuar (pero solo después de cierto tiempo)
+        if (Time.time - enterTime > 0.2f)  // Agregar variable float enterTime
         {
-            // Si el jugador no está en rango, desactivar ambos indicadores
-            rangeIndicator.SetActive(false);
-            interactIndicator.SetActive(false);
+            bool canPlayerInteract = CanInteract();
+
+            // Activar el indicador apropiado
+            if (rangeIndicator != null) rangeIndicator.SetActive(!canPlayerInteract);
+            if (interactIndicator != null) interactIndicator.SetActive(canPlayerInteract);
         }
     }
-
     private bool CanInteract()
     {
         // Verificar si tenemos referencia al PlayerInteraction
@@ -399,19 +396,35 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
     private void OnTriggerEnter(Collider other)
     {
-        // Verificamos si el objeto que entra en el trigger es el jugador y si el collider es del objeto de detección
+        enterTime = Time.time;
+
+        // Verificamos si el objeto que entra en el trigger es el jugador
         if (other.CompareTag("Player") && other.gameObject.GetComponent<PlayerInteraction>() != null)
         {
             playerOnRange = true;
             playerInteraction = other.gameObject.GetComponent<PlayerInteraction>();
             Debug.Log("Jugador en rango de detección");
 
-            // Forzar la activación del rangeIndicator y desactivar el interactIndicator al entrar en el rango
-            rangeIndicator.SetActive(true);
-            interactIndicator.SetActive(false);
+            // Desactivar explícitamente ambos indicadores
+            if (rangeIndicator != null) rangeIndicator.SetActive(false);
+            if (interactIndicator != null) interactIndicator.SetActive(false);
 
-            // Llamar a un pequeño retraso para asegurarnos de que el PlayerInteraction se actualice
-            StartCoroutine(CheckInteractionAfterDelay());
+            // Usar una corrutina con más espera para asegurar que no haya parpadeos
+            StartCoroutine(DelayedIndicatorActivation());
+        }
+    }
+
+    private IEnumerator DelayedIndicatorActivation()
+    {
+        // Esperamos varios frames para asegurarnos que todo se ha actualizado correctamente
+        yield return new WaitForSeconds(0.1f);
+
+        // Solo si seguimos en rango
+        if (playerOnRange)
+        {
+            // Forzar mostrar SOLO el indicador de detección al principio
+            if (rangeIndicator != null) rangeIndicator.SetActive(true);
+            if (interactIndicator != null) interactIndicator.SetActive(false);
         }
     }
 
@@ -420,20 +433,14 @@ public class InteractableObject : MonoBehaviour, IInteractable
         // Esperar un frame para que el PlayerInteraction se actualice
         yield return null;
 
-        // Después del retraso, actualizar los indicadores
-        if (playerOnRange)
-        {
-            if (CanInteract())
-            {
-                rangeIndicator.SetActive(false);
-                interactIndicator.SetActive(true);
-            }
-            else
-            {
-                rangeIndicator.SetActive(true);
-                interactIndicator.SetActive(false);
-            }
-        }
+        // Asegurarnos de que seguimos en el rango
+        if (!playerOnRange) yield break;
+
+        // Determinar cuál indicador activar basado en CanInteract()
+        bool canPlayerInteract = CanInteract();
+
+        if (rangeIndicator != null) rangeIndicator.SetActive(!canPlayerInteract);
+        if (interactIndicator != null) interactIndicator.SetActive(canPlayerInteract);
     }
 
     private void OnTriggerExit(Collider other)
@@ -441,13 +448,52 @@ public class InteractableObject : MonoBehaviour, IInteractable
         // Verificamos si el objeto que sale del trigger es el jugador
         if (other.CompareTag("Player") && other.gameObject.GetComponent<PlayerInteraction>() != null)
         {
+            // Marcar que estamos en proceso de salida
+            isExiting = true;
+            exitTime = Time.time;
+
+            // Desactivar INMEDIATAMENTE ambos indicadores
+            if (interactIndicator != null)
+            {
+                interactIndicator.gameObject.SetActive(false);
+            }
+
+            if (rangeIndicator != null)
+            {
+                rangeIndicator.gameObject.SetActive(false);
+            }
+
             playerOnRange = false;
+            playerInteraction = null;
+
             Debug.Log("Jugador fuera de rango de detección");
 
-            // Desactivar ambos indicadores al salir del rango
-            rangeIndicator.SetActive(false);
-            interactIndicator.SetActive(false);
+            // Cancelar cualquier corrutina pendiente
+            StopAllCoroutines();
+
+            // Iniciar una corrutina de limpieza para asegurarnos que todo está desactivado
+            StartCoroutine(CleanupAfterExit());
         }
+    }
+
+    private IEnumerator CleanupAfterExit()
+    {
+        // Esperar un par de frames para asegurarnos que todo está procesado
+        yield return null;
+        yield return null;
+
+        // Desactivar los indicadores de nuevo, por si acaso
+        if (interactIndicator != null) interactIndicator.gameObject.SetActive(false);
+        if (rangeIndicator != null) rangeIndicator.gameObject.SetActive(false);
+
+        // Esperar un poco más
+        yield return new WaitForSeconds(0.1f);
+
+        // Desactivar una vez más
+        if (interactIndicator != null) interactIndicator.gameObject.SetActive(false);
+        if (rangeIndicator != null) rangeIndicator.gameObject.SetActive(false);
+
+        isExiting = false;
     }
 
     private void OnDisable()
