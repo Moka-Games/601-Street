@@ -6,8 +6,9 @@ public class SceneChange : MonoBehaviour
     [System.Serializable]
     public class EscenaCambio
     {
-        public string escenaActual; // La escena donde está el objeto
-        public string escenaDestino; // La escena a la que cambiará
+        public string escenaActual;     
+        public string escenaAnterior;     
+        public string escenaSiguiente;    
     }
 
     public EscenaCambio[] cambiosDeEscena;
@@ -22,7 +23,32 @@ public class SceneChange : MonoBehaviour
 
             if (cambio != null)
             {
-                GameSceneManager.Instance.LoadScene(cambio.escenaDestino);
+                string escenaDestino = "";
+
+                // Determinar qué escena cargar basado en el nombre del objeto trigger
+                if (other.gameObject.name == "Escena_Anterior")
+                {
+                    escenaDestino = cambio.escenaAnterior;
+                }
+                else if (other.gameObject.name == "Escena_Siguiente")
+                {
+                    escenaDestino = cambio.escenaSiguiente;
+                }
+                else
+                {
+                    Debug.LogWarning($"Trigger de cambio de escena no reconocido: {other.gameObject.name}");
+                    return;
+                }
+
+                // Verificar que la escena destino tenga un valor válido
+                if (!string.IsNullOrEmpty(escenaDestino))
+                {
+                    GameSceneManager.Instance.LoadScene(escenaDestino);
+                }
+                else
+                {
+                    Debug.LogWarning($"No se ha definido un destino para {other.gameObject.name} en la escena actual: {escenaActual}");
+                }
             }
             else
             {

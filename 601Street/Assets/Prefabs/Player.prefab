@@ -196,7 +196,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1699d38761fe624fa9ccb15a3b57993, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cambiosDeEscena: []
+  cambiosDeEscena:
+  - escenaActual: Colegio
+    escenaAnterior: 
+    escenaSiguiente: ColegioExterior
+  - escenaActual: ColegioExterior
+    escenaAnterior: Colegio
+    escenaSiguiente: BarExterior
+  - escenaActual: BarExterior
+    escenaAnterior: ColegioExterior
+    escenaSiguiente: Colegio
   escenaPersistente: PersistentScene
 --- !u!114 &4678181675161628757
 MonoBehaviour:
@@ -257,7 +266,7 @@ MonoBehaviour:
   interactionRange: 3
   interactableLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   canInteract: 0
   currentInteractableItem: {fileID: 0}
   inputKey_to_Interact: 101
@@ -280,6 +289,7 @@ MonoBehaviour:
     m_Bits: 64
   showDebugRay: 1
   debugRayColor: {r: 0, g: 1, b: 0, a: 1}
+  canInteract: 0
 --- !u!1 &6424756049886318420
 GameObject:
   m_ObjectHideFlags: 0

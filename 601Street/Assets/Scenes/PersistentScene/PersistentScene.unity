@@ -456,7 +456,7 @@ PrefabInstance:
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
       propertyPath: cambiosDeEscena.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
@@ -486,6 +486,31 @@ PrefabInstance:
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
       propertyPath: cambiosDeEscena.Array.data[2].escenaDestino
+      value: Colegio
+      objectReference: {fileID: 0}
+    - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: cambiosDeEscena.Array.data[1].escenaAnterior
+      value: Colegio
+      objectReference: {fileID: 0}
+    - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: cambiosDeEscena.Array.data[2].escenaAnterior
+      value: ColegioExterior
+      objectReference: {fileID: 0}
+    - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: cambiosDeEscena.Array.data[0].escenaSiguiente
+      value: ColegioExterior
+      objectReference: {fileID: 0}
+    - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: cambiosDeEscena.Array.data[1].escenaSiguiente
+      value: BarExterior
+      objectReference: {fileID: 0}
+    - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: cambiosDeEscena.Array.data[2].escenaSiguiente
       value: Colegio
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1775,18 +1800,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1524181018}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1524181022 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7176021604587895965, guid: 36a03b43277491040a00cc349d560a74,
-    type: 3}
-  m_PrefabInstance: {fileID: 1524181018}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1524181023 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7276359190105568052, guid: 36a03b43277491040a00cc349d560a74,
-    type: 3}
-  m_PrefabInstance: {fileID: 1524181018}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1539481033
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2615,10 +2628,6 @@ MonoBehaviour:
   fadeInDuration: 2
   fadeOutDuration: 2
   blackScreenDuration: 0.5
-  a: {fileID: 1524181023}
-  b: {fileID: 1524181022}
-  c: {fileID: 7508778948407620640}
-  d: {fileID: 6383312579853706550}
 --- !u!114 &1908496563 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2243586267735399357, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
@@ -2708,7 +2717,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e20812a65d635c47b8851ee871d52f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  predefinedTemplates: []
 --- !u!224 &2000895169 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5333302690238951813, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
@@ -2889,12 +2897,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f33201337ece229469ebad4153904de3, type: 3}
---- !u!1 &6383312579853706550 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7035691133969395508, guid: f33201337ece229469ebad4153904de3,
-    type: 3}
-  m_PrefabInstance: {fileID: 6383312579853706549}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7508778948407620639
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3013,12 +3015,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7981494a910d7db4f867a09223bd2773, type: 3}
---- !u!1 &7508778948407620640 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1766820716472220860, guid: 7981494a910d7db4f867a09223bd2773,
-    type: 3}
-  m_PrefabInstance: {fileID: 7508778948407620639}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

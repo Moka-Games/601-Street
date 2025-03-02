@@ -274,6 +274,59 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1 &59052941
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 59052942}
+  - component: {fileID: 59052943}
+  m_Layer: 0
+  m_Name: Escena_Anterior
+  m_TagString: SceneChange
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &59052942
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 59052941}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -52.1}
+  m_LocalScale: {x: 13.500775, y: 5.3290324, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1293079150}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &59052943
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 59052941}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &65652797
 GameObject:
   m_ObjectHideFlags: 0
@@ -2045,7 +2098,7 @@ GameObject:
   - component: {fileID: 593378267}
   - component: {fileID: 593378268}
   m_Layer: 0
-  m_Name: SceneChange
+  m_Name: Escena_Siguiente
   m_TagString: SceneChange
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2609,7 +2662,7 @@ Transform:
   m_GameObject: {fileID: 705704787}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 46.72, y: 1, z: 64.1}
+  m_LocalPosition: {x: 46.72, y: 1, z: 29.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5316,6 +5369,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 593378267}
+    - targetCorrespondingSourceObject: {fileID: 9042303122315482955, guid: b712841404558d74fb7f3418060bf2f7,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 59052942}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b712841404558d74fb7f3418060bf2f7, type: 3}
 --- !u!4 &1293079150 stripped
