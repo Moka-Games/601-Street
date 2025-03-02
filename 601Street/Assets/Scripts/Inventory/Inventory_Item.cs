@@ -102,45 +102,19 @@ public class Inventory_Item : MonoBehaviour
 
     private void InitializeFeedbackTemplates()
     {
-        // Si ya se inicializaron las plantillas, no hacerlo nuevamente
-        if (templatesInitialized)
-            return;
+        // Usar el Singleton para obtener las plantillas
+        nearItemFeedbackTemplate = UITemplateManager.Instance.GetNearItemFeedbackTemplate();
+        inputFeedbackTemplate = UITemplateManager.Instance.GetInputFeedbackTemplate();
 
-        // Buscar los objetos originales solo una vez
-        GameObject originalNearFeedback = GameObject.Find("Near_Item_Feedback");
-        GameObject originalInputFeedback = GameObject.Find("Input_Feedback");
-
-        if (originalNearFeedback == null)
+        if (nearItemFeedbackTemplate == null || inputFeedbackTemplate == null)
         {
-            Debug.LogError("No se encontró objeto con nombre 'Near_Item_Feedback'");
+            Debug.LogError("Las plantillas de feedback no se han inicializado correctamente");
             enabled = false;
             return;
-        }
-
-        if (originalInputFeedback == null)
-        {
-            Debug.LogError("No se encontró objeto con nombre 'Input_Feedback'");
-            enabled = false;
-            return;
-        }
-
-        // Guardar los originales como plantillas y desactivarlos
-        nearItemFeedbackTemplate = originalNearFeedback;
-        inputFeedbackTemplate = originalInputFeedback;
-
-        // Desactivar los originales para que no se muestren constantemente
-        if (nearItemFeedbackTemplate.activeInHierarchy)
-        {
-            nearItemFeedbackTemplate.SetActive(false);
-        }
-
-        if (inputFeedbackTemplate.activeInHierarchy)
-        {
-            inputFeedbackTemplate.SetActive(false);
         }
 
         templatesInitialized = true;
-        Debug.Log("Plantillas de feedback inicializadas y desactivadas");
+        Debug.Log("Plantillas de feedback inicializadas");
     }
 
     private void CreateFeedbackIndicators()
@@ -193,7 +167,6 @@ public class Inventory_Item : MonoBehaviour
 
         Debug.Log("Indicadores de feedback creados para " + gameObject.name);
     }
-
     private void Update()
     {
         // Verificar si el objeto sigue existiendo
@@ -372,6 +345,10 @@ public class Inventory_Item : MonoBehaviour
         {
             playerInDetectionRange = false;
             Debug.Log(gameObject.name + ": Player left detection range");
+
+            // Desactivar los indicadores inmediatamente al salir del rango
+            if (rangeIndicator != null) rangeIndicator.SetActive(false);
+            if (interactIndicator != null) interactIndicator.SetActive(false);
         }
     }
 
@@ -402,7 +379,6 @@ public class Inventory_Item : MonoBehaviour
             interactIndicator = null;
         }
     }
-
     private void OnDisable()
     {
         // Limpiar cuando se deshabilite este script

@@ -88,35 +88,16 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
     private void InitializeTemplates()
     {
-        // Si ya se inicializaron las plantillas, no hacerlo nuevamente
-        if (templatesInitialized)
-            return;
+        // Usar el Singleton para obtener las plantillas
+        rangeIndicatorTemplate = UITemplateManager.Instance.GetNearItemFeedbackTemplate();
+        interactIndicatorTemplate = UITemplateManager.Instance.GetInputFeedbackTemplate();
 
-        // Buscar los objetos originales solo una vez
-        GameObject originalRangeIndicator = GameObject.Find("Near_Interactable_Item_Feedback");
-        GameObject originalInteractIndicator = GameObject.Find("Input_Interactable_Feedback");
-
-        if (originalRangeIndicator == null)
+        if (rangeIndicatorTemplate == null || interactIndicatorTemplate == null)
         {
-            Debug.LogError("No se encontró objeto con nombre 'Near_Interactable_Item_Feedback'");
+            Debug.LogError("Las plantillas de feedback no se han inicializado correctamente");
             enabled = false;
             return;
         }
-
-        if (originalInteractIndicator == null)
-        {
-            Debug.LogError("No se encontró objeto con nombre 'Input_Interactable_Feedback'");
-            enabled = false;
-            return;
-        }
-
-        // Guardar los originales como plantillas
-        rangeIndicatorTemplate = originalRangeIndicator;
-        interactIndicatorTemplate = originalInteractIndicator;
-
-        // Desactivar los originales para que no se muestren en la escena
-        rangeIndicatorTemplate.SetActive(false);
-        interactIndicatorTemplate.SetActive(false);
 
         // Marcar como inicializado
         templatesInitialized = true;
@@ -130,26 +111,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
         {
             Debug.LogError("Las plantillas de feedback no se han inicializado correctamente");
             return;
-        }
-
-        // Encontrar el canvas para instanciar los indicadores
-        if (hudCanvas == null)
-        {
-            GameObject hudObj = GameObject.Find("HUD");
-            if (hudObj != null)
-            {
-                hudCanvas = hudObj.GetComponent<Canvas>();
-                if (hudCanvas == null)
-                {
-                    hudCanvas = hudObj.GetComponentInChildren<Canvas>();
-                }
-            }
-
-            if (hudCanvas == null)
-            {
-                Debug.LogError("No se pudo encontrar el Canvas HUD");
-                return;
-            }
         }
 
         // Instanciar los indicadores como hijos del canvas

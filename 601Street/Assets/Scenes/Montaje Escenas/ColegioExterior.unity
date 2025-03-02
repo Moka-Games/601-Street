@@ -1960,74 +1960,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b5c8ca7ed10b61e499cce8ec3b6e2e4c, type: 3}
---- !u!1 &575172378
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 575172381}
-  - component: {fileID: 575172380}
-  - component: {fileID: 575172379}
-  m_Layer: 0
-  m_Name: EventSystem
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &575172379
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 575172378}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SendPointerHoverToParent: 1
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
-  m_InputActionsPerSecond: 10
-  m_RepeatDelay: 0.5
-  m_ForceModuleActive: 0
---- !u!114 &575172380
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 575172378}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 0}
-  m_sendNavigationEvents: 1
-  m_DragThreshold: 10
---- !u!4 &575172381
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 575172378}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &575203864
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2128,8 +2060,8 @@ Transform:
   m_GameObject: {fileID: 593378266}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 9.7556, y: 5.3290324, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0.67}
+  m_LocalScale: {x: 13.500775, y: 5.3290324, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1293079150}
@@ -2677,7 +2609,7 @@ Transform:
   m_GameObject: {fileID: 705704787}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 46.72, y: 1, z: 29.56}
+  m_LocalPosition: {x: 46.72, y: 1, z: 64.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12414,8 +12346,8 @@ GameObject:
   - component: {fileID: 1916873894}
   - component: {fileID: 1916873893}
   - component: {fileID: 1916873892}
-  - component: {fileID: 1916873897}
   - component: {fileID: 1916873898}
+  - component: {fileID: 1916873897}
   m_Layer: 0
   m_Name: ECO
   m_TagString: Untagged
@@ -46495,8 +46427,8 @@ MonoBehaviour:
   raycastDistance: 25
   ecoLookAt: {fileID: 526152577}
   pensamientoNyssa: AHHHH, QUE ES ESO?!
-  "pensamientoNyssaPostInteracci\xF3n": "Esa cosa.. deber\xEDa atemorizarme, pero
-    solo me da pena..."
+  "pensamientoNyssaPostInteracci\xF3n": "No se que est\xE1 pasando, deber\xEDa irme
+    a casa"
   callejonCamera: {fileID: 363703929}
   temporalColliders: {fileID: 1486919049}
   imagenEco: {fileID: 40385895}
@@ -47499,6 +47431,7 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 2126412896}
   - {fileID: 79890381}
   - {fileID: 713890118}
   - {fileID: 1588864183}
@@ -47508,6 +47441,4 @@ SceneRoots:
   - {fileID: 1916873896}
   - {fileID: 726442225}
   - {fileID: 705704788}
-  - {fileID: 2126412896}
   - {fileID: 453224546}
-  - {fileID: 575172381}

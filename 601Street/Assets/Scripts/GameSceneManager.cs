@@ -41,6 +41,7 @@ public class GameSceneManager : MonoBehaviour
         instance = this;
         DontDestroyOnLoad(gameObject);
 
+
         string activeSceneName = SceneManager.GetActiveScene().name;
 
         if (activeSceneName == "PersistentScene")
@@ -94,7 +95,6 @@ public class GameSceneManager : MonoBehaviour
             }
         }
     }
-
     private void OnDestroy()
     {
         // Limpiamos los eventos suscritos
@@ -134,8 +134,9 @@ public class GameSceneManager : MonoBehaviour
 
     public void LoadScene(string sceneName)
     {
+        
         if (currentSceneName == sceneName || isTransitioning) return;
-
+        
         StartCoroutine(LoadSceneWithTransition(sceneName));
     }
 
@@ -143,59 +144,53 @@ public class GameSceneManager : MonoBehaviour
     {
         isTransitioning = true;
 
-        // Desactivamos el controlador del jugador durante la transición
+        // Desactivar el controlador del jugador durante la transición
         DisablePlayerMovement();
 
-        // Congelamos la cámara durante la transición
+        // Congelar la cámara durante la transición
         if (currentCamera != null)
         {
             currentCamera.FreezeCamera();
         }
 
-        // Nos aseguramos de desuscribir cualquier evento previo
-        if (fadeManager != null)
-        {
-            fadeManager.OnFadeOutComplete -= EnablePlayerMovementAfterFade;
-        }
-
-        // Realizamos el fade in (a negro)
+        // Realizar el fade in (a negro)
         if (fadeManager != null)
         {
             fadeManager.FadeIn(fadeInDuration);
             yield return new WaitForSeconds(fadeInDuration);
         }
 
-        // Descargamos la escena actual
+        // Descargar la escena actual
         if (!string.IsNullOrEmpty(currentSceneName))
         {
             AsyncOperation unloadOperation = SceneManager.UnloadSceneAsync(currentSceneName);
             yield return unloadOperation;
         }
 
-        // Mantenemos la pantalla en negro por un momento
+        // Mantener la pantalla en negro por un momento
         yield return new WaitForSeconds(blackScreenDuration);
 
-        // Cargamos la nueva escena
+        // Cargar la nueva escena
         currentSceneName = sceneName;
         AsyncOperation loadOperation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
 
-        // Esperamos a que la escena esté completamente cargada
+        // Esperar a que la escena esté completamente cargada
         yield return loadOperation;
 
-        // Movemos al jugador y la cámara a los puntos de spawn
+        // Asegurarse de que los indicadores estén activos
+        //UITemplateManager.Instance.EnsureTemplatesAreInactive();
+
+        // Mover al jugador y la cámara a los puntos de spawn
         yield return StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
 
-        // Realizamos el fade out (de negro a transparente)
+        // Realizar el fade out (de negro a transparente)
         if (fadeManager != null)
         {
-            // Suscribimos al evento de finalización de fadeOut para reactivar el movimiento
             fadeManager.OnFadeOutComplete += EnablePlayerMovementAfterFade;
             fadeManager.FadeOut(fadeOutDuration);
-
-            // No esperamos aquí, el evento se encargará de activar el movimiento
         }
 
-        // Descongelamos la cámara
+        // Descongelar la cámara
         if (currentCamera != null)
         {
             currentCamera.UnfreezeCamera();
