@@ -456,7 +456,7 @@ PrefabInstance:
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
       propertyPath: cambiosDeEscena.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
@@ -472,6 +472,11 @@ PrefabInstance:
         type: 3}
       propertyPath: cambiosDeEscena.Array.data[2].escenaActual
       value: BarExterior
+      objectReference: {fileID: 0}
+    - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: cambiosDeEscena.Array.data[3].escenaActual
+      value: CasaExterior
       objectReference: {fileID: 0}
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
@@ -500,6 +505,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
+      propertyPath: cambiosDeEscena.Array.data[3].escenaAnterior
+      value: BarExterior
+      objectReference: {fileID: 0}
+    - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
       propertyPath: cambiosDeEscena.Array.data[0].escenaSiguiente
       value: ColegioExterior
       objectReference: {fileID: 0}
@@ -511,6 +521,11 @@ PrefabInstance:
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
       propertyPath: cambiosDeEscena.Array.data[2].escenaSiguiente
+      value: Colegio
+      objectReference: {fileID: 0}
+    - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: cambiosDeEscena.Array.data[3].escenaSiguiente
       value: Colegio
       objectReference: {fileID: 0}
     m_RemovedComponents: []

@@ -6,9 +6,9 @@ public class SceneChange : MonoBehaviour
     [System.Serializable]
     public class EscenaCambio
     {
-        public string escenaActual;     
-        public string escenaAnterior;     
-        public string escenaSiguiente;    
+        public string escenaActual;
+        public string escenaAnterior;
+        public string escenaSiguiente;
     }
 
     public EscenaCambio[] cambiosDeEscena;
@@ -24,15 +24,18 @@ public class SceneChange : MonoBehaviour
             if (cambio != null)
             {
                 string escenaDestino = "";
+                bool isBackward = false;
 
                 // Determinar qué escena cargar basado en el nombre del objeto trigger
                 if (other.gameObject.name == "Escena_Anterior")
                 {
                     escenaDestino = cambio.escenaAnterior;
+                    isBackward = true; // Estamos retrocediendo a una escena anterior
                 }
                 else if (other.gameObject.name == "Escena_Siguiente")
                 {
                     escenaDestino = cambio.escenaSiguiente;
+                    isBackward = false; // Estamos avanzando a una escena siguiente
                 }
                 else
                 {
@@ -43,7 +46,8 @@ public class SceneChange : MonoBehaviour
                 // Verificar que la escena destino tenga un valor válido
                 if (!string.IsNullOrEmpty(escenaDestino))
                 {
-                    GameSceneManager.Instance.LoadScene(escenaDestino);
+                    // Pasamos el parámetro isBackward para saber si estamos regresando
+                    GameSceneManager.Instance.LoadScene(escenaDestino, isBackward);
                 }
                 else
                 {

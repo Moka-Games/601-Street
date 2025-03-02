@@ -22,6 +22,10 @@ public class GameSceneManager : MonoBehaviour
     private string currentSceneName;
     private bool persistentSceneLoaded = false;
 
+    // Añadimos una variable para rastrear la dirección del cambio de escena
+    private enum SceneChangeDirection { Initial, Forward, Backward };
+    private SceneChangeDirection lastChangeDirection = SceneChangeDirection.Initial;
+
     [Header("Configuración de Transiciones")]
     [SerializeField] private float fadeInDuration = 1.0f;
     [SerializeField] private float fadeOutDuration = 1.0f;
@@ -132,11 +136,14 @@ public class GameSceneManager : MonoBehaviour
         }
     }
 
-    public void LoadScene(string sceneName)
+    // Añadimos parámetro para la dirección
+    public void LoadScene(string sceneName, bool isBackward = false)
     {
-        
         if (currentSceneName == sceneName || isTransitioning) return;
-        
+
+        // Guardamos la dirección del cambio
+        lastChangeDirection = isBackward ? SceneChangeDirection.Backward : SceneChangeDirection.Forward;
+
         StartCoroutine(LoadSceneWithTransition(sceneName));
     }
 
@@ -235,7 +242,23 @@ public class GameSceneManager : MonoBehaviour
     {
         yield return new WaitUntil(() => SceneManager.GetSceneByName(currentSceneName).isLoaded);
 
-        GameObject playerSpawnPoint = FindObjectInAllScenes("Player_InitialPosition");
+        // Elegimos el punto de spawn dependiendo de la dirección
+        string playerSpawnPointName = "Player_InitialPosition";
+        if (lastChangeDirection == SceneChangeDirection.Backward)
+        {
+            // Si estamos regresando a una escena anterior, usamos Player_ExitPosition
+            GameObject exitPoint = FindObjectInAllScenes("Player_ExitPosition");
+            if (exitPoint != null)
+            {
+                playerSpawnPointName = "Player_ExitPosition";
+            }
+            else
+            {
+                Debug.LogWarning("No se encontró 'Player_ExitPosition', usando la posición inicial por defecto.");
+            }
+        }
+
+        GameObject playerSpawnPoint = FindObjectInAllScenes(playerSpawnPointName);
         GameObject cameraSpawnPoint = FindObjectInAllScenes("Camera_InitialPosition");
 
         if (playerSpawnPoint != null && currentPlayer != null)
@@ -250,11 +273,11 @@ public class GameSceneManager : MonoBehaviour
             currentPlayer.transform.position = playerSpawnPoint.transform.position;
             currentPlayer.transform.rotation = playerSpawnPoint.transform.rotation;
 
-            Debug.Log("Jugador movido al punto de spawn en la nueva escena.");
+            Debug.Log($"Jugador movido al punto de spawn '{playerSpawnPointName}' en la nueva escena.");
         }
         else
         {
-            Debug.LogError($"No se encontró 'Player_InitialPosition' o el jugador en la escena {currentSceneName}!");
+            Debug.LogError($"No se encontró '{playerSpawnPointName}' o el jugador en la escena {currentSceneName}!");
         }
 
         if (cameraSpawnPoint != null && currentCamera != null)
