@@ -29,7 +29,7 @@ public class Camera_Script : MonoBehaviour
     void Update()
     {
         // Testing Inputs
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.G))
         {
             FreezeCamera();
         }
