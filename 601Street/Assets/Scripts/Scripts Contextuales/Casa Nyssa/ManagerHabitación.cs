@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class ManagerHabitación : MonoBehaviour
 {
-    private static bool primerDia;
-    private static bool segundoDia;
+    public static bool primerDia;
+    public static bool segundoDia;
 
     public GameObject globalLightInicial;
     public GameObject globalLightSegundoDia;
