@@ -388,6 +388,111 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 534bf218cf387fb47a87a9534728bbbb, type: 3}
+--- !u!1 &441216645
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 441216647}
+  - component: {fileID: 441216646}
+  - component: {fileID: 441216648}
+  - component: {fileID: 441216649}
+  m_Layer: 6
+  m_Name: Puerta
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!65 &441216646
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441216645}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!4 &441216647
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441216645}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 42.186, y: 1.6, z: 53.75}
+  m_LocalScale: {x: 1, y: 2.3774, z: 0.82590187}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &441216648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441216645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdf2841cde257ce41a7e4884979576c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactionID: 
+  interactionPrompt: Presiona E para interactuar
+  onInteraction:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 441216649}
+        m_TargetAssemblyTypeName: "Puerta_Habitaci\xF3n, Assembly-CSharp"
+        m_MethodName: CambiarEscena
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onInteracted:
+    m_PersistentCalls:
+      m_Calls: []
+  rangeIndicator: {fileID: 0}
+  interactIndicator: {fileID: 0}
+  detectionRadius: 5
+  edgeOffset: 50
+  objectInteracted: 0
+--- !u!114 &441216649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441216645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 943b6992653505547b98811d8a801896, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EscenaACargar: CasaNyssa
 --- !u!4 &453628535 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7429221924985629162, guid: e2722d3e7adf6964bb7cea8b3f7b12ae,
@@ -901,7 +1006,7 @@ PrefabInstance:
     - target: {fileID: 9042303122315482955, guid: b712841404558d74fb7f3418060bf2f7,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 34.18
+      value: 30.6
       objectReference: {fileID: 0}
     - target: {fileID: 9042303122315482955, guid: b712841404558d74fb7f3418060bf2f7,
         type: 3}
@@ -978,7 +1083,7 @@ Transform:
   m_GameObject: {fileID: 897006572}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 37.13, y: 1, z: 36.68}
+  m_LocalPosition: {x: 37.13, y: 1, z: 39.96}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1145,7 +1250,7 @@ Transform:
   m_GameObject: {fileID: 947531258}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 42.29, y: 1, z: 51.76}
+  m_LocalPosition: {x: 42.29, y: 1, z: 52.27}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1945,7 +2050,7 @@ Transform:
   m_GameObject: {fileID: 1649353360}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 37.066, y: 2, z: 35.2}
+  m_LocalPosition: {x: 37.066, y: 2, z: 38.48}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4749,3 +4854,4 @@ SceneRoots:
   - {fileID: 947531259}
   - {fileID: 1127161799}
   - {fileID: 1130514819}
+  - {fileID: 441216647}

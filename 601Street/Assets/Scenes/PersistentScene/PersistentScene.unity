@@ -471,7 +471,7 @@ PrefabInstance:
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
       propertyPath: cambiosDeEscena.Array.size
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
@@ -492,6 +492,16 @@ PrefabInstance:
         type: 3}
       propertyPath: cambiosDeEscena.Array.data[3].escenaActual
       value: CasaExterior
+      objectReference: {fileID: 0}
+    - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: cambiosDeEscena.Array.data[4].escenaActual
+      value: "Comisar\xEDaExterior"
+      objectReference: {fileID: 0}
+    - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: cambiosDeEscena.Array.data[5].escenaActual
+      value: CasaNyssa
       objectReference: {fileID: 0}
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
@@ -525,6 +535,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
+      propertyPath: cambiosDeEscena.Array.data[4].escenaAnterior
+      value: CasaExterior
+      objectReference: {fileID: 0}
+    - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: cambiosDeEscena.Array.data[5].escenaAnterior
+      value: BarExterior
+      objectReference: {fileID: 0}
+    - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
       propertyPath: cambiosDeEscena.Array.data[0].escenaSiguiente
       value: ColegioExterior
       objectReference: {fileID: 0}
@@ -536,12 +556,22 @@ PrefabInstance:
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
       propertyPath: cambiosDeEscena.Array.data[2].escenaSiguiente
-      value: Colegio
+      value: CasaExterior
       objectReference: {fileID: 0}
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
       propertyPath: cambiosDeEscena.Array.data[3].escenaSiguiente
-      value: Colegio
+      value: "Comisar\xEDaExterior"
+      objectReference: {fileID: 0}
+    - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: cambiosDeEscena.Array.data[4].escenaSiguiente
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: cambiosDeEscena.Array.data[5].escenaSiguiente
+      value: CasaNyssa
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -852,22 +882,22 @@ PrefabInstance:
     - target: {fileID: 133649891946562627, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.04120004
+      value: -0.041199885
       objectReference: {fileID: 0}
     - target: {fileID: 133649891946562627, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.0057639354
+      value: -0.0057639168
       objectReference: {fileID: 0}
     - target: {fileID: 133649891946562627, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.9894979
+      value: -0.98949784
       objectReference: {fileID: 0}
     - target: {fileID: 133649891946562627, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.13843189
+      value: 0.13843195
       objectReference: {fileID: 0}
     - target: {fileID: 384377331363478202, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
@@ -907,12 +937,12 @@ PrefabInstance:
     - target: {fileID: 2178201324368974428, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.041330654
+      value: -0.041330565
       objectReference: {fileID: 0}
     - target: {fileID: 2178201324368974428, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.0047373385
+      value: -0.004737328
       objectReference: {fileID: 0}
     - target: {fileID: 2178201324368974428, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
@@ -922,7 +952,7 @@ PrefabInstance:
     - target: {fileID: 2178201324368974428, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.11377627
+      value: 0.11377626
       objectReference: {fileID: 0}
     - target: {fileID: 2691415738208649849, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
@@ -957,12 +987,12 @@ PrefabInstance:
     - target: {fileID: 4185262220942612075, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.040510092
+      value: -0.040510017
       objectReference: {fileID: 0}
     - target: {fileID: 4185262220942612075, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.009465713
+      value: -0.009465689
       objectReference: {fileID: 0}
     - target: {fileID: 4185262220942612075, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
@@ -972,7 +1002,7 @@ PrefabInstance:
     - target: {fileID: 4185262220942612075, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.2273371
+      value: 0.22733706
       objectReference: {fileID: 0}
     - target: {fileID: 5328540266262194570, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}

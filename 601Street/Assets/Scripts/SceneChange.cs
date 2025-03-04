@@ -6,9 +6,9 @@ public class SceneChange : MonoBehaviour
     [System.Serializable]
     public class EscenaCambio
     {
-        public string escenaActual;
-        public string escenaAnterior;
-        public string escenaSiguiente;
+        public string escenaActual;       // La escena donde está el objeto
+        public string escenaAnterior;     // La escena a la que cambiará si el trigger es "Escena_Anterior"
+        public string escenaSiguiente;    // La escena a la que cambiará si el trigger es "Escena_Siguiente"
     }
 
     public EscenaCambio[] cambiosDeEscena;
@@ -24,18 +24,17 @@ public class SceneChange : MonoBehaviour
             if (cambio != null)
             {
                 string escenaDestino = "";
-                bool isBackward = false;
+                bool usarPuntoSalida = false;
 
                 // Determinar qué escena cargar basado en el nombre del objeto trigger
                 if (other.gameObject.name == "Escena_Anterior")
                 {
                     escenaDestino = cambio.escenaAnterior;
-                    isBackward = true; // Estamos retrocediendo a una escena anterior
+                    usarPuntoSalida = true;
                 }
                 else if (other.gameObject.name == "Escena_Siguiente")
                 {
                     escenaDestino = cambio.escenaSiguiente;
-                    isBackward = false; // Estamos avanzando a una escena siguiente
                 }
                 else
                 {
@@ -46,8 +45,8 @@ public class SceneChange : MonoBehaviour
                 // Verificar que la escena destino tenga un valor válido
                 if (!string.IsNullOrEmpty(escenaDestino))
                 {
-                    // Pasamos el parámetro isBackward para saber si estamos regresando
-                    GameSceneManager.Instance.LoadScene(escenaDestino, isBackward);
+                    // Llamar al método de cambio de escena con el parámetro de punto de salida
+                    GameSceneManager.Instance.LoadScene(escenaDestino, usarPuntoSalida);
                 }
                 else
                 {
@@ -58,6 +57,18 @@ public class SceneChange : MonoBehaviour
             {
                 Debug.LogWarning($"No se ha definido un cambio de escena para la escena actual: {escenaActual}");
             }
+        }
+    }
+
+    public void CambiarEscenaConPuntoSalida(string escenaDestino)
+    {
+        if (!string.IsNullOrEmpty(escenaDestino))
+        {
+            GameSceneManager.Instance.LoadScene(escenaDestino, true);
+        }
+        else
+        {
+            Debug.LogWarning("Escena destino no especificada para cambio con punto de salida.");
         }
     }
 
