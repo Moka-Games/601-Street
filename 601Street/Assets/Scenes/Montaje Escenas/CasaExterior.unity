@@ -17619,6 +17619,7 @@ MonoBehaviour:
   barrera_1: {fileID: 517719334}
   teleportComisaria: {fileID: 891281453}
   runa: {fileID: 1288539583}
+  puerta: {fileID: 441216648}
 --- !u!4 &1934383336
 Transform:
   m_ObjectHideFlags: 0
@@ -18067,6 +18068,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1448901450}
+  - {fileID: 1934383336}
   - {fileID: 870357223}
   - {fileID: 891281451}
   - {fileID: 138879345}
@@ -18078,6 +18080,5 @@ SceneRoots:
   - {fileID: 1130514819}
   - {fileID: 441216647}
   - {fileID: 1288539584}
-  - {fileID: 1934383336}
   - {fileID: 285476962}
   - {fileID: 618329992}
