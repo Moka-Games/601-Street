@@ -1111,7 +1111,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1649462076}
   - component: {fileID: 1649462077}
-  - component: {fileID: 1649462078}
   m_Layer: 0
   m_Name: ActionController
   m_TagString: Untagged
@@ -1144,18 +1143,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29f9dfc1f8e6fbe42bb2be3353091a4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1649462078
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1649462075}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3000cf436445d3842b83dd6be68d7a72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1746557394

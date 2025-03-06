@@ -410,6 +410,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3754790435304779438, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
+      propertyPath: configuracionesPorEscena.Array.data[3].nombreEscena
+      value: CasaExterior
+      objectReference: {fileID: 0}
+    - target: {fileID: 3754790435304779438, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
       propertyPath: configuracionesPorEscena.Array.data[0].pensamientoInicioTexto
       value: "Deber\xEDa llamar a Umi"
       objectReference: {fileID: 0}
@@ -425,6 +430,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3754790435304779438, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
+      propertyPath: configuracionesPorEscena.Array.data[3].pensamientoInicioTexto
+      value: Por fin llego a casa...
+      objectReference: {fileID: 0}
+    - target: {fileID: 3754790435304779438, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
       propertyPath: configuracionesPorEscena.Array.data[0].activarPensamientoInicial
       value: 0
       objectReference: {fileID: 0}
@@ -436,6 +446,11 @@ PrefabInstance:
     - target: {fileID: 3754790435304779438, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
       propertyPath: configuracionesPorEscena.Array.data[2].activarPensamientoInicial
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3754790435304779438, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: configuracionesPorEscena.Array.data[3].activarPensamientoInicial
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4678181675161628757, guid: c33191c6797853f4d8cb4de889205796,
