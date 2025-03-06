@@ -12,7 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 281b790b0324bdb49aca9bbad878a09c, type: 3}
   m_Name: "PostInteracci\xF3n_Conversaci\xF3n"
   m_EditorClassIdentifier: 
+  actionId: ConversationEnd_1
   dialogues:
   - speakerName: Police Officer
-    content: 
+    content: The truth is that I don't have many details. But we are going to open
+      an investigation into Umi's case. As for your mother... The best person to
+      talk about that would be Miguel, the officer who handled her case.
+  - speakerName: Nyssa
+    content: Where can I find him?
+  - speakerName: Police Officer
+    content: He retired. That case affected him too much and ended up affecting his
+      mental health... If you want to talk to him, you'll probably find him in a
+      bar somewhere.
   dialogueOptions: []

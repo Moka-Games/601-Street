@@ -4,9 +4,13 @@ using UnityEngine;
 
 public class Actions_Script : MonoBehaviour
 {
-
+    private Pensamientos_Manager pensamientosManager;
     public static Actions_Script Instance { get; private set; }
 
+    private void Start()
+    {
+        pensamientosManager = FindAnyObjectByType<Pensamientos_Manager>();
+    }
     void Awake()
     {
         if (Instance == null)
@@ -31,5 +35,10 @@ public class Actions_Script : MonoBehaviour
     {
         print("3333");
 
+    }
+
+    public void MostrarPensamiento(string pensamiento)
+    {
+        pensamientosManager.MostrarPensamiento(pensamiento);
     }
 }

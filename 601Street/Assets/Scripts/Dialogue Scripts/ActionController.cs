@@ -8,6 +8,9 @@ public class ActionController : MonoBehaviour
 
     private Dictionary<string, DialogueAction> actionMap = new Dictionary<string, DialogueAction>();
 
+    [Header("Interior Comisaria")]
+    public string pensamientoPostInteracción;
+
     void Start()
     {
         //DESCRIPCIÓN FUNCIONALIDAD
@@ -35,6 +38,13 @@ public class ActionController : MonoBehaviour
             () => Debug.Log("Opción 3 respuesta de éxito"),
             () => Debug.Log("Opción 3 respuesta de fallo")
         ));
+
+        //Ejemplo Acción registrada para final de conversación
+        RegisterAction("ConversationEnd_1", new DialogueAction(
+    () => Actions_Script.Instance.MostrarPensamiento(pensamientoPostInteracción),
+    null,
+    null
+));
 
     }
     void Awake()

@@ -37,6 +37,9 @@ public class DialogueManager : MonoBehaviour
     [Header("Cinemachine Camera")]
     private Camera_Script cameraScript;
 
+    private Conversation nextContextualConversation;
+
+
     void Awake()
     {
         if (Instance == null)
@@ -189,7 +192,6 @@ public class DialogueManager : MonoBehaviour
 
     public void SelectOption(int optionIndex)
     {
-        // Guardamos el índice de la opción seleccionada
         selectedOptionIndex = optionIndex;
 
         if (currentConversation != null && optionIndex < currentConversation.dialogueOptions.Length)
@@ -203,30 +205,33 @@ public class DialogueManager : MonoBehaviour
                     SelectDiceOption();
                     diceManager.SetDifficultyClass(selectedOption.difficultyClass);
 
+                    // Asignamos el callback para almacenar el resultado y la conversación correspondiente
                     diceManager.OnRollComplete = (isSuccess) =>
                     {
-                        diceRollResult = isSuccess;  // Guardar el resultado del dado
+                        diceRollResult = isSuccess;
+                        nextContextualConversation = isSuccess ? selectedOption.successDialogue : selectedOption.failureDialogue;
                     };
                 }
                 else
                 {
-                    // Ejecutar acción estándar
+                    // Ejecutar acción estándar sin dados
                     ActionController.Instance.InvokeAction(selectedOption.actionId);
-                }
-            }
 
-            // Guardamos la referencia de la próxima conversación
-            Conversation nextConversation = selectedOption.nextDialogue;
-            if (nextConversation != null)
-            {
-                StartConversation(nextConversation, currentNPC);
-            }
-            else
-            {
-                EndConversation();
+                    // Continuar con la siguiente conversación estándar (si existe)
+                    Conversation nextConversation = selectedOption.nextDialogue;
+                    if (nextConversation != null)
+                    {
+                        StartConversation(nextConversation, currentNPC);
+                    }
+                    else
+                    {
+                        EndConversation();
+                    }
+                }
             }
         }
     }
+
 
     public void NextDialogue()
     {
@@ -252,6 +257,13 @@ public class DialogueManager : MonoBehaviour
         {
             optionsUI.SetActive(false);
         }
+
+        // Ejecutar la acción asociada a la conversación si existe
+        if (currentConversation != null && !string.IsNullOrEmpty(currentConversation.actionId))
+        {
+            ActionController.Instance.InvokeAction(currentConversation.actionId);
+        }
+
         if (currentNPC != null)
         {
             currentNPC.SetInteracted();
@@ -291,24 +303,38 @@ public class DialogueManager : MonoBehaviour
 
     public void OnDiceRollCompleteButtonPressed()
     {
-        // Verificar si se ha seleccionado una opción y si hay un resultado de dado
         if (selectedOptionIndex != -1 && diceRollResult.HasValue && currentConversation != null && selectedOptionIndex < currentConversation.dialogueOptions.Length)
         {
             DialogueOption selectedOption = currentConversation.dialogueOptions[selectedOptionIndex];
 
-            // Ejecutamos la acción basada en el resultado del dado
+            // Ejecutar la acción con el resultado de la tirada
             ActionController.Instance.InvokeAction(selectedOption.actionId, diceRollResult.Value);
 
+            // Iniciar la conversación que se asignó previamente
+            if (nextContextualConversation != null)
+            {
+                StartConversation(nextContextualConversation, currentNPC);
+                nextContextualConversation = null; // Limpiar la referencia tras usarla
+            }
+            else
+            {
+                EndConversation();
+            }
+
+            // Reset de variables
             diceRollResult = null;
             selectedOptionIndex = -1;
         }
         else
         {
-            Debug.LogWarning("No dice roll result available or no option selected.");
+            Debug.LogWarning("No hay resultado de dado disponible o ninguna opción seleccionada.");
         }
 
         diceInterface.SetActive(false);
     }
+
+
+
 }
 
 [System.Serializable]

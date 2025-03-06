@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 281b790b0324bdb49aca9bbad878a09c, type: 3}
   m_Name: "Policia_Conversaci\xF3n"
   m_EditorClassIdentifier: 
+  actionId: 
   dialogues:
   - speakerName: Nyssa
     content: Hello, I am here to report a missing person. It's a friend of mine,
@@ -56,18 +57,24 @@ MonoBehaviour:
       she hasn't been coming to class for a week and is not answering my calls. I
       am very worried.
   dialogueOptions:
-  - optionText: 
-    actionId: 
-    requiresDiceRoll: 0
-    difficultyClass: 0
-    nextDialogue: {fileID: 0}
-  - optionText: 
-    actionId: 
-    requiresDiceRoll: 0
-    difficultyClass: 0
-    nextDialogue: {fileID: 0}
-  - optionText: 
-    actionId: 
-    requiresDiceRoll: 0
-    difficultyClass: 0
-    nextDialogue: {fileID: 0}
+  - optionText: Caca
+    actionId: Option_1
+    requiresDiceRoll: 1
+    difficultyClass: 1
+    nextDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    successDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    failureDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+  - optionText: Pedo
+    actionId: Option_2
+    requiresDiceRoll: 1
+    difficultyClass: 1
+    nextDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    successDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    failureDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+  - optionText: Culo
+    actionId: Option_3
+    requiresDiceRoll: 1
+    difficultyClass: 1
+    nextDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    successDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    failureDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
