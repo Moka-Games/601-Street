@@ -23,21 +23,21 @@ public class ActionController : MonoBehaviour
         //
 
         RegisterAction("Option_1", new DialogueAction(
-        () => Actions_Script.Instance.Option1_Action1(),
-        () => Actions_Script.Instance.Option2_Action2(),
-        () => Actions_Script.Instance.Option3_Action3()
+        () => CalleBar_Manager.puertaAbiertaBool = true, // Acción estandard
+        () => CalleBar_Manager.puertaAbiertaBool = true, // Acción de éxito
+        () => CalleBar_Manager.puertaAbiertaBool = true  // Acción de fracaso
     ));
 
         RegisterAction("Option_2", new DialogueAction(
-            () => Debug.Log("Opción 2 respuesta estandard"),
-            () => Debug.Log("Opción 2 respuesta de éxito"),
-            () => Debug.Log("Opción 2 respuesta de fallo")
-        ));
+        () => CalleBar_Manager.puertaAbiertaBool = true, // Acción estandard
+        () => CalleBar_Manager.puertaAbiertaBool = true, // Acción de éxito
+        () => CalleBar_Manager.puertaAbiertaBool = true  // Acción de fracaso
+    ));
         RegisterAction("Option_3", new DialogueAction(
-            () => Debug.Log("Opción 3 respuesta estandard"),
-            () => Debug.Log("Opción 3 respuesta de éxito"),
-            () => Debug.Log("Opción 3 respuesta de fallo")
-        ));
+        () => CalleBar_Manager.puertaAbiertaBool = true, // Acción estandard
+        () => CalleBar_Manager.puertaAbiertaBool = true, // Acción de éxito
+        () => CalleBar_Manager.puertaAbiertaBool = true  // Acción de fracaso
+    ));
 
         //Ejemplo Acción registrada para final de conversación
         RegisterAction("ConversationEnd_1", new DialogueAction(

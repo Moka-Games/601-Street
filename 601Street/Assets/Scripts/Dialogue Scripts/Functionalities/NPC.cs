@@ -10,7 +10,6 @@ public class NPC : MonoBehaviour
     public Conversation funnyConversation;
     public bool hasInteracted = false;
     private Animator animator;
-    public UnityEvent onObjectDelivered;
     
     private void Awake()
     {
