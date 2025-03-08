@@ -71,6 +71,19 @@ public class DialogueManager : MonoBehaviour
         {
             Next_bubble.SetActive(false);
         }
+
+        // Verifica que se haya asignado el componente textComponent en typewriterEffect
+        if (typewriterEffect != null && typewriterEffect.textComponent == null)
+        {
+            Debug.LogError("TypewriterEffect no tiene asignado textComponent. Asignando contentText por defecto.");
+            typewriterEffect.textComponent = contentText;
+        }
+
+        // Asegúrate de que contentText tiene richText habilitado
+        if (contentText != null)
+        {
+            contentText.richText = true;
+        }
     }
 
     void Update()
@@ -118,6 +131,12 @@ public class DialogueManager : MonoBehaviour
             cameraScript.ChangeLookAtTarget(npcLookAtTarget);
         }
 
+        // Reiniciar el TypewriterEffect antes de comenzar
+        if (typewriterEffect != null)
+        {
+            typewriterEffect.Reset();
+        }
+
         if (dialogueUI != null)
         {
             dialogueUI.SetActive(true);
@@ -131,9 +150,17 @@ public class DialogueManager : MonoBehaviour
             Next_bubble.SetActive(false);
         }
 
+        // Pequeño delay para asegurar que la UI esté completamente activa antes de mostrar el diálogo
+        StartCoroutine(DelayedShowDialogue());
+    }
+    private IEnumerator DelayedShowDialogue()
+    {
+        // Esperar un frame para asegurar que los componentes estén activos
+        yield return null;
+
+        // Ahora mostrar el diálogo
         ShowDialogue();
     }
-
     public void ShowDialogue()
     {
         if (currentConversation != null && currentDialogueIndex < currentConversation.dialogues.Length)
@@ -143,14 +170,35 @@ public class DialogueManager : MonoBehaviour
             {
                 speakerNameText.text = currentDialogue.speakerName;
             }
+
             isTyping = true;
+
             if (Next_bubble != null)
             {
                 Next_bubble.SetActive(false);
             }
+
             if (typewriterEffect != null)
             {
+                // Verificar que contentText está asignado
+                if (typewriterEffect.textComponent == null)
+                {
+                    typewriterEffect.textComponent = contentText;
+                    Debug.Log("Asignando contentText a typewriterEffect.textComponent");
+                }
+
+                // Iniciar la animación de escritura
                 typewriterEffect.StartTyping(currentDialogue.content, currentNPC);
+            }
+            else
+            {
+                // Si no hay efecto de tipeo, procesamos las etiquetas directamente
+                if (contentText != null)
+                {
+                    contentText.text = TextFormatHelper.ProcessTextTags(currentDialogue.content);
+                    contentText.richText = true;
+                }
+                OnTypingComplete();
             }
         }
         else
@@ -236,10 +284,20 @@ public class DialogueManager : MonoBehaviour
     public void NextDialogue()
     {
         Debug.Log("Next Dialogue");
+
+        // Detener cualquier animación en curso
+        if (typewriterEffect != null && isTyping)
+        {
+            typewriterEffect.StopTyping();
+            isTyping = false;
+        }
+
         if (currentConversation != null && currentDialogueIndex < currentConversation.dialogues.Length - 1)
         {
             currentDialogueIndex++;
-            ShowDialogue();
+
+            // Pequeño delay para asegurar que todo esté listo
+            StartCoroutine(DelayedShowDialogue());
         }
         else
         {
@@ -343,4 +401,78 @@ public class Dialogue
     public string speakerName;
     [TextArea(4, 4)]
     public string content;
+}
+public static class TextFormatHelper
+{
+    public static string ProcessTextTags(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        string processed = input;
+
+        // Procesamos las etiquetas personalizadas y las convertimos en etiquetas de TextMeshPro
+
+        // Negrita: <Bold>(texto)</Bold> -> <b>texto</b>
+        processed = System.Text.RegularExpressions.Regex.Replace(
+            processed,
+            @"<Bold>\((.*?)\)</Bold>",
+            "<b>$1</b>");
+
+        // Versión simplificada: <Bold>texto</Bold> -> <b>texto</b>
+        processed = System.Text.RegularExpressions.Regex.Replace(
+            processed,
+            @"<Bold>(.*?)</Bold>",
+            "<b>$1</b>");
+
+        // Cursiva: <Italic>(texto)</Italic> -> <i>texto</i>
+        processed = System.Text.RegularExpressions.Regex.Replace(
+            processed,
+            @"<Italic>\((.*?)\)</Italic>",
+            "<i>$1</i>");
+
+        // Versión simplificada: <Italic>texto</Italic> -> <i>texto</i>
+        processed = System.Text.RegularExpressions.Regex.Replace(
+            processed,
+            @"<Italic>(.*?)</Italic>",
+            "<i>$1</i>");
+
+        // Subrayado: <Underline>(texto)</Underline> -> <u>texto</u>
+        processed = System.Text.RegularExpressions.Regex.Replace(
+            processed,
+            @"<Underline>\((.*?)\)</Underline>",
+            "<u>$1</u>");
+
+        // Versión simplificada: <Underline>texto</Underline> -> <u>texto</u>
+        processed = System.Text.RegularExpressions.Regex.Replace(
+            processed,
+            @"<Underline>(.*?)</Underline>",
+            "<u>$1</u>");
+
+        // Color: <Color=red>(texto)</Color> -> <color=red>texto</color>
+        processed = System.Text.RegularExpressions.Regex.Replace(
+            processed,
+            @"<Color=([^>]*?)>\((.*?)\)</Color>",
+            "<color=$1>$2</color>");
+
+        // Versión simplificada: <Color=red>texto</Color> -> <color=red>texto</color>
+        processed = System.Text.RegularExpressions.Regex.Replace(
+            processed,
+            @"<Color=([^>]*?)>(.*?)</Color>",
+            "<color=$1>$2</color>");
+
+        // Tamaño: <Size=150%>(texto)</Size> -> <size=150%>texto</size>
+        processed = System.Text.RegularExpressions.Regex.Replace(
+            processed,
+            @"<Size=([^>]*?)>\((.*?)\)</Size>",
+            "<size=$1>$2</size>");
+
+        // Versión simplificada: <Size=150%>texto</Size> -> <size=150%>texto</size>
+        processed = System.Text.RegularExpressions.Regex.Replace(
+            processed,
+            @"<Size=([^>]*?)>(.*?)</Size>",
+            "<size=$1>$2</size>");
+
+        return processed;
+    }
 }

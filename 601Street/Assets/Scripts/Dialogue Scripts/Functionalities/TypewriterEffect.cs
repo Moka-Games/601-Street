@@ -1,33 +1,121 @@
-using System.Collections;
 using UnityEngine;
+using System.Collections;
 using TMPro;
 
 public class TypewriterEffect : MonoBehaviour
 {
-    public float defaultLetterDelay = 0.1f;
-    private float letterDelay;
-    private TextMeshProUGUI textComponent;
-    private Coroutine typingCoroutine;
-    private string processedText = "";
-    private NPC currentNPC;
-    private DialogueManager dialogueManager;
+    public TMP_Text textComponent;
+    public float typeSpeed = 0.05f;
+    public AudioSource typingSoundEffect;
 
-    void Awake()
+    private string processedText;
+    private float timer;
+    private int charIndex;
+    private Coroutine typingCoroutine;
+    private NPC currentNPC;
+    private bool isInitialized = false;
+
+    private void Awake()
     {
-        textComponent = GetComponent<TextMeshProUGUI>();
-        letterDelay = defaultLetterDelay;
-        dialogueManager = FindAnyObjectByType<DialogueManager>();
+        // Asegúrate de que textComponent está asignado
+        if (textComponent == null)
+        {
+            textComponent = GetComponent<TMP_Text>();
+            if (textComponent == null)
+            {
+                Debug.LogError("TypewriterEffect no tiene un TextMeshPro asignado");
+            }
+        }
     }
 
-    public void StartTyping(string textToWrite, NPC npc)
+    // Método para reiniciar el componente
+    public void Reset()
     {
         if (typingCoroutine != null)
         {
             StopCoroutine(typingCoroutine);
+            typingCoroutine = null;
         }
-        letterDelay = defaultLetterDelay;
+
+        if (textComponent != null)
+        {
+            textComponent.text = "";
+            textComponent.maxVisibleCharacters = 0;
+        }
+
+        isInitialized = false;
+    }
+
+    // Procesa el texto antes de iniciar la animación de escritura
+    public void StartTyping(string text, NPC npc)
+    {
         currentNPC = npc;
-        typingCoroutine = StartCoroutine(ShowText(textToWrite));
+
+        // Asegurarse de detener cualquier animación en curso
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+            typingCoroutine = null;
+        }
+
+        // Procesamos el texto ANTES de iniciar la animación
+        processedText = TextFormatHelper.ProcessTextTags(text);
+
+        // Aseguramos que el textComponent existe
+        if (textComponent == null)
+        {
+            Debug.LogError("TypewriterEffect.textComponent no está asignado");
+            return;
+        }
+
+        // Configuramos el texto inicial
+        textComponent.text = processedText;
+        textComponent.richText = true;
+        textComponent.maxVisibleCharacters = 0;  // Inicialmente no se muestra ningún carácter
+
+        // Iniciamos la animación después de un breve delay para asegurar que todo esté configurado
+        typingCoroutine = StartCoroutine(TypeText());
+
+        isInitialized = true;
+    }
+
+    private IEnumerator TypeText()
+    {
+        // Pequeño delay para asegurar que todo esté configurado correctamente
+        yield return null;
+
+        charIndex = 0;
+        timer = 0;
+
+        // Nos aseguramos que el texto se ha procesado correctamente
+        textComponent.ForceMeshUpdate();
+
+        while (charIndex < textComponent.textInfo.characterCount)
+        {
+            timer += Time.deltaTime;
+
+            if (timer >= typeSpeed)
+            {
+                charIndex++;
+                textComponent.maxVisibleCharacters = charIndex;
+
+                // Reproducir sonido de tipeo
+                if (typingSoundEffect != null && !typingSoundEffect.isPlaying)
+                {
+                    typingSoundEffect.Play();
+                }
+
+                timer = 0;
+            }
+
+            yield return null;
+        }
+
+        // Aseguramos que todo el texto sea visible al final
+        textComponent.maxVisibleCharacters = int.MaxValue;
+
+        // Notificamos que se ha completado la escritura
+        DialogueManager.Instance.OnTypingComplete();
     }
 
     public void StopTyping()
@@ -36,105 +124,15 @@ public class TypewriterEffect : MonoBehaviour
         {
             StopCoroutine(typingCoroutine);
             typingCoroutine = null;
-        }
-        textComponent.text = processedText;
-    }
 
-    private IEnumerator ShowText(string textToWrite)
-    {
-        int index = 0;
-        textComponent.text = "";
-        processedText = "";
-
-        while (index < textToWrite.Length)
-        {
-            if (textToWrite[index] == '<')
+            // Mostrar el texto completo inmediatamente
+            if (textComponent != null)
             {
-                int endIndex = textToWrite.IndexOf('>', index);
-                if (endIndex != -1)
-                {
-                    string tag = textToWrite.Substring(index + 1, endIndex - index - 1);
-                    ProcessTag(tag);
-                    index = endIndex + 1;
-                    continue;
-                }
+                textComponent.maxVisibleCharacters = int.MaxValue;
             }
-            textComponent.text += textToWrite[index];
-            processedText += textToWrite[index];
-            index++;
-            yield return new WaitForSeconds(letterDelay);
-        }
 
-        // Llamamos a OnTypingComplete cuando termine de escribir todo el texto
-        if (dialogueManager != null)
-        {
-            dialogueManager.OnTypingComplete();
-        }
-    }
-
-    private void ProcessTag(string tag)
-    {
-        string[] parts = tag.Split('=');
-        if (parts.Length == 2)
-        {
-            string action = parts[0].Trim();
-            string parameter = parts[1].Trim();
-            switch (action)
-            {
-                case "speed":
-                    float newSpeed;
-                    if (float.TryParse(parameter, out newSpeed))
-                    {
-                        letterDelay = 1f / newSpeed;
-                    }
-                    break;
-                case "pause":
-                    float pauseDuration;
-                    if (float.TryParse(parameter, out pauseDuration))
-                    {
-                        StartCoroutine(Pause(pauseDuration));
-                    }
-                    break;
-                case "emotion":
-                    ChangeEmotion(parameter);
-                    break;
-                case "action":
-                    ExecuteAction(parameter);
-                    break;
-                case "size":
-                    ChangeTextSize(parameter);
-                    break;
-            }
-        }
-    }
-
-    private IEnumerator Pause(float duration)
-    {
-        yield return new WaitForSeconds(duration);
-    }
-
-    private void ChangeEmotion(string emotion)
-    {
-        if (currentNPC != null)
-        {
-            currentNPC.PerformEmotion(emotion);
-        }
-    }
-
-    private void ExecuteAction(string action)
-    {
-        if (currentNPC != null)
-        {
-            currentNPC.PerformAction(action);
-        }
-    }
-
-    private void ChangeTextSize(string size)
-    {
-        float newSize;
-        if (float.TryParse(size.Replace("%", ""), out newSize))
-        {
-            textComponent.fontSize = newSize;
+            // Notificar que se completó la escritura
+            DialogueManager.Instance.OnTypingComplete();
         }
     }
 }

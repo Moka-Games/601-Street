@@ -1903,11 +1903,21 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnRollButtonClicked
       objectReference: {fileID: 0}
+    - target: {fileID: 2242875429752166847, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
+        type: 3}
+      propertyPath: m_fontStyle
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2384681060200947106, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3038479862657568483, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
+        type: 3}
+      propertyPath: textComponent
+      value: 
+      objectReference: {fileID: 1539481041}
     - target: {fileID: 4497677527349774984, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_Name
