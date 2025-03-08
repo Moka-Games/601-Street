@@ -9,7 +9,8 @@ public class Inventory_Item : MonoBehaviour
     public ItemData itemData;
 
     [Header("Función Item Recogido")]
-    public UnityEvent onItemClick;
+    public UnityEvent onItemClick; //Función que se realiza el pulsar el objeto en el inventario
+    public UnityEvent OnItemInteracted; //Función que se realiza interactuar con el objeto
     public GameObject interactableObject;
 
     [Header("Configuración de Feedback")]

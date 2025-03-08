@@ -15,7 +15,7 @@ public class ActionController : MonoBehaviour
     {
         //DESCRIPCIÓN FUNCIONALIDAD
         // 
-        //Se registración acciones según los parámtros 1. Acción Estandard, 2.Acción cuando el dado devuelve éxito
+        //Se registran acciones según los parámetros: 1. Acción Estandard, 2.Acción cuando el dado devuelve éxito
         //3. Acción cuando el dado devuelve fallo
         //En este caso ("Opcion_1" es el actionID que le damos a nuestra acción, de forma que si configuramos nuestra
         //Dialogue Option con este Id se realizará una de las 3 acciones dependiendo del contexto

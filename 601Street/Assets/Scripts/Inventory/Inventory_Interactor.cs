@@ -59,6 +59,12 @@ public class Inventory_Interactor : MonoBehaviour
         {
             lastItemName = currentInteractableItem.itemData.itemName;
 
+            // Invocar el evento OnItemInteracted antes de cualquier otra acción
+            if (currentInteractableItem.OnItemInteracted != null)
+            {
+                currentInteractableItem.OnItemInteracted.Invoke();
+            }
+
             if (currentInteractableItem.interactableObject != null)
             {
                 lastInteractableObject = currentInteractableItem.interactableObject;

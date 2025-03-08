@@ -706,7 +706,7 @@ MonoBehaviour:
   bonus1Popup: {fileID: 495210968}
   bonus2Popup: {fileID: 495210967}
   bonus3Popup: {fileID: 495210966}
-  bonus1Activated: 1
+  bonus1Activated: 0
   bonus2Activated: 0
   bonus3Activated: 0
 --- !u!1001 &674986340
@@ -933,6 +933,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_YAxis.Value
       value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 571450271917270595, guid: 7685b785844a38049a4bf1af2d883a49,
+        type: 3}
+      propertyPath: m_XAxis.m_MaxSpeed
+      value: 275
+      objectReference: {fileID: 0}
+    - target: {fileID: 571450271917270595, guid: 7685b785844a38049a4bf1af2d883a49,
+        type: 3}
+      propertyPath: m_YAxis.m_MaxSpeed
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2178201324368974428, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
@@ -2921,7 +2931,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29f9dfc1f8e6fbe42bb2be3353091a4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  "pensamientoPostInteracci\xF3n": "Deber\xEDa volver al bar..."
+  "pensamientoPostInteracci\xF3n": "Deber\xEDa buscar el bar..."
 --- !u!4 &2126777934
 Transform:
   m_ObjectHideFlags: 0

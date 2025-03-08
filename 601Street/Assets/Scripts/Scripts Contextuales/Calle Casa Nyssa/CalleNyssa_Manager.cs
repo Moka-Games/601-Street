@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CalleNyssa_Manager : MonoBehaviour
@@ -7,22 +8,35 @@ public class CalleNyssa_Manager : MonoBehaviour
     public GameObject teleportComisaria;
 
     public GameObject runa;
-    public InteractableObject puerta;
+    public GameObject puerta;
+    public GameObject pensamiento;
+
     void Start()
     {
         if(ManagerHabitación.segundoDia)
         {
-
             barrera_1.SetActive(false);
             teleportComisaria.SetActive(true);
+            puerta.SetActive(false);
+            pensamiento.SetActive(true);
+
             runa.SetActive(true);
-            puerta.enabled = false;
+            if(!Runa.runeInteracted)
+            {
+                runa.SetActive(true);
+            }
+            else
+            {
+                runa.SetActive(false);
+            }
+         
         }
         else 
         {
             barrera_1.SetActive(true);
             teleportComisaria.SetActive(false);
             runa.SetActive(false);
+            pensamiento.SetActive(false);
         }
     }
 
