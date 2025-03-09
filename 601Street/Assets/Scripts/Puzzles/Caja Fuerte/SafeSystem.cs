@@ -161,6 +161,9 @@ public class SafeSystem : MonoBehaviour
         switch (button.buttonType)
         {
             case SafeButtonType.Number:
+                // Reproducir sonido de botón numérico
+                PlaySound(buttonPressSound);
+
                 // Añadir el número al password actual si no hemos llegado al máximo
                 if (currentPassword.Length < maxDigits)
                 {
@@ -174,6 +177,10 @@ public class SafeSystem : MonoBehaviour
                 if (currentPassword.Length < maxDigits)
                 {
                     Debug.Log("Se requieren " + maxDigits + " dígitos para verificar la contraseña.");
+
+                    // Reproducir sonido de contraseña incorrecta (mismo que para contraseña errónea)
+                    PlaySound(wrongPasswordSound);
+
                     // Mostrar luz roja parpadeante si faltan dígitos
                     BlinkLight(redMaterial);
                 }
@@ -185,6 +192,9 @@ public class SafeSystem : MonoBehaviour
                 break;
 
             case SafeButtonType.Delete:
+                // Reproducir sonido de botón
+                PlaySound(buttonPressSound);
+
                 // Borrar el último dígito si hay alguno
                 if (currentPassword.Length > 0)
                 {
@@ -194,6 +204,9 @@ public class SafeSystem : MonoBehaviour
                 break;
 
             case SafeButtonType.Clear:
+                // Reproducir sonido de limpiar
+                PlaySound(clearPasswordSound);
+
                 // Limpiar toda la contraseña
                 currentPassword = "";
                 UpdatePasswordDisplay();
@@ -331,6 +344,12 @@ public class SafeSystem : MonoBehaviour
             audioSource.clip = clip;
             audioSource.Play();
         }
+    }
+
+    // Método público para verificar si la caja fuerte está desbloqueada
+    public bool IsSafeUnlocked()
+    {
+        return isSafeUnlocked;
     }
 
     // Método público para reiniciar la caja fuerte (puede ser llamado desde otros scripts)

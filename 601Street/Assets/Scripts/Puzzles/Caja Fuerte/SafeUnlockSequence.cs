@@ -5,9 +5,6 @@ using System.Collections;
 public class SafeUnlockSequence : MonoBehaviour
 {
     [Header("Cámaras")]
-    [Tooltip("Cámara virtual principal que se usa normalmente")]
-    public CinemachineVirtualCamera mainVirtualCamera;
-
     [Tooltip("Cámara virtual que se activará durante la secuencia de desbloqueo")]
     public CinemachineVirtualCamera unlockSequenceCamera;
 
@@ -32,9 +29,6 @@ public class SafeUnlockSequence : MonoBehaviour
     [Tooltip("Prioridad de la cámara de secuencia (debe ser mayor que la principal)")]
     public int sequenceCameraPriority = 15;
 
-    // Prioridad original de la cámara principal
-    private int mainCameraPriorityOriginal;
-
     // Referencia al sistema de la caja fuerte
     private SafeSystem safeSystem;
 
@@ -49,14 +43,14 @@ public class SafeUnlockSequence : MonoBehaviour
         }
 
         // Validar referencias
-        if (mainVirtualCamera == null)
-        {
-            Debug.LogError("No se ha asignado la cámara virtual principal.");
-        }
-
         if (unlockSequenceCamera == null)
         {
             Debug.LogError("No se ha asignado la cámara virtual de la secuencia de desbloqueo.");
+        }
+        else
+        {
+            // Asegurarse de que la cámara de secuencia esté desactivada inicialmente
+            unlockSequenceCamera.gameObject.SetActive(false);
         }
 
         if (safeDoorAnimator == null)
@@ -74,19 +68,6 @@ public class SafeUnlockSequence : MonoBehaviour
                 sequenceAudioSource = gameObject.AddComponent<AudioSource>();
                 Debug.Log("Se ha añadido automáticamente un componente AudioSource para la secuencia de desbloqueo.");
             }
-        }
-
-        // Guardar la prioridad original de la cámara principal
-        if (mainVirtualCamera != null)
-        {
-            mainCameraPriorityOriginal = mainVirtualCamera.Priority;
-        }
-
-        // Asegurar que la cámara de secuencia esté desactivada inicialmente
-        if (unlockSequenceCamera != null)
-        {
-            // Configurar una prioridad baja para asegurar que no esté activa
-            unlockSequenceCamera.Priority = 0;
         }
     }
 
@@ -110,13 +91,11 @@ public class SafeUnlockSequence : MonoBehaviour
     private IEnumerator PlayUnlockSequence()
     {
         // 1. Activar la cámara de secuencia
-        if (unlockSequenceCamera != null && mainVirtualCamera != null)
+        if (unlockSequenceCamera != null)
         {
-            // Aumentar la prioridad de la cámara de secuencia para que sea la activa
+            // Activar la cámara de secuencia
+            unlockSequenceCamera.gameObject.SetActive(true);
             unlockSequenceCamera.Priority = sequenceCameraPriority;
-
-            // Opcionalmente, reducir aún más la prioridad de la cámara principal
-            mainVirtualCamera.Priority = 0;
 
             Debug.Log("Cámara de secuencia activada");
         }
@@ -140,15 +119,8 @@ public class SafeUnlockSequence : MonoBehaviour
         // 4. Esperar la duración de la secuencia
         yield return new WaitForSeconds(sequenceDuration);
 
-        // 5. Restaurar la configuración original de las cámaras
-        if (unlockSequenceCamera != null && mainVirtualCamera != null)
-        {
-            // Desactivar ambas cámaras (asumiendo que otra cámara del juego tomará el control)
-            unlockSequenceCamera.Priority = 0;
-            mainVirtualCamera.Priority = 0;
-
-            Debug.Log("Ambas cámaras desactivadas tras secuencia");
-        }
+        // La desactivación de las cámaras se maneja en SafeGameplayManager
+        // después de que esta secuencia termina + un retraso adicional
     }
 
     // Para depuración: método para iniciar la secuencia manualmente
