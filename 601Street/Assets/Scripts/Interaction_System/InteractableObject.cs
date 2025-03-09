@@ -7,6 +7,7 @@ public interface IInteractable
     void Interact();
     void SecondInteraction();
     string GetInteractionID();
+    bool CanBeInteractedAgain();
 }
 
 public class InteractableObject : MonoBehaviour, IInteractable
@@ -17,6 +18,12 @@ public class InteractableObject : MonoBehaviour, IInteractable
     [Tooltip("Evento que se disparará cuando el jugador interactúe con este objeto")]
     [SerializeField] private UnityEvent onInteraction;
     [SerializeField] private UnityEvent onInteracted; //Evento por si volvemos a interactuar con el mismo objeto
+
+    [Header("Comportamiento de interacción")]
+    [Tooltip("Si está activado, este objeto solo podrá ser interactuado una vez")]
+    [SerializeField] private bool singleUseInteraction = false;
+    [Tooltip("Si está activado, el objeto se desactivará después de una interacción (solo aplica si singleUseInteraction = true)")]
+    [SerializeField] private bool disableAfterInteraction = false;
 
     [Header("Feedback")]
     [SerializeField] private GameObject rangeIndicator;
@@ -48,6 +55,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
     private float enterTime;
     private bool isExiting = false;
     private float exitTime = 0f;
+
     private void Start()
     {
         // Crear y configurar el SphereCollider
@@ -159,12 +167,39 @@ public class InteractableObject : MonoBehaviour, IInteractable
     {
         Debug.Log($"Interactuando con objeto: {gameObject.name} (ID: {interactionID})");
         onInteraction.Invoke();
+
+        // Marcar como interactuado
+        objectInteracted = true;
+
+        // Si es de un solo uso, destruir los indicadores de feedback
+        if (singleUseInteraction)
+        {
+            // Destruir los indicadores visuales
+            DestroyFeedbackIndicators();
+
+            // Si está configurado para desactivarse después de la interacción
+            if (disableAfterInteraction)
+            {
+                // Desactivar el objeto después de un breve retardo para permitir que las animaciones terminen
+                StartCoroutine(DisableAfterDelay(0.5f));
+            }
+        }
     }
 
     public virtual void SecondInteraction()
     {
-        Debug.Log($"Interactuando por segunda vez con objeto: {gameObject.name} (ID: {interactionID})");
-        onInteracted.Invoke();
+        // Solo permitir segunda interacción si no es de un solo uso
+        if (!singleUseInteraction)
+        {
+            Debug.Log($"Interactuando por segunda vez con objeto: {gameObject.name} (ID: {interactionID})");
+            onInteracted.Invoke();
+        }
+    }
+
+    // Implementación del método de la interfaz para verificar si puede volver a interactuarse
+    public bool CanBeInteractedAgain()
+    {
+        return !singleUseInteraction || !objectInteracted;
     }
 
     public string GetInteractionID()
@@ -177,8 +212,47 @@ public class InteractableObject : MonoBehaviour, IInteractable
         return interactionPrompt;
     }
 
+    // Corrutina para desactivar el objeto después de un retardo
+    private IEnumerator DisableAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        // Desactivar el GameObject
+        gameObject.SetActive(false);
+    }
+
+    // Método para destruir los indicadores de feedback
+    private void DestroyFeedbackIndicators()
+    {
+        if (rangeIndicator != null)
+        {
+            rangeIndicator.SetActive(false);
+            Destroy(rangeIndicator);
+            rangeIndicator = null;
+        }
+
+        if (interactIndicator != null)
+        {
+            interactIndicator.SetActive(false);
+            Destroy(interactIndicator);
+            interactIndicator = null;
+        }
+
+        // Desactivar el collider de detección para que el jugador no pueda volver a activar los indicadores
+        if (detectionCollider != null)
+        {
+            detectionCollider.enabled = false;
+        }
+    }
+
     private void Update()
     {
+        // Si es un objeto de un solo uso y ya fue interactuado, no hacer nada
+        if (singleUseInteraction && objectInteracted)
+        {
+            return;
+        }
+
         if (!isInitialized || !playerOnRange)
         {
             // Si no está inicializado o el jugador no está en rango, asegurarse que todo está desactivado
@@ -191,7 +265,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
         UpdateIndicatorPosition();
 
         // Verificar si el jugador puede interactuar (pero solo después de cierto tiempo)
-        if (Time.time - enterTime > 0.2f)  // Agregar variable float enterTime
+        if (Time.time - enterTime > 0.2f)
         {
             bool canPlayerInteract = CanInteract();
 
@@ -200,6 +274,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
             if (interactIndicator != null) interactIndicator.SetActive(canPlayerInteract);
         }
     }
+
     private bool CanInteract()
     {
         // Verificar si tenemos referencia al PlayerInteraction
@@ -357,6 +432,12 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
     private void OnTriggerEnter(Collider other)
     {
+        // Si es un objeto de un solo uso y ya fue interactuado, ignorar
+        if (singleUseInteraction && objectInteracted)
+        {
+            return;
+        }
+
         enterTime = Time.time;
 
         // Verificamos si el objeto que entra en el trigger es el jugador
@@ -380,8 +461,8 @@ public class InteractableObject : MonoBehaviour, IInteractable
         // Esperamos varios frames para asegurarnos que todo se ha actualizado correctamente
         yield return new WaitForSeconds(0.1f);
 
-        // Solo si seguimos en rango
-        if (playerOnRange)
+        // Solo si seguimos en rango y el objeto puede ser interactuado
+        if (playerOnRange && (!singleUseInteraction || !objectInteracted))
         {
             // Forzar mostrar SOLO el indicador de detección al principio
             if (rangeIndicator != null) rangeIndicator.SetActive(true);
@@ -394,8 +475,8 @@ public class InteractableObject : MonoBehaviour, IInteractable
         // Esperar un frame para que el PlayerInteraction se actualice
         yield return null;
 
-        // Asegurarnos de que seguimos en el rango
-        if (!playerOnRange) yield break;
+        // Asegurarnos de que seguimos en el rango y el objeto puede ser interactuado
+        if (!playerOnRange || (singleUseInteraction && objectInteracted)) yield break;
 
         // Determinar cuál indicador activar basado en CanInteract()
         bool canPlayerInteract = CanInteract();
