@@ -128,9 +128,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 122917229}
-  - component: {fileID: 122917228}
   - component: {fileID: 122917230}
   - component: {fileID: 122917231}
+  - component: {fileID: 122917232}
   m_Layer: 6
   m_Name: PuertaSalida
   m_TagString: Untagged
@@ -138,27 +138,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!135 &122917228
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 122917227}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 1.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &122917229
 Transform:
   m_ObjectHideFlags: 0
@@ -167,13 +146,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 122917227}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -31.045286, y: 1.4018931, z: -20.529474}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: 0.38817197, z: -0, w: 0.92158705}
+  m_LocalPosition: {x: -31.03, y: 1.7, z: -20.53}
+  m_LocalScale: {x: 3.3435, y: 3.4933589, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 45.682, z: 0}
 --- !u!114 &122917230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -206,6 +185,8 @@ MonoBehaviour:
   onInteracted:
     m_PersistentCalls:
       m_Calls: []
+  singleUseInteraction: 0
+  disableAfterInteraction: 0
   rangeIndicator: {fileID: 0}
   interactIndicator: {fileID: 0}
   detectionRadius: 7
@@ -225,6 +206,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cambiosDeEscena: []
   escenaPersistente: PersistentScene
+--- !u!65 &122917232
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 122917227}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &133563815
 PrefabInstance:
   m_ObjectHideFlags: 0

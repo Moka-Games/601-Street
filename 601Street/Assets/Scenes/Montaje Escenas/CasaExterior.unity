@@ -907,8 +907,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 1, z: 0.82104033}
+  m_Center: {x: 0, y: 0, z: 0.089479454}
 --- !u!4 &441216647
 Transform:
   m_ObjectHideFlags: 0
@@ -956,6 +956,8 @@ MonoBehaviour:
   onInteracted:
     m_PersistentCalls:
       m_Calls: []
+  singleUseInteraction: 0
+  disableAfterInteraction: 0
   rangeIndicator: {fileID: 0}
   interactIndicator: {fileID: 0}
   detectionRadius: 5
