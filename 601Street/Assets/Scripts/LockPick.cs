@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -33,10 +32,25 @@ public class LockPick : MonoBehaviour
     private Transform lockpickAnchor;
 
     // Rotación inicial del objeto
-    private Quaternion initialRotation;
+    private Quaternion initialPickRotation;
+
+    // Rotación inicial del innerLock
+    private Quaternion initialInnerLockRotation;
 
     // Ángulo de la ganzúa cuando se presiona E
     private float lockedPickAngle;
+
+    // Valor de rotación actual del innerLock (relativo a su posición inicial)
+    private float currentInnerLockRotation = 0f;
+
+    // Variables para la transición suave
+    private float returnLerpSpeed = 5f;
+    private bool isReturning = false;
+    private float returnTime = 0f;
+    private Quaternion targetPickRotation;
+    private Quaternion fromPickRotation;
+    private float targetInnerLockAngle;
+    private float fromInnerLockAngle;
 
     // Posición inicial del objeto relativa a la cámara
     private Vector3 initialPositionFromCamera;
@@ -103,7 +117,16 @@ public class LockPick : MonoBehaviour
             originalPriority = lockpickVCam.Priority;
         }
 
+        // Guardamos la rotación inicial del innerLock
+        if (innerLock != null)
+        {
+            initialInnerLockRotation = innerLock.rotation;
+        }
+
         newLock();
+
+        // Para pruebas, activamos automáticamente el modo lockpick
+        EnterLockpickMode();
     }
 
     private void SetupVirtualCamera()
@@ -167,8 +190,17 @@ public class LockPick : MonoBehaviour
             lockpickVCam.Priority = lockpickCameraPriority;
             isLockpickModeActive = true;
 
-            // Guardamos la rotación inicial
-            initialRotation = transform.rotation;
+            // Guardamos las rotaciones iniciales
+            initialPickRotation = transform.rotation;
+
+            // Aseguramos que hayamos guardado la rotación inicial del innerLock
+            if (initialInnerLockRotation == Quaternion.identity && innerLock != null)
+            {
+                initialInnerLockRotation = innerLock.rotation;
+            }
+
+            // Reiniciamos el valor de rotación actual
+            currentInnerLockRotation = 0f;
 
             // Invocamos el evento si hay listeners
             OnLockpickModeEntered?.Invoke();
@@ -228,6 +260,12 @@ public class LockPick : MonoBehaviour
         initialPositionFromCamera = lockpickAnchor.position - mainCamera.transform.position;
     }
 
+    // Aplica una rotación al innerLock relativa a su posición inicial
+    private void SetInnerLockRotation(float angle)
+    {
+        innerLock.rotation = initialInnerLockRotation * Quaternion.Euler(0, 0, angle);
+    }
+
     void Update()
     {
         // Solo procesamos la lógica si está activo el modo lockpick
@@ -240,6 +278,33 @@ public class LockPick : MonoBehaviour
             transform.position = pickPosition.position;
         }
 
+        // Procesamos la transición suave de retorno
+        if (isReturning)
+        {
+            returnTime += Time.deltaTime * returnLerpSpeed;
+            float t = Mathf.Clamp01(returnTime);
+
+            // Aplicar interpolación suave a la ganzúa
+            transform.rotation = Quaternion.Slerp(fromPickRotation, targetPickRotation, t);
+
+            // Aplicar interpolación suave al ángulo del innerLock
+            float newAngle = Mathf.Lerp(fromInnerLockAngle, targetInnerLockAngle, t);
+            SetInnerLockRotation(newAngle);
+
+            // Cuando la transición está completa
+            if (t >= 0.99f)
+            {
+                isReturning = false;
+                movePick = true;
+                transform.rotation = targetPickRotation;
+                SetInnerLockRotation(targetInnerLockAngle);
+                currentInnerLockRotation = targetInnerLockAngle;
+            }
+
+            // Durante la transición no permitimos mover la ganzúa
+            return;
+        }
+
         // Procesamos la acción de la tecla E
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -247,15 +312,25 @@ public class LockPick : MonoBehaviour
             keyPressTime = 1;
             // Guardamos el ángulo actual de la ganzúa al presionar E
             lockedPickAngle = eulerAngle;
+            // Reiniciamos el valor de rotación actual del innerLock
+            currentInnerLockRotation = 0f;
         }
         if (Input.GetKeyUp(KeyCode.E))
         {
-            movePick = true;
+            // En lugar de restaurar inmediatamente, iniciar la transición suave
+            isReturning = true;
+            returnTime = 0f;
+
+            // Guardar las rotaciones actuales como punto de partida
+            fromPickRotation = transform.rotation;
+            fromInnerLockAngle = currentInnerLockRotation;
+
+            // Calcular las rotaciones objetivo
+            targetPickRotation = initialPickRotation * Quaternion.Euler(0, 0, eulerAngle);
+            targetInnerLockAngle = 0f;
+
+            // No restauramos inmediatamente
             keyPressTime = 0;
-            // Restauramos la rotación inicial de la ganzúa
-            transform.rotation = initialRotation * Quaternion.Euler(0, 0, eulerAngle);
-            // Restauramos la rotación del innerLock a 0
-            innerLock.eulerAngles = Vector3.zero;
         }
 
         // Lógica para salir del modo lockpick con Escape
@@ -284,23 +359,36 @@ public class LockPick : MonoBehaviour
             eulerAngle = Mathf.Clamp(eulerAngle, -maxAngle, maxAngle);
 
             // Aplicamos la rotación respetando la rotación inicial del objeto
-            transform.rotation = initialRotation * Quaternion.Euler(0, 0, eulerAngle);
+            transform.rotation = initialPickRotation * Quaternion.Euler(0, 0, eulerAngle);
         }
         else
         {
             // Si no estamos moviendo la ganzúa (pulsamos E), calculamos las rotaciones
-            float percentage = Mathf.Round(100 - Mathf.Abs(((lockedPickAngle - unlockAngle) / 100) * 100));
+
+            // Calculamos la distancia angular más corta entre el ángulo actual y el ángulo de desbloqueo
+            float angularDistance = Mathf.Abs(Mathf.DeltaAngle(lockedPickAngle, unlockAngle));
+
+            // Convertimos a un porcentaje inversamente proporcional (0% lejos, 100% cerca)
+            // La distancia máxima posible es maxAngle*2 (de -maxAngle a +maxAngle)
+            float percentage = 100 * (1 - (angularDistance / (maxAngle * 2)));
+
+            // Limitamos el porcentaje para que no sea negativo (por si acaso)
+            percentage = Mathf.Max(0, percentage);
+
+            // Calculamos la rotación máxima basada en el porcentaje
             float lockRotation = ((percentage / 100) * maxAngle) * keyPressTime;
             float maxRotation = (percentage / 100) * maxAngle;
 
+            // Calculamos la nueva rotación del innerLock basada en el tiempo
+            currentInnerLockRotation = Mathf.Lerp(currentInnerLockRotation, lockRotation, Time.deltaTime * lockSpeed);
+
             // Aplicamos la rotación al innerLock
-            float lockLerp = Mathf.LerpAngle(innerLock.eulerAngles.z, lockRotation, Time.deltaTime * lockSpeed);
-            innerLock.eulerAngles = new Vector3(0, 0, lockLerp);
+            SetInnerLockRotation(currentInnerLockRotation);
 
             // Hacemos que la ganzúa siga el movimiento del innerLock (como si estuvieran acoplados)
-            transform.rotation = initialRotation * Quaternion.Euler(0, 0, lockedPickAngle + lockLerp);
+            transform.rotation = initialPickRotation * Quaternion.Euler(0, 0, lockedPickAngle + currentInnerLockRotation);
 
-            if (lockLerp >= maxRotation - 1)
+            if (currentInnerLockRotation >= maxRotation - 1)
             {
                 if (lockedPickAngle < unlockRange.y && lockedPickAngle > unlockRange.x)
                 {
