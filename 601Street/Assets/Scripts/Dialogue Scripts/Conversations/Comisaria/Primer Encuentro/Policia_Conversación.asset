@@ -52,21 +52,21 @@ MonoBehaviour:
   - speakerName: Nyssa
     content: "Please tell me something!  \n"
   dialogueOptions:
-  - optionText: Caca
+  - optionText: Es muy importante para mi, por favor.
     actionId: Option_1
     requiresDiceRoll: 1
     difficultyClass: 1
     nextDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     successDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     failureDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
-  - optionText: Pedo
+  - optionText: Compartir lo que sepas puede ayudarnos a los dos.
     actionId: Option_2
     requiresDiceRoll: 1
     difficultyClass: 1
     nextDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     successDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     failureDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
-  - optionText: Culo
+  - optionText: Tengo derecho a saber la verdad
     actionId: Option_3
     requiresDiceRoll: 1
     difficultyClass: 1
