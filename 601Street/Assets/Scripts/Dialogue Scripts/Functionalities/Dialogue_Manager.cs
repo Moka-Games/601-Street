@@ -325,7 +325,6 @@ public class DialogueManager : MonoBehaviour
         if (currentNPC != null)
         {
             currentNPC.SetInteracted();
-            currentNPC.InvokeOnConversationEnd();
             onConversationEnd.Invoke();
         }
 

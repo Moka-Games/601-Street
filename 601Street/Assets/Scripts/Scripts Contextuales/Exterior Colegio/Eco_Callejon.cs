@@ -24,6 +24,7 @@ public class Eco_Callejon : MonoBehaviour
 
     public GameObject imagenEco;
 
+    public GameObject abuela;
 
     private void Start()
     {
@@ -38,6 +39,8 @@ public class Eco_Callejon : MonoBehaviour
         playerController = FindAnyObjectByType<PlayerController>();
 
         callejonCamera.enabled = false;
+
+        abuela.SetActive(false);
     }
     void Update()
     {
@@ -84,6 +87,7 @@ public class Eco_Callejon : MonoBehaviour
         
 
         playerController.SetMovementEnabled(true);
+        abuela.SetActive(true);
     }
 
     private void CameraSwap(CinemachineVirtualCamera virtualCamera_, CinemachineFreeLook playerCamera_, bool value_1, bool value_2)

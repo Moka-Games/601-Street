@@ -97,7 +97,7 @@ public class Pensamientos_Manager : MonoBehaviour
 
     private IEnumerator DesactivarPensamiento()
     {
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(5);
         pensamientoUI.SetActive(false);
     }
 

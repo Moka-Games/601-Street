@@ -1918,6 +1918,16 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnRollButtonClicked
       objectReference: {fileID: 0}
+    - target: {fileID: 2159474812181361293, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.0000030398369
+      objectReference: {fileID: 0}
+    - target: {fileID: 2159474812181361293, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2242875429752166847, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_fontStyle
@@ -1958,6 +1968,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: __DIALOGUE-CANVAS__
       objectReference: {fileID: 0}
+    - target: {fileID: 4497677527349774984, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4528371306567692611, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_SizeDelta.x
@@ -1972,6 +1987,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -116
+      objectReference: {fileID: 0}
+    - target: {fileID: 5070031618670047855, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
+        type: 3}
+      propertyPath: m_text
+      value: 'Minimum number:'
       objectReference: {fileID: 0}
     - target: {fileID: 5333302690238951813, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}

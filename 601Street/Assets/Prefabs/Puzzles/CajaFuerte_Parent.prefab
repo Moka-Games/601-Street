@@ -1516,7 +1516,6 @@ Transform:
   - {fileID: 5057657977918626904}
   - {fileID: 8215503768119861702}
   - {fileID: 4448313353238307729}
-  - {fileID: 4390772631193929552}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!114 &422334847174790149
@@ -1552,7 +1551,31 @@ MonoBehaviour:
   blinkDuration: 1
   OnSafeUnlocked:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5136646863411926590}
+        m_TargetAssemblyTypeName: SafeGameplayManager, Assembly-CSharp
+        m_MethodName: ExitSafeMode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1833477273651023365}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnWrongPassword:
     m_PersistentCalls:
       m_Calls: []
@@ -1616,6 +1639,7 @@ MonoBehaviour:
   safeSystem: {fileID: 422334847174790149}
   unlockSequence: {fileID: 8091287239678105364}
   returnToGameplayDelay: 2
+  oneTimeInteraction: 1
 --- !u!114 &1833477273651023365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1632,10 +1656,36 @@ MonoBehaviour:
   interactionPrompt: Presiona E para interactuar
   onInteraction:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5136646863411926590}
+        m_TargetAssemblyTypeName: SafeGameplayManager, Assembly-CSharp
+        m_MethodName: EnterSafeMode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1833477273651023365}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onInteracted:
     m_PersistentCalls:
       m_Calls: []
+  singleUseInteraction: 0
+  disableAfterInteraction: 0
   rangeIndicator: {fileID: 0}
   interactIndicator: {fileID: 0}
   detectionRadius: 10
@@ -3631,37 +3681,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 8365992944990912549}
   m_maskType: 0
---- !u!1 &5817306736572019146
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4390772631193929552}
-  m_Layer: 6
-  m_Name: CajaFuerte
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4390772631193929552
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5817306736572019146}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 10.038954, y: 16.3538, z: 51.52098}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4625153449018724322}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5857639781654388448
 GameObject:
   m_ObjectHideFlags: 0

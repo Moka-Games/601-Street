@@ -29,19 +29,25 @@ public class ActionController : MonoBehaviour
     ));
 
         RegisterAction("Option_2", new DialogueAction(
-        () => CalleBar_Manager.puertaAbiertaBool = true, // Acción estandard
-        () => CalleBar_Manager.puertaAbiertaBool = true, // Acción de éxito
-        () => CalleBar_Manager.puertaAbiertaBool = true  // Acción de fracaso
+        () => CalleBar_Manager.puertaAbiertaBool = true, 
+        () => CalleBar_Manager.puertaAbiertaBool = true, 
+        () => CalleBar_Manager.puertaAbiertaBool = true  
     ));
         RegisterAction("Option_3", new DialogueAction(
-        () => CalleBar_Manager.puertaAbiertaBool = true, // Acción estandard
-        () => CalleBar_Manager.puertaAbiertaBool = true, // Acción de éxito
-        () => CalleBar_Manager.puertaAbiertaBool = true  // Acción de fracaso
+        () => CalleBar_Manager.puertaAbiertaBool = true, 
+        () => CalleBar_Manager.puertaAbiertaBool = true,
+        () => CalleBar_Manager.puertaAbiertaBool = true  
     ));
 
         //Ejemplo Acción registrada para final de conversación
         RegisterAction("ConversationEnd_1", new DialogueAction(
     () => Actions_Script.Instance.MostrarPensamiento(pensamientoPostInteracción),
+    null,
+    null
+));
+
+        RegisterAction("Bar", new DialogueAction(
+    () => BarInterior.conversaciónPoliciaTerminada = true,
     null,
     null
 ));

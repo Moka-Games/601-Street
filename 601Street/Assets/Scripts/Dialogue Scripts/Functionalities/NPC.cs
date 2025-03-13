@@ -5,28 +5,100 @@ using UnityEngine.Events;
 public class NPC : MonoBehaviour
 {
     public int npcId;
-    public Conversation conversation;
-    public Conversation achievementConversation;
-    public Conversation funnyConversation;
+    public Conversation conversation;           // Conversación normal
+    public Conversation achievementConversation; // Conversación si se logra algún objetivo
+    public Conversation funnyConversation;      // Conversación después de haber interactuado una vez
+
+    [Header("Diálogo especial para la botella")]
+    public bool isNakamura = false;                // Marcar si este NPC es Nakamura
+    public Conversation conversacionDespuesDeInteraccion; // Conversación después de interactuar con la botella
+    public string pensamientoFalloTirada = "Parece que Nakamura no está dispuesto a hablar. Quizás si le doy algo de beber...";
+
+    private bool tiradaFallada = false;
     public bool hasInteracted = false;
     private Animator animator;
-    
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
-    }
 
+        // Si es Nakamura, registramos las acciones específicas
+        if (isNakamura)
+        {
+            RegisterNakamuraActions();
+        }
+    }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !hasInteracted)
+        if (!other.CompareTag("Player"))
+            return;
+
+        // Si es Nakamura, usamos la lógica específica
+        if (isNakamura)
+        {
+            HandleNakamuraConversation();
+        }
+        // Si no es Nakamura, usamos la lógica normal
+        else if (!hasInteracted)
         {
             Debug.Log("Interactor Triggered");
             DialogueManager.Instance.StartConversation(conversation, this);
         }
-        else if (other.CompareTag("Player") && hasInteracted)
+        else if (hasInteracted)
         {
             DialogueManager.Instance.StartConversation(funnyConversation, this);
+        }
+    }
+
+    private void HandleNakamuraConversation()
+    {
+        // Si el jugador ya ha interactuado con la botella
+        if (Botella.objectInteracted)
+        {
+            DialogueManager.Instance.StartConversation(conversacionDespuesDeInteraccion, this);
+            // Opcionalmente, resetear la variable si es una interacción única
+            Botella.objectInteracted = false;
+        }
+        // Si ha fallado la tirada previamente pero no ha interactuado con la botella
+        else if (tiradaFallada)
+        {
+            DialogueManager.Instance.StartConversation(funnyConversation, this);
+        }
+        // Primera interacción, mostramos la conversación normal
+        else
+        {
+            DialogueManager.Instance.StartConversation(conversation, this);
+        }
+    }
+
+    private void RegisterNakamuraActions()
+    {
+        // Registrar las acciones necesarias
+        ActionController actionController = ActionController.Instance;
+        if (actionController != null)
+        {
+            // Acción para el resultado de la tirada
+            actionController.RegisterAction("NakamuraTirada", new DialogueAction(
+                // Acción estándar (sin tirada)
+                () => {
+                    Debug.Log("Comenzando conversación con Nakamura");
+                },
+                // Acción de éxito
+                () => {
+                    Debug.Log("Tirada exitosa con Nakamura");
+                },
+                // Acción de fracaso
+                () => {
+                    Debug.Log("Tirada fallida con Nakamura");
+                    tiradaFallada = true;
+                    Pensamientos_Manager pensamientosManager = FindAnyObjectByType<Pensamientos_Manager>();
+                    if (pensamientosManager != null)
+                    {
+                        pensamientosManager.MostrarPensamiento(pensamientoFalloTirada);
+                    }
+                }
+            ));
         }
     }
 
@@ -40,10 +112,6 @@ public class NPC : MonoBehaviour
     {
         hasInteracted = false;
         Debug.Log("Conversación Terminada");
-    }
-    public void InvokeOnConversationEnd()
-    {
-
     }
 
     public void PerformEmotion(string emotion)
@@ -77,5 +145,10 @@ public class NPC : MonoBehaviour
                 Debug.LogWarning($"Acción desconocida: {action}");
                 break;
         }
+    }
+
+    public void InvokeOnConversationEnd()
+    {
+        // Implementación vacía para satisfacer cualquier llamada desde el DialogueManager
     }
 }
