@@ -41,4 +41,10 @@ public class Actions_Script : MonoBehaviour
     {
         pensamientosManager.MostrarPensamiento(pensamiento);
     }
+
+    public void PoliciaInteractuado()
+    {
+        CalleBar_Manager.puertaAbiertaBool = true;
+        CalleNyssa_Manager.policiaInteractuado = true;
+    }
 }

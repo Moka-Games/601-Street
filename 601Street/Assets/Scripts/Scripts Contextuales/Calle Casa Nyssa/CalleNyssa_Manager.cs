@@ -7,9 +7,12 @@ public class CalleNyssa_Manager : MonoBehaviour
 
     public GameObject teleportComisaria;
 
-    public GameObject runa;
     public GameObject puerta;
     public GameObject pensamiento;
+
+    public GameObject abuela;
+
+    public static bool policiaInteractuado = false;
 
     void Start()
     {
@@ -18,25 +21,22 @@ public class CalleNyssa_Manager : MonoBehaviour
             barrera_1.SetActive(false);
             teleportComisaria.SetActive(true);
             puerta.SetActive(false);
-            pensamiento.SetActive(true);
-
-            runa.SetActive(true);
-            if(!Runa.runeInteracted)
-            {
-                runa.SetActive(true);
-            }
-            else
-            {
-                runa.SetActive(false);
-            }
-         
+            pensamiento.SetActive(true);        
         }
         else 
         {
             barrera_1.SetActive(true);
             teleportComisaria.SetActive(false);
-            runa.SetActive(false);
             pensamiento.SetActive(false);
+        }
+
+        if(policiaInteractuado)
+        {
+            abuela.SetActive(true);
+        }
+        else
+        {
+            abuela.SetActive(false);
         }
     }
 

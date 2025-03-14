@@ -23,20 +23,20 @@ public class ActionController : MonoBehaviour
         //
 
         RegisterAction("Option_1", new DialogueAction(
-        () => CalleBar_Manager.puertaAbiertaBool = true, // Acción estandard
-        () => CalleBar_Manager.puertaAbiertaBool = true, // Acción de éxito
-        () => CalleBar_Manager.puertaAbiertaBool = true  // Acción de fracaso
-    ));
+        () => Actions_Script.Instance.PoliciaInteractuado(), // Acción estandard
+        () => Actions_Script.Instance.PoliciaInteractuado(), // Acción de éxito
+        () => Actions_Script.Instance.PoliciaInteractuado()  // Acción de fracaso
+    )); 
 
         RegisterAction("Option_2", new DialogueAction(
-        () => CalleBar_Manager.puertaAbiertaBool = true, 
-        () => CalleBar_Manager.puertaAbiertaBool = true, 
-        () => CalleBar_Manager.puertaAbiertaBool = true  
+        () => Actions_Script.Instance.PoliciaInteractuado(), 
+        () => Actions_Script.Instance.PoliciaInteractuado(), 
+        () => Actions_Script.Instance.PoliciaInteractuado()
     ));
         RegisterAction("Option_3", new DialogueAction(
-        () => CalleBar_Manager.puertaAbiertaBool = true, 
-        () => CalleBar_Manager.puertaAbiertaBool = true,
-        () => CalleBar_Manager.puertaAbiertaBool = true  
+        () => Actions_Script.Instance.PoliciaInteractuado(), 
+        () => Actions_Script.Instance.PoliciaInteractuado(),
+        () => Actions_Script.Instance.PoliciaInteractuado()  
     ));
 
         //Ejemplo Acción registrada para final de conversación
