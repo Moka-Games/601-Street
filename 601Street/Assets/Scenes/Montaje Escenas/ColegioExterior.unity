@@ -2419,6 +2419,10 @@ MonoBehaviour:
   conversation: {fileID: 11400000, guid: 5bc7ce7b5cc17b1499e9a45c37d3fa09, type: 2}
   achievementConversation: {fileID: 0}
   funnyConversation: {fileID: 11400000, guid: 38246f4f7def4c54ab576162f3f1c787, type: 2}
+  isNakamura: 0
+  conversacionDespuesDeInteraccion: {fileID: 0}
+  pensamientoFalloTirada: "Parece que Nakamura no est\xE1 dispuesto a hablar. Quiz\xE1s
+    si le doy algo de beber..."
   hasInteracted: 0
 --- !u!23 &601222104
 MeshRenderer:
@@ -6912,7 +6916,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4534318889990103942, guid: 130e049627235e24c8dc547133d5f101,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1506392167}
   m_SourcePrefab: {fileID: 100100000, guid: 130e049627235e24c8dc547133d5f101, type: 3}
 --- !u!4 &1506392165 stripped
 Transform:
@@ -6920,6 +6928,34 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1506392164}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1506392166 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4534318889990103942, guid: 130e049627235e24c8dc547133d5f101,
+    type: 3}
+  m_PrefabInstance: {fileID: 1506392164}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &1506392167
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1506392166}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -6505552537926968463, guid: 7be335774da8ac1419e63b1c0d1c231b, type: 3}
 --- !u!1 &1551652724
 GameObject:
   m_ObjectHideFlags: 0
