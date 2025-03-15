@@ -2065,7 +2065,7 @@ PrefabInstance:
     - target: {fileID: 858292012640182491, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
       propertyPath: m_TagString
-      value: MainCamera
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 1689739709801964472, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
@@ -2096,6 +2096,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsTrigger
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749253469104845320, guid: 10526014e2aca84438494ef6cb3d8e67,
+        type: 3}
+      propertyPath: m_Priority
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 4300668713590977289, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
@@ -2251,6 +2256,7 @@ PrefabInstance:
     - {fileID: 3079553400576404774, guid: 10526014e2aca84438494ef6cb3d8e67, type: 3}
     m_RemovedGameObjects:
     - {fileID: 8548489317848435099, guid: 10526014e2aca84438494ef6cb3d8e67, type: 3}
+    - {fileID: 858292012640182491, guid: 10526014e2aca84438494ef6cb3d8e67, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 2830979939959797174, guid: 10526014e2aca84438494ef6cb3d8e67,
