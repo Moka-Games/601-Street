@@ -7,7 +7,6 @@ public class CalleNyssa_Manager : MonoBehaviour
 
     public GameObject teleportComisaria;
 
-    public GameObject puerta;
     public GameObject pensamiento;
 
     public GameObject abuela;
@@ -16,11 +15,10 @@ public class CalleNyssa_Manager : MonoBehaviour
 
     void Start()
     {
-        if(ManagerHabitación.segundoDia)
+        if(Ordenador.ordenadorInteractuado)
         {
             barrera_1.SetActive(false);
             teleportComisaria.SetActive(true);
-            puerta.SetActive(false);
             pensamiento.SetActive(true);        
         }
         else 
