@@ -508,7 +508,7 @@ GameObject:
   - component: {fileID: 1889017236}
   - component: {fileID: 1889017235}
   m_Layer: 0
-  m_Name: Policia Retirado
+  m_Name: Nakamura
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -555,8 +555,8 @@ MonoBehaviour:
   isNakamura: 1
   conversacionDespuesDeInteraccion: {fileID: 11400000, guid: 8a6bd95861830ff4d8e7ef685635baf7,
     type: 2}
-  pensamientoFalloTirada: "Parece que Nakamura no est\xE1 dispuesto a hablar. Quiz\xE1s
-    si le doy algo de beber..."
+  pensamientoFalloTirada: It seems that Nakamura is not willing to talk. Maybe if
+    I give him something to drink?
   hasInteracted: 0
 --- !u!23 &1889017237
 MeshRenderer:
