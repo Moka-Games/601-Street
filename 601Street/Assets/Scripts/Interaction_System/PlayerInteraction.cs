@@ -85,4 +85,20 @@ public class PlayerInteraction : MonoBehaviour
 
         canInteract = false;
     }
+
+    public void ForceUpdateInteraction()
+    {
+        // Esto forzará a que se actualice el estado de interacción en el próximo Update
+        // Esencialmente reiniciamos la detección de objetos interactuables
+
+        // Liberar cualquier referencia actual
+        if (currentInteractable != null)
+        {
+            currentInteractable = null;
+            canInteract = false;
+        }
+
+        // Forzar una nueva detección inmediatamente
+        CheckForInteractables();
+    }
 }

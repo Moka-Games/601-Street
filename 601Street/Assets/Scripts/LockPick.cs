@@ -1,22 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
-using Cinemachine; // Añadimos el namespace de Cinemachine
-using Cinemachine.Utility; // Para acceso a utilidades adicionales de Cinemachine
+using Cinemachine;
+using Cinemachine.Utility;
 
 public class LockPick : MonoBehaviour
 {
-    // Cámara principal (la que usa el Brain de Cinemachine)
+    // Referencias de cámaras
+    [Header("Referencias de Cámara")]
     [Tooltip("Si no se asigna, se buscará automáticamente una cámara con el tag MainCamera")]
     public Camera mainCamera;
 
-    // Cámara virtual para el lockpick
     [Tooltip("Si no se asigna, se buscará o creará automáticamente")]
     public CinemachineVirtualCamera lockpickVCam;
 
-    // Prioridad que tendrá la cámara al activarse
+    [Tooltip("Prioridad que tendrá la cámara al activarse")]
     public int lockpickCameraPriority = 15;
 
     // Prioridad original para restaurar al salir
@@ -27,6 +28,39 @@ public class LockPick : MonoBehaviour
 
     // Offset para el punto de mira de la cámara
     public Vector3 cameraLookAtOffset = Vector3.zero;
+
+    // Referencia a un objeto opcional que servirá como punto de mira
+    [Tooltip("Si se asigna, la cámara mirará a este objeto en lugar de al transform principal")]
+    public Transform lookAtTarget;
+
+    [Header("Referencias de Lockpick")]
+    public Transform innerLock;
+    public Transform pickPosition;
+
+    [Header("Configuración de Dificultad")]
+    public float maxAngle = 90;
+    public float lockSpeed = 10;
+    [Range(1, 25)]
+    public float lockRange = 10;
+
+    // Representa la dificultad de la cerradura
+    public TMP_Text difficultyText;
+
+    [Header("Referencias del Sistema")]
+    public PlayerInteraction playerInteraction;
+
+    [Header("Eventos")]
+    public UnityEvent OnUnlocked;
+    public UnityEvent OnLockpickModeEntered;
+    public UnityEvent OnLockpickModeExited;
+
+    // Variables privadas
+    private float eulerAngle;
+    private float unlockAngle;
+    private Vector2 unlockRange;
+    private float keyPressTime = 0;
+    private bool movePick = true;
+    private bool isLockpickModeActive = false;
 
     // Referencia a un transform que mantendrá la posición constante de la ganzúa
     private Transform lockpickAnchor;
@@ -52,29 +86,8 @@ public class LockPick : MonoBehaviour
     private float targetInnerLockAngle;
     private float fromInnerLockAngle;
 
-    // Posición inicial del objeto relativa a la cámara
-    private Vector3 initialPositionFromCamera;
-
-    public Transform innerLock;
-    public Transform pickPosition;
-    public float maxAngle = 90;
-    public float lockSpeed = 10;
-    [Range(1, 25)]
-    public float lockRange = 10;
-    // Representa la dificultad de la cerradura
-    // O lo que es lo mismo
-    // El rango de tolerancia para el desbloqueo
-    public TMP_Text difficultyText;
-    private float eulerAngle;
-    private float unlockAngle;
-    private Vector2 unlockRange;
-    private float keyPressTime = 0;
-    private bool movePick = true;
-    private bool isLockpickModeActive = false;
-
-    public UnityEvent OnUnlocked;
-    public UnityEvent OnLockpickModeEntered;
-    public UnityEvent OnLockpickModeExited;
+    // Referencia al estado de interacción anterior
+    private bool previousInteractionState = false;
 
     void Awake()
     {
@@ -107,6 +120,21 @@ public class LockPick : MonoBehaviour
 
         // Configurar o crear la cámara virtual
         SetupVirtualCamera();
+
+        // Buscar el PlayerInteraction si no está asignado
+        if (playerInteraction == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                playerInteraction = player.GetComponent<PlayerInteraction>();
+            }
+
+            if (playerInteraction == null)
+            {
+                Debug.LogWarning("No se encontró PlayerInteraction. Algunas funcionalidades pueden no estar disponibles.");
+            }
+        }
     }
 
     void Start()
@@ -124,9 +152,6 @@ public class LockPick : MonoBehaviour
         }
 
         newLock();
-
-        // Para pruebas, activamos automáticamente el modo lockpick
-        EnterLockpickMode();
     }
 
     private void SetupVirtualCamera()
@@ -155,8 +180,8 @@ public class LockPick : MonoBehaviour
                 composer.m_TrackedObjectOffset = cameraLookAtOffset;
 
                 // Configurar el seguimiento
-                lockpickVCam.Follow = pickPosition != null ? pickPosition : transform;
-                lockpickVCam.LookAt = pickPosition != null ? pickPosition : transform;
+                lockpickVCam.Follow = transform;
+                lockpickVCam.LookAt = lookAtTarget != null ? lookAtTarget : transform;
 
                 Debug.Log("Cámara virtual de lockpick creada automáticamente.");
             }
@@ -183,7 +208,14 @@ public class LockPick : MonoBehaviour
     {
         if (!isLockpickModeActive && lockpickVCam != null)
         {
-            // Creamos un objeto vacío para mantener una posición fija en el espacio
+            // Guardar el estado de interacción actual
+            if (playerInteraction != null)
+            {
+                previousInteractionState = playerInteraction.enabled;
+                playerInteraction.enabled = false; // Desactivar temporalmente la interacción del jugador
+            }
+
+            // Crear un objeto vacío para mantener una posición fija en el espacio
             CreateLockpickAnchor();
 
             // Aumentamos la prioridad para que esta cámara sea la activa
@@ -208,6 +240,15 @@ public class LockPick : MonoBehaviour
             // También podemos activar el cursor si estaba oculto
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
+
+            // Notificar a cualquier sistema que necesite saber sobre el cambio de cámara
+            // Esto es importante para los sistemas de UI e interacción
+            BroadcastMessage("OnCameraChanged", lockpickVCam, SendMessageOptions.DontRequireReceiver);
+
+            // Pausar el movimiento del jugador si es posible
+            DisablePlayerMovement();
+
+            Debug.Log("Modo lockpick activado");
         }
     }
 
@@ -229,10 +270,36 @@ public class LockPick : MonoBehaviour
             // Invocamos el evento si hay listeners
             OnLockpickModeExited?.Invoke();
 
-            // Podemos volver a ocultar/bloquear el cursor si lo necesita el juego
-            // Estos valores dependerán de tu sistema de control
-            // Cursor.visible = false;
-            // Cursor.lockState = CursorLockMode.Locked;
+            // Restaurar el estado de interacción anterior
+            if (playerInteraction != null)
+            {
+                // Damos un pequeño delay para asegurar que la transición de cámara se completa
+                StartCoroutine(RestoreInteractionAfterDelay(0.2f));
+            }
+
+            // Notificar a cualquier sistema que necesite saber sobre el cambio de cámara
+            BroadcastMessage("OnCameraChanged", mainCamera, SendMessageOptions.DontRequireReceiver);
+
+            // Restaurar el movimiento del jugador
+            EnablePlayerMovement();
+
+            Debug.Log("Modo lockpick desactivado");
+        }
+    }
+
+    private IEnumerator RestoreInteractionAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (playerInteraction != null)
+        {
+            playerInteraction.enabled = previousInteractionState;
+
+            // Forzar una actualización del estado de interacción
+            if (playerInteraction.enabled)
+            {
+                playerInteraction.ForceUpdateInteraction();
+            }
         }
     }
 
@@ -255,9 +322,6 @@ public class LockPick : MonoBehaviour
         }
 
         lockpickAnchor.rotation = transform.rotation;
-
-        // Guardamos la posición relativa a la cámara
-        initialPositionFromCamera = lockpickAnchor.position - mainCamera.transform.position;
     }
 
     // Aplica una rotación al innerLock relativa a su posición inicial
@@ -419,6 +483,9 @@ public class LockPick : MonoBehaviour
 
     void UpdateDifficultyText()
     {
+        if (difficultyText == null)
+            return;
+
         if (lockRange <= 10)
         {
             difficultyText.text = "Dificil";
@@ -430,6 +497,42 @@ public class LockPick : MonoBehaviour
         else if (lockRange > 15 && lockRange <= 25)
         {
             difficultyText.text = "Fácil";
+        }
+    }
+
+    // Métodos para gestionar el movimiento del jugador
+    void DisablePlayerMovement()
+    {
+        // Buscar el PlayerController y deshabilitarlo si es posible
+        PlayerController playerController = FindAnyObjectByType<PlayerController>();
+        if (playerController != null)
+        {
+            playerController.SetMovementEnabled(false);
+        }
+    }
+
+    void EnablePlayerMovement()
+    {
+        // Restaurar el PlayerController
+        PlayerController playerController = FindAnyObjectByType<PlayerController>();
+        if (playerController != null)
+        {
+            playerController.SetMovementEnabled(true);
+        }
+    }
+
+    // Método para asegurarnos de que se limpien todas las referencias si se destruye este objeto
+    private void OnDestroy()
+    {
+        if (isLockpickModeActive)
+        {
+            // Asegurarnos de que restauramos todo si el objeto es destruido mientras está en modo lockpick
+            ExitLockpickMode();
+        }
+
+        if (lockpickAnchor != null)
+        {
+            Destroy(lockpickAnchor.gameObject);
         }
     }
 }
