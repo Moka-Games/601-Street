@@ -117,7 +117,7 @@ public class Inventory_Manager : MonoBehaviour
     public void DisplayPopUp(string itemName)
     {
         popUpParent.SetActive(true);
-        popUpText.text = itemName + " añadido/a";
+        popUpText.text = itemName + " added";
         lastPickUpTime = Time.time;
     }
 

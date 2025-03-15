@@ -17858,13 +17858,38 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
         type: 3}
+      propertyPath: correctPassword
+      value: 3324
+      objectReference: {fileID: 0}
+    - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
       propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
         type: 3}
-      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
+      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 557172681}
+    - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: ExitSafeMode
+      objectReference: {fileID: 0}
+    - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: SafeGameplayManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1833477273651023365, guid: 4b20f13d419e62548994c2f1b8936253,
         type: 3}
@@ -18063,6 +18088,18 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 4b20f13d419e62548994c2f1b8936253, type: 3}
+--- !u!114 &557172681 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5136646863411926590, guid: 4b20f13d419e62548994c2f1b8936253,
+    type: 3}
+  m_PrefabInstance: {fileID: 550093922}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f89453b4dec658446aa57369466023a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!43 &562784550
 Mesh:
   m_ObjectHideFlags: 0
@@ -22269,7 +22306,7 @@ PrefabInstance:
     - target: {fileID: 8530884455404047612, guid: 4bbbae5fbbaf98445bfd1ba0c1e939ac,
         type: 3}
       propertyPath: m_text
-      value: '"1234"'
+      value: '"3324"'
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -58981,6 +59018,10 @@ MonoBehaviour:
   conversation: {fileID: 11400000, guid: 755eb890725ce8e428fa9832ed06c30a, type: 2}
   achievementConversation: {fileID: 0}
   funnyConversation: {fileID: 11400000, guid: ac563df4b20ed6b4187afdf50c2f99b1, type: 2}
+  isNakamura: 0
+  conversacionDespuesDeInteraccion: {fileID: 0}
+  pensamientoFalloTirada: "Parece que Nakamura no est\xE1 dispuesto a hablar. Quiz\xE1s
+    si le doy algo de beber..."
   hasInteracted: 0
 --- !u!43 &1663824599
 Mesh:

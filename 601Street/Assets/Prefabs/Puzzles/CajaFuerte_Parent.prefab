@@ -1485,9 +1485,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4625153449018724322}
+  - component: {fileID: 3281019312945242941}
   - component: {fileID: 422334847174790149}
   - component: {fileID: 8091287239678105364}
-  - component: {fileID: 3281019312945242941}
   - component: {fileID: 5136646863411926590}
   - component: {fileID: 1833477273651023365}
   m_Layer: 6
@@ -1518,6 +1518,27 @@ Transform:
   - {fileID: 4448313353238307729}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!65 &3281019312945242941
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2325475263788770251}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 2.8862145, z: 1.6910051}
+  m_Center: {x: 1.6268088e-17, y: 1.2481073, z: -0.006667733}
 --- !u!114 &422334847174790149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1601,27 +1622,6 @@ MonoBehaviour:
   sequenceAudioSource: {fileID: 3497125519718793742}
   sequenceDuration: 3
   sequenceCameraPriority: 15
---- !u!65 &3281019312945242941
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2325475263788770251}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 2.8862145, z: 1.6910051}
-  m_Center: {x: 1.6268088e-17, y: 1.2481073, z: -0.006667733}
 --- !u!114 &5136646863411926590
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -91,6 +91,13 @@ public class InteractableObject : MonoBehaviour, IInteractable
         // Crear indicadores específicos para esta instancia
         CreateFeedbackIndicators();
 
+        // Buscar el PlayerInteraction
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            playerInteraction = player.GetComponent<PlayerInteraction>();
+        }
+
         isInitialized = true;
     }
 
@@ -267,35 +274,41 @@ public class InteractableObject : MonoBehaviour, IInteractable
         // Verificar si el jugador puede interactuar (pero solo después de cierto tiempo)
         if (Time.time - enterTime > 0.2f)
         {
-            bool canPlayerInteract = CanInteract();
+            // CORRECCIÓN: Verificar si este objeto específico es el objetivo actual del raycast
+            bool isTargetObject = IsCurrentInteractableTarget();
 
-            // Activar el indicador apropiado
-            if (rangeIndicator != null) rangeIndicator.SetActive(!canPlayerInteract);
-            if (interactIndicator != null) interactIndicator.SetActive(canPlayerInteract);
+            // Modificación para que siempre muestre el indicador de rango cuando el jugador está en rango
+            // pero el indicador de interacción solo cuando este objeto es el objetivo del raycast
+            if (isTargetObject && playerInteraction != null && playerInteraction.canInteract)
+            {
+                // Este objeto es el objetivo y el jugador puede interactuar: mostrar indicador de interacción
+                if (rangeIndicator != null) rangeIndicator.SetActive(false);
+                if (interactIndicator != null) interactIndicator.SetActive(true);
+            }
+            else
+            {
+                // El jugador está en rango pero no está mirando este objeto o no puede interactuar: mostrar indicador de rango
+                if (rangeIndicator != null) rangeIndicator.SetActive(true);
+                if (interactIndicator != null) interactIndicator.SetActive(false);
+            }
         }
     }
 
-    private bool CanInteract()
+    // Método para verificar si este objeto es el objetivo actual del raycast
+    private bool IsCurrentInteractableTarget()
     {
-        // Verificar si tenemos referencia al PlayerInteraction
         if (playerInteraction == null)
-        {
-            // Intentar encontrar el componente PlayerInteraction en el jugador
-            GameObject player = GameObject.FindGameObjectWithTag("Player");
-            if (player != null)
-            {
-                playerInteraction = player.GetComponent<PlayerInteraction>();
-            }
-        }
+            return false;
 
-        // Si tenemos el playerInteraction, usar su valor canInteract
-        if (playerInteraction != null)
+        // Lanzar un raycast desde la posición del jugador en la dirección que mira
+        RaycastHit hit;
+        if (Physics.Raycast(playerInteraction.transform.position, playerInteraction.transform.forward,
+                            out hit, detectionRadius * 2, LayerMask.GetMask(LayerMask.LayerToName(gameObject.layer))))
         {
-            return playerInteraction.canInteract;
+            // Comprobar si el raycast golpeó este objeto específico
+            return hit.collider.gameObject == this.gameObject;
         }
-
-        // Si no podemos obtener el playerInteraction, usar la lógica por defecto
-        return true;
+        return false;
     }
 
     private void UpdateIndicatorPosition()
@@ -441,7 +454,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
         enterTime = Time.time;
 
         // Verificamos si el objeto que entra en el trigger es el jugador
-        if (other.CompareTag("Player") && other.gameObject.GetComponent<PlayerInteraction>() != null)
+        if (other.CompareTag("Player"))
         {
             playerOnRange = true;
             playerInteraction = other.gameObject.GetComponent<PlayerInteraction>();
@@ -464,31 +477,28 @@ public class InteractableObject : MonoBehaviour, IInteractable
         // Solo si seguimos en rango y el objeto puede ser interactuado
         if (playerOnRange && (!singleUseInteraction || !objectInteracted))
         {
-            // Forzar mostrar SOLO el indicador de detección al principio
-            if (rangeIndicator != null) rangeIndicator.SetActive(true);
-            if (interactIndicator != null) interactIndicator.SetActive(false);
+            // Verificar si este objeto es el objetivo del raycast
+            bool isTargetObject = IsCurrentInteractableTarget();
+
+            // Si es el objetivo y puede interactuar, mostrar indicador de interacción
+            if (isTargetObject && playerInteraction != null && playerInteraction.canInteract)
+            {
+                if (rangeIndicator != null) rangeIndicator.SetActive(false);
+                if (interactIndicator != null) interactIndicator.SetActive(true);
+            }
+            else
+            {
+                // De lo contrario, mostrar indicador de rango
+                if (rangeIndicator != null) rangeIndicator.SetActive(true);
+                if (interactIndicator != null) interactIndicator.SetActive(false);
+            }
         }
-    }
-
-    private IEnumerator CheckInteractionAfterDelay()
-    {
-        // Esperar un frame para que el PlayerInteraction se actualice
-        yield return null;
-
-        // Asegurarnos de que seguimos en el rango y el objeto puede ser interactuado
-        if (!playerOnRange || (singleUseInteraction && objectInteracted)) yield break;
-
-        // Determinar cuál indicador activar basado en CanInteract()
-        bool canPlayerInteract = CanInteract();
-
-        if (rangeIndicator != null) rangeIndicator.SetActive(!canPlayerInteract);
-        if (interactIndicator != null) interactIndicator.SetActive(canPlayerInteract);
     }
 
     private void OnTriggerExit(Collider other)
     {
         // Verificamos si el objeto que sale del trigger es el jugador
-        if (other.CompareTag("Player") && other.gameObject.GetComponent<PlayerInteraction>() != null)
+        if (other.CompareTag("Player"))
         {
             // Marcar que estamos en proceso de salida
             isExiting = true;
