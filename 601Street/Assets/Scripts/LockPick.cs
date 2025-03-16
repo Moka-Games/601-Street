@@ -89,6 +89,9 @@ public class LockPick : MonoBehaviour
     // Referencia al estado de interacción anterior
     private bool previousInteractionState = false;
 
+    // Cámara del jugador (FreeLookCamera)
+    private CinemachineFreeLook playerCamera;
+
     void Awake()
     {
         // Buscar la cámara principal si no está asignada
@@ -110,6 +113,9 @@ public class LockPick : MonoBehaviour
                 }
             }
         }
+
+        // Buscar la cámara del jugador (FreeLookCamera)
+        FindPlayerCamera();
 
         // Verificar que la cámara principal tenga CinemachineBrain
         if (mainCamera != null && mainCamera.GetComponent<CinemachineBrain>() == null)
@@ -134,6 +140,29 @@ public class LockPick : MonoBehaviour
             {
                 Debug.LogWarning("No se encontró PlayerInteraction. Algunas funcionalidades pueden no estar disponibles.");
             }
+        }
+    }
+
+    // Método para buscar la cámara de tipo FreeLook
+    private void FindPlayerCamera()
+    {
+        // Usar el nuevo método FindObjectsByType que es más eficiente
+        CinemachineFreeLook[] freeLookCameras = FindObjectsByType<CinemachineFreeLook>(FindObjectsSortMode.None);
+
+        if (freeLookCameras.Length > 0)
+        {
+            // Usar la primera encontrada
+            playerCamera = freeLookCameras[0];
+            Debug.Log("Cámara del jugador (FreeLookCamera) encontrada: " + playerCamera.name);
+
+            if (freeLookCameras.Length > 1)
+            {
+                Debug.LogWarning("Se encontraron múltiples CinemachineFreeLookCamera. Usando la primera encontrada: " + playerCamera.name);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No se encontró ninguna CinemachineFreeLookCamera en la escena.");
         }
     }
 
@@ -215,6 +244,13 @@ public class LockPick : MonoBehaviour
                 playerInteraction.enabled = false; // Desactivar temporalmente la interacción del jugador
             }
 
+            // Desactivamos la cámara del jugador
+            if (playerCamera != null)
+            {
+                playerCamera.gameObject.SetActive(false);
+                Debug.Log("Cámara del jugador desactivada");
+            }
+
             // Crear un objeto vacío para mantener una posición fija en el espacio
             CreateLockpickAnchor();
 
@@ -261,6 +297,13 @@ public class LockPick : MonoBehaviour
             lockpickVCam.Priority = originalPriority;
             isLockpickModeActive = false;
 
+            // Reactivamos la cámara del jugador
+            if (playerCamera != null)
+            {
+                playerCamera.gameObject.SetActive(true);
+                Debug.Log("Cámara del jugador reactivada");
+            }
+
             // Eliminamos el anchor
             if (lockpickAnchor != null)
             {
@@ -273,8 +316,14 @@ public class LockPick : MonoBehaviour
             // Restaurar el estado de interacción anterior
             if (playerInteraction != null)
             {
-                // Damos un pequeño delay para asegurar que la transición de cámara se completa
-                StartCoroutine(RestoreInteractionAfterDelay(0.2f));
+                // Restauramos inmediatamente el PlayerInteraction
+                playerInteraction.enabled = previousInteractionState;
+
+                // Forzar una actualización del estado de interacción
+                if (playerInteraction.enabled)
+                {
+                    playerInteraction.ForceUpdateInteraction();
+                }
             }
 
             // Notificar a cualquier sistema que necesite saber sobre el cambio de cámara
@@ -284,22 +333,6 @@ public class LockPick : MonoBehaviour
             EnablePlayerMovement();
 
             Debug.Log("Modo lockpick desactivado");
-        }
-    }
-
-    private IEnumerator RestoreInteractionAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-
-        if (playerInteraction != null)
-        {
-            playerInteraction.enabled = previousInteractionState;
-
-            // Forzar una actualización del estado de interacción
-            if (playerInteraction.enabled)
-            {
-                playerInteraction.ForceUpdateInteraction();
-            }
         }
     }
 
@@ -457,6 +490,19 @@ public class LockPick : MonoBehaviour
                 if (lockedPickAngle < unlockRange.y && lockedPickAngle > unlockRange.x)
                 {
                     Debug.Log("Unlocked!");
+
+                    // IMPORTANTE: Restaurar playerInteraction antes de invocar OnUnlocked
+                    // para que los listeners puedan interactuar correctamente
+                    if (playerInteraction != null)
+                    {
+                        playerInteraction.enabled = previousInteractionState;
+                        if (playerInteraction.enabled)
+                        {
+                            playerInteraction.ForceUpdateInteraction();
+                        }
+                    }
+
+                    // Invocar el evento de desbloqueo
                     OnUnlocked.Invoke();
 
                     // Al desbloquear, salimos del modo lockpick
@@ -500,11 +546,12 @@ public class LockPick : MonoBehaviour
         }
     }
 
-    // Métodos para gestionar el movimiento del jugador
     void DisablePlayerMovement()
     {
-        // Buscar el PlayerController y deshabilitarlo si es posible
-        PlayerController playerController = FindAnyObjectByType<PlayerController>();
+        PlayerController playerController = FindObjectsByType<PlayerController>(FindObjectsSortMode.None).Length > 0
+            ? FindObjectsByType<PlayerController>(FindObjectsSortMode.None)[0]
+            : null;
+
         if (playerController != null)
         {
             playerController.SetMovementEnabled(false);
@@ -513,20 +560,20 @@ public class LockPick : MonoBehaviour
 
     void EnablePlayerMovement()
     {
-        // Restaurar el PlayerController
-        PlayerController playerController = FindAnyObjectByType<PlayerController>();
+        PlayerController playerController = FindObjectsByType<PlayerController>(FindObjectsSortMode.None).Length > 0
+            ? FindObjectsByType<PlayerController>(FindObjectsSortMode.None)[0]
+            : null;
+
         if (playerController != null)
         {
             playerController.SetMovementEnabled(true);
         }
     }
 
-    // Método para asegurarnos de que se limpien todas las referencias si se destruye este objeto
     private void OnDestroy()
     {
         if (isLockpickModeActive)
         {
-            // Asegurarnos de que restauramos todo si el objeto es destruido mientras está en modo lockpick
             ExitLockpickMode();
         }
 
