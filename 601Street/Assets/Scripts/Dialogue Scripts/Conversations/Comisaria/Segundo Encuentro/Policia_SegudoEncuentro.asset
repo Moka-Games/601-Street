@@ -30,24 +30,24 @@ MonoBehaviour:
   - speakerName: Police Officer
     content: "I don\u2019t know if I believe you\u2026"
   dialogueOptions:
-  - optionText: "No pedir\xEDa esto si no fuera realmente importante"
+  - optionText: I wouldn't ask for this if it wasn't really important
     actionId: policia_2_id
     requiresDiceRoll: 1
-    difficultyClass: 20
+    difficultyClass: 10
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: cab47bc037ab2bd47852eba75a31992a, type: 2}
     failureDialogue: {fileID: 0}
   - optionText: Don't waste my time and open the door.
     actionId: policia_2_id
     requiresDiceRoll: 1
-    difficultyClass: 20
+    difficultyClass: 10
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: cab47bc037ab2bd47852eba75a31992a, type: 2}
     failureDialogue: {fileID: 0}
   - optionText: I have permission, I will get in one way or another.
     actionId: policia_2_id
     requiresDiceRoll: 1
-    difficultyClass: 20
+    difficultyClass: 10
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: cab47bc037ab2bd47852eba75a31992a, type: 2}
     failureDialogue: {fileID: 0}
