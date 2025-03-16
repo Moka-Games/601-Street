@@ -11,8 +11,12 @@ public class ActionController : MonoBehaviour
     [Header("Interior Comisaria")]
     public string pensamientoPostInteracción;
 
+    private ComisariManager comisariaManager;
+
     void Start()
     {
+        comisariaManager = FindAnyObjectByType<ComisariManager>();
+
         //DESCRIPCIÓN FUNCIONALIDAD
         // 
         //Se registran acciones según los parámetros: 1. Acción Estandard, 2.Acción cuando el dado devuelve éxito
@@ -37,6 +41,12 @@ public class ActionController : MonoBehaviour
         () => Actions_Script.Instance.PoliciaInteractuado(), 
         () => Actions_Script.Instance.PoliciaInteractuado(),
         () => Actions_Script.Instance.PoliciaInteractuado()  
+    ));
+        
+        RegisterAction("policia_2_id", new DialogueAction(
+        () => comisariaManager.ObjetosPostPolicia(), 
+        () => comisariaManager.ObjetosPostPolicia(),
+        () => comisariaManager.ObjetosPostPoliciaFracaso()  
     ));
 
         //Ejemplo Acción registrada para final de conversación

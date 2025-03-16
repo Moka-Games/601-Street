@@ -524,6 +524,11 @@ PrefabInstance:
       propertyPath: correctPassword
       value: 2557
       objectReference: {fileID: 0}
+    - target: {fileID: 1833477273651023365, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: detectionRadius
+      value: 7.5
+      objectReference: {fileID: 0}
     - target: {fileID: 2325475263788770251, guid: 4b20f13d419e62548994c2f1b8936253,
         type: 3}
       propertyPath: m_Name
@@ -726,7 +731,7 @@ GameObject:
   - component: {fileID: 583523088}
   - component: {fileID: 583523087}
   m_Layer: 0
-  m_Name: ComisariaManager
+  m_Name: //COMISARIA-MANAGER//
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -749,6 +754,7 @@ MonoBehaviour:
   "ganz\xFAa": {fileID: 867317112}
   puertaCaja: {fileID: 2596957926160197021}
   "contrase\xF1a": {fileID: 1734883696}
+  "pensamientoPostInteracci\xF3n": I will have to find another way to enter the office
 --- !u!4 &583523088
 Transform:
   m_ObjectHideFlags: 0
@@ -2210,7 +2216,7 @@ PrefabInstance:
     - target: {fileID: 7404180985309168843, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
       propertyPath: detectionRadius
-      value: 25
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 7404180985309168843, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
