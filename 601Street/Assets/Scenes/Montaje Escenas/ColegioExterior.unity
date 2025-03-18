@@ -2401,8 +2401,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.03514809, y: 0.018356932, z: 0.020192908}
-  m_Center: {x: 0.013554037, y: -0.000286054, z: 0.0026072047}
+  m_Size: {x: 0.028409328, y: 0.021393966, z: 0.020192908}
+  m_Center: {x: 0.016923398, y: 0.00021858215, z: 0.002607205}
 --- !u!114 &601222103
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5863,8 +5863,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f2011e98db2abc4e9618ca2a3927844, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pensamientoPrincipal: "Deber\xEDa irme a casa..."
-  pensamientoSecundario: "Se est\xE1 haciendo tarde, deber\xEDa ir a casa"
+  pensamientoPrincipal: I should go home...
+  pensamientoSecundario: It's getting late, I should go home
   Id: 0
 --- !u!4 &1278043838
 Transform:
@@ -47283,9 +47283,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   raycastDistance: 25
   ecoLookAt: {fileID: 526152577}
-  pensamientoNyssa: AHHHH, QUE ES ESO?!
-  "pensamientoNyssaPostInteracci\xF3n": "No se que est\xE1 pasando, deber\xEDa irme
-    a casa"
+  pensamientoNyssa: AHHHH, WHAT IS THAT?!
+  "pensamientoNyssaPostInteracci\xF3n": That thing looked familiar, but why?
   callejonCamera: {fileID: 363703929}
   temporalColliders: {fileID: 1486919049}
   imagenEco: {fileID: 40385895}
@@ -47976,7 +47975,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f2011e98db2abc4e9618ca2a3927844, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pensamientoPrincipal: Vaya.. parece que no responde
+  pensamientoPrincipal: Wow... he doesn't seem to be responding
   pensamientoSecundario: 
   Id: 1
 --- !u!4 &1958325037

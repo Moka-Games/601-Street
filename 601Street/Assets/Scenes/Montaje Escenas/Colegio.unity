@@ -11239,7 +11239,7 @@ Transform:
   m_GameObject: {fileID: 330553311}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.112525634, z: -0, w: 0.9936488}
-  m_LocalPosition: {x: -1.76, y: 0.27, z: -1.54}
+  m_LocalPosition: {x: -1.76, y: 0.3399997, z: -1.54}
   m_LocalScale: {x: 0.26602, y: 2.7231092, z: 1.9424511}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18161,6 +18161,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 224140955854437439, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: m_Name
+      value: Exit
+      objectReference: {fileID: 0}
     - target: {fileID: 275274301865369838, guid: 4b20f13d419e62548994c2f1b8936253,
         type: 3}
       propertyPath: m_Priority
@@ -19685,7 +19690,7 @@ Transform:
   m_GameObject: {fileID: 586499112}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.112526916, z: 0, w: 0.9936487}
-  m_LocalPosition: {x: -1.77, y: 0.27, z: 6.16}
+  m_LocalPosition: {x: -1.77, y: 0.3399997, z: 6.16}
   m_LocalScale: {x: 0.26602, y: 2.7231092, z: 1.9424511}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -19771,7 +19776,7 @@ Transform:
   m_GameObject: {fileID: 587376235}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.112525634, z: -0, w: 0.9936488}
-  m_LocalPosition: {x: -1.7799944, y: 0.27, z: 4.1800003}
+  m_LocalPosition: {x: -1.7799944, y: 0.34, z: 4.1800003}
   m_LocalScale: {x: 0.26602, y: 2.7231092, z: 1.9424511}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -32163,7 +32168,7 @@ Transform:
   m_GameObject: {fileID: 964604011}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.112526916, z: 0, w: 0.9936487}
-  m_LocalPosition: {x: -1.9, y: 0.27, z: 0.47}
+  m_LocalPosition: {x: -1.9, y: 0.3399997, z: 0.47}
   m_LocalScale: {x: 0.26602, y: 2.7231092, z: 1.9424511}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -47348,7 +47353,7 @@ PrefabInstance:
     - target: {fileID: 5516513481268374641, guid: 4bbbae5fbbaf98445bfd1ba0c1e939ac,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6404279448903620777, guid: 4bbbae5fbbaf98445bfd1ba0c1e939ac,
         type: 3}

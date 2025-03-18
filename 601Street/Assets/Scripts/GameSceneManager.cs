@@ -219,8 +219,12 @@ public class GameSceneManager : MonoBehaviour
         }
     }
 
+    // In the EnablePlayerMovementAfterFade method in GameSceneManager.cs
     private void EnablePlayerMovementAfterFade()
     {
+        // Restablecer el estado de transición
+        PlayerInteraction.SetSceneTransitionState(false);
+
         if (currentPlayer != null)
         {
             PlayerController playerController = currentPlayer.GetComponent<PlayerController>();

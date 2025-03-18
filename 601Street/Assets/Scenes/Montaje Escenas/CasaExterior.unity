@@ -977,7 +977,7 @@ GameObject:
   - component: {fileID: 441216647}
   - component: {fileID: 441216646}
   - component: {fileID: 441216648}
-  - component: {fileID: 441216649}
+  - component: {fileID: 441216650}
   m_Layer: 6
   m_Name: Puerta
   m_TagString: Untagged
@@ -1004,8 +1004,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 0.82104033}
-  m_Center: {x: 0, y: 0, z: 0.089479454}
+  m_Size: {x: 2.8974113, y: 1, z: 1.6991756}
+  m_Center: {x: 0.10138893, y: 0, z: -0.34958878}
 --- !u!4 &441216647
 Transform:
   m_ObjectHideFlags: 0
@@ -1033,21 +1033,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdf2841cde257ce41a7e4884979576c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionID: 
+  interactionID: 1
   interactionPrompt: Presiona E para interactuar
   onInteraction:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 441216649}
-        m_TargetAssemblyTypeName: "Puerta_Habitaci\xF3n, Assembly-CSharp"
-        m_MethodName: CambiarEscena
-        m_Mode: 1
+      - m_Target: {fileID: 441216650}
+        m_TargetAssemblyTypeName: SceneChange, Assembly-CSharp
+        m_MethodName: CambiarEscenaConPuntoSalida
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: CasaNyssa
           m_BoolArgument: 0
         m_CallState: 2
   onInteracted:
@@ -1060,7 +1060,7 @@ MonoBehaviour:
   detectionRadius: 5
   edgeOffset: 50
   objectInteracted: 0
---- !u!114 &441216649
+--- !u!114 &441216650
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1069,10 +1069,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 441216645}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 943b6992653505547b98811d8a801896, type: 3}
+  m_Script: {fileID: 11500000, guid: b1699d38761fe624fa9ccb15a3b57993, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EscenaACargar: CasaNyssa
+  cambiosDeEscena: []
+  escenaPersistente: PersistentScene
 --- !u!4 &453628535 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7429221924985629162, guid: e2722d3e7adf6964bb7cea8b3f7b12ae,
@@ -18182,7 +18183,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   barrera_1: {fileID: 517719334}
   teleportComisaria: {fileID: 891281453}
-  puerta: {fileID: 441216645}
   pensamiento: {fileID: 1382922278}
   abuela: {fileID: 1609657511}
 --- !u!4 &1934383336

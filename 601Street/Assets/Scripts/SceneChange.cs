@@ -60,15 +60,32 @@ public class SceneChange : MonoBehaviour
         }
     }
 
+    // In the CambiarEscenaConPuntoSalida method in SceneChange.cs
     public void CambiarEscenaConPuntoSalida(string escenaDestino)
     {
-        if (!string.IsNullOrEmpty(escenaDestino))
+        Debug.Log($"Intentando cambiar a escena: {escenaDestino}");
+        try
         {
-            GameSceneManager.Instance.LoadScene(escenaDestino, true);
+            // Marcar que estamos en transición para evitar interacciones
+            PlayerInteraction.SetSceneTransitionState(true);
+
+            if (GameSceneManager.Instance != null)
+            {
+                GameSceneManager.Instance.LoadScene(escenaDestino, true);
+                Debug.Log("LoadScene llamado correctamente");
+            }
+            else
+            {
+                Debug.LogError("GameSceneManager.Instance es nulo");
+                // Restablecer el estado si falla
+                PlayerInteraction.SetSceneTransitionState(false);
+            }
         }
-        else
+        catch (System.Exception e)
         {
-            Debug.LogWarning("Escena destino no especificada para cambio con punto de salida.");
+            Debug.LogError($"Error en CambiarEscenaConPuntoSalida: {e.Message}\n{e.StackTrace}");
+            // Restablecer el estado si hay un error
+            PlayerInteraction.SetSceneTransitionState(false);
         }
     }
 

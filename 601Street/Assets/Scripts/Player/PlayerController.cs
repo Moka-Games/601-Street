@@ -81,6 +81,12 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Verificar si el CharacterController está habilitado antes de ejecutar la lógica
+        if (characterController == null || !characterController.enabled || !gameObject.activeInHierarchy)
+        {
+            return; // No ejecutar la lógica de movimiento si el controller está desactivado
+        }
+
         Vector2 input = GetMovementInput();
         UpdateMovement(input);
         UpdateRotation(input);
@@ -97,13 +103,16 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateMovement(Vector2 input)
     {
+        // Verificación adicional por seguridad
+        if (!characterController.enabled) return;
+
         (Vector3 forward, Vector3 right) = GetCameraDirections();
 
         movementState.MoveDirection = CalculateMoveDirection(input, forward, right);
         movementState.IsMoving = movementState.MoveDirection.magnitude > movementThreshold;
         movementState.CurrentSpeed = CalculateCurrentSpeed(input.y);
 
-        if (movementState.IsMoving)
+        if (movementState.IsMoving && characterController.enabled)
         {
             characterController.Move(movementState.MoveDirection * movementState.CurrentSpeed * Time.deltaTime);
         }
@@ -289,6 +298,9 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyGravity()
     {
+        // Verificación adicional por seguridad
+        if (!characterController.enabled) return;
+
         movementState.Velocity.y += gravity * Time.deltaTime;
         characterController.Move(movementState.Velocity * Time.deltaTime);
     }

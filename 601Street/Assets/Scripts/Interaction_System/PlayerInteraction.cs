@@ -15,6 +15,20 @@ public class PlayerInteraction : MonoBehaviour
 
     private bool hasInteracted = false;
     public bool canInteract = false;
+    private bool interactionsEnabled = true;
+
+    // Variable estática para controlar el estado global de transición
+    public static bool IsSceneTransitioning = false;
+
+    public void SetInteractionsEnabled(bool enabled)
+    {
+        interactionsEnabled = enabled;
+        if (!enabled)
+        {
+            canInteract = false;
+            currentInteractable = null;
+        }
+    }
 
     private void Start()
     {
@@ -24,6 +38,14 @@ public class PlayerInteraction : MonoBehaviour
 
     private void Update()
     {
+        // Verificar primero si estamos en transición de escena
+        if (IsSceneTransitioning || !interactionsEnabled)
+        {
+            canInteract = false;
+            return;
+        }
+
+        // Solo procesar interacciones si no estamos en transición
         CheckForInteractables();
 
         if (currentInteractable != null && Input.GetKeyDown(interactionKey) && canInteract)
@@ -31,6 +53,11 @@ public class PlayerInteraction : MonoBehaviour
             // Comprobar si ya hemos interactuado con este objeto
             if (!hasInteracted)
             {
+                // Marcar que estamos iniciando una posible transición antes de la interacción
+                string interactableID = currentInteractable.GetInteractionID();
+                // Corregido: Eliminada la referencia incorrecta a hit
+                Debug.Log($"Interactuando con objeto: {(currentInteractable as MonoBehaviour)?.gameObject.name ?? "Unknown"} (ID: {interactableID})");
+
                 currentInteractable.Interact();
                 hasInteracted = true;
             }
@@ -45,6 +72,13 @@ public class PlayerInteraction : MonoBehaviour
 
     private void CheckForInteractables()
     {
+        // No verificar interactables si estamos en transición
+        if (IsSceneTransitioning)
+        {
+            canInteract = false;
+            return;
+        }
+
         RaycastHit hit;
         Vector3 rayDirection = transform.forward;
 
@@ -59,6 +93,9 @@ public class PlayerInteraction : MonoBehaviour
         {
             Debug.Log($"Raycast golpeó: {hit.collider.gameObject.name} en la capa {LayerMask.LayerToName(hit.collider.gameObject.layer)}");
 
+            // No procesar más si estamos en transición
+            if (IsSceneTransitioning) return;
+
             IInteractable interactable = hit.collider.GetComponent<IInteractable>();
             if (interactable != null)
             {
@@ -69,7 +106,6 @@ public class PlayerInteraction : MonoBehaviour
                     hasInteracted = false; // Reiniciar el estado de interacción al cambiar de objeto
                     Debug.Log($"Objeto interactuable encontrado: {hit.collider.gameObject.name}");
                 }
-
                 // Solo permitir interacción si el objeto lo permite
                 canInteract = true;
                 return;
@@ -88,9 +124,11 @@ public class PlayerInteraction : MonoBehaviour
 
     public void ForceUpdateInteraction()
     {
+        // No actualizar si estamos en transición
+        if (IsSceneTransitioning) return;
+
         // Esto forzará a que se actualice el estado de interacción en el próximo Update
         // Esencialmente reiniciamos la detección de objetos interactuables
-
         // Liberar cualquier referencia actual
         if (currentInteractable != null)
         {
@@ -100,5 +138,19 @@ public class PlayerInteraction : MonoBehaviour
 
         // Forzar una nueva detección inmediatamente
         CheckForInteractables();
+    }
+
+    // Método para desactivar las interacciones durante las transiciones de escena
+    public static void SetSceneTransitionState(bool isTransitioning)
+    {
+        IsSceneTransitioning = isTransitioning;
+        Debug.Log($"Estado de transición de escena: {(isTransitioning ? "Activo" : "Inactivo")}");
+    }
+
+    // Asegurarnos de que se restablece si se destruye o desactiva
+    private void OnDisable()
+    {
+        canInteract = false;
+        currentInteractable = null;
     }
 }
