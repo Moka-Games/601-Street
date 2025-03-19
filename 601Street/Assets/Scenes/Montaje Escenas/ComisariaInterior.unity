@@ -708,6 +708,51 @@ PrefabInstance:
       propertyPath: correctPassword
       value: 2557
       objectReference: {fileID: 0}
+    - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[3].m_Mode
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[3].m_Target
+      value: 
+      objectReference: {fileID: 769003899}
+    - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[3].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[3].m_MethodName
+      value: SetActive
+      objectReference: {fileID: 0}
+    - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[3].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[3].m_Arguments.m_BoolArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 422334847174790149, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[3].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 1833477273651023365, guid: 4b20f13d419e62548994c2f1b8936253,
         type: 3}
       propertyPath: detectionRadius
@@ -1016,6 +1061,169 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1626415194}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &769003899
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 769003903}
+  - component: {fileID: 769003902}
+  - component: {fileID: 769003901}
+  - component: {fileID: 769003900}
+  - component: {fileID: 769003904}
+  - component: {fileID: 769003905}
+  m_Layer: 6
+  m_Name: Runa
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!136 &769003900
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769003899}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5000001
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0.000000059604645, y: 1.98, z: -0.00000008940697}
+--- !u!23 &769003901
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769003899}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 107397c079cd7ae4ab63ef0ab69e7dd9, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &769003902
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769003899}
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &769003903
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769003899}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -25.221, y: 0.541, z: -20.842}
+  m_LocalScale: {x: 1, y: 0.16020843, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &769003904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769003899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44409751ae1b75c4795c84efedd64243, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &769003905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769003899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdf2841cde257ce41a7e4884979576c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactionID: 5
+  interactionPrompt: Presiona E para interactuar
+  onInteraction:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 769003904}
+        m_TargetAssemblyTypeName: Runa, Assembly-CSharp
+        m_MethodName: SetInteracted
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onInteracted:
+    m_PersistentCalls:
+      m_Calls: []
+  singleUseInteraction: 1
+  disableAfterInteraction: 1
+  rangeIndicator: {fileID: 0}
+  interactIndicator: {fileID: 0}
+  detectionRadius: 5
+  edgeOffset: 50
+  objectInteracted: 0
 --- !u!64 &822858997
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2238,7 +2446,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &1771493771
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2272,7 +2480,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8d5ad5eb02d8c349b67e649b8eca5d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  npcId: 1
+  npcId: 2
   conversation: {fileID: 11400000, guid: 70ebacb828ed32b4d94d2ea97e57b750, type: 2}
   achievementConversation: {fileID: 0}
   funnyConversation: {fileID: 11400000, guid: 9daf59da119c79a4b95740f4a0c2c16c, type: 2}
@@ -14979,3 +15187,4 @@ SceneRoots:
   - {fileID: 1734883695}
   - {fileID: 1173150251}
   - {fileID: 1636692843}
+  - {fileID: 769003903}

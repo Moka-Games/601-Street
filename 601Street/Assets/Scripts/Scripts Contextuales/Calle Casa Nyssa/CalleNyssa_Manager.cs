@@ -13,6 +13,10 @@ public class CalleNyssa_Manager : MonoBehaviour
 
     public static bool policiaInteractuado = false;
 
+    [Header("Portal")]
+    public GameObject portalFeedback;
+    public GameObject portalTriggerFinal;
+
     void Start()
     {
         if(Ordenador.ordenadorInteractuado)
@@ -38,4 +42,12 @@ public class CalleNyssa_Manager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if(Runa.runeInteracted)
+        {
+            portalFeedback.SetActive(false);
+            portalTriggerFinal.SetActive(true);
+        }
+    }
 }

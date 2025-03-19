@@ -17,7 +17,7 @@ public class ComisariManager : MonoBehaviour
     {
         pensamientosManager = FindAnyObjectByType<Pensamientos_Manager>();
 
-        print(BarInterior.conversaciónPoliciaTerminada + "aaaaaa");
+        print("Conversación con policia terminada = " + BarInterior.conversaciónPoliciaTerminada);
         if(BarInterior.conversaciónPoliciaTerminada == true)
         {
             policia2.SetActive(true);

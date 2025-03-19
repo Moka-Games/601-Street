@@ -75,5 +75,6 @@ public enum SafeButtonType
     Number,
     Enter,
     Delete,
-    Clear
+    Clear,
+    Exit
 }

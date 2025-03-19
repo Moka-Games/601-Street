@@ -220,6 +220,21 @@ public class SafeSystem : MonoBehaviour
                     StartCoroutine(ResetLightAfterDelay(blinkDuration));
                 }
                 break;
+            case SafeButtonType.Exit:
+                // Reproducir sonido (puedes usar el mismo que Clear u otro)
+                PlaySound(clearPasswordSound);
+
+                // Buscar y notificar al SafeGameplayManager para salir del modo
+                SafeGameplayManager gameplayManager = FindObjectOfType<SafeGameplayManager>();
+                if (gameplayManager != null)
+                {
+                    gameplayManager.ExitSafeMode();
+                }
+                else
+                {
+                    Debug.LogWarning("No se encontró el SafeGameplayManager para salir del modo caja fuerte.");
+                }
+                break;
         }
     }
 

@@ -6,6 +6,8 @@ public class GameSceneManager : MonoBehaviour
 {
     private static GameSceneManager instance;
     public static GameSceneManager Instance
+
+
     {
         get
         {

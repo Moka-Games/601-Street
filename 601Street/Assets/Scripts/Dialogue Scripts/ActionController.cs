@@ -15,7 +15,7 @@ public class ActionController : MonoBehaviour
 
     void Start()
     {
-        comisariaManager = FindAnyObjectByType<ComisariManager>();
+
 
         //DESCRIPCIÓN FUNCIONALIDAD
         // 
@@ -43,11 +43,11 @@ public class ActionController : MonoBehaviour
         () => Actions_Script.Instance.PoliciaInteractuado()  
     ));
         
-        RegisterAction("policia_2_id", new DialogueAction(
-        () => comisariaManager.ObjetosPostPolicia(), 
-        () => comisariaManager.ObjetosPostPolicia(),
-        () => comisariaManager.ObjetosPostPoliciaFracaso()  
-    ));
+        RegisterAction("policia_1_id", new DialogueAction(
+        () => Actions_Script.Instance.PoliciaSucess(),
+        () => Actions_Script.Instance.PoliciaSucess(),
+        () => Actions_Script.Instance.PoliciaFail()  
+    )); 
 
         //Ejemplo Acción registrada para final de conversación
         RegisterAction("ConversationEnd_1", new DialogueAction(
@@ -62,7 +62,11 @@ public class ActionController : MonoBehaviour
     null
 ));
 
-
+        RegisterAction("Post-Bar", new DialogueAction(
+    () => BarInterior.conversaciónPoliciaTerminada = true,
+    null,
+    null
+));
     }
     void Awake()
     {

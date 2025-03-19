@@ -47,4 +47,19 @@ public class Actions_Script : MonoBehaviour
         CalleBar_Manager.puertaAbiertaBool = true;
         CalleNyssa_Manager.policiaInteractuado = true;
     }
+
+
+    public void PoliciaSucess()
+    {
+        ComisariManager comisariaManager = FindAnyObjectByType<ComisariManager>();
+
+        comisariaManager.ObjetosPostPolicia();
+    }
+
+    public void PoliciaFail()
+    {
+        ComisariManager comisariaManager = FindAnyObjectByType<ComisariManager>();
+
+        comisariaManager.ObjetosPostPoliciaFracaso();
+    }
 }

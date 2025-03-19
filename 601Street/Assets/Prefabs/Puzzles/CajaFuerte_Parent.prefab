@@ -164,7 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ef2192a3b90b2a4aaa9821ff0dece19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonType: 3
+  buttonType: 4
   buttonValue: 0
   useCustomSound: 1
   customButtonSound: {fileID: 8300000, guid: 4e8064290cd6d9c49a111a43491ee058, type: 3}
@@ -3618,7 +3618,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Clear
+  m_text: Exit
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

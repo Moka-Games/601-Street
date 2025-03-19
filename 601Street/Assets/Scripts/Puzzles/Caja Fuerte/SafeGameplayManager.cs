@@ -111,15 +111,17 @@ public class SafeGameplayManager : MonoBehaviour
     // Método para desactivar el modo de interacción con la caja fuerte
     public void ExitSafeMode()
     {
-        if (isSafeMode && safeVCam != null)
-        {
-            // Desactivar la cámara de la caja fuerte
-            safeVCam.gameObject.SetActive(false);
+        print("Llanado Extit Safe Mode");
+       
+        // Desactivar la cámara de la caja fuerte
+        safeVCam.gameObject.SetActive(false);
 
-            isSafeMode = false;
+        isSafeMode = false;
 
-            Debug.Log("Modo de interacción con caja fuerte desactivado");
-        }
+        Debug.Log("Modo de interacción con caja fuerte desactivado");
+
+
+
     }
 
     // Método que se llama cuando se desbloquea la caja fuerte
