@@ -99,6 +99,10 @@ public class PlayerInteraction : MonoBehaviour
             IInteractable interactable = hit.collider.GetComponent<IInteractable>();
             if (interactable != null)
             {
+                if (GameStateManager.Instance != null)
+                {
+                    GameStateManager.Instance.EnterInteractingState();
+                }
                 // Verificar si se puede interactuar con este objeto
                 if (currentInteractable != interactable)
                 {
@@ -117,6 +121,12 @@ public class PlayerInteraction : MonoBehaviour
         {
             currentInteractable = null;
             hasInteracted = false;
+
+            // Return to OnGameplay state
+            if (GameStateManager.Instance != null)
+            {
+                GameStateManager.Instance.EnterGameplayState();
+            }
         }
 
         canInteract = false;

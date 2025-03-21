@@ -124,6 +124,10 @@ public class DialogueManager : MonoBehaviour
         currentNPC = npc;
         currentDialogueIndex = 0;
 
+        if (GameStateManager.Instance != null)
+        {
+            GameStateManager.Instance.EnterDialogueState();
+        }
         // Cambiar el LookAt de la cámara al NPC con transición suave
         Transform npcLookAtTarget = currentNPC.transform.Find("LookAt");
         if (npcLookAtTarget != null && cameraScript != null)
@@ -327,7 +331,10 @@ public class DialogueManager : MonoBehaviour
             currentNPC.SetInteracted();
             onConversationEnd.Invoke();
         }
-
+        if (GameStateManager.Instance != null)
+        {
+            GameStateManager.Instance.EnterGameplayState();
+        }
         // Restaurar el LookAt de la cámara al jugador con transición suave
         if (cameraScript != null)
         {

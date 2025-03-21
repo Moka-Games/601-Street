@@ -385,6 +385,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3754790435304779438, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
+      propertyPath: timeBetweenThoughts
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 3754790435304779438, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
       propertyPath: pensamientoInicioTexto
       value: Odio a la renfe... Mucho...
       objectReference: {fileID: 0}
@@ -863,8 +868,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77e5b455efedcff4fb786dc3b91779fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameStarted: 0
-  delayToStart: 10
 --- !u!224 &885880753 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3262157178235323899, guid: f33201337ece229469ebad4153904de3,
