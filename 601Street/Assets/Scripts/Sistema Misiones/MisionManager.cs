@@ -44,7 +44,9 @@ public class MisionManager : MonoBehaviour
 
     // Propiedad para verificar si hay una misión activa
     public bool TieneMisionActiva => misionActual != null;
-
+    
+    [Header("Depuración")]
+    [SerializeField] private bool mostrarOrigenLlamadas = true;
     private void Awake()
     {
         // Singleton setup
@@ -208,6 +210,13 @@ public class MisionManager : MonoBehaviour
             return false;
         }
 
+        // Obtener información del origen de la llamada si está habilitado
+        if (mostrarOrigenLlamadas)
+        {
+            string origenLlamada = MisionDebugExtensions.ObtenerOrigenLlamada();
+            Debug.Log($"[MisionManager] Misión '{misionActual.Nombre}' completada desde: {origenLlamada}");
+        }
+
         Mision misionCompletada = misionActual;
         misionCompletada.CompletarMision();
 
@@ -264,6 +273,13 @@ public class MisionManager : MonoBehaviour
     // Completar la misión actual e iniciar una específica
     public bool CompletarEIniciar(Mision siguienteMision)
     {
+        // Obtener información del origen de la llamada si está habilitado
+        if (mostrarOrigenLlamadas)
+        {
+            string origenLlamada = MisionDebugExtensions.ObtenerOrigenLlamada();
+            Debug.Log($"[MisionManager] Completar e iniciar nueva misión llamado desde: {origenLlamada}");
+        }
+
         if (CompletarMisionActual())
         {
             return IniciarMision(siguienteMision);
@@ -272,9 +288,17 @@ public class MisionManager : MonoBehaviour
         return false;
     }
 
+
     // Completar la misión actual e iniciar otra por ID
     public bool CompletarEIniciar(string siguienteMisionID)
     {
+        // Obtener información del origen de la llamada si está habilitado
+        if (mostrarOrigenLlamadas)
+        {
+            string origenLlamada = MisionDebugExtensions.ObtenerOrigenLlamada();
+            Debug.Log($"[MisionManager] Completar e iniciar misión con ID '{siguienteMisionID}' llamado desde: {origenLlamada}");
+        }
+
         if (CompletarMisionActual())
         {
             return IniciarMision(siguienteMisionID);

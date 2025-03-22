@@ -1471,9 +1471,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7249e9c754468b04e841edd492046246, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  iniciarMisionAlComenzar: 0
+  iniciarMisionAlDespertar: 0
   misionInicial: {fileID: 0}
   misionActual: {fileID: 0}
+  mostrarOrigenLlamadas: 1
 --- !u!4 &1192413688
 Transform:
   m_ObjectHideFlags: 0
@@ -1505,7 +1506,7 @@ MonoBehaviour:
     type: 3}
   canvasParent: {fileID: 1942858743}
   tiempoDestruccionInterfaz: 2
-  canva: {fileID: 1524181022}
+  canvas: {fileID: 1524181022}
 --- !u!1 &1257928492 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5788841686323738173, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
