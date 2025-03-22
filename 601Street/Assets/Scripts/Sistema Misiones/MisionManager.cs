@@ -1,9 +1,12 @@
-using System.Collections.Generic;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
+// Gestor principal de misiones (MonoBehaviour)
 public class MisionManager : MonoBehaviour
 {
+    // Singleton para acceso global
     private static MisionManager instance;
     public static MisionManager Instance
     {
@@ -20,7 +23,7 @@ public class MisionManager : MonoBehaviour
     }
 
     [Header("Configuración")]
-    [SerializeField] private bool iniciarMisionAlComenzar = false;
+    [SerializeField] private bool iniciarMisionAlDespertar = false;
     [SerializeField] private Mision misionInicial;
 
     [Header("Estado")]
@@ -61,10 +64,22 @@ public class MisionManager : MonoBehaviour
     private void Start()
     {
         // Iniciar misión inicial si está configurado
-        if (iniciarMisionAlComenzar && misionInicial != null)
+        if (iniciarMisionAlDespertar && misionInicial != null)
         {
             IniciarMision(misionInicial);
         }
+    }
+
+    private void OnEnable()
+    {
+        // Suscribirse a eventos internos
+        OnMisionCompletada += ManejarCompletadoInterno;
+    }
+
+    private void OnDisable()
+    {
+        // Desuscribirse de eventos internos
+        OnMisionCompletada -= ManejarCompletadoInterno;
     }
 
     private void CargarMisiones()
@@ -72,9 +87,13 @@ public class MisionManager : MonoBehaviour
         // Encuentra todas las misiones en el proyecto
         Mision[] todasLasMisiones = Resources.LoadAll<Mision>("Misiones");
 
+        Debug.Log($"Se encontraron {todasLasMisiones.Length} misiones en Resources/Misiones");
+
         // Registra cada misión en el diccionario para acceso rápido
         foreach (Mision mision in todasLasMisiones)
         {
+            Debug.Log($"Misión encontrada: {mision.name}, ID: {mision.ID}");
+
             if (!string.IsNullOrEmpty(mision.ID))
             {
                 if (!misionesPorID.ContainsKey(mision.ID))
@@ -103,17 +122,37 @@ public class MisionManager : MonoBehaviour
             return false;
         }
 
-        // Si hay una misión activa actualmente, la cancelamos
+        // Guardamos una referencia a la misión actual antes de cambiarla
+        Mision misionAnterior = misionActual;
+
+        // Si hay una misión activa actualmente, la completamos
         if (misionActual != null)
         {
-            misionActual.CancelarMision();
+            // Desactivar notificación del evento para evitar que se ejecute la lógica estándar
+            // que podría interferir con nuestra transición personalizada
+            OnMisionCompletada -= ManejarCompletadoInterno;
+
+            // Completar la misión anterior sin iniciar automáticamente la siguiente
+            misionActual.CompletarMision();
+
+            // Añadir a la lista de misiones completadas si no está ya
+            if (!misionesCompletadas.Contains(misionAnterior))
+            {
+                misionesCompletadas.Add(misionAnterior);
+            }
+
+            // Notificar manualmente pero sin cambiar aún la misión actual
+            OnMisionCompletada?.Invoke(misionAnterior);
+
+            // Reactivar el evento para futuras misiones
+            OnMisionCompletada += ManejarCompletadoInterno;
         }
 
         // Establecer la nueva misión actual
         misionActual = mision;
         misionActual.IniciarMision();
 
-        // Notificar el cambio
+        // Notificar el cambio de misión
         OnMisionCambiada?.Invoke(misionActual);
 
         return true;
@@ -317,5 +356,13 @@ public class MisionManager : MonoBehaviour
         }
 
         Debug.Log("Sistema de misiones reiniciado.");
+    }
+
+    // Método para manejar el completado de misiones internamente
+    private void ManejarCompletadoInterno(Mision mision)
+    {
+        // Este método se usa para escuchar el evento de misión completada
+        // y realizar acciones específicas que queremos evitar durante transiciones personalizadas
+        // En la implementación actual no hacemos nada especial, pero podría extenderse si es necesario
     }
 }

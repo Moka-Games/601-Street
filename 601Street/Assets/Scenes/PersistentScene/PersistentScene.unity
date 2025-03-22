@@ -1451,6 +1451,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1192413688}
   - component: {fileID: 1192413687}
+  - component: {fileID: 1192413689}
   m_Layer: 0
   m_Name: Mision Manager
   m_TagString: Untagged
@@ -1488,6 +1489,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1192413689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1192413686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dea0c6e5f0f6e5f4fa472a14d85a18ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  misionInterfacePrefab: {fileID: 7976140563931821677, guid: 576dfbace4e0965479245f07a263fea3,
+    type: 3}
+  canvasParent: {fileID: 1942858743}
+  tiempoDestruccionInterfaz: 2
+  canva: {fileID: 1524181022}
 --- !u!1 &1257928492 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5788841686323738173, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
@@ -1937,6 +1955,12 @@ GameObject:
 --- !u!1 &1524181021 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6897246829007206051, guid: 36a03b43277491040a00cc349d560a74,
+    type: 3}
+  m_PrefabInstance: {fileID: 1524181018}
+  m_PrefabAsset: {fileID: 0}
+--- !u!223 &1524181022 stripped
+Canvas:
+  m_CorrespondingSourceObject: {fileID: 3889633736389816428, guid: 36a03b43277491040a00cc349d560a74,
     type: 3}
   m_PrefabInstance: {fileID: 1524181018}
   m_PrefabAsset: {fileID: 0}
