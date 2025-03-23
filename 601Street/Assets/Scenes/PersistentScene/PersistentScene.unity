@@ -286,7 +286,7 @@ PrefabInstance:
     - target: {fileID: 297787153583136723, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 297787153583136723, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
@@ -463,6 +463,11 @@ PrefabInstance:
       propertyPath: configuracionesPorEscena.Array.data[3].activarPensamientoInicial
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3903586827763414875, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: cameraTransform
+      value: 
+      objectReference: {fileID: 1025010809}
     - target: {fileID: 4678181675161628757, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
       propertyPath: telefonoUI
@@ -487,6 +492,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7337399244683708749, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7337399244683708749, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7337399244683708749, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: m_Intensity
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8407419777404134908, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
@@ -598,7 +618,18 @@ PrefabInstance:
       propertyPath: cambiosDeEscena.Array.data[5].escenaSiguiente
       value: CasaNyssa
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 8520878618192538454, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: rotationSpeed
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 8520878618192538454, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: cameraTransform
+      value: 
+      objectReference: {fileID: 1025010809}
+    m_RemovedComponents:
+    - {fileID: 297787153583136723, guid: c33191c6797853f4d8cb4de889205796, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -1127,6 +1158,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7685b785844a38049a4bf1af2d883a49, type: 3}
+--- !u!4 &1025010809 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7179143261369398533, guid: 7685b785844a38049a4bf1af2d883a49,
+    type: 3}
+  m_PrefabInstance: {fileID: 1025010808}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1025010810 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2691415738208649849, guid: 7685b785844a38049a4bf1af2d883a49,
