@@ -141,7 +141,7 @@ public class FlashlightController : MonoBehaviour
         }
     }
 
-    private void UpdateNaturalHandMovement(Quaternion cameraRotation)
+    private void UpdateNaturalHandMovement(Quaternion currentCameraRotation)
     {
         // Calculamos el offset de rotación basado en la entrada
         float deltaYaw = moveInput.x * rotationSpeed * Time.deltaTime;
@@ -155,29 +155,29 @@ public class FlashlightController : MonoBehaviour
         currentYawAngle = Mathf.Clamp(currentYawAngle, -maxAngle, maxAngle);
         currentPitchAngle = Mathf.Clamp(currentPitchAngle, -maxAngle, maxAngle);
 
-        // Crear una rotación basada en los ángulos acumulados, relativa a la rotación inicial
+        // Crear una rotación basada en los ángulos acumulados
         Quaternion offsetRotation = Quaternion.Euler(currentPitchAngle, currentYawAngle, 0);
 
         if (handPosition != null)
         {
-            // Si hay una mano, calculamos la rotación respecto a ella
+            // Si hay una mano, calculamos la rotación respecto a ella y a la rotación inicial de la cámara
 
-            // 1. Calculamos cómo la cámara ha rotado desde su posición inicial
-            Quaternion cameraChange = Quaternion.Inverse(initialCameraRotation) * cameraRotation;
+            // Calculamos la rotación que debe aplicarse desde la mano para apuntar hacia la cámara inicial
+            Quaternion initialHandToCameraRotation = Quaternion.Inverse(initialHandRotation) * initialCameraRotation;
 
-            // 2. Aplicamos esta rotación relativa a la mano
-            Quaternion handWithCameraMovement = handPosition.rotation * cameraChange;
+            // Añadimos nuestra rotación de offset basada en la entrada del jugador
+            Quaternion targetLocalRotation = initialHandToCameraRotation * offsetRotation;
 
-            // 3. Aplicamos nuestra rotación de offset del jugador
-            Quaternion targetRotation = handWithCameraMovement * offsetRotation;
+            // Aplicamos esta rotación a la mano actual
+            Quaternion targetRotation = handPosition.rotation * targetLocalRotation;
 
-            // 4. Aplicamos la rotación con suavidad
+            // Aplicamos la rotación con suavidad
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
         }
         else
         {
-            // Si no hay mano, simplemente combinamos la rotación actual de la cámara con nuestro offset
-            Quaternion targetRotation = cameraRotation * offsetRotation;
+            // Si no hay mano, aplicamos la rotación relativa a la rotación inicial de la cámara
+            Quaternion targetRotation = initialCameraRotation * offsetRotation;
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
         }
 

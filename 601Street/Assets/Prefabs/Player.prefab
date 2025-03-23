@@ -79,7 +79,7 @@ Light:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 10
   m_Range: 10
-  m_SpotAngle: 45
+  m_SpotAngle: 80
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
@@ -187,6 +187,7 @@ GameObject:
   - component: {fileID: 8455454513532626248}
   - component: {fileID: 8518133697557743755}
   - component: {fileID: 8520878618192538454}
+  - component: {fileID: 280599536985749025}
   m_Layer: 3
   m_Name: Flashlight
   m_TagString: Untagged
@@ -306,6 +307,22 @@ MonoBehaviour:
   maxIntensity: 10
   minIntensity: 0
   intensityChangeSpeed: 2
+--- !u!114 &280599536985749025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5475860887917989149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c23ccd95d5b4b646b44a7e5394b6664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraTransform: {fileID: 0}
+  followSpeed: 15
+  rotationOffset: {x: 0, y: 0, z: 0}
+  overrideAllRotation: 1
 --- !u!1 &5831046738247469719
 GameObject:
   m_ObjectHideFlags: 0
