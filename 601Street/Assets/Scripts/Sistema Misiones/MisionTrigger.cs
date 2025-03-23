@@ -19,6 +19,8 @@ public class MisionTrigger : MonoBehaviour
             {
                 MisionManager.Instance.IniciarMision(idMision);
             }
+
+            Destroy(gameObject);
         }
     }
 

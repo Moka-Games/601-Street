@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// Este componente hace que los objetos en la capa "HidenObject" solo sean visibles
-/// cuando están dentro del cono de luz de la linterna.
+/// exactamente mientras están dentro del cono de luz de la linterna.
 /// </summary>
 public class FlashlightVisibilityController : MonoBehaviour
 {
@@ -24,16 +24,13 @@ public class FlashlightVisibilityController : MonoBehaviour
 
     [Header("Configuración de Detección")]
     [Tooltip("Frecuencia de actualización de objetos visibles (segundos)")]
-    [SerializeField] private float updateFrequency = 0.1f;
+    [SerializeField] private float updateFrequency = 0.05f;
 
     [Tooltip("Distancia máxima de detección")]
     [SerializeField] private float maxDetectionDistance = 20f;
 
     [Tooltip("Agregar un margen al ángulo del spotlight para detección")]
     [SerializeField] private float angleMargin = 5f;
-
-    [Tooltip("Tiempo de permanencia adicional tras perder la iluminación (segundos)")]
-    [SerializeField] private float visibilityPersistence = 0.0f;
 
     [Tooltip("Visualizar rayos de depuración")]
     [SerializeField] private bool showDebugRays = false;
@@ -43,19 +40,21 @@ public class FlashlightVisibilityController : MonoBehaviour
     private HashSet<GameObject> objectsInLightBeam = new HashSet<GameObject>();
     private int originalCullingMask;
 
+    // Control del tiempo de actualización
+    private float lastUpdateTime = 0f;
+    private bool isUpdating = false;
+
     // Estructura para controlar objetos visibles
     private class VisibleObject
     {
         public GameObject gameObject;
         public int originalLayer;
-        public float visibleUntil; // Tiempo hasta que el objeto vuelve a ser invisible
         public bool inCurrentBeam; // Si está actualmente en el haz de luz
 
         public VisibleObject(GameObject go, int layer)
         {
             gameObject = go;
             originalLayer = layer;
-            visibleUntil = 0f; // Se actualizará en cada frame
             inCurrentBeam = true;
         }
     }
@@ -99,9 +98,6 @@ public class FlashlightVisibilityController : MonoBehaviour
                 Debug.LogWarning("Capa 'HidenObject' no encontrada. Asegúrate de que existe en las capas del proyecto.");
             }
         }
-
-        // Iniciar la búsqueda de objetos
-        InvokeRepeating("UpdateVisibleObjects", 0f, updateFrequency);
     }
 
     void OnDisable()
@@ -118,41 +114,50 @@ public class FlashlightVisibilityController : MonoBehaviour
 
     void Update()
     {
-        // Verificar objetos que ya no deberían ser visibles
-        CheckVisibilityTimeout();
+        // Actualizar los objetos visibles con una frecuencia controlada
+        if (Time.time - lastUpdateTime >= updateFrequency && !isUpdating)
+        {
+            StartCoroutine(UpdateVisibleObjectsCoroutine());
+        }
     }
 
     /// <summary>
     /// Actualiza la lista de objetos que están dentro del cono de luz
     /// </summary>
-    void UpdateVisibleObjects()
+    IEnumerator UpdateVisibleObjectsCoroutine()
     {
-        // Limpiar la lista de objetos en el haz actual
+        isUpdating = true;
+        lastUpdateTime = Time.time;
+
+        // Guardar la lista de objetos actualmente en el haz
+        HashSet<GameObject> previousObjectsInBeam = new HashSet<GameObject>(objectsInLightBeam);
+
+        // Limpiar la lista para la nueva búsqueda
         objectsInLightBeam.Clear();
 
         // Solo procesamos si la luz está encendida
         if (spotLight == null || !spotLight.enabled || spotLight.intensity <= 0.01f)
         {
-            // Marcar todos los objetos como fuera del haz de luz
-            foreach (VisibleObject visObj in visibleObjects)
-            {
-                visObj.inCurrentBeam = false;
-                // El objeto debe desaparecer inmediatamente cuando sale del haz de luz
-                visObj.visibleUntil = Time.time;
-            }
-            return;
+            // Si la luz está apagada, restaurar todos los objetos a su capa original
+            RestoreAllObjects();
+            isUpdating = false;
+            yield break;
         }
 
         // Obtenemos la posición y dirección de la luz
         Vector3 lightPosition = spotLight.transform.position;
         Vector3 lightDirection = spotLight.transform.forward;
 
-        // Obtenemos todos los objetos en la capa de objetos ocultos
-        Collider[] hiddenObjects = Physics.OverlapSphere(lightPosition, maxDetectionDistance, hiddenObjectsLayer);
+        // Obtenemos todos los objetos en la capa de objetos ocultos y la capa visible (para detectar los que ya cambiamos)
+        Collider[] potentialObjects = Physics.OverlapSphere(lightPosition, maxDetectionDistance,
+                                                         hiddenObjectsLayer | (1 << visibleLayer));
 
-        foreach (Collider collider in hiddenObjects)
+        // Crear una lista temporal para registrar objetos que entrarán en el haz de luz
+        List<GameObject> objectsToMakeVisible = new List<GameObject>();
+
+        foreach (Collider collider in potentialObjects)
         {
-            GameObject hiddenObject = collider.gameObject;
+            GameObject currentObject = collider.gameObject;
 
             // Calculamos la dirección hacia el objeto
             Vector3 directionToObject = (collider.bounds.center - lightPosition).normalized;
@@ -163,19 +168,20 @@ public class FlashlightVisibilityController : MonoBehaviour
             // Calculamos la distancia al objeto
             float distance = Vector3.Distance(lightPosition, collider.bounds.center);
 
-            // Verificamos si el objeto está dentro del cono de luz (con un margen para suavizar)
+            // Verificamos si el objeto está dentro del cono de luz
             if (angle <= (spotLight.spotAngle / 2f + angleMargin) && distance <= maxDetectionDistance)
             {
                 // Lanzamos un rayo para comprobar si hay obstáculos entre la luz y el objeto
                 RaycastHit hit;
-                if (Physics.Raycast(lightPosition, directionToObject, out hit, distance, ~hiddenObjectsLayer))
+                if (Physics.Raycast(lightPosition, directionToObject, out hit, distance))
                 {
                     // Si el rayo golpea algo que no es el objeto, entonces hay un obstáculo
-                    if (hit.collider.gameObject != hiddenObject)
+                    if (hit.collider.gameObject != currentObject &&
+                        !hit.collider.gameObject.transform.IsChildOf(currentObject.transform))
                     {
                         if (showDebugRays)
                         {
-                            Debug.DrawRay(lightPosition, directionToObject * distance, Color.red);
+                            Debug.DrawRay(lightPosition, directionToObject * distance, Color.red, updateFrequency);
                         }
                         continue;
                     }
@@ -184,35 +190,55 @@ public class FlashlightVisibilityController : MonoBehaviour
                 // El objeto está dentro del cono de luz y no hay obstáculos
                 if (showDebugRays)
                 {
-                    Debug.DrawRay(lightPosition, directionToObject * distance, Color.green);
+                    Debug.DrawRay(lightPosition, directionToObject * distance, Color.green, updateFrequency);
                 }
 
                 // Añadimos el objeto a la lista de objetos en el haz actual
-                objectsInLightBeam.Add(hiddenObject);
-
-                // Hacemos el objeto visible
-                MakeObjectVisible(hiddenObject);
+                objectsInLightBeam.Add(currentObject);
+                objectsToMakeVisible.Add(currentObject);
             }
             else
             {
                 // El objeto está fuera del cono de luz
                 if (showDebugRays)
                 {
-                    Debug.DrawRay(lightPosition, directionToObject * distance, Color.yellow);
+                    Debug.DrawRay(lightPosition, directionToObject * distance, Color.yellow, updateFrequency);
                 }
+            }
+
+            // Pausa para evitar sobrecarga de procesamiento si hay muchos objetos
+            if (potentialObjects.Length > 10 && potentialObjects.Length % 10 == 0)
+            {
+                yield return null;
             }
         }
 
-        // Marcar los objetos que ya no están en el haz de luz
-        foreach (VisibleObject visObj in visibleObjects)
+        // Restaurar objetos que ya no están en el haz de luz
+        for (int i = visibleObjects.Count - 1; i >= 0; i--)
         {
-            if (visObj.gameObject != null && !objectsInLightBeam.Contains(visObj.gameObject))
+            VisibleObject visObj = visibleObjects[i];
+
+            // Si el objeto ha sido destruido o ya no está en el haz de luz
+            if (visObj.gameObject == null || !objectsInLightBeam.Contains(visObj.gameObject))
             {
-                visObj.inCurrentBeam = false;
-                // El objeto debe desaparecer inmediatamente cuando sale del haz de luz
-                visObj.visibleUntil = Time.time;
+                // Restauramos la capa original
+                if (visObj.gameObject != null)
+                {
+                    RestoreObjectLayer(visObj);
+                }
+
+                // Eliminamos de la lista
+                visibleObjects.RemoveAt(i);
             }
         }
+
+        // Hacer visibles los objetos que están en el haz de luz
+        foreach (GameObject obj in objectsToMakeVisible)
+        {
+            MakeObjectVisible(obj);
+        }
+
+        isUpdating = false;
     }
 
     /// <summary>
@@ -227,55 +253,55 @@ public class FlashlightVisibilityController : MonoBehaviour
         {
             // Si ya está en la lista, lo marcamos como dentro del haz actual
             existingObject.inCurrentBeam = true;
-            // Mantener visible solo mientras esté en el haz
-            existingObject.visibleUntil = Time.time + updateFrequency * 1.5f;
         }
         else
         {
             // Si no está en la lista, lo añadimos
             int originalLayer = hiddenObject.layer;
+
+            // Cambiamos la capa del objeto a la capa visible
             hiddenObject.layer = visibleLayer;
 
-            visibleObjects.Add(new VisibleObject(hiddenObject, originalLayer));
+            // Crear el nuevo objeto visible
+            VisibleObject newObject = new VisibleObject(hiddenObject, originalLayer);
+            visibleObjects.Add(newObject);
+
+            // Si tiene hijos, también cambiamos su capa
+            foreach (Transform child in hiddenObject.transform)
+            {
+                SetLayerRecursively(child.gameObject, visibleLayer);
+            }
         }
     }
 
     /// <summary>
-    /// Verifica qué objetos ya no deberían ser visibles y los restaura
+    /// Establece la capa de un GameObject y todos sus hijos recursivamente
     /// </summary>
-    void CheckVisibilityTimeout()
+    void SetLayerRecursively(GameObject obj, int layer)
     {
-        if (visibleObjects.Count == 0) return;
+        if (obj == null) return;
 
-        float currentTime = Time.time;
+        obj.layer = layer;
 
-        // Iteramos la lista en reversa para poder eliminar elementos sin problemas
-        for (int i = visibleObjects.Count - 1; i >= 0; i--)
+        foreach (Transform child in obj.transform)
         {
-            VisibleObject visObj = visibleObjects[i];
+            SetLayerRecursively(child.gameObject, layer);
+        }
+    }
 
-            // Si el objeto ha sido destruido
-            if (visObj.gameObject == null)
-            {
-                visibleObjects.RemoveAt(i);
-                continue;
-            }
+    /// <summary>
+    /// Restaura la capa original de un objeto y sus hijos
+    /// </summary>
+    void RestoreObjectLayer(VisibleObject visObj)
+    {
+        if (visObj.gameObject == null) return;
 
-            // Si está en el haz de luz actual, se mantiene visible
-            if (visObj.inCurrentBeam)
-            {
-                continue;
-            }
+        visObj.gameObject.layer = visObj.originalLayer;
 
-            // Si el tiempo ha expirado
-            if (currentTime > visObj.visibleUntil)
-            {
-                // Restauramos la capa original
-                visObj.gameObject.layer = visObj.originalLayer;
-
-                // Eliminamos de la lista
-                visibleObjects.RemoveAt(i);
-            }
+        // Restaurar también las capas de los hijos
+        foreach (Transform child in visObj.gameObject.transform)
+        {
+            SetLayerRecursively(child.gameObject, visObj.originalLayer);
         }
     }
 
@@ -288,11 +314,12 @@ public class FlashlightVisibilityController : MonoBehaviour
         {
             if (visObj.gameObject != null)
             {
-                visObj.gameObject.layer = visObj.originalLayer;
+                RestoreObjectLayer(visObj);
             }
         }
 
         visibleObjects.Clear();
+        objectsInLightBeam.Clear();
     }
 
     /// <summary>

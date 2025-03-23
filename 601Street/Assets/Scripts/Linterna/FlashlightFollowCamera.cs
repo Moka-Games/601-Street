@@ -27,11 +27,22 @@ public class FlashlightFollowCamera : MonoBehaviour
     [Tooltip("Transform del pivote de la mano (opcional)")]
     [SerializeField] private Transform handPivot;
 
+    [Header("Estabilización")]
+    [Tooltip("Umbral en grados para ignorar pequeños cambios de rotación")]
+    [SerializeField] private float rotationThreshold = 0.5f;
+
+    [Tooltip("Suavizado adicional para la rotación")]
+    [SerializeField] private float additionalSmoothing = 0.5f;
+
     // Variables privadas
     private FlashlightController flashlightController;
     private Quaternion initialCameraRotation;
     private Quaternion initialHandRotation;
     private bool initialized = false;
+    private Quaternion lastRotation;
+    private Quaternion currentTargetRotation;
+    private float timeWithoutSignificantChange = 0f;
+    private float stabilizationTime = 1.0f;
 
     private void Start()
     {
@@ -74,6 +85,10 @@ public class FlashlightFollowCamera : MonoBehaviour
             initialHandRotation = handPivot.rotation;
         }
 
+        // Inicializar las rotaciones de seguimiento
+        lastRotation = transform.rotation;
+        currentTargetRotation = lastRotation;
+
         // Obtener referencia al controlador de linterna si existe
         flashlightController = GetComponent<FlashlightController>();
         if (flashlightController != null && overrideAllRotation)
@@ -82,13 +97,14 @@ public class FlashlightFollowCamera : MonoBehaviour
         }
 
         // Establecer rotación inicial
-        ResetOrientation();
+        //ResetOrientation();
 
         initialized = true;
     }
 
-    private void LateUpdate()
+    private void FixedUpdate()
     {
+        // Actualizar en FixedUpdate para una mayor consistencia
         if (!initialized || cameraTransform == null)
         {
             if (!initialized) Initialize();
@@ -96,10 +112,66 @@ public class FlashlightFollowCamera : MonoBehaviour
         }
 
         // Calcular límites de rotación
-        Quaternion limitedRotation = CalculateLimitedRotation();
+        UpdateRotation();
+    }
+
+    private void LateUpdate()
+    {
+        // También actualizar en LateUpdate para asegurar un seguimiento fluido
+        if (!initialized || cameraTransform == null)
+        {
+            if (!initialized) Initialize();
+            return;
+        }
+
+        // Aplicar la rotación calculada
+        ApplyCalculatedRotation();
+    }
+
+    private void UpdateRotation()
+    {
+        // Calcular la rotación objetivo
+        Quaternion newTargetRotation = CalculateLimitedRotation();
+
+        // Comprobar si ha habido un cambio significativo en la rotación
+        float angleDiff = Quaternion.Angle(lastRotation, newTargetRotation);
+
+        if (angleDiff > rotationThreshold)
+        {
+            // Si hay un cambio significativo, actualizar la rotación objetivo
+            currentTargetRotation = newTargetRotation;
+            timeWithoutSignificantChange = 0;
+        }
+        else
+        {
+            // Si no hay cambio significativo, contar el tiempo sin cambios
+            timeWithoutSignificantChange += Time.fixedDeltaTime;
+
+            // Si llevamos suficiente tiempo sin cambios, estabilizar la rotación
+            if (timeWithoutSignificantChange > stabilizationTime)
+            {
+                // Estabilizar la rotación: no cambiamos la rotación objetivo
+                // y dejamos que se aplique suavemente sin cambios
+            }
+        }
+
+        // Actualizar la última rotación conocida
+        lastRotation = newTargetRotation;
+    }
+
+    private void ApplyCalculatedRotation()
+    {
+        // Aplicar la rotación con suavizado avanzado
+        float smoothFactor = Time.deltaTime * followSpeed;
+
+        // Si hemos estado estables por un tiempo, reducir el factor de suavizado
+        if (timeWithoutSignificantChange > stabilizationTime)
+        {
+            smoothFactor *= (1 - additionalSmoothing);
+        }
 
         // Aplicar la rotación con suavidad
-        transform.rotation = Quaternion.Slerp(transform.rotation, limitedRotation, Time.deltaTime * followSpeed);
+        transform.rotation = Quaternion.Slerp(transform.rotation, currentTargetRotation, smoothFactor);
     }
 
     private Quaternion CalculateLimitedRotation()
@@ -145,44 +217,4 @@ public class FlashlightFollowCamera : MonoBehaviour
             }
         }
     }
-
-    /// <summary>
-    /// Resetea la orientación de la linterna a la posición inicial
-    /// </summary>
-    public void ResetOrientation()
-    {
-        if (cameraTransform == null) return;
-
-        if (useHandReference && handPivot != null)
-        {
-            // Alineamos respecto a la mano primero
-            Quaternion handToCamera = Quaternion.Inverse(initialHandRotation) * initialCameraRotation;
-            transform.rotation = handPivot.rotation * handToCamera;
-        }
-        else
-        {
-            // Directamente a la rotación inicial de la cámara
-            transform.rotation = initialCameraRotation;
-        }
-    }
-
-    /// <summary>
-    /// Actualiza las referencias iniciales (útil si la cámara o mano cambia)
-    /// </summary>
-    public void UpdateReferences()
-    {
-        if (cameraTransform != null)
-        {
-            initialCameraRotation = cameraTransform.rotation;
-        }
-
-        if (handPivot != null)
-        {
-            initialHandRotation = handPivot.rotation;
-        }
-
-        ResetOrientation();
-    }
-
-    
 }

@@ -76,7 +76,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 0
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.6886792, g: 0, b: 0.543295, a: 1}
   m_Intensity: 10
   m_Range: 10
   m_SpotAngle: 80
@@ -166,10 +166,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b4bfba1be575344e8333983db1c5de1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lightColor: {r: 1, g: 1, b: 1, a: 1}
+  lightColor: {r: 0.6886792, g: 0, b: 0.543295, a: 1}
   spotAngle: 80
   range: 10
-  intensity: 10
+  intensity: 15
   shadows: 1
   shadowResolution: 1
   createCookieTexture: 0
@@ -305,6 +305,9 @@ MonoBehaviour:
   maxAngle: 60
   originalLocalRotation: {x: 0, y: 0, z: 0}
   naturalHandMovement: 1
+  movementSmoothing: 0.1
+  stabilityThreshold: 0.05
+  ignoreSmallMovements: 1
   maxIntensity: 10
   minIntensity: 0
   intensityChangeSpeed: 2
@@ -327,6 +330,8 @@ MonoBehaviour:
   overrideAllRotation: 1
   useHandReference: 1
   handPivot: {fileID: 1938759759169537483}
+  rotationThreshold: 0.5
+  additionalSmoothing: 0.5
 --- !u!114 &4534888673594612740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -344,7 +349,7 @@ MonoBehaviour:
   hiddenObjectsLayer:
     serializedVersion: 2
     m_Bits: 1024
-  visibleLayer: 1
+  visibleLayer: 0
   updateFrequency: 0.1
   maxDetectionDistance: 20
   angleMargin: 5

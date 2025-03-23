@@ -36,6 +36,10 @@ public class HiddenObjectSetup : MonoBehaviour
     private Material[] originalMaterials;
     private bool wasRevealed = false;
 
+    // Variable para prevenir cambios rápidos de material
+    private float lastLayerChangeTime = 0f;
+    private float minTimeBetweenChanges = 0.1f; // Tiempo mínimo entre cambios de material
+
     void Awake()
     {
         // Obtener el índice de la capa oculta
@@ -80,6 +84,7 @@ public class HiddenObjectSetup : MonoBehaviour
         // Asegurarnos de que el objeto está en la capa oculta cuando se activa
         SetToHiddenLayer();
         wasRevealed = false;
+        lastLayerChangeTime = 0f;
     }
 
     void OnDisable()
@@ -122,19 +127,27 @@ public class HiddenObjectSetup : MonoBehaviour
     /// <summary>
     /// Este método es llamado cuando el objeto cambia de layer
     /// </summary>
-    private void OnLayerChanged()
+    private void CheckLayerChange()
     {
+        // Evitar múltiples cambios en un corto período de tiempo
+        if (Time.time - lastLayerChangeTime < minTimeBetweenChanges)
+        {
+            return;
+        }
+
         if (gameObject.layer != hiddenLayer && !wasRevealed)
         {
             // El objeto ha sido revelado
             OnObjectRevealed();
             wasRevealed = true;
+            lastLayerChangeTime = Time.time;
         }
-        else if (gameObject.layer == hiddenLayer)
+        else if (gameObject.layer == hiddenLayer && wasRevealed)
         {
             // El objeto ha vuelto a ocultarse
             OnObjectHidden();
             wasRevealed = false;
+            lastLayerChangeTime = Time.time;
         }
     }
 
@@ -143,6 +156,8 @@ public class HiddenObjectSetup : MonoBehaviour
     /// </summary>
     private void OnObjectRevealed()
     {
+        Debug.Log($"Objeto revelado: {gameObject.name}");
+
         // Cambiar materiales si está configurado
         if (changeMaterial && visibleMaterial != null)
         {
@@ -171,6 +186,8 @@ public class HiddenObjectSetup : MonoBehaviour
     /// </summary>
     private void OnObjectHidden()
     {
+        Debug.Log($"Objeto ocultado: {gameObject.name}");
+
         // Restaurar materiales originales si está configurado
         if (changeMaterial && hiddenMaterial != null)
         {
@@ -188,15 +205,11 @@ public class HiddenObjectSetup : MonoBehaviour
     }
 
     /// <summary>
-    /// Update verifica cambios en la capa
+    /// LateUpdate verifica cambios en la capa después de que todas las actualizaciones se hayan procesado
     /// </summary>
-    void Update()
+    void LateUpdate()
     {
         // Comprobar si la capa ha cambiado
-        if ((gameObject.layer == hiddenLayer && wasRevealed) ||
-            (gameObject.layer != hiddenLayer && !wasRevealed))
-        {
-            OnLayerChanged();
-        }
+        CheckLayerChange();
     }
 }

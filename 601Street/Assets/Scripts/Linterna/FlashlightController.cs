@@ -13,6 +13,11 @@ public class FlashlightController : MonoBehaviour
     [SerializeField] private Vector3 originalLocalRotation = Vector3.zero; // Rotación local inicial
     [SerializeField] private bool naturalHandMovement = true; // Para comportamiento más natural de mano
 
+    [Header("Estabilización de Movimiento")]
+    [SerializeField] private float movementSmoothing = 0.1f; // Suavizado para evitar movimientos bruscos
+    [SerializeField] private float stabilityThreshold = 0.05f; // Umbral para considerar que no hay movimiento
+    [SerializeField] private bool ignoreSmallMovements = true; // Ignorar pequeños movimientos
+
     [Header("Configuración de la luz")]
     [SerializeField] private float maxIntensity = 2f;
     [SerializeField] private float minIntensity = 0f;
@@ -25,10 +30,16 @@ public class FlashlightController : MonoBehaviour
     private Quaternion initialCameraRotation;
     private Vector3 initialForwardVector;
     private Vector2 moveInput;
+    private Vector2 smoothedMoveInput;
 
     // Limitadores de rotación
     private float currentPitchAngle = 0f; // Rotación vertical (arriba/abajo)
     private float currentYawAngle = 0f;   // Rotación horizontal (izquierda/derecha)
+
+    // Estabilizador de movimiento
+    private bool isStabilizing = false;
+    private float lastInputTime = 0f;
+    private const float stableTime = 0.5f; // Tiempo que debe pasar sin movimiento para estabilizar
 
     void Start()
     {
@@ -86,6 +97,9 @@ public class FlashlightController : MonoBehaviour
             isFlashlightOn = true;
             spotLight.enabled = true;
         }
+
+        // Inicializar el vector de entrada suavizado
+        smoothedMoveInput = Vector2.zero;
     }
 
     void Update()
@@ -103,7 +117,30 @@ public class FlashlightController : MonoBehaviour
         moveInput.x = Input.GetAxis("Horizontal");
         moveInput.y = Input.GetAxis("Vertical");
 
-        // Actualizar la rotación de la linterna
+        // Si hay algún input significativo, resetear el temporizador de estabilización
+        if (Mathf.Abs(moveInput.x) > stabilityThreshold || Mathf.Abs(moveInput.y) > stabilityThreshold)
+        {
+            lastInputTime = Time.time;
+            isStabilizing = false;
+        }
+
+        // Aplicar suavizado al input para evitar movimientos bruscos
+        smoothedMoveInput = Vector2.Lerp(smoothedMoveInput, moveInput, Time.deltaTime / movementSmoothing);
+
+        // Si ha pasado suficiente tiempo sin input significativo, estabilizar
+        if (!isStabilizing && Time.time - lastInputTime > stableTime)
+        {
+            isStabilizing = true;
+
+            // Para estabilizar completamente, podemos reducir gradualmente los valores hacia cero
+            smoothedMoveInput = Vector2.Lerp(smoothedMoveInput, Vector2.zero, Time.deltaTime * 5f);
+
+            // También podemos ajustar los ángulos acumulados gradualmente hacia cero
+            currentYawAngle = Mathf.Lerp(currentYawAngle, 0, Time.deltaTime * 2f);
+            currentPitchAngle = Mathf.Lerp(currentPitchAngle, 0, Time.deltaTime * 2f);
+        }
+
+        // Actualizar la rotación de la linterna usando el input suavizado
         UpdateFlashlightRotation();
     }
 
@@ -119,9 +156,6 @@ public class FlashlightController : MonoBehaviour
 
         // Verificar si la luz debería estar habilitada o no
         spotLight.enabled = isFlashlightOn || currentIntensity > 0.01f;
-
-        // Debug para ver los valores de la luz
-        Debug.Log($"Flashlight: isOn={isFlashlightOn}, intensity={currentIntensity}, enabled={spotLight.enabled}");
     }
 
     private void UpdateFlashlightRotation()
@@ -143,11 +177,20 @@ public class FlashlightController : MonoBehaviour
 
     private void UpdateNaturalHandMovement(Quaternion currentCameraRotation)
     {
-        // Calculamos el offset de rotación basado en la entrada
-        float deltaYaw = moveInput.x * rotationSpeed * Time.deltaTime;
-        float deltaPitch = -moveInput.y * rotationSpeed * Time.deltaTime;
+        // Ignorar movimientos muy pequeños si está habilitada la opción
+        if (ignoreSmallMovements &&
+            Mathf.Abs(smoothedMoveInput.x) < stabilityThreshold &&
+            Mathf.Abs(smoothedMoveInput.y) < stabilityThreshold)
+        {
+            // Si el movimiento es muy pequeño, no modificamos la rotación
+            return;
+        }
 
-        // Acumular los ángulos
+        // Calculamos el offset de rotación basado en la entrada suavizada
+        float deltaYaw = smoothedMoveInput.x * rotationSpeed * Time.deltaTime;
+        float deltaPitch = -smoothedMoveInput.y * rotationSpeed * Time.deltaTime;
+
+        // Acumular los ángulos con control de sensibilidad
         currentYawAngle += deltaYaw;
         currentPitchAngle += deltaPitch;
 
@@ -182,7 +225,7 @@ public class FlashlightController : MonoBehaviour
         }
 
         // Cuando no hay entrada, volvemos gradualmente a la posición central (sin offset)
-        if (Mathf.Abs(moveInput.x) < 0.05f && Mathf.Abs(moveInput.y) < 0.05f)
+        if (isStabilizing || (Mathf.Abs(moveInput.x) < stabilityThreshold && Mathf.Abs(moveInput.y) < stabilityThreshold))
         {
             currentYawAngle = Mathf.Lerp(currentYawAngle, 0, Time.deltaTime * 2f);
             currentPitchAngle = Mathf.Lerp(currentPitchAngle, 0, Time.deltaTime * 2f);
@@ -191,11 +234,20 @@ public class FlashlightController : MonoBehaviour
 
     private void UpdateRelativeCameraMovement(Quaternion cameraRotation)
     {
-        // Calculamos el offset de rotación basado en la entrada
-        float deltaYaw = moveInput.x * rotationSpeed * Time.deltaTime * 0.5f;
-        float deltaPitch = -moveInput.y * rotationSpeed * Time.deltaTime * 0.5f;
+        // Ignorar movimientos muy pequeños si está habilitada la opción
+        if (ignoreSmallMovements &&
+            Mathf.Abs(smoothedMoveInput.x) < stabilityThreshold &&
+            Mathf.Abs(smoothedMoveInput.y) < stabilityThreshold)
+        {
+            // Si el movimiento es muy pequeño, no modificamos la rotación
+            return;
+        }
 
-        // Acumular los ángulos
+        // Calculamos el offset de rotación basado en la entrada suavizada
+        float deltaYaw = smoothedMoveInput.x * rotationSpeed * Time.deltaTime * 0.5f;
+        float deltaPitch = -smoothedMoveInput.y * rotationSpeed * Time.deltaTime * 0.5f;
+
+        // Acumular los ángulos con control de sensibilidad
         currentYawAngle = Mathf.Lerp(currentYawAngle, currentYawAngle + deltaYaw, 0.5f);
         currentPitchAngle = Mathf.Lerp(currentPitchAngle, currentPitchAngle + deltaPitch, 0.5f);
 
@@ -223,7 +275,7 @@ public class FlashlightController : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed * 2f);
 
         // Siempre que no haya entrada del jugador, volvemos gradualmente a alinear con la cámara
-        if (Mathf.Abs(moveInput.x) < 0.05f && Mathf.Abs(moveInput.y) < 0.05f)
+        if (isStabilizing || (Mathf.Abs(moveInput.x) < stabilityThreshold && Mathf.Abs(moveInput.y) < stabilityThreshold))
         {
             currentYawAngle = Mathf.Lerp(currentYawAngle, 0, Time.deltaTime * 2f);
             currentPitchAngle = Mathf.Lerp(currentPitchAngle, 0, Time.deltaTime * 2f);
@@ -281,6 +333,8 @@ public class FlashlightController : MonoBehaviour
     {
         currentPitchAngle = 0f;
         currentYawAngle = 0f;
+        smoothedMoveInput = Vector2.zero;
+        isStabilizing = true;
 
         if (handPosition != null)
         {
