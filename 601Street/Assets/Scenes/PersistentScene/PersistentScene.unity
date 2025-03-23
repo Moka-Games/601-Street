@@ -285,6 +285,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 297787153583136723, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 297787153583136723, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
       propertyPath: interactableLayer.m_Bits
       value: 256
       objectReference: {fileID: 0}
@@ -1816,6 +1821,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: HUD
       objectReference: {fileID: 0}
+    - target: {fileID: 6897246829007206051, guid: 36a03b43277491040a00cc349d560a74,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7176021604587895965, guid: 36a03b43277491040a00cc349d560a74,
         type: 3}
       propertyPath: m_IsActive
@@ -2958,6 +2968,7 @@ GameObject:
   - component: {fileID: 1942858743}
   - component: {fileID: 1942858744}
   - component: {fileID: 1942858745}
+  - component: {fileID: 1942858746}
   m_Layer: 0
   m_Name: UI/HUD
   m_TagString: Untagged
@@ -3012,6 +3023,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e20812a65d635c47b8851ee871d52f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1942858746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942858742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81cfb174b50a2184e823a4a80f94b76d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rangeIndicatorPrefab: {fileID: 2944035614537743585, guid: ab09ddbc60263874a974a85a13a06939,
+    type: 3}
+  interactIndicatorPrefab: {fileID: 7068084133590669078, guid: ebfc0cf7c92637e4c8e43da9c36d7044,
+    type: 3}
+  hudCanvas: {fileID: 1524181022}
 --- !u!224 &2000895169 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5333302690238951813, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,

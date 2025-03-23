@@ -53,15 +53,6 @@ public class SafeButtonAnimator : MonoBehaviour
         // Decidir qué tipo de animación usar
         useProceduralAnimation = (buttonAnimator == null) ||
                                  !HasParameter(pressAnimationTrigger);
-
-        if (!useProceduralAnimation && buttonAnimator != null)
-        {
-            Debug.Log("Usando animación basada en Animator para " + gameObject.name);
-        }
-        else
-        {
-            Debug.Log("Usando animación procedural para " + gameObject.name);
-        }
     }
 
     void Update()

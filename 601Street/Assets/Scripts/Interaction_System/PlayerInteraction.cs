@@ -1,39 +1,43 @@
 using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
 
+/// <summary>
+/// Sistema unificado de interacción del jugador que maneja tanto IInteractable como Inventory_Item
+/// </summary>
 public class PlayerInteraction : MonoBehaviour
 {
     [Header("Configuración de interacción")]
-    [SerializeField] private float interactionRange = 2f;
+    [SerializeField] private float interactionRange = 2.5f;
     [SerializeField] private KeyCode interactionKey = KeyCode.E;
     [SerializeField] private LayerMask interactableLayer;
-
-    private IInteractable currentInteractable;
 
     [Header("Depuración")]
     [SerializeField] private bool showDebugRay = true;
     [SerializeField] private Color debugRayColor = Color.green;
 
-    private bool hasInteracted = false;
-    public bool canInteract = false;
+    // Referencias para objetos interactuables
+    private IInteractable currentInteractable;
+    private bool hasInteractedWithInteractable = false;
+
+    // Referencias para objetos de inventario
+    private Inventory_Item currentInventoryItem;
+    private GameObject lastInteractableObject;
+    private string lastItemName;
+
+    // Estado de interacción
+    [HideInInspector] public bool canInteract = false;
     private bool interactionsEnabled = true;
 
     // Variable estática para controlar el estado global de transición
     public static bool IsSceneTransitioning = false;
 
-    public void SetInteractionsEnabled(bool enabled)
-    {
-        interactionsEnabled = enabled;
-        if (!enabled)
-        {
-            canInteract = false;
-            currentInteractable = null;
-        }
-    }
+    // Diccionario para registrar si un objeto ya mostró su pop-up
+    private Dictionary<GameObject, bool> popUpShown = new Dictionary<GameObject, bool>();
 
     private void Start()
     {
         canInteract = false;
-        hasInteracted = false;
     }
 
     private void Update()
@@ -45,91 +49,182 @@ public class PlayerInteraction : MonoBehaviour
             return;
         }
 
-        // Solo procesar interacciones si no estamos en transición
+        // Si tenemos un objeto interactuable activado, manejarlo
+        if (lastInteractableObject != null)
+        {
+            if (Input.GetKeyDown(interactionKey))
+            {
+                DeactivateObject();
+            }
+            return;
+        }
+
+        // Buscar objetos interactuables
         CheckForInteractables();
 
-        if (currentInteractable != null && Input.GetKeyDown(interactionKey) && canInteract)
+        // Procesar entrada de interacción
+        if (Input.GetKeyDown(interactionKey) && canInteract)
         {
-            // Comprobar si ya hemos interactuado con este objeto
-            if (!hasInteracted)
+            // Dependiendo del tipo de objeto encontrado, interactuar
+            if (currentInteractable != null)
             {
-                // Marcar que estamos iniciando una posible transición antes de la interacción
-                string interactableID = currentInteractable.GetInteractionID();
-                // Corregido: Eliminada la referencia incorrecta a hit
-                Debug.Log($"Interactuando con objeto: {(currentInteractable as MonoBehaviour)?.gameObject.name ?? "Unknown"} (ID: {interactableID})");
-
-                currentInteractable.Interact();
-                hasInteracted = true;
+                InteractWithObject();
             }
-            else if (currentInteractable.CanBeInteractedAgain())
+            else if (currentInventoryItem != null)
             {
-                // Solo permitir segunda interacción si el objeto lo permite
-                currentInteractable.SecondInteraction();
-                hasInteracted = false;
+                InteractWithInventoryItem();
             }
         }
     }
 
     private void CheckForInteractables()
     {
-        // No verificar interactables si estamos en transición
-        if (IsSceneTransitioning)
-        {
-            canInteract = false;
-            return;
-        }
-
+        Ray ray = new Ray(transform.position, transform.forward);
         RaycastHit hit;
-        Vector3 rayDirection = transform.forward;
 
         if (showDebugRay)
         {
-            Debug.DrawRay(transform.position, rayDirection * interactionRange, debugRayColor, 0.1f);
+            Debug.DrawRay(ray.origin, ray.direction * interactionRange, debugRayColor);
         }
 
+        // Resetear estado de interacción
         canInteract = false;
+        currentInteractable = null;
+        currentInventoryItem = null;
 
-        if (Physics.Raycast(transform.position, rayDirection, out hit, interactionRange, interactableLayer))
+        if (Physics.Raycast(ray, out hit, interactionRange, interactableLayer))
         {
-            Debug.Log($"Raycast golpeó: {hit.collider.gameObject.name} en la capa {LayerMask.LayerToName(hit.collider.gameObject.layer)}");
+            // Comprobar primero si es un objeto interactuable
+            currentInteractable = hit.collider.GetComponent<IInteractable>();
 
-            // No procesar más si estamos en transición
-            if (IsSceneTransitioning) return;
-
-            IInteractable interactable = hit.collider.GetComponent<IInteractable>();
-            if (interactable != null)
+            // Si no es un IInteractable, comprobar si es un item de inventario
+            if (currentInteractable == null)
             {
-                if (GameStateManager.Instance != null)
-                {
-                    GameStateManager.Instance.EnterInteractingState();
-                }
-                // Verificar si se puede interactuar con este objeto
-                if (currentInteractable != interactable)
-                {
-                    currentInteractable = interactable;
-                    hasInteracted = false; // Reiniciar el estado de interacción al cambiar de objeto
-                    Debug.Log($"Objeto interactuable encontrado: {hit.collider.gameObject.name}");
-                }
-                // Solo permitir interacción si el objeto lo permite
+                currentInventoryItem = hit.collider.GetComponent<Inventory_Item>();
+                canInteract = currentInventoryItem != null && currentInventoryItem.itemData != null;
+            }
+            else
+            {
                 canInteract = true;
-                return;
+
+                // Si cambiamos de objeto, resetear el estado de interacción
+                if (currentInteractable != hit.collider.GetComponent<IInteractable>())
+                {
+                    hasInteractedWithInteractable = false;
+                }
+            }
+
+            // Entrar en estado de interacción si es necesario
+            if (canInteract && GameStateManager.Instance != null)
+            {
+                GameStateManager.Instance.EnterInteractingState();
             }
         }
-
-        // Si no estamos apuntando a un objeto interactuable, limpiar la referencia
-        if (currentInteractable != null)
+        else
         {
-            currentInteractable = null;
-            hasInteracted = false;
-
-            // Return to OnGameplay state
+            // Si no estamos apuntando a nada, volver al estado normal
             if (GameStateManager.Instance != null)
             {
                 GameStateManager.Instance.EnterGameplayState();
             }
         }
+    }
 
-        canInteract = false;
+    private void InteractWithObject()
+    {
+        // Comprobar si ya hemos interactuado con este objeto
+        if (!hasInteractedWithInteractable)
+        {
+            string interactableID = currentInteractable.GetInteractionID();
+            Debug.Log($"Interactuando con objeto: {(currentInteractable as MonoBehaviour)?.gameObject.name ?? "Unknown"} (ID: {interactableID})");
+
+            currentInteractable.Interact();
+            hasInteractedWithInteractable = true;
+        }
+        else if (currentInteractable.CanBeInteractedAgain())
+        {
+            // Solo permitir segunda interacción si el objeto lo permite
+            currentInteractable.SecondInteraction();
+            hasInteractedWithInteractable = false;
+        }
+    }
+
+    private void InteractWithInventoryItem()
+    {
+        if (currentInventoryItem != null && canInteract)
+        {
+            lastItemName = currentInventoryItem.itemData.itemName;
+
+            // Invocar el evento OnItemInteracted antes de cualquier otra acción
+            if (currentInventoryItem.OnItemInteracted != null)
+            {
+                currentInventoryItem.OnItemInteracted.Invoke();
+            }
+
+            if (currentInventoryItem.interactableObject != null)
+            {
+                lastInteractableObject = currentInventoryItem.interactableObject;
+                lastInteractableObject.SetActive(true);
+
+                // Buscar y asignar la función al botón de cerrar
+                AssignButtonFunction(lastInteractableObject);
+            }
+
+            Inventory_Manager.Instance.AddItem(currentInventoryItem.itemData, currentInventoryItem.onItemClick);
+            Destroy(currentInventoryItem.gameObject);
+        }
+    }
+
+    private void AssignButtonFunction(GameObject parentObject)
+    {
+        // Buscar el botón en el objeto interactuable, incluso si está desactivado
+        Button closeButton = FindButtonInChildren(parentObject, "Close_Interacted_Button");
+
+        if (closeButton != null)
+        {
+            // Añadir la función sin eliminar las ya existentes
+            closeButton.onClick.AddListener(DeactivateObject);
+        }
+    }
+
+    private Button FindButtonInChildren(GameObject parent, string buttonName)
+    {
+        Transform[] allChildren = parent.GetComponentsInChildren<Transform>(true); // Buscar en hijos, incluyendo inactivos
+        foreach (Transform child in allChildren)
+        {
+            if (child.name == buttonName)
+            {
+                return child.GetComponent<Button>();
+            }
+        }
+        return null;
+    }
+
+    public void DeactivateObject()
+    {
+        if (lastInteractableObject == null) return;
+
+        lastInteractableObject.SetActive(false);
+
+        // Mostrar el pop-up solo la primera vez que se desactiva
+        if (!popUpShown.ContainsKey(lastInteractableObject) || !popUpShown[lastInteractableObject])
+        {
+            Inventory_Manager.Instance.DisplayPopUp(lastItemName);
+            popUpShown[lastInteractableObject] = true;
+        }
+
+        lastInteractableObject = null;
+    }
+
+    public void SetInteractionsEnabled(bool enabled)
+    {
+        interactionsEnabled = enabled;
+        if (!enabled)
+        {
+            canInteract = false;
+            currentInteractable = null;
+            currentInventoryItem = null;
+        }
     }
 
     public void ForceUpdateInteraction()
@@ -137,16 +232,12 @@ public class PlayerInteraction : MonoBehaviour
         // No actualizar si estamos en transición
         if (IsSceneTransitioning) return;
 
-        // Esto forzará a que se actualice el estado de interacción en el próximo Update
-        // Esencialmente reiniciamos la detección de objetos interactuables
-        // Liberar cualquier referencia actual
-        if (currentInteractable != null)
-        {
-            currentInteractable = null;
-            canInteract = false;
-        }
+        // Reiniciar el estado de interacción
+        currentInteractable = null;
+        currentInventoryItem = null;
+        canInteract = false;
 
-        // Forzar una nueva detección inmediatamente
+        // Forzar una nueva detección
         CheckForInteractables();
     }
 
@@ -157,10 +248,12 @@ public class PlayerInteraction : MonoBehaviour
         Debug.Log($"Estado de transición de escena: {(isTransitioning ? "Activo" : "Inactivo")}");
     }
 
-    // Asegurarnos de que se restablece si se destruye o desactiva
-    private void OnDisable()
+    private void OnDrawGizmos()
     {
-        canInteract = false;
-        currentInteractable = null;
+        if (showDebugRay)
+        {
+            Gizmos.color = debugRayColor;
+            Gizmos.DrawRay(transform.position, transform.forward * interactionRange);
+        }
     }
 }

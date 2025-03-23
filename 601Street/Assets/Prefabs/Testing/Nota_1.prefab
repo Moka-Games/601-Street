@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3416207317952422469}
   - component: {fileID: 5071625262002975445}
   - component: {fileID: 8532003786964051582}
-  m_Layer: 8
+  m_Layer: 6
   m_Name: Nota_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -165,6 +165,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  OnItemInteracted:
+    m_PersistentCalls:
+      m_Calls: []
   interactableObject: {fileID: 0}
   edgeOffset: 50
   detectionCollider: {fileID: 0}

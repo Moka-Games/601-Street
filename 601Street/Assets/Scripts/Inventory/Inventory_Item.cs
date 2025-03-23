@@ -20,17 +20,12 @@ public class Inventory_Item : MonoBehaviour
     [Header("Colliders")]
     public SphereCollider detectionCollider; // Collider para mostrar feedback inicial
 
-    // Referencias a los prefabs originales (templates)
-    private static GameObject nearItemFeedbackTemplate;
-    private static GameObject inputFeedbackTemplate;
-    private static bool templatesInitialized = false;
-
     // Referencias de instancias para este item específico
     private Canvas hudCanvas;
     private GameObject rangeIndicator; // Instancia del indicador de rango
     private GameObject interactIndicator; // Instancia del indicador de interacción
 
-    private Inventory_Interactor inventory_Interactor;
+    private PlayerInteraction playerInteraction;
     private bool playerInDetectionRange = false;
     private RectTransform rangeIndicatorRect;
     private RectTransform interactIndicatorRect;
@@ -52,115 +47,62 @@ public class Inventory_Item : MonoBehaviour
     private void Start()
     {
         // Buscar referencias automáticamente
-        inventory_Interactor = FindAnyObjectByType<Inventory_Interactor>();
+        playerInteraction = FindAnyObjectByType<PlayerInteraction>();
         mainCamera = Camera.main;
 
-        // Buscar el HUD Canvas por nombre
-        GameObject hudObj = GameObject.Find("HUD");
-        if (hudObj != null)
+        // Obtener el Canvas HUD a través del gestor
+        hudCanvas = UIFeedbackManager.Instance.GetHUDCanvas();
+        if (hudCanvas != null)
         {
-            hudCanvas = hudObj.GetComponent<Canvas>();
-            if (hudCanvas == null)
-            {
-                hudCanvas = hudObj.GetComponentInChildren<Canvas>();
-                if (hudCanvas == null)
-                {
-                    Debug.LogError("No se encontró componente Canvas en el objeto 'HUD'");
-                    enabled = false;
-                    return;
-                }
-            }
-
             canvasRectTransform = hudCanvas.GetComponent<RectTransform>();
-            if (canvasRectTransform == null)
-            {
-                Debug.LogError("El Canvas no tiene un componente RectTransform");
-                enabled = false;
-                return;
-            }
-        }
-        else
-        {
-            Debug.LogError("No se encontró objeto con nombre 'HUD'");
-            enabled = false;
-            return;
         }
 
-        // Inicializar las plantillas solo una vez para todos los items
-        InitializeFeedbackTemplates();
-
-        // Crear los indicadores para este ítem específico (pero no activarlos aún)
+        // Crear los indicadores para este ítem específico
         CreateFeedbackIndicators();
 
         // Verificación final
-        if (inventory_Interactor == null)
+        if (playerInteraction == null)
         {
-            Debug.LogWarning("No se pudo encontrar Inventory_Interactor en la escena");
+            Debug.LogWarning("No se pudo encontrar UnifiedPlayerInteraction en la escena");
         }
 
         isInitialized = true;
     }
 
-    private void InitializeFeedbackTemplates()
-    {
-        // Usar el Singleton para obtener las plantillas
-        nearItemFeedbackTemplate = UITemplateManager.Instance.GetNearItemFeedbackTemplate();
-        inputFeedbackTemplate = UITemplateManager.Instance.GetInputFeedbackTemplate();
-
-        if (nearItemFeedbackTemplate == null || inputFeedbackTemplate == null)
-        {
-            Debug.LogError("Las plantillas de feedback no se han inicializado correctamente");
-            enabled = false;
-            return;
-        }
-
-        templatesInitialized = true;
-        Debug.Log("Plantillas de feedback inicializadas");
-    }
-
     private void CreateFeedbackIndicators()
     {
-        // Verificar que las plantillas existan
-        if (nearItemFeedbackTemplate == null || inputFeedbackTemplate == null)
+        // Obtener el nombre único para este objeto
+        string objectIdentifier = gameObject.name + "_" + GetInstanceID();
+
+        // Crear indicadores a través del gestor
+        rangeIndicator = UIFeedbackManager.Instance.CreateRangeIndicator(objectIdentifier);
+        interactIndicator = UIFeedbackManager.Instance.CreateInteractIndicator(objectIdentifier);
+
+        // Obtener los RectTransform
+        if (rangeIndicator != null)
         {
-            Debug.LogError("Las plantillas de feedback no se han inicializado correctamente");
-            return;
-        }
-
-        // Instanciar los indicadores como hijos del canvas
-        rangeIndicator = Instantiate(nearItemFeedbackTemplate, hudCanvas.transform);
-        interactIndicator = Instantiate(inputFeedbackTemplate, hudCanvas.transform);
-
-        // Asegurarse de que tengan los nombres correctos para identificarlos
-        rangeIndicator.name = "RangeIndicator_" + gameObject.name;
-        interactIndicator.name = "InteractIndicator_" + gameObject.name;
-
-        // Obtener sus RectTransforms
-        rangeIndicatorRect = rangeIndicator.GetComponent<RectTransform>();
-        interactIndicatorRect = interactIndicator.GetComponent<RectTransform>();
-
-        // Si los indicadores no tienen RectTransform, intentar encontrarlo en sus hijos
-        if (rangeIndicatorRect == null)
-        {
-            rangeIndicatorRect = rangeIndicator.GetComponentInChildren<RectTransform>();
+            rangeIndicatorRect = rangeIndicator.GetComponent<RectTransform>();
             if (rangeIndicatorRect == null)
             {
-                Debug.LogError("No se pudo encontrar RectTransform para el indicador de rango");
-                enabled = false;
-                return;
+                rangeIndicatorRect = rangeIndicator.GetComponentInChildren<RectTransform>();
             }
         }
 
-        if (interactIndicatorRect == null)
+        if (interactIndicator != null)
         {
-            interactIndicatorRect = interactIndicator.GetComponentInChildren<RectTransform>();
+            interactIndicatorRect = interactIndicator.GetComponent<RectTransform>();
             if (interactIndicatorRect == null)
             {
-                Debug.LogError("No se pudo encontrar RectTransform para el indicador de interacción");
+                interactIndicatorRect = interactIndicator.GetComponentInChildren<RectTransform>();
+            }
+        }
+        if (rangeIndicator == null || interactIndicator == null ||
+            rangeIndicatorRect == null || interactIndicatorRect == null)
+            {
+                Debug.LogError("No se pudieron crear o configurar los indicadores para " + gameObject.name);
                 enabled = false;
                 return;
             }
-        }
 
         // Inicialmente desactivados
         rangeIndicator.SetActive(false);
@@ -168,6 +110,7 @@ public class Inventory_Item : MonoBehaviour
 
         Debug.Log("Indicadores de feedback creados para " + gameObject.name);
     }
+
     private void Update()
     {
         // Verificar si el objeto sigue existiendo
@@ -196,9 +139,7 @@ public class Inventory_Item : MonoBehaviour
             UpdateIndicatorPosition();
 
             // Verificar si el jugador está mirando este objeto específico y puede interactuar
-            bool canInteractWithThis = inventory_Interactor != null &&
-                                      inventory_Interactor.canInteract &&
-                                      inventory_Interactor.currentInteractableItem == this;
+            bool canInteractWithThis = IsTargetOfPlayerInteraction();
 
             // Mostrar el indicador de interacción solo si se puede interactuar
             interactIndicator.SetActive(canInteractWithThis);
@@ -212,6 +153,26 @@ public class Inventory_Item : MonoBehaviour
             rangeIndicator.SetActive(false);
             interactIndicator.SetActive(false);
         }
+    }
+
+    // Método para verificar si este objeto es el objetivo actual de la interacción del jugador
+    private bool IsTargetOfPlayerInteraction()
+    {
+        if (playerInteraction == null || !playerInteraction.canInteract)
+            return false;
+
+        // Lanzar un raycast desde la posición del jugador en la dirección que mira
+        RaycastHit hit;
+        if (Physics.Raycast(playerInteraction.transform.position,
+                          playerInteraction.transform.forward,
+                          out hit,
+                          5f, // Usar un valor similar al rango de interacción
+                          1 << gameObject.layer))
+        {
+            // Comprobar si el raycast golpeó este objeto específico
+            return hit.collider.gameObject == this.gameObject;
+        }
+        return false;
     }
 
     private void UpdateIndicatorPosition()
@@ -364,7 +325,6 @@ public class Inventory_Item : MonoBehaviour
 
     private void CleanupIndicators()
     {
-        print("Cleaning Indicators");
         // Eliminar los indicadores si existen
         if (rangeIndicator != null)
         {
@@ -380,6 +340,7 @@ public class Inventory_Item : MonoBehaviour
             interactIndicator = null;
         }
     }
+
     private void OnDisable()
     {
         // Limpiar cuando se deshabilite este script

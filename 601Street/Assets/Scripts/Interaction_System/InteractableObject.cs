@@ -9,7 +9,6 @@ public interface IInteractable
     string GetInteractionID();
     bool CanBeInteractedAgain();
 }
-
 public class InteractableObject : MonoBehaviour, IInteractable
 {
     [Header("Configuración básica")]
@@ -25,20 +24,15 @@ public class InteractableObject : MonoBehaviour, IInteractable
     [Tooltip("Si está activado, el objeto se desactivará después de una interacción (solo aplica si singleUseInteraction = true)")]
     [SerializeField] private bool disableAfterInteraction = false;
 
-    [Header("Feedback")]
-    [SerializeField] private GameObject rangeIndicator;
-    [SerializeField] private GameObject interactIndicator;
-
     [Header("Detección de Rango")]
     [SerializeField] private float detectionRadius = 5f; // Radio del SphereCollider
 
     [Header("Configuración de Indicadores")]
     [SerializeField] private float edgeOffset = 50f; // Distancia desde el borde de la pantalla
 
-    // Referencias a los prefabs originales (templates)
-    private static GameObject rangeIndicatorTemplate;
-    private static GameObject interactIndicatorTemplate;
-    private static bool templatesInitialized = false;
+    // Referencias a los indicadores
+    private GameObject rangeIndicator;
+    private GameObject interactIndicator;
 
     private bool playerOnRange = false;
     private bool isInitialized = false;
@@ -54,7 +48,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
     public bool objectInteracted = false;
     private float enterTime;
     private bool isExiting = false;
-    private float exitTime = 0f;
 
     private void Start()
     {
@@ -65,33 +58,17 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
         mainCamera = Camera.main;
 
-        // Buscar el HUD Canvas
-        GameObject hudObj = GameObject.Find("HUD");
-        if (hudObj != null)
+        // Obtener el Canvas HUD a través del gestor
+        hudCanvas = UIFeedbackManager.Instance.GetHUDCanvas();
+        if (hudCanvas != null)
         {
-            hudCanvas = hudObj.GetComponent<Canvas>();
-            if (hudCanvas == null)
-            {
-                hudCanvas = hudObj.GetComponentInChildren<Canvas>();
-                if (hudCanvas == null)
-                {
-                    Debug.LogError("No se encontró componente Canvas en el objeto 'HUD'");
-                }
-            }
-
-            if (hudCanvas != null)
-            {
-                canvasRectTransform = hudCanvas.GetComponent<RectTransform>();
-            }
+            canvasRectTransform = hudCanvas.GetComponent<RectTransform>();
         }
 
-        // Inicializar las plantillas solo una vez para todos los objetos interactuables
-        InitializeTemplates();
-
-        // Crear indicadores específicos para esta instancia
+        // Crear indicadores a través del gestor
         CreateFeedbackIndicators();
 
-        // Buscar el PlayerInteraction
+        // Buscar el UnifiedPlayerInteraction
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
@@ -101,75 +78,47 @@ public class InteractableObject : MonoBehaviour, IInteractable
         isInitialized = true;
     }
 
-    private void InitializeTemplates()
+    private void CreateFeedbackIndicators()
     {
-        // Usar el Singleton para obtener las plantillas
-        rangeIndicatorTemplate = UITemplateManager.Instance.GetNearItemFeedbackTemplate();
-        interactIndicatorTemplate = UITemplateManager.Instance.GetInputFeedbackTemplate();
+        // Obtener el nombre único para este objeto
+        string objectIdentifier = gameObject.name + "_" + GetInstanceID();
 
-        if (rangeIndicatorTemplate == null || interactIndicatorTemplate == null)
+        // Crear indicadores a través del gestor
+        rangeIndicator = UIFeedbackManager.Instance.CreateRangeIndicator(objectIdentifier);
+        interactIndicator = UIFeedbackManager.Instance.CreateInteractIndicator(objectIdentifier);
+
+        // Obtener los RectTransform
+        if (rangeIndicator != null)
         {
-            Debug.LogError("Las plantillas de feedback no se han inicializado correctamente");
+            rangeIndicatorRect = rangeIndicator.GetComponent<RectTransform>();
+            if (rangeIndicatorRect == null)
+            {
+                rangeIndicatorRect = rangeIndicator.GetComponentInChildren<RectTransform>();
+            }
+        }
+
+        if (interactIndicator != null)
+        {
+            interactIndicatorRect = interactIndicator.GetComponent<RectTransform>();
+            if (interactIndicatorRect == null)
+            {
+                interactIndicatorRect = interactIndicator.GetComponentInChildren<RectTransform>();
+            }
+        }
+
+        // Comprobar que todo está bien
+        if (rangeIndicator == null || interactIndicator == null ||
+            rangeIndicatorRect == null || interactIndicatorRect == null)
+        {
+            Debug.LogError("No se pudieron crear o configurar los indicadores para " + gameObject.name);
             enabled = false;
             return;
         }
 
-        // Marcar como inicializado
-        templatesInitialized = true;
-        Debug.Log("Plantillas de feedback inicializadas");
-    }
-
-    private void CreateFeedbackIndicators()
-    {
-        // Verificar que las plantillas existan
-        if (rangeIndicatorTemplate == null || interactIndicatorTemplate == null)
-        {
-            Debug.LogError("Las plantillas de feedback no se han inicializado correctamente");
-            return;
-        }
-
-        // Instanciar los indicadores como hijos del canvas
-        rangeIndicator = Instantiate(rangeIndicatorTemplate, hudCanvas.transform);
-        interactIndicator = Instantiate(interactIndicatorTemplate, hudCanvas.transform);
-
-        // Asegurarse de que tengan los nombres correctos para identificarlos
-        rangeIndicator.name = "RangeIndicator_" + gameObject.name + "_" + GetInstanceID();
-        interactIndicator.name = "InteractIndicator_" + gameObject.name + "_" + GetInstanceID();
-
-        // Obtener sus RectTransforms
-        rangeIndicatorRect = rangeIndicator.GetComponent<RectTransform>();
-        interactIndicatorRect = interactIndicator.GetComponent<RectTransform>();
-
-        // Si los indicadores no tienen RectTransform, intentar encontrarlo en sus hijos
-        if (rangeIndicatorRect == null)
-        {
-            rangeIndicatorRect = rangeIndicator.GetComponentInChildren<RectTransform>();
-            if (rangeIndicatorRect == null)
-            {
-                Debug.LogError("No se pudo encontrar RectTransform para el indicador de rango");
-                enabled = false;
-                return;
-            }
-        }
-
-        if (interactIndicatorRect == null)
-        {
-            interactIndicatorRect = interactIndicator.GetComponentInChildren<RectTransform>();
-            if (interactIndicatorRect == null)
-            {
-                Debug.LogError("No se pudo encontrar RectTransform para el indicador de interacción");
-                enabled = false;
-                return;
-            }
-        }
-
-        // Inicialmente desactivados
-        rangeIndicator.SetActive(false);
-        interactIndicator.SetActive(false);
-
         Debug.Log("Indicadores de feedback creados para " + gameObject.name);
     }
 
+    // Implementación de IInteractable
     public virtual void Interact()
     {
         Debug.Log($"Interactuando con objeto: {gameObject.name} (ID: {interactionID})");
@@ -274,8 +223,8 @@ public class InteractableObject : MonoBehaviour, IInteractable
         // Verificar si el jugador puede interactuar (pero solo después de cierto tiempo)
         if (Time.time - enterTime > 0.2f)
         {
-            // CORRECCIÓN: Verificar si este objeto específico es el objetivo actual del raycast
-            bool isTargetObject = IsCurrentInteractableTarget();
+            // Verificar si este objeto específico es el objetivo actual del raycast
+            bool isTargetObject = IsTargetOfPlayerInteraction();
 
             // Modificación para que siempre muestre el indicador de rango cuando el jugador está en rango
             // pero el indicador de interacción solo cuando este objeto es el objetivo del raycast
@@ -294,16 +243,19 @@ public class InteractableObject : MonoBehaviour, IInteractable
         }
     }
 
-    // Método para verificar si este objeto es el objetivo actual del raycast
-    private bool IsCurrentInteractableTarget()
+    // Método para verificar si este objeto es el objetivo actual del raycast del nuevo sistema
+    private bool IsTargetOfPlayerInteraction()
     {
         if (playerInteraction == null)
             return false;
 
         // Lanzar un raycast desde la posición del jugador en la dirección que mira
         RaycastHit hit;
-        if (Physics.Raycast(playerInteraction.transform.position, playerInteraction.transform.forward,
-                            out hit, detectionRadius * 2, LayerMask.GetMask(LayerMask.LayerToName(gameObject.layer))))
+        if (Physics.Raycast(playerInteraction.transform.position,
+                         playerInteraction.transform.forward,
+                         out hit,
+                         detectionRadius * 2,
+                         1 << gameObject.layer))
         {
             // Comprobar si el raycast golpeó este objeto específico
             return hit.collider.gameObject == this.gameObject;
@@ -478,7 +430,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
         if (playerOnRange && (!singleUseInteraction || !objectInteracted))
         {
             // Verificar si este objeto es el objetivo del raycast
-            bool isTargetObject = IsCurrentInteractableTarget();
+            bool isTargetObject = IsTargetOfPlayerInteraction();
 
             // Si es el objetivo y puede interactuar, mostrar indicador de interacción
             if (isTargetObject && playerInteraction != null && playerInteraction.canInteract)
@@ -502,7 +454,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
         {
             // Marcar que estamos en proceso de salida
             isExiting = true;
-            exitTime = Time.time;
 
             // Desactivar INMEDIATAMENTE ambos indicadores
             if (interactIndicator != null)
