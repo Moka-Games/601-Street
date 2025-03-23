@@ -188,6 +188,7 @@ GameObject:
   - component: {fileID: 8518133697557743755}
   - component: {fileID: 8520878618192538454}
   - component: {fileID: 280599536985749025}
+  - component: {fileID: 4534888673594612740}
   m_Layer: 3
   m_Name: Flashlight
   m_TagString: Untagged
@@ -322,7 +323,32 @@ MonoBehaviour:
   cameraTransform: {fileID: 0}
   followSpeed: 15
   rotationOffset: {x: 0, y: 0, z: 0}
+  maxAngleLimit: 90
   overrideAllRotation: 1
+  useHandReference: 1
+  handPivot: {fileID: 1938759759169537483}
+--- !u!114 &4534888673594612740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5475860887917989149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10a3cc5fd3c88944eba76f74dd7b9827, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spotLight: {fileID: 7337399244683708749}
+  mainCamera: {fileID: 0}
+  hiddenObjectsLayer:
+    serializedVersion: 2
+    m_Bits: 1024
+  visibleLayer: 1
+  updateFrequency: 0.1
+  maxDetectionDistance: 20
+  angleMargin: 5
+  showDebugRays: 0
 --- !u!1 &5831046738247469719
 GameObject:
   m_ObjectHideFlags: 0
