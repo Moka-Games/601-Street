@@ -13263,6 +13263,8 @@ MonoBehaviour:
   fadeInDuration: 1
   fadeOutDuration: 1
   blackScreenDuration: 0.5
+  defaultInitialSpawnPointName: Player_InitialPosition
+  defaultExitSpawnPointName: Player_ExitPosition
 --- !u!4 &385182778
 Transform:
   m_ObjectHideFlags: 0
@@ -68426,9 +68428,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1891648457}
   - component: {fileID: 1891648456}
-  m_Layer: 0
-  m_Name: Escena_Siguiente
-  m_TagString: SceneChange
+  - component: {fileID: 1891648459}
+  - component: {fileID: 1891648460}
+  m_Layer: 6
+  m_Name: Salida_2
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -68469,6 +68473,59 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1891648459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1891648455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdf2841cde257ce41a7e4884979576c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactionID: 4
+  interactionPrompt: Presiona E para interactuar
+  onInteraction:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1891648460}
+        m_TargetAssemblyTypeName: SceneTransitionPoint, Assembly-CSharp
+        m_MethodName: TransitionToScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: ColegioExterior
+          m_BoolArgument: 0
+        m_CallState: 2
+  onInteracted:
+    m_PersistentCalls:
+      m_Calls: []
+  singleUseInteraction: 0
+  disableAfterInteraction: 0
+  detectionRadius: 5
+  edgeOffset: 50
+  objectInteracted: 0
+--- !u!114 &1891648460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1891648455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc36d99e88b6bd0449dc4c22f8e1842c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetSceneName: ColegioExterior
+  spawnPointName: Player_InitialPosition_ExteriorColegio
+  isExitToMainScene: 1
+  sceneChangeManager: {fileID: 0}
 --- !u!64 &1892753604
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -70173,9 +70230,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1936779531}
   - component: {fileID: 1936779530}
-  m_Layer: 0
-  m_Name: Escena_Siguiente
-  m_TagString: SceneChange
+  - component: {fileID: 1936779533}
+  - component: {fileID: 1936779534}
+  m_Layer: 6
+  m_Name: Salida_1
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -70216,6 +70275,59 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1936779533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1936779529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdf2841cde257ce41a7e4884979576c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactionID: 4
+  interactionPrompt: Presiona E para interactuar
+  onInteraction:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1891648460}
+        m_TargetAssemblyTypeName: SceneTransitionPoint, Assembly-CSharp
+        m_MethodName: TransitionToScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: ColegioExterior
+          m_BoolArgument: 0
+        m_CallState: 2
+  onInteracted:
+    m_PersistentCalls:
+      m_Calls: []
+  singleUseInteraction: 0
+  disableAfterInteraction: 0
+  detectionRadius: 5
+  edgeOffset: 50
+  objectInteracted: 0
+--- !u!114 &1936779534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1936779529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc36d99e88b6bd0449dc4c22f8e1842c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetSceneName: ColegioExterior
+  spawnPointName: Player_InitialPosition_ExteriorColegio
+  isExitToMainScene: 1
+  sceneChangeManager: {fileID: 0}
 --- !u!43 &1936965315
 Mesh:
   m_ObjectHideFlags: 0

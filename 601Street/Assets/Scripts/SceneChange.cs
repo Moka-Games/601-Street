@@ -1,110 +1,159 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class SceneChange : MonoBehaviour
 {
     [System.Serializable]
-    public class EscenaCambio
+    public class SpawnPointMapping
     {
-        public string escenaActual;       // La escena donde está el objeto
-        public string escenaAnterior;     // La escena a la que cambiará si el trigger es "Escena_Anterior"
-        public string escenaSiguiente;    // La escena a la que cambiará si el trigger es "Escena_Siguiente"
+        public string sourceScene;      // Escena de origen
+        public string targetScene;      // Escena de destino
+        public string spawnPointName;   // Nombre del punto de aparición en la escena destino
     }
 
-    public EscenaCambio[] cambiosDeEscena;
-    public string escenaPersistente = "PersistentScene"; // Nombre de la escena persistente
+    [Header("Configuración de Escenas")]
+    [Tooltip("Nombre de la escena principal (zona exterior)")]
+    public string mainSceneName = "MainArea";
 
-    private void OnTriggerEnter(Collider other)
+    [Tooltip("Mapeo de puntos de aparición para volver desde interiores")]
+    public List<SpawnPointMapping> exitSpawnPoints = new List<SpawnPointMapping>();
+
+    [Tooltip("Nombre por defecto del punto de aparición al entrar a interiores")]
+    public string defaultInteriorSpawnPoint = "Player_InitialPosition";
+
+    [Tooltip("Nombre por defecto del punto de aparición en la escena principal")]
+    public string defaultMainSceneSpawnPoint = "Player_MainSpawnPoint";
+
+    [Tooltip("Nombre de la escena persistente")]
+    public string persistentSceneName = "PersistentScene";
+
+    private void Awake()
     {
-        if (other.CompareTag("SceneChange"))
+        // Validar configuración
+        if (string.IsNullOrEmpty(mainSceneName))
         {
-            string escenaActual = ObtenerEscenaActual();
-            EscenaCambio cambio = System.Array.Find(cambiosDeEscena, c => c.escenaActual == escenaActual);
-
-            if (cambio != null)
-            {
-                string escenaDestino = "";
-                bool usarPuntoSalida = false;
-
-                // Determinar qué escena cargar basado en el nombre del objeto trigger
-                if (other.gameObject.name == "Escena_Anterior")
-                {
-                    escenaDestino = cambio.escenaAnterior;
-                    usarPuntoSalida = true;
-                }
-                else if (other.gameObject.name == "Escena_Siguiente")
-                {
-                    escenaDestino = cambio.escenaSiguiente;
-                }
-                else
-                {
-                    Debug.LogWarning($"Trigger de cambio de escena no reconocido: {other.gameObject.name}");
-                    return;
-                }
-
-                // Verificar que la escena destino tenga un valor válido
-                if (!string.IsNullOrEmpty(escenaDestino))
-                {
-                    // Llamar al método de cambio de escena con el parámetro de punto de salida
-                    GameSceneManager.Instance.LoadScene(escenaDestino, usarPuntoSalida);
-                }
-                else
-                {
-                    Debug.LogWarning($"No se ha definido un destino para {other.gameObject.name} en la escena actual: {escenaActual}");
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"No se ha definido un cambio de escena para la escena actual: {escenaActual}");
-            }
+            Debug.LogWarning("No se ha configurado el nombre de la escena principal en SceneChange");
         }
     }
 
-    // In the CambiarEscenaConPuntoSalida method in SceneChange.cs
-    public void CambiarEscenaConPuntoSalida(string escenaDestino)
+    // Método para entrar a un interior (compatible con UnityEvent - un solo parámetro)
+    public void EntrarAInterior(string interiorSceneName)
     {
-        Debug.Log($"Intentando cambiar a escena: {escenaDestino}");
-        try
+        if (string.IsNullOrEmpty(interiorSceneName))
         {
-            // Marcar que estamos en transición para evitar interacciones
+            Debug.LogError("No se ha especificado una escena destino");
+            return;
+        }
+
+        // Guardar la escena actual como origen
+        string currentScene = GetCurrentActiveScene();
+        PlayerPrefs.SetString("LastSourceScene", currentScene);
+
+        // Usar el punto de aparición predeterminado para interiores
+        string spawnPoint = defaultInteriorSpawnPoint;
+
+        Debug.Log($"Entrando a interior: {interiorSceneName}, apareciendo en: {spawnPoint}");
+
+        // Configurar el GameSceneManager con el punto de aparición
+        if (GameSceneManager.Instance != null)
+        {
+            // Marcar que estamos en transición
             PlayerInteraction.SetSceneTransitionState(true);
 
-            if (GameSceneManager.Instance != null)
-            {
-                GameSceneManager.Instance.LoadScene(escenaDestino, true);
-                Debug.Log("LoadScene llamado correctamente");
-            }
-            else
-            {
-                Debug.LogError("GameSceneManager.Instance es nulo");
-                // Restablecer el estado si falla
-                PlayerInteraction.SetSceneTransitionState(false);
-            }
+            // Configurar el punto de aparición personalizado
+            GameSceneManager.Instance.SetCustomSpawnPoint(spawnPoint);
+
+            // Cargar la escena
+            GameSceneManager.Instance.LoadScene(interiorSceneName, false);
         }
-        catch (System.Exception e)
+        else
         {
-            Debug.LogError($"Error en CambiarEscenaConPuntoSalida: {e.Message}\n{e.StackTrace}");
-            // Restablecer el estado si hay un error
+            Debug.LogError("GameSceneManager.Instance es null");
             PlayerInteraction.SetSceneTransitionState(false);
         }
     }
 
-    private string ObtenerEscenaActual()
+    // Método para salir a la escena principal (compatible con UnityEvent - un solo parámetro)
+    public void SalirAExterior(string mainSceneName = "")
     {
-        Scene[] escenasCargadas = new Scene[SceneManager.sceneCount];
-        for (int i = 0; i < SceneManager.sceneCount; i++)
+        // Si no se especifica una escena, usar la configurada por defecto
+        if (string.IsNullOrEmpty(mainSceneName))
         {
-            escenasCargadas[i] = SceneManager.GetSceneAt(i);
+            mainSceneName = this.mainSceneName;
         }
 
-        foreach (Scene escena in escenasCargadas)
+        if (string.IsNullOrEmpty(mainSceneName))
         {
-            if (escena.name != escenaPersistente && escena.isLoaded)
+            Debug.LogError("No se ha especificado una escena principal destino");
+            return;
+        }
+
+        // Obtener la escena actual como origen
+        string currentScene = GetCurrentActiveScene();
+
+        // Buscar un mapeo de punto de aparición para esta combinación origen-destino
+        string spawnPointName = FindExitSpawnPoint(currentScene, mainSceneName);
+
+        // Si no hay un mapeo específico, usar el valor guardado en PlayerPrefs (si existe)
+        if (string.IsNullOrEmpty(spawnPointName))
+        {
+            spawnPointName = PlayerPrefs.GetString("LastSpawnPointName", defaultMainSceneSpawnPoint);
+        }
+
+        Debug.Log($"Saliendo a exterior: {mainSceneName}, apareciendo en: {spawnPointName}");
+
+        // Configurar el GameSceneManager con el punto de aparición
+        if (GameSceneManager.Instance != null)
+        {
+            // Marcar que estamos en transición
+            PlayerInteraction.SetSceneTransitionState(true);
+
+            // Configurar el punto de aparición personalizado
+            GameSceneManager.Instance.SetCustomSpawnPoint(spawnPointName);
+
+            // Cargar la escena
+            GameSceneManager.Instance.LoadScene(mainSceneName, true);
+        }
+        else
+        {
+            Debug.LogError("GameSceneManager.Instance es null");
+            PlayerInteraction.SetSceneTransitionState(false);
+        }
+    }
+
+    // Método para buscar un punto de aparición específico basado en la escena origen y destino
+    private string FindExitSpawnPoint(string sourceScene, string targetScene)
+    {
+        foreach (var mapping in exitSpawnPoints)
+        {
+            if (mapping.sourceScene == sourceScene && mapping.targetScene == targetScene)
             {
-                return escena.name; // Devuelve la primera escena que no sea la persistente
+                return mapping.spawnPointName;
             }
         }
+        return null;
+    }
 
-        return SceneManager.GetActiveScene().name; // Si no encuentra otra, devuelve la activa
+    // Método para obtener la escena activa actual (que no sea la persistente)
+    private string GetCurrentActiveScene()
+    {
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+        {
+            Scene scene = SceneManager.GetSceneAt(i);
+            if (scene.isLoaded && scene.name != persistentSceneName)
+            {
+                return scene.name;
+            }
+        }
+        return SceneManager.GetActiveScene().name;
+    }
+
+    // Método de ayuda para debug
+    public void LogSceneInfo()
+    {
+        Debug.Log($"Escena activa: {GetCurrentActiveScene()}");
+        Debug.Log($"Escena principal configurada: {mainSceneName}");
+        Debug.Log($"Mapeos de puntos de aparición configurados: {exitSpawnPoints.Count}");
     }
 }

@@ -1542,37 +1542,6 @@ MonoBehaviour:
   m_BoundingShape2D: {fileID: 0}
   m_ConfineScreenEdges: 1
   m_Damping: 1
---- !u!1 &374382919
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 374382920}
-  m_Layer: 0
-  m_Name: Player_ExitPosition
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &374382920
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 374382919}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 45.7, y: 1, z: 70.12}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1001 &425615150
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2874,7 +2843,7 @@ GameObject:
   m_Component:
   - component: {fileID: 705704788}
   m_Layer: 0
-  m_Name: Player_InitialPosition
+  m_Name: Player_InitialPosition_ExteriorColegio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48331,6 +48300,8 @@ MonoBehaviour:
   fadeInDuration: 1
   fadeOutDuration: 1
   blackScreenDuration: 0.5
+  defaultInitialSpawnPointName: Player_InitialPosition
+  defaultExitSpawnPointName: Player_ExitPosition
 --- !u!4 &2126412896
 Transform:
   m_ObjectHideFlags: 0
@@ -48392,6 +48363,5 @@ SceneRoots:
   - {fileID: 726442225}
   - {fileID: 705704788}
   - {fileID: 453224546}
-  - {fileID: 374382920}
   - {fileID: 1123914917}
   - {fileID: 601222106}

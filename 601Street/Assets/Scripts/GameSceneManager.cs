@@ -6,8 +6,6 @@ public class GameSceneManager : MonoBehaviour
 {
     private static GameSceneManager instance;
     public static GameSceneManager Instance
-
-
     {
         get
         {
@@ -24,14 +22,19 @@ public class GameSceneManager : MonoBehaviour
     private string currentSceneName;
     private bool persistentSceneLoaded = false;
 
-    // Añadimos una variable para rastrear la dirección del cambio de escena
-    private enum SceneChangeDirection { Initial, Forward, Backward };
-    private SceneChangeDirection lastChangeDirection = SceneChangeDirection.Initial;
+    // Variable para puntos de aparición personalizados
+    private string customSpawnPointName = null;
 
     [Header("Configuración de Transiciones")]
     [SerializeField] private float fadeInDuration = 1.0f;
     [SerializeField] private float fadeOutDuration = 1.0f;
     [SerializeField] private float blackScreenDuration = 0.5f;
+
+    [Header("Configuración de Puntos de Aparición")]
+    [Tooltip("Nombre del punto de aparición por defecto al entrar a una escena")]
+    [SerializeField] private string defaultInitialSpawnPointName = "Player_InitialPosition";
+    [Tooltip("Nombre del punto de aparición por defecto al volver de otra escena")]
+    [SerializeField] private string defaultExitSpawnPointName = "Player_ExitPosition";
 
     private FadeManager fadeManager;
     private bool isTransitioning = false;
@@ -46,7 +49,6 @@ public class GameSceneManager : MonoBehaviour
 
         instance = this;
         DontDestroyOnLoad(gameObject);
-
 
         string activeSceneName = SceneManager.GetActiveScene().name;
 
@@ -70,13 +72,10 @@ public class GameSceneManager : MonoBehaviour
                     FindFadeManager();
 
                     currentSceneName = initialScene.name;
-                    // Desactivamos el movimiento del jugador inicialmente
                     DisablePlayerMovement();
-                    // Iniciamos con un fadeOut al cargar por primera vez
                     if (fadeManager != null)
                     {
                         fadeManager.BlackScreenIntoFadeOut(fadeOutDuration);
-                        // Suscribimos al evento de finalización de fadeOut
                         fadeManager.OnFadeOutComplete += EnablePlayerMovementAfterFade;
                     }
                     StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
@@ -88,22 +87,19 @@ public class GameSceneManager : MonoBehaviour
                 FindPlayerAndCameraInPersistentScene();
                 FindFadeManager();
                 currentSceneName = activeSceneName;
-                // Desactivamos el movimiento del jugador inicialmente
                 DisablePlayerMovement();
-                // Iniciamos con un fadeOut al cargar por primera vez
                 if (fadeManager != null)
                 {
                     fadeManager.BlackScreenIntoFadeOut(fadeOutDuration);
-                    // Suscribimos al evento de finalización de fadeOut
                     fadeManager.OnFadeOutComplete += EnablePlayerMovementAfterFade;
                 }
                 StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
             }
         }
     }
+
     private void OnDestroy()
     {
-        // Limpiamos los eventos suscritos
         if (fadeManager != null)
         {
             fadeManager.OnFadeOutComplete -= EnablePlayerMovementAfterFade;
@@ -138,72 +134,67 @@ public class GameSceneManager : MonoBehaviour
         }
     }
 
-    // Añadimos parámetro para la dirección
+    // Método para establecer un punto de aparición personalizado
+    public void SetCustomSpawnPoint(string spawnPointName)
+    {
+        if (!string.IsNullOrEmpty(spawnPointName))
+        {
+            customSpawnPointName = spawnPointName;
+            Debug.Log($"Punto de aparición personalizado establecido: {spawnPointName}");
+        }
+    }
+
+    // Cargar una nueva escena
     public void LoadScene(string sceneName, bool isBackward = false)
     {
         if (currentSceneName == sceneName || isTransitioning) return;
-
-        // Guardamos la dirección del cambio
-        lastChangeDirection = isBackward ? SceneChangeDirection.Backward : SceneChangeDirection.Forward;
-
-        StartCoroutine(LoadSceneWithTransition(sceneName));
+        StartCoroutine(LoadSceneWithTransition(sceneName, isBackward));
     }
 
-    private IEnumerator LoadSceneWithTransition(string sceneName)
+    private IEnumerator LoadSceneWithTransition(string sceneName, bool isBackward)
     {
         isTransitioning = true;
 
-        // Desactivar el controlador del jugador durante la transición
         DisablePlayerMovement();
 
-        // Congelar la cámara durante la transición
         if (currentCamera != null)
         {
             currentCamera.FreezeCamera();
         }
 
-        // Realizar el fade in (a negro)
         if (fadeManager != null)
         {
             fadeManager.FadeIn(fadeInDuration);
             yield return new WaitForSeconds(fadeInDuration);
         }
 
-        // Descargar la escena actual
         if (!string.IsNullOrEmpty(currentSceneName))
         {
             AsyncOperation unloadOperation = SceneManager.UnloadSceneAsync(currentSceneName);
             yield return unloadOperation;
         }
 
-        // Mantener la pantalla en negro por un momento
         yield return new WaitForSeconds(blackScreenDuration);
 
-        // Cargar la nueva escena
         currentSceneName = sceneName;
         AsyncOperation loadOperation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-
-        // Esperar a que la escena esté completamente cargada
         yield return loadOperation;
 
-        // Asegurarse de que los indicadores estén activos
-        //UITemplateManager.Instance.EnsureTemplatesAreInactive();
-
-        // Mover al jugador y la cámara a los puntos de spawn
         yield return StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
 
-        // Realizar el fade out (de negro a transparente)
         if (fadeManager != null)
         {
             fadeManager.OnFadeOutComplete += EnablePlayerMovementAfterFade;
             fadeManager.FadeOut(fadeOutDuration);
         }
 
-        // Descongelar la cámara
         if (currentCamera != null)
         {
             currentCamera.UnfreezeCamera();
         }
+
+        // Limpiar el punto de aparición personalizado después de usarlo
+        customSpawnPointName = null;
 
         isTransitioning = false;
     }
@@ -221,10 +212,8 @@ public class GameSceneManager : MonoBehaviour
         }
     }
 
-    // In the EnablePlayerMovementAfterFade method in GameSceneManager.cs
     private void EnablePlayerMovementAfterFade()
     {
-        // Restablecer el estado de transición
         PlayerInteraction.SetSceneTransitionState(false);
 
         if (currentPlayer != null)
@@ -237,7 +226,6 @@ public class GameSceneManager : MonoBehaviour
             }
         }
 
-        // Desuscribimos el evento para evitar múltiples activaciones
         if (fadeManager != null)
         {
             fadeManager.OnFadeOutComplete -= EnablePlayerMovementAfterFade;
@@ -248,55 +236,80 @@ public class GameSceneManager : MonoBehaviour
     {
         yield return new WaitUntil(() => SceneManager.GetSceneByName(currentSceneName).isLoaded);
 
-        // Elegimos el punto de spawn dependiendo de la dirección
-        string playerSpawnPointName = "Player_InitialPosition";
-        if (lastChangeDirection == SceneChangeDirection.Backward)
+        // Determinar qué punto de aparición usar
+        string spawnPointName = DetermineSpawnPointName();
+
+        Debug.Log($"Buscando punto de aparición: {spawnPointName}");
+        GameObject spawnPoint = FindObjectInAllScenes(spawnPointName);
+
+        // Si no se encuentra el punto específico, buscar el punto por defecto
+        if (spawnPoint == null)
         {
-            // Si estamos regresando a una escena anterior, usamos Player_ExitPosition
-            GameObject exitPoint = FindObjectInAllScenes("Player_ExitPosition");
-            if (exitPoint != null)
+            Debug.LogWarning($"No se encontró el punto de aparición '{spawnPointName}'. Buscando punto por defecto.");
+            spawnPointName = defaultInitialSpawnPointName;
+            spawnPoint = FindObjectInAllScenes(spawnPointName);
+
+            // Si aún no se encuentra, intentar con el de salida
+            if (spawnPoint == null)
             {
-                playerSpawnPointName = "Player_ExitPosition";
-            }
-            else
-            {
-                Debug.LogWarning("No se encontró 'Player_ExitPosition', usando la posición inicial por defecto.");
+                spawnPointName = defaultExitSpawnPointName;
+                spawnPoint = FindObjectInAllScenes(spawnPointName);
             }
         }
 
-        GameObject playerSpawnPoint = FindObjectInAllScenes(playerSpawnPointName);
         GameObject cameraSpawnPoint = FindObjectInAllScenes("Camera_InitialPosition");
 
-        if (playerSpawnPoint != null && currentPlayer != null)
+        if (spawnPoint != null && currentPlayer != null)
         {
-            // Aseguramos que el movimiento está desactivado durante el posicionamiento
             PlayerController playerController = currentPlayer.GetComponent<PlayerController>();
             if (playerController != null)
             {
                 playerController.SetMovementEnabled(false);
             }
 
-            currentPlayer.transform.position = playerSpawnPoint.transform.position;
-            currentPlayer.transform.rotation = playerSpawnPoint.transform.rotation;
+            // Mover al jugador al punto de aparición
+            currentPlayer.transform.position = spawnPoint.transform.position;
+            currentPlayer.transform.rotation = spawnPoint.transform.rotation;
 
-            Debug.Log($"Jugador movido al punto de spawn '{playerSpawnPointName}' en la nueva escena.");
+            Debug.Log($"Jugador movido al punto de aparición: {spawnPointName}");
         }
         else
         {
-            Debug.LogError($"No se encontró '{playerSpawnPointName}' o el jugador en la escena {currentSceneName}!");
+            Debug.LogError($"No se encontró un punto de aparición válido para el jugador en la escena {currentSceneName}!");
         }
 
         if (cameraSpawnPoint != null && currentCamera != null)
         {
             currentCamera.transform.position = cameraSpawnPoint.transform.position;
             currentCamera.transform.rotation = cameraSpawnPoint.transform.rotation;
-
             Debug.Log("Cámara movida al punto de spawn en la nueva escena.");
         }
         else
         {
-            Debug.LogError($"No se encontró 'Camera_InitialPosition' o la cámara en la escena {currentSceneName}!");
+            Debug.LogError($"No se encontró 'Camera_InitialPosition' para la cámara en la escena {currentSceneName}!");
         }
+    }
+
+    // Determinar el nombre del punto de aparición a usar
+    private string DetermineSpawnPointName()
+    {
+        // Prioridad 1: Usar el punto personalizado si está establecido
+        if (!string.IsNullOrEmpty(customSpawnPointName))
+        {
+            return customSpawnPointName;
+        }
+
+        // Prioridad 2: Usar el valor almacenado en PlayerPrefs
+        string savedSpawnPoint = PlayerPrefs.GetString("LastSpawnPointName", "");
+        if (!string.IsNullOrEmpty(savedSpawnPoint))
+        {
+            // Limpiar el valor guardado para no reutilizarlo accidentalmente
+            PlayerPrefs.DeleteKey("LastSpawnPointName");
+            return savedSpawnPoint;
+        }
+
+        // Prioridad 3: Usar el punto de aparición por defecto
+        return defaultInitialSpawnPointName;
     }
 
     private GameObject FindObjectInAllScenes(string objectName)
