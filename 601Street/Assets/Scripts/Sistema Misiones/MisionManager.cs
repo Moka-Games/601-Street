@@ -1,4 +1,4 @@
-using System;
+Ôªøusing System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,30 +22,30 @@ public class MisionManager : MonoBehaviour
         }
     }
 
-    [Header("ConfiguraciÛn")]
+    [Header("Configuraci√≥n")]
     [SerializeField] private bool iniciarMisionAlDespertar = false;
     [SerializeField] private Mision misionInicial;
 
     [Header("Estado")]
     [SerializeField] private Mision misionActual;
 
-    // Lista de todas las misiones completadas durante la sesiÛn
+    // Lista de todas las misiones completadas durante la sesi√≥n
     private List<Mision> misionesCompletadas = new List<Mision>();
 
-    // Diccionario para acceder r·pidamente a misiones por ID
+    // Diccionario para acceder r√°pidamente a misiones por ID
     private Dictionary<string, Mision> misionesPorID = new Dictionary<string, Mision>();
 
-    // Evento para notificar cambios en la misiÛn actual
+    // Evento para notificar cambios en la misi√≥n actual
     public event Action<Mision> OnMisionCambiada;
     public event Action<Mision> OnMisionCompletada;
 
-    // Propiedad p˙blica para acceder a la misiÛn actual
+    // Propiedad p√∫blica para acceder a la misi√≥n actual
     public Mision MisionActual => misionActual;
 
-    // Propiedad para verificar si hay una misiÛn activa
+    // Propiedad para verificar si hay una misi√≥n activa
     public bool TieneMisionActiva => misionActual != null;
     
-    [Header("DepuraciÛn")]
+    [Header("Depuraci√≥n")]
     [SerializeField] private bool mostrarOrigenLlamadas = true;
     private void Awake()
     {
@@ -65,7 +65,7 @@ public class MisionManager : MonoBehaviour
 
     private void Start()
     {
-        // Iniciar misiÛn inicial si est· configurado
+        // Iniciar misi√≥n inicial si est√° configurado
         if (iniciarMisionAlDespertar && misionInicial != null)
         {
             IniciarMision(misionInicial);
@@ -91,21 +91,21 @@ public class MisionManager : MonoBehaviour
 
         Debug.Log($"Se encontraron {todasLasMisiones.Length} misiones en Resources/Misiones");
 
-        // Registra cada misiÛn en el diccionario para acceso r·pido
+        // Registra cada misi√≥n en el diccionario para acceso r√°pido
         foreach (Mision mision in todasLasMisiones)
         {
-            Debug.Log($"MisiÛn encontrada: {mision.name}, ID: {mision.ID}");
+            Debug.Log($"Misi√≥n encontrada: {mision.name}, ID: {mision.ID}");
 
             if (!string.IsNullOrEmpty(mision.ID))
             {
                 if (!misionesPorID.ContainsKey(mision.ID))
                 {
                     misionesPorID.Add(mision.ID, mision);
-                    mision.ValidarMision(); // Validar configuraciÛn
+                    mision.ValidarMision(); // Validar configuraci√≥n
                 }
                 else
                 {
-                    Debug.LogError($"ID de misiÛn duplicado: {mision.ID}. Cada ID debe ser ˙nico.");
+                    Debug.LogError($"ID de misi√≥n duplicado: {mision.ID}. Cada ID debe ser √∫nico.");
                 }
             }
         }
@@ -113,59 +113,74 @@ public class MisionManager : MonoBehaviour
         Debug.Log($"Sistema de misiones inicializado. {misionesPorID.Count} misiones registradas.");
     }
 
-    // M…TODOS P⁄BLICOS PARA GESTIONAR MISIONES
+    // M√âTODOS P√öBLICOS PARA GESTIONAR MISIONES
 
-    // Iniciar una misiÛn especÌfica
+    // Iniciar una misi√≥n espec√≠fica
     public bool IniciarMision(Mision mision)
     {
         if (mision == null)
         {
-            Debug.LogError("Se intentÛ iniciar una misiÛn nula.");
+            Debug.LogError("Se intent—É iniciar una misi—Én nula.");
             return false;
         }
 
-        // Guardamos una referencia a la misiÛn actual antes de cambiarla
+        // Verificar si la misi√≥n que se quiere iniciar es la misma que la actual
+        if (misionActual != null && misionActual.ID == mision.ID)
+        {
+            Debug.Log($"Se intent√≥ iniciar la misi√≥n '{mision.ID}' pero ya est√° activa. Operaci√≥n ignorada.");
+            return false;
+        }
+
+        // Resto del c√≥digo original...
+        // Guardamos una referencia a la misi—Én actual antes de cambiarla
         Mision misionAnterior = misionActual;
 
-        // Si hay una misiÛn activa actualmente, la completamos
+        // Si hay una misi—Én activa actualmente, la completamos
         if (misionActual != null)
         {
-            // Desactivar notificaciÛn del evento para evitar que se ejecute la lÛgica est·ndar
-            // que podrÌa interferir con nuestra transiciÛn personalizada
+            // Desactivar notificaci—Én del evento para evitar que se ejecute la l—Égica est–±ndar
+            // que podr–Ωa interferir con nuestra transici—Én personalizada
             OnMisionCompletada -= ManejarCompletadoInterno;
 
-            // Completar la misiÛn anterior sin iniciar autom·ticamente la siguiente
+            // Completar la misi—Én anterior sin iniciar autom–±ticamente la siguiente
             misionActual.CompletarMision();
 
-            // AÒadir a la lista de misiones completadas si no est· ya
+            // A—Åadir a la lista de misiones completadas si no est–± ya
             if (!misionesCompletadas.Contains(misionAnterior))
             {
                 misionesCompletadas.Add(misionAnterior);
             }
 
-            // Notificar manualmente pero sin cambiar a˙n la misiÛn actual
+            // Notificar manualmente pero sin cambiar a—än la misi—Én actual
             OnMisionCompletada?.Invoke(misionAnterior);
 
             // Reactivar el evento para futuras misiones
             OnMisionCompletada += ManejarCompletadoInterno;
         }
 
-        // Establecer la nueva misiÛn actual
+        // Establecer la nueva misi—Én actual
         misionActual = mision;
         misionActual.IniciarMision();
 
-        // Notificar el cambio de misiÛn
+        // Notificar el cambio de misi—Én
         OnMisionCambiada?.Invoke(misionActual);
 
         return true;
     }
 
-    // Iniciar una misiÛn por ID
+    // Iniciar una misi√≥n por ID
     public bool IniciarMision(string misionID)
     {
         if (string.IsNullOrEmpty(misionID))
         {
-            Debug.LogError("Se intentÛ iniciar una misiÛn con ID nulo o vacÌo.");
+            Debug.LogError("Se intent—É iniciar una misi—Én con ID nulo o vac–Ωo.");
+            return false;
+        }
+
+        // Verificar si la misi√≥n que se quiere iniciar es la misma que la actual
+        if (misionActual != null && misionActual.ID == misionID)
+        {
+            Debug.Log($"Se intent√≥ iniciar la misi√≥n '{misionID}' pero ya est√° activa. Operaci√≥n ignorada.");
             return false;
         }
 
@@ -175,17 +190,18 @@ public class MisionManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"No se encontrÛ una misiÛn con el ID: {misionID}");
+            Debug.LogError($"No se encontr—É una misi—Én con el ID: {misionID}");
             return false;
         }
     }
 
-    // Iniciar una misiÛn por nombre
+
+    // Iniciar una misi√≥n por nombre
     public bool IniciarMisionPorNombre(string nombreMision)
     {
         if (string.IsNullOrEmpty(nombreMision))
         {
-            Debug.LogError("Se intentÛ iniciar una misiÛn con nombre nulo o vacÌo.");
+            Debug.LogError("Se intent√≥ iniciar una misi√≥n con nombre nulo o vac√≠o.");
             return false;
         }
 
@@ -197,30 +213,30 @@ public class MisionManager : MonoBehaviour
             }
         }
 
-        Debug.LogError($"No se encontrÛ una misiÛn con el nombre: {nombreMision}");
+        Debug.LogError($"No se encontr√≥ una misi√≥n con el nombre: {nombreMision}");
         return false;
     }
 
-    // Completar la misiÛn actual
+    // Completar la misi√≥n actual
     public bool CompletarMisionActual()
     {
         if (misionActual == null)
         {
-            Debug.LogWarning("No hay misiÛn activa para completar.");
+            Debug.LogWarning("No hay misi√≥n activa para completar.");
             return false;
         }
 
-        // Obtener informaciÛn del origen de la llamada si est· habilitado
+        // Obtener informaci√≥n del origen de la llamada si est√° habilitado
         if (mostrarOrigenLlamadas)
         {
             string origenLlamada = MisionDebugExtensions.ObtenerOrigenLlamada();
-            Debug.Log($"[MisionManager] MisiÛn '{misionActual.Nombre}' completada desde: {origenLlamada}");
+            Debug.Log($"[MisionManager] Misi√≥n '{misionActual.Nombre}' completada desde: {origenLlamada}");
         }
 
         Mision misionCompletada = misionActual;
         misionCompletada.CompletarMision();
 
-        // AÒadir a la lista de misiones completadas
+        // A√±adir a la lista de misiones completadas
         if (!misionesCompletadas.Contains(misionCompletada))
         {
             misionesCompletadas.Add(misionCompletada);
@@ -229,14 +245,14 @@ public class MisionManager : MonoBehaviour
         // Notificar a los listeners
         OnMisionCompletada?.Invoke(misionCompletada);
 
-        // Si hay una siguiente misiÛn configurada, la iniciamos
+        // Si hay una siguiente misi√≥n configurada, la iniciamos
         if (misionCompletada.SiguienteMision != null)
         {
             IniciarMision(misionCompletada.SiguienteMision);
         }
         else
         {
-            // Si no hay siguiente misiÛn, limpiamos la misiÛn actual
+            // Si no hay siguiente misi√≥n, limpiamos la misi√≥n actual
             misionActual = null;
             OnMisionCambiada?.Invoke(null);
         }
@@ -244,17 +260,24 @@ public class MisionManager : MonoBehaviour
         return true;
     }
 
-    // Completar la misiÛn por ID
+    // Completar la misi√≥n por ID
     public bool CompletarMision(string misionID)
     {
+        // Si la misi√≥n actual ya est√° completada o no coincide con el ID, no hacer nada
         if (misionActual != null && misionActual.ID == misionID)
         {
             return CompletarMisionActual();
         }
         else if (misionesPorID.TryGetValue(misionID, out Mision mision))
         {
-            // Si la misiÛn existe pero no es la actual, la marcamos como completada
-            // pero no la iniciamos ni afecta a la misiÛn actual
+            // Si la misi√≥n existe pero no es la actual, verificar si ya est√° completada
+            if (misionesCompletadas.Contains(mision))
+            {
+                Debug.Log($"La misi√≥n '{misionID}' ya est√° completada. Operaci√≥n ignorada.");
+                return false;
+            }
+
+            // Si no est√° completada, marcarla como completada
             mision.CompletarMision();
 
             if (!misionesCompletadas.Contains(mision))
@@ -266,18 +289,18 @@ public class MisionManager : MonoBehaviour
             return true;
         }
 
-        Debug.LogError($"No se encontrÛ una misiÛn con el ID: {misionID}");
+        Debug.LogError($"No se encontr—É una misi—Én con el ID: {misionID}");
         return false;
     }
 
-    // Completar la misiÛn actual e iniciar una especÌfica
+    // Completar la misi√≥n actual e iniciar una espec√≠fica
     public bool CompletarEIniciar(Mision siguienteMision)
     {
-        // Obtener informaciÛn del origen de la llamada si est· habilitado
+        // Obtener informaci√≥n del origen de la llamada si est√° habilitado
         if (mostrarOrigenLlamadas)
         {
             string origenLlamada = MisionDebugExtensions.ObtenerOrigenLlamada();
-            Debug.Log($"[MisionManager] Completar e iniciar nueva misiÛn llamado desde: {origenLlamada}");
+            Debug.Log($"[MisionManager] Completar e iniciar nueva misi√≥n llamado desde: {origenLlamada}");
         }
 
         if (CompletarMisionActual())
@@ -289,14 +312,14 @@ public class MisionManager : MonoBehaviour
     }
 
 
-    // Completar la misiÛn actual e iniciar otra por ID
+    // Completar la misi√≥n actual e iniciar otra por ID
     public bool CompletarEIniciar(string siguienteMisionID)
     {
-        // Obtener informaciÛn del origen de la llamada si est· habilitado
+        // Obtener informaci√≥n del origen de la llamada si est√° habilitado
         if (mostrarOrigenLlamadas)
         {
             string origenLlamada = MisionDebugExtensions.ObtenerOrigenLlamada();
-            Debug.Log($"[MisionManager] Completar e iniciar misiÛn con ID '{siguienteMisionID}' llamado desde: {origenLlamada}");
+            Debug.Log($"[MisionManager] Completar e iniciar misi√≥n con ID '{siguienteMisionID}' llamado desde: {origenLlamada}");
         }
 
         if (CompletarMisionActual())
@@ -307,12 +330,12 @@ public class MisionManager : MonoBehaviour
         return false;
     }
 
-    // Cancelar la misiÛn actual
+    // Cancelar la misi√≥n actual
     public bool CancelarMisionActual()
     {
         if (misionActual == null)
         {
-            Debug.LogWarning("No hay misiÛn activa para cancelar.");
+            Debug.LogWarning("No hay misi√≥n activa para cancelar.");
             return false;
         }
 
@@ -325,7 +348,7 @@ public class MisionManager : MonoBehaviour
         return true;
     }
 
-    // Verificar si una misiÛn est· completada
+    // Verificar si una misi√≥n est√° completada
     public bool EstaMisionCompletada(string misionID)
     {
         if (misionesPorID.TryGetValue(misionID, out Mision mision))
@@ -333,11 +356,11 @@ public class MisionManager : MonoBehaviour
             return misionesCompletadas.Contains(mision);
         }
 
-        Debug.LogWarning($"No se encontrÛ una misiÛn con el ID: {misionID}");
+        Debug.LogWarning($"No se encontr√≥ una misi√≥n con el ID: {misionID}");
         return false;
     }
 
-    // Obtener una misiÛn por ID
+    // Obtener una misi√≥n por ID
     public Mision ObtenerMision(string misionID)
     {
         if (misionesPorID.TryGetValue(misionID, out Mision mision))
@@ -357,7 +380,7 @@ public class MisionManager : MonoBehaviour
     // Reiniciar el sistema de misiones
     public void ReiniciarSistema()
     {
-        // Cancelar la misiÛn actual si existe
+        // Cancelar la misi√≥n actual si existe
         if (misionActual != null)
         {
             misionActual.CancelarMision();
@@ -367,13 +390,13 @@ public class MisionManager : MonoBehaviour
         // Limpiar misiones completadas
         misionesCompletadas.Clear();
 
-        // Reiniciar cada misiÛn
+        // Reiniciar cada misi√≥n
         foreach (var mision in misionesPorID.Values)
         {
             mision.Reiniciar();
         }
 
-        // Iniciar misiÛn inicial si est· configurada
+        // Iniciar misi√≥n inicial si est√° configurada
         if (misionInicial != null)
         {
             IniciarMision(misionInicial);
@@ -382,11 +405,11 @@ public class MisionManager : MonoBehaviour
         Debug.Log("Sistema de misiones reiniciado.");
     }
 
-    // MÈtodo para manejar el completado de misiones internamente
+    // M√©todo para manejar el completado de misiones internamente
     private void ManejarCompletadoInterno(Mision mision)
     {
-        // Este mÈtodo se usa para escuchar el evento de misiÛn completada
-        // y realizar acciones especÌficas que queremos evitar durante transiciones personalizadas
-        // En la implementaciÛn actual no hacemos nada especial, pero podrÌa extenderse si es necesario
+        // Este m√©todo se usa para escuchar el evento de misi√≥n completada
+        // y realizar acciones espec√≠ficas que queremos evitar durante transiciones personalizadas
+        // En la implementaci√≥n actual no hacemos nada especial, pero podr√≠a extenderse si es necesario
     }
 }
