@@ -116,7 +116,7 @@ public class CallSystem : MonoBehaviour
 
     private void Update()
     {
-        // Solo procesar inputs si el popup está visible
+        // Solo procesar input para aceptar la llamada si el popup está visible
         if (isPopupVisible)
         {
             // Aceptar llamada
@@ -124,11 +124,7 @@ public class CallSystem : MonoBehaviour
             {
                 AcceptCall();
             }
-            // Rechazar llamada
-            else if (Input.GetKeyDown(rejectCallKey))
-            {
-                RejectCall();
-            }
+            // Ya no tendremos opción de rechazar la llamada
         }
     }
 
@@ -191,12 +187,12 @@ public class CallSystem : MonoBehaviour
 
         isPopupVisible = true;
 
-        // Iniciar temporizador para ocultar automáticamente
-        if (popupTimerCoroutine != null)
+        // En este nuevo sistema, el popup permanecerá visible hasta que finalice la conversación
+        // El usuario solo tiene la opción de aceptar la llamada, así que mostramos un mensaje adecuado
+        if (callerDescriptionText != null)
         {
-            StopCoroutine(popupTimerCoroutine);
+            callerDescriptionText.text = description + "\nPresiona " + acceptCallKey.ToString() + " para atender";
         }
-        popupTimerCoroutine = StartCoroutine(PopupTimer());
     }
 
     // Ocultar el popup de llamada
@@ -246,14 +242,24 @@ public class CallSystem : MonoBehaviour
         isCallActive = true;
         OnCallStateChanged?.Invoke(true);
 
-        // Ocultar popup
-        HideCallPopup();
+        // Ya no ocultamos el popup, permanecerá visible durante la conversación
+        // Podemos actualizar el texto o la interfaz para indicar que la llamada está en curso
+        if (callerDescriptionText != null)
+        {
+            callerDescriptionText.text = "Llamada en curso...";
+        }
+
+        // Detener el temporizador de cierre automático si existe
+        if (popupTimerCoroutine != null)
+        {
+            StopCoroutine(popupTimerCoroutine);
+            popupTimerCoroutine = null;
+        }
 
         // Iniciar la conversación si hay una válida
         if (currentCallConversation != null && DialogueManager.Instance != null)
         {
             // Asegurar que el DialogueManager esté listo para una nueva conversación
-            // Esto resuelve posibles problemas con el estado previo del diálogo
             if (DialogueManager.Instance.dialogueUI != null && !DialogueManager.Instance.dialogueUI.activeSelf)
             {
                 DialogueManager.Instance.dialogueUI.SetActive(true);
@@ -412,6 +418,15 @@ public class CallSystem : MonoBehaviour
             {
                 enabler.ReleasePlayer();
             }
+
+            // Actualizar el texto de estado antes de ocultar el popup
+            if (callerDescriptionText != null)
+            {
+                callerDescriptionText.text = "Llamada finalizada";
+            }
+
+            // Ahora sí ocultamos el popup con la animación correspondiente
+            HideCallPopup();
 
             // Restablecer el estado del diálogo si es necesario
             if (DialogueManager.Instance != null && DialogueManager.Instance.dialogueUI != null &&
