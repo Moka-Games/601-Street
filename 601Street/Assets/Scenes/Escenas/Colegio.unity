@@ -13265,6 +13265,8 @@ MonoBehaviour:
   blackScreenDuration: 0.5
   defaultInitialSpawnPointName: Player_InitialPosition
   defaultExitSpawnPointName: Player_ExitPosition
+  applyGlobalFonts: 1
+  fontApplicationDelay: 0.2
 --- !u!4 &385182778
 Transform:
   m_ObjectHideFlags: 0
@@ -47451,6 +47453,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2839441963471576537, guid: 4bbbae5fbbaf98445bfd1ba0c1e939ac,
+        type: 3}
+      propertyPath: m_text
+      value: Close
+      objectReference: {fileID: 0}
     - target: {fileID: 2935625641637488012, guid: 4bbbae5fbbaf98445bfd1ba0c1e939ac,
         type: 3}
       propertyPath: m_Pivot.x
@@ -68522,8 +68529,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc36d99e88b6bd0449dc4c22f8e1842c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetSceneName: ColegioExterior
-  spawnPointName: Player_InitialPosition_ExteriorColegio
+  targetSceneName: MapaExterior
+  spawnPointName: Colegio_Exit_SpawnPoint
   isExitToMainScene: 1
   sceneChangeManager: {fileID: 0}
 --- !u!64 &1892753604
@@ -70324,8 +70331,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc36d99e88b6bd0449dc4c22f8e1842c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetSceneName: ColegioExterior
-  spawnPointName: Player_InitialPosition_ExteriorColegio
+  targetSceneName: MapaExterior
+  spawnPointName: Colegio_Exit_SpawnPoint
   isExitToMainScene: 1
   sceneChangeManager: {fileID: 0}
 --- !u!43 &1936965315

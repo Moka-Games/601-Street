@@ -36,6 +36,12 @@ public class GameSceneManager : MonoBehaviour
     [Tooltip("Nombre del punto de aparición por defecto al volver de otra escena")]
     [SerializeField] private string defaultExitSpawnPointName = "Player_ExitPosition";
 
+    [Header("Integración con FontManager")]
+    [Tooltip("¿Aplicar fuentes globales después de cargar una escena?")]
+    [SerializeField] private bool applyGlobalFonts = true;
+    [Tooltip("Retraso antes de aplicar las fuentes (segundos)")]
+    [SerializeField] private float fontApplicationDelay = 0.2f;
+
     private FadeManager fadeManager;
     private bool isTransitioning = false;
 
@@ -79,6 +85,12 @@ public class GameSceneManager : MonoBehaviour
                         fadeManager.OnFadeOutComplete += EnablePlayerMovementAfterFade;
                     }
                     StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
+
+                    // Aplicar fuentes globales a la escena inicial
+                    if (applyGlobalFonts)
+                    {
+                        StartCoroutine(ApplyGlobalFontsWithDelay(initialScene));
+                    }
                 };
             }
             else
@@ -94,6 +106,13 @@ public class GameSceneManager : MonoBehaviour
                     fadeManager.OnFadeOutComplete += EnablePlayerMovementAfterFade;
                 }
                 StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
+
+                // Aplicar fuentes globales a la escena actual
+                if (applyGlobalFonts)
+                {
+                    Scene currentScene = SceneManager.GetActiveScene();
+                    StartCoroutine(ApplyGlobalFontsWithDelay(currentScene));
+                }
             }
         }
     }
@@ -131,6 +150,25 @@ public class GameSceneManager : MonoBehaviour
         else
         {
             Debug.LogError("No se encontró la cámara en la escena persistente!");
+        }
+    }
+
+    // Método para aplicar fuentes globales con un retraso
+    private IEnumerator ApplyGlobalFontsWithDelay(Scene scene)
+    {
+        // Esperar el tiempo configurado
+        yield return new WaitForSeconds(fontApplicationDelay);
+
+        // Buscar el FontManager y aplicar las fuentes
+        FontManager fontManager = FontManager.Instance;
+        if (fontManager != null)
+        {
+            Debug.Log($"GameSceneManager: Aplicando fuentes globales a la escena '{scene.name}'");
+            fontManager.ApplyFontToAllLoadedScenesImmediately();
+        }
+        else
+        {
+            Debug.LogWarning("GameSceneManager: No se encontró el FontManager para aplicar fuentes globales");
         }
     }
 
@@ -179,6 +217,15 @@ public class GameSceneManager : MonoBehaviour
         currentSceneName = sceneName;
         AsyncOperation loadOperation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
         yield return loadOperation;
+
+        // Obtener referencia a la escena recién cargada
+        Scene loadedScene = SceneManager.GetSceneByName(sceneName);
+
+        // Aplicar fuentes globales a la nueva escena
+        if (applyGlobalFonts)
+        {
+            StartCoroutine(ApplyGlobalFontsWithDelay(loadedScene));
+        }
 
         yield return StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
 
@@ -326,5 +373,26 @@ public class GameSceneManager : MonoBehaviour
             }
         }
         return null;
+    }
+
+    // Método para forzar la aplicación de fuentes a la escena actual
+    public void ForceApplyFontsToCurrentScene()
+    {
+        if (string.IsNullOrEmpty(currentSceneName))
+        {
+            Debug.LogWarning("GameSceneManager: No hay una escena actual definida para aplicar fuentes");
+            return;
+        }
+
+        Scene currentScene = SceneManager.GetSceneByName(currentSceneName);
+        if (currentScene.isLoaded)
+        {
+            FontManager fontManager = FontManager.Instance;
+            if (fontManager != null)
+            {
+                Debug.Log($"GameSceneManager: Forzando aplicación de fuentes globales a la escena '{currentSceneName}'");
+                StartCoroutine(ApplyGlobalFontsWithDelay(currentScene));
+            }
+        }
     }
 }
