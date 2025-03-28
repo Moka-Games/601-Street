@@ -42,6 +42,10 @@ public class GameSceneManager : MonoBehaviour
     [Tooltip("Retraso antes de aplicar las fuentes (segundos)")]
     [SerializeField] private float fontApplicationDelay = 0.2f;
 
+    [Header("Debug")]
+    [Tooltip("Mostrar logs detallados de depuración")]
+    [SerializeField] private bool showDetailedLogs = false;
+
     private FadeManager fadeManager;
     private bool isTransitioning = false;
 
@@ -127,7 +131,7 @@ public class GameSceneManager : MonoBehaviour
 
     private void FindFadeManager()
     {
-        fadeManager = FindAnyObjectByType<FadeManager>();
+        fadeManager = FindFirstObjectByType<FadeManager>();
         if (fadeManager == null)
         {
             Debug.LogError("No se encontró el FadeManager en la escena persistente!");
@@ -142,7 +146,7 @@ public class GameSceneManager : MonoBehaviour
             Debug.LogError("No se encontró el jugador en la escena persistente!");
         }
 
-        GameObject cameraObject = FindAnyObjectByType<Camera_Script>()?.gameObject;
+        GameObject cameraObject = FindFirstObjectByType<Camera_Script>()?.gameObject;
         if (cameraObject != null)
         {
             currentCamera = cameraObject.GetComponent<Camera_Script>();
@@ -163,7 +167,10 @@ public class GameSceneManager : MonoBehaviour
         FontManager fontManager = FontManager.Instance;
         if (fontManager != null)
         {
-            Debug.Log($"GameSceneManager: Aplicando fuentes globales a la escena '{scene.name}'");
+            if (showDetailedLogs)
+            {
+                Debug.Log($"GameSceneManager: Aplicando fuentes globales a la escena '{scene.name}'");
+            }
             fontManager.ApplyFontToAllLoadedScenesImmediately();
         }
         else
@@ -185,13 +192,28 @@ public class GameSceneManager : MonoBehaviour
     // Cargar una nueva escena
     public void LoadScene(string sceneName, bool isBackward = false)
     {
-        if (currentSceneName == sceneName || isTransitioning) return;
+        if (currentSceneName == sceneName || isTransitioning)
+        {
+            Debug.LogWarning($"No se puede cargar la escena '{sceneName}': Ya es la escena actual o hay una transición en curso");
+            return;
+        }
+
+        if (showDetailedLogs)
+        {
+            Debug.Log($"GameSceneManager: Iniciando carga de escena '{sceneName}' (isBackward: {isBackward})");
+        }
+
         StartCoroutine(LoadSceneWithTransition(sceneName, isBackward));
     }
 
     private IEnumerator LoadSceneWithTransition(string sceneName, bool isBackward)
     {
         isTransitioning = true;
+
+        if (showDetailedLogs)
+        {
+            Debug.Log($"GameSceneManager: Iniciando transición a escena '{sceneName}'");
+        }
 
         DisablePlayerMovement();
 
@@ -206,29 +228,92 @@ public class GameSceneManager : MonoBehaviour
             yield return new WaitForSeconds(fadeInDuration);
         }
 
+        // DESCARGA DE ESCENA ACTUAL
         if (!string.IsNullOrEmpty(currentSceneName))
         {
+            if (showDetailedLogs)
+            {
+                Debug.Log($"GameSceneManager: Descargando escena actual '{currentSceneName}'");
+            }
+
             AsyncOperation unloadOperation = SceneManager.UnloadSceneAsync(currentSceneName);
             yield return unloadOperation;
+
+            if (showDetailedLogs)
+            {
+                Debug.Log($"GameSceneManager: Escena '{currentSceneName}' descargada correctamente");
+            }
         }
 
         yield return new WaitForSeconds(blackScreenDuration);
 
-        currentSceneName = sceneName;
-        AsyncOperation loadOperation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-        yield return loadOperation;
-
-        // Obtener referencia a la escena recién cargada
-        Scene loadedScene = SceneManager.GetSceneByName(sceneName);
-
-        // Aplicar fuentes globales a la nueva escena
-        if (applyGlobalFonts)
+        // CARGA DE NUEVA ESCENA
+        if (showDetailedLogs)
         {
-            StartCoroutine(ApplyGlobalFontsWithDelay(loadedScene));
+            Debug.Log($"GameSceneManager: Iniciando carga de escena '{sceneName}'");
         }
 
+        // Guardar la nueva escena como actual antes de cargarla
+        currentSceneName = sceneName;
+
+        // Nueva comprobación para asegurar que la escena existe antes de intentar cargarla
+        if (Application.CanStreamedLevelBeLoaded(sceneName))
+        {
+            AsyncOperation loadOperation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+
+            // Asegurarse de que la operación complete antes de continuar
+            while (!loadOperation.isDone)
+            {
+                if (showDetailedLogs)
+                {
+                    Debug.Log($"GameSceneManager: Progreso de carga de escena '{sceneName}': {loadOperation.progress * 100}%");
+                }
+                yield return null;
+            }
+
+            if (showDetailedLogs)
+            {
+                Debug.Log($"GameSceneManager: Escena '{sceneName}' cargada correctamente");
+            }
+
+            // Hacer la escena recién cargada activa
+            Scene loadedScene = SceneManager.GetSceneByName(sceneName);
+            if (loadedScene.isLoaded)
+            {
+                SceneManager.SetActiveScene(loadedScene);
+
+                if (showDetailedLogs)
+                {
+                    Debug.Log($"GameSceneManager: Escena '{sceneName}' establecida como activa");
+                }
+
+                // Aplicar fuentes globales a la nueva escena
+                if (applyGlobalFonts)
+                {
+                    StartCoroutine(ApplyGlobalFontsWithDelay(loadedScene));
+                }
+            }
+            else
+            {
+                Debug.LogError($"GameSceneManager: La escena '{sceneName}' no se cargó correctamente");
+                isTransitioning = false;
+                PlayerInteraction.SetSceneTransitionState(false);
+                yield break;
+            }
+        }
+        else
+        {
+            Debug.LogError($"GameSceneManager: No se puede cargar la escena '{sceneName}'. Asegúrate de que está en el Build Settings.");
+            currentSceneName = ""; // Resetear ya que no pudimos cargar la nueva escena
+            isTransitioning = false;
+            PlayerInteraction.SetSceneTransitionState(false);
+            yield break;
+        }
+
+        // POSICIONAMIENTO DEL JUGADOR Y CÁMARA
         yield return StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
 
+        // FADE OUT Y FINALIZACIÓN
         if (fadeManager != null)
         {
             fadeManager.OnFadeOutComplete += EnablePlayerMovementAfterFade;
@@ -244,6 +329,11 @@ public class GameSceneManager : MonoBehaviour
         customSpawnPointName = null;
 
         isTransitioning = false;
+
+        if (showDetailedLogs)
+        {
+            Debug.Log($"GameSceneManager: Transición a escena '{sceneName}' completada");
+        }
     }
 
     private void DisablePlayerMovement()
@@ -281,8 +371,23 @@ public class GameSceneManager : MonoBehaviour
 
     private IEnumerator MovePlayerAndCameraToSpawnPointWithDelay()
     {
-        yield return new WaitUntil(() => SceneManager.GetSceneByName(currentSceneName).isLoaded);
+        if (showDetailedLogs)
+        {
+            Debug.Log($"GameSceneManager: Esperando a que la escena '{currentSceneName}' esté cargada");
+        }
 
+        // Esperar a que la escena esté cargada
+        yield return new WaitUntil(() => {
+            Scene targetScene = SceneManager.GetSceneByName(currentSceneName);
+            return targetScene.isLoaded;
+        });
+
+        if (showDetailedLogs)
+        {
+            Debug.Log($"GameSceneManager: Escena '{currentSceneName}' confirmada como cargada, procediendo a mover al jugador");
+        }
+
+        // MOVER AL JUGADOR
         // Determinar qué punto de aparición usar
         string spawnPointName = DetermineSpawnPointName();
 
@@ -301,11 +406,38 @@ public class GameSceneManager : MonoBehaviour
             {
                 spawnPointName = defaultExitSpawnPointName;
                 spawnPoint = FindObjectInAllScenes(spawnPointName);
+
+                // Si aún no se encuentra ningún punto, buscar cualquier objeto con "Spawn" en su nombre
+                if (spawnPoint == null)
+                {
+                    Debug.LogWarning($"No se encontraron puntos de aparición estándar. Buscando cualquier objeto con 'Spawn' en su nombre.");
+                    spawnPoint = FindObjectWithNameContaining("Spawn");
+
+                    if (spawnPoint == null)
+                    {
+                        Debug.LogError($"No se pudo encontrar ningún punto de aparición en la escena '{currentSceneName}'");
+                    }
+                }
             }
         }
 
+        // MOVER LA CÁMARA
         GameObject cameraSpawnPoint = FindObjectInAllScenes("Camera_InitialPosition");
 
+        // Si no se encuentra, buscar alternativas
+        if (cameraSpawnPoint == null)
+        {
+            cameraSpawnPoint = FindObjectWithNameContaining("Camera_");
+
+            if (cameraSpawnPoint == null && spawnPoint != null)
+            {
+                // En el peor caso, usar el mismo punto que el jugador
+                Debug.LogWarning("No se encontró punto para la cámara. Usando el punto del jugador.");
+                cameraSpawnPoint = spawnPoint;
+            }
+        }
+
+        // APLICAR POSICIONES
         if (spawnPoint != null && currentPlayer != null)
         {
             PlayerController playerController = currentPlayer.GetComponent<PlayerController>();
@@ -333,7 +465,7 @@ public class GameSceneManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"No se encontró 'Camera_InitialPosition' para la cámara en la escena {currentSceneName}!");
+            Debug.LogError($"No se encontró un punto de aparición válido para la cámara en la escena {currentSceneName}!");
         }
     }
 
@@ -359,17 +491,92 @@ public class GameSceneManager : MonoBehaviour
         return defaultInitialSpawnPointName;
     }
 
-    private GameObject FindObjectInAllScenes(string objectName)
+    private GameObject FindObjectInAllScenes(string exactName)
     {
         for (int i = 0; i < SceneManager.sceneCount; i++)
         {
             Scene scene = SceneManager.GetSceneAt(i);
-            foreach (GameObject obj in scene.GetRootGameObjects())
+            if (scene.isLoaded)
             {
-                if (obj.name == objectName)
+                foreach (GameObject obj in scene.GetRootGameObjects())
                 {
-                    return obj;
+                    if (obj.name == exactName)
+                    {
+                        return obj;
+                    }
+
+                    // También buscar en hijos
+                    Transform childTransform = FindChildWithName(obj.transform, exactName);
+                    if (childTransform != null)
+                    {
+                        return childTransform.gameObject;
+                    }
                 }
+            }
+        }
+        return null;
+    }
+
+    // Buscar un objeto que contenga cierto string en su nombre
+    private GameObject FindObjectWithNameContaining(string partialName)
+    {
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+        {
+            Scene scene = SceneManager.GetSceneAt(i);
+            if (scene.isLoaded)
+            {
+                foreach (GameObject obj in scene.GetRootGameObjects())
+                {
+                    if (obj.name.Contains(partialName))
+                    {
+                        return obj;
+                    }
+
+                    // También buscar en hijos
+                    Transform childTransform = FindChildWithNameContaining(obj.transform, partialName);
+                    if (childTransform != null)
+                    {
+                        return childTransform.gameObject;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    // Buscar un hijo con un nombre exacto
+    private Transform FindChildWithName(Transform parent, string name)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.name == name)
+            {
+                return child;
+            }
+
+            Transform result = FindChildWithName(child, name);
+            if (result != null)
+            {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    // Buscar un hijo que contenga cierto string en su nombre
+    private Transform FindChildWithNameContaining(Transform parent, string partialName)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.name.Contains(partialName))
+            {
+                return child;
+            }
+
+            Transform result = FindChildWithNameContaining(child, partialName);
+            if (result != null)
+            {
+                return result;
             }
         }
         return null;
@@ -394,5 +601,17 @@ public class GameSceneManager : MonoBehaviour
                 StartCoroutine(ApplyGlobalFontsWithDelay(currentScene));
             }
         }
+    }
+
+    // Método para verificar si estamos actualmente en una transición de escena
+    public bool IsTransitioning()
+    {
+        return isTransitioning;
+    }
+
+    // Método para obtener la escena actual
+    public string GetCurrentSceneName()
+    {
+        return currentSceneName;
     }
 }

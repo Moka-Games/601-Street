@@ -3102,7 +3102,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1363304977}
   - component: {fileID: 1363304978}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: DetectionCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3435,9 +3435,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2032695343}
-        m_TargetAssemblyTypeName: SceneChange, Assembly-CSharp
-        m_MethodName: CambiarEscenaConPuntoSalida
-        m_Mode: 5
+        m_TargetAssemblyTypeName: SceneTransitionPoint, Assembly-CSharp
+        m_MethodName: TransitionToScene
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3451,8 +3451,6 @@ MonoBehaviour:
       m_Calls: []
   singleUseInteraction: 0
   disableAfterInteraction: 0
-  rangeIndicator: {fileID: 0}
-  interactIndicator: {fileID: 0}
   detectionRadius: 5
   edgeOffset: 50
   objectInteracted: 0
@@ -3465,11 +3463,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2032695339}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1699d38761fe624fa9ccb15a3b57993, type: 3}
+  m_Script: {fileID: 11500000, guid: bc36d99e88b6bd0449dc4c22f8e1842c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cambiosDeEscena: []
-  escenaPersistente: PersistentScene
+  targetSceneName: MapaExterior
+  spawnPointName: Salida_Casa
+  isExitToMainScene: 1
+  sceneChangeManager: {fileID: 0}
+  showDetailedLogs: 0
 --- !u!1 &2054442266
 GameObject:
   m_ObjectHideFlags: 0
@@ -3683,8 +3684,6 @@ MonoBehaviour:
         m_CallState: 2
   singleUseInteraction: 0
   disableAfterInteraction: 0
-  rangeIndicator: {fileID: 0}
-  interactIndicator: {fileID: 0}
   detectionRadius: 5
   edgeOffset: 50
   objectInteracted: 0
@@ -3870,6 +3869,11 @@ MonoBehaviour:
   fadeInDuration: 1
   fadeOutDuration: 1
   blackScreenDuration: 0.5
+  defaultInitialSpawnPointName: Player_InitialPosition
+  defaultExitSpawnPointName: Player_ExitPosition
+  applyGlobalFonts: 1
+  fontApplicationDelay: 0.2
+  showDetailedLogs: 0
 --- !u!4 &2138498149
 Transform:
   m_ObjectHideFlags: 0
@@ -3979,7 +3983,7 @@ GameObject:
   - component: {fileID: 695268711259970820}
   - component: {fileID: 5757224581832998113}
   - component: {fileID: 1600276514995301875}
-  m_Layer: 8
+  m_Layer: 6
   m_Name: Cube.021
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4012,7 +4016,7 @@ GameObject:
   - component: {fileID: 1024159654477915643}
   - component: {fileID: 7688419701685249851}
   - component: {fileID: 3572658465370267536}
-  m_Layer: 8
+  m_Layer: 6
   m_Name: Cylinder.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4030,7 +4034,7 @@ GameObject:
   - component: {fileID: 2096382022637206766}
   - component: {fileID: 1257240870817792951}
   - component: {fileID: 6636482786873187475}
-  m_Layer: 8
+  m_Layer: 6
   m_Name: Cylinder.003
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4166,7 +4170,7 @@ GameObject:
   - component: {fileID: 6878170232025778812}
   - component: {fileID: 6878170232025778813}
   - component: {fileID: 6878170232025778814}
-  m_Layer: 8
+  m_Layer: 6
   m_Name: Cerradura
   m_TagString: Untagged
   m_Icon: {fileID: 0}

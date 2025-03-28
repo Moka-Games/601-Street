@@ -21,6 +21,10 @@ public class SceneTransitionPoint : MonoBehaviour
     [Tooltip("Referencia al SceneChange (si está vacío, se buscará automáticamente)")]
     [SerializeField] private SceneChange sceneChangeManager;
 
+    [Header("Debug")]
+    [Tooltip("Mostrar logs detallados")]
+    [SerializeField] private bool showDetailedLogs = false;
+
     private void Awake()
     {
         // Validar configuración
@@ -34,13 +38,14 @@ public class SceneTransitionPoint : MonoBehaviour
     {
         if (sceneChangeManager == null)
         {
-            sceneChangeManager = FindAnyObjectByType<SceneChange>();
+            sceneChangeManager = FindFirstObjectByType<SceneChange>();
             if (sceneChangeManager == null)
             {
                 Debug.LogError("No se encontró ningún SceneChange en la escena. Debe existir uno para cambiar de escena.");
             }
         }
     }
+
     // Método para añadir al evento OnInteraction del InteractableObject
     public void TransitionToScene()
     {
@@ -52,6 +57,11 @@ public class SceneTransitionPoint : MonoBehaviour
 
         Debug.Log($"Cambiando a escena: {targetSceneName}, punto de aparición: {spawnPointName}, es salida: {isExitToMainScene}");
 
+        if (showDetailedLogs)
+        {
+            sceneChangeManager.LogSceneInfo();
+        }
+
         // Guardar el punto de aparición para que esté disponible en la siguiente escena
         PlayerPrefs.SetString("LastSpawnPointName", spawnPointName);
         PlayerPrefs.Save();
@@ -59,11 +69,21 @@ public class SceneTransitionPoint : MonoBehaviour
         // Realizar el cambio de escena según la configuración
         if (isExitToMainScene)
         {
+            if (showDetailedLogs)
+            {
+                Debug.Log($"Llamando a SalirAExterior con la escena principal configurada");
+            }
+
             // Llamar al método simple que solo requiere un parámetro
             sceneChangeManager.SalirAExterior(targetSceneName);
         }
         else
         {
+            if (showDetailedLogs)
+            {
+                Debug.Log($"Llamando a EntrarAInterior con escena '{targetSceneName}'");
+            }
+
             // Llamar al método simple que solo requiere un parámetro
             sceneChangeManager.EntrarAInterior(targetSceneName);
         }

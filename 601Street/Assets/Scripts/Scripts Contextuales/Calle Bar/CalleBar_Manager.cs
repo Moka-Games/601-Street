@@ -8,6 +8,7 @@ public class CalleBar_Manager : MonoBehaviour
     public static bool puertaAbiertaBool = false;
     private void Start()
     {
+        print(puertaAbiertaBool);
         if(!puertaAbiertaBool)
         {
             puertaCerrada.SetActive(true);

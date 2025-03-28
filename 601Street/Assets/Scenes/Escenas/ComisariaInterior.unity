@@ -313,8 +313,8 @@ GameObject:
   m_Component:
   - component: {fileID: 122917229}
   - component: {fileID: 122917230}
-  - component: {fileID: 122917231}
   - component: {fileID: 122917232}
+  - component: {fileID: 122917233}
   m_Layer: 6
   m_Name: PuertaSalida
   m_TagString: Untagged
@@ -354,10 +354,10 @@ MonoBehaviour:
   onInteraction:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 122917231}
-        m_TargetAssemblyTypeName: SceneChange, Assembly-CSharp
-        m_MethodName: CambiarEscenaConPuntoSalida
-        m_Mode: 5
+      - m_Target: {fileID: 122917233}
+        m_TargetAssemblyTypeName: SceneTransitionPoint, Assembly-CSharp
+        m_MethodName: TransitionToScene
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -371,25 +371,9 @@ MonoBehaviour:
       m_Calls: []
   singleUseInteraction: 0
   disableAfterInteraction: 0
-  rangeIndicator: {fileID: 0}
-  interactIndicator: {fileID: 0}
   detectionRadius: 7
   edgeOffset: 50
   objectInteracted: 0
---- !u!114 &122917231
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 122917227}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1699d38761fe624fa9ccb15a3b57993, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cambiosDeEscena: []
-  escenaPersistente: PersistentScene
 --- !u!65 &122917232
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -411,6 +395,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &122917233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 122917227}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc36d99e88b6bd0449dc4c22f8e1842c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetSceneName: MapaExterior
+  spawnPointName: Salida_Comisaria
+  isExitToMainScene: 1
+  sceneChangeManager: {fileID: 0}
+  showDetailedLogs: 0
 --- !u!64 &124767102
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1219,8 +1220,6 @@ MonoBehaviour:
       m_Calls: []
   singleUseInteraction: 1
   disableAfterInteraction: 1
-  rangeIndicator: {fileID: 0}
-  interactIndicator: {fileID: 0}
   detectionRadius: 5
   edgeOffset: 50
   objectInteracted: 0
@@ -1624,6 +1623,11 @@ MonoBehaviour:
   fadeInDuration: 1
   fadeOutDuration: 1
   blackScreenDuration: 0.5
+  defaultInitialSpawnPointName: Player_InitialPosition
+  defaultExitSpawnPointName: Player_ExitPosition
+  applyGlobalFonts: 1
+  fontApplicationDelay: 0.2
+  showDetailedLogs: 0
 --- !u!4 &1202542094
 Transform:
   m_ObjectHideFlags: 0
