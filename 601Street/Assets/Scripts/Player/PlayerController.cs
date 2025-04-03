@@ -1,6 +1,7 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
 {
     [Header("Movement Settings")]
     [SerializeField] private float baseSpeed = 5f;
@@ -18,6 +19,11 @@ public class PlayerController : MonoBehaviour
 
     [Header("Required Components")]
     [SerializeField] private CharacterController characterController;
+
+    // New Input System
+    private PlayerControls playerControls;
+    private Vector2 currentMovementInput;
+    private bool isSprinting = false;
 
     private MovementState movementState;
     private RotationState rotationState;
@@ -44,8 +50,54 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        // Initialize the input system
+        playerControls = new PlayerControls();
+        playerControls.Gameplay.AddCallbacks(this);
+
         InitializeComponents();
         InitializeStates();
+    }
+
+    private void OnEnable()
+    {
+        // Enable the input actions
+        playerControls.Gameplay.Enable();
+    }
+
+    private void OnDisable()
+    {
+        // Disable the input actions
+        playerControls.Gameplay.Disable();
+    }
+
+    private void OnDestroy()
+    {
+        // Dispose of the input action asset
+        playerControls.Dispose();
+    }
+
+    // Input System callbacks implementation
+    public void OnWalking(InputAction.CallbackContext context)
+    {
+        currentMovementInput = context.ReadValue<Vector2>();
+    }
+
+    public void OnSprint(InputAction.CallbackContext context)
+    {
+        // For a button action, we can check if it's pressed using ReadValueAsButton()
+        isSprinting = context.ReadValueAsButton();
+    }
+
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        // Este método necesita ser implementado debido a la interfaz,
+        // pero la lógica real está en PlayerInteraction
+    }
+
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        // La lógica de rotación de cámara se maneja en el FreeLookCameraController
+        // Si no existe ese script, esta implementación vacía evita el error
     }
 
     private void InitializeComponents()
@@ -87,18 +139,12 @@ public class PlayerController : MonoBehaviour
             return; // No ejecutar la lógica de movimiento si el controller está desactivado
         }
 
-        Vector2 input = GetMovementInput();
+        // Use the input from the Input System
+        Vector2 input = currentMovementInput;
+
         UpdateMovement(input);
         UpdateRotation(input);
         ApplyGravity();
-    }
-
-    private Vector2 GetMovementInput()
-    {
-        return new Vector2(
-            Input.GetAxis("Horizontal"),
-            Input.GetAxis("Vertical")
-        );
     }
 
     private void UpdateMovement(Vector2 input)
@@ -147,7 +193,8 @@ public class PlayerController : MonoBehaviour
 
     private float CalculateCurrentSpeed(float verticalInput)
     {
-        if (verticalInput > 0 && Input.GetKey(KeyCode.LeftShift) && Mathf.Approximately(Input.GetAxis("Horizontal"), 0))
+        // Use the sprint status from the Input System instead of the old Input.GetKey
+        if (verticalInput > 0 && isSprinting && Mathf.Approximately(currentMovementInput.x, 0))
         {
             return sprintSpeed;
         }
@@ -304,6 +351,7 @@ public class PlayerController : MonoBehaviour
         movementState.Velocity.y += gravity * Time.deltaTime;
         characterController.Move(movementState.Velocity * Time.deltaTime);
     }
+
     public void SetMovementEnabled(bool enabled)
     {
         if (characterController != null)
@@ -315,6 +363,7 @@ public class PlayerController : MonoBehaviour
             Debug.LogError($"CharacterController not found on {gameObject.name}!");
         }
     }
+
     public void Respawn(Vector3 spawnPosition, Quaternion spawnRotation)
     {
         if (characterController != null)

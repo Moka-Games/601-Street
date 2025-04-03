@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   freeLookCamera: {fileID: 571450271917270595}
+  playerLookAtTarget: {fileID: 0}
 --- !u!1 &1545126609547444719
 GameObject:
   m_ObjectHideFlags: 0
@@ -848,6 +849,7 @@ GameObject:
   - component: {fileID: 2691415738208649849}
   - component: {fileID: 571450271917270595}
   - component: {fileID: 3661639598845073249}
+  - component: {fileID: 7812203262356441411}
   m_Layer: 0
   m_Name: RightSoulder_Camera
   m_TagString: Untagged
@@ -1008,3 +1010,21 @@ MonoBehaviour:
   m_Damping: 1
   m_DampingWhenOccluded: 2
   m_OptimalTargetDistance: 0
+--- !u!114 &7812203262356441411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8170836158102458906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b69bc099a93ab04a8c59063393a66e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gamepadLookSpeed: 250
+  mouseLookSpeed: 1
+  requireMouseButtonToRotate: 1
+  mouseButton: 1
+  invertY: 0
+  lookSmoothing: 0.5

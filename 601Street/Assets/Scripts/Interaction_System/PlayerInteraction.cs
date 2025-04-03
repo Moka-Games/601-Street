@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Sistema unificado de interacción del jugador que maneja tanto IInteractable como Inventory_Item
@@ -9,12 +10,15 @@ public class PlayerInteraction : MonoBehaviour
 {
     [Header("Configuración de interacción")]
     [SerializeField] private float interactionRange = 2.5f;
-    [SerializeField] private KeyCode interactionKey = KeyCode.E;
     [SerializeField] private LayerMask interactableLayer;
 
     [Header("Depuración")]
     [SerializeField] private bool showDebugRay = true;
     [SerializeField] private Color debugRayColor = Color.green;
+
+    // Nuevo Input System
+    private PlayerControls playerControls;
+    private bool interactPressed = false;
 
     // Referencias para objetos interactuables
     private IInteractable currentInteractable;
@@ -35,6 +39,44 @@ public class PlayerInteraction : MonoBehaviour
     // Diccionario para registrar si un objeto ya mostró su pop-up
     private Dictionary<GameObject, bool> popUpShown = new Dictionary<GameObject, bool>();
 
+    private void Awake()
+    {
+        // Inicializar el sistema de input
+        playerControls = new PlayerControls();
+    }
+
+    private void OnEnable()
+    {
+        // Habilitar el mapa de acciones
+        playerControls.Gameplay.Enable();
+
+        // Suscribirse a los eventos de input
+        playerControls.Gameplay.Interact.performed += OnInteractPerformed;
+        playerControls.Gameplay.Interact.canceled += OnInteractCanceled;
+    }
+
+    private void OnDisable()
+    {
+        // Desuscribirse de los eventos
+        playerControls.Gameplay.Interact.performed -= OnInteractPerformed;
+        playerControls.Gameplay.Interact.canceled -= OnInteractCanceled;
+
+        // Deshabilitar el mapa de acciones
+        playerControls.Gameplay.Disable();
+    }
+
+    // Callback para cuando se presiona el botón de interacción
+    private void OnInteractPerformed(InputAction.CallbackContext context)
+    {
+        interactPressed = true;
+    }
+
+    // Callback para cuando se suelta el botón de interacción
+    private void OnInteractCanceled(InputAction.CallbackContext context)
+    {
+        interactPressed = false;
+    }
+
     private void Start()
     {
         canInteract = false;
@@ -52,9 +94,10 @@ public class PlayerInteraction : MonoBehaviour
         // Si tenemos un objeto interactuable activado, manejarlo
         if (lastInteractableObject != null)
         {
-            if (Input.GetKeyDown(interactionKey))
+            if (interactPressed)
             {
                 DeactivateObject();
+                interactPressed = false; // Consumir el input
             }
             return;
         }
@@ -63,7 +106,7 @@ public class PlayerInteraction : MonoBehaviour
         CheckForInteractables();
 
         // Procesar entrada de interacción
-        if (Input.GetKeyDown(interactionKey) && canInteract)
+        if (interactPressed && canInteract)
         {
             // Dependiendo del tipo de objeto encontrado, interactuar
             if (currentInteractable != null)
@@ -74,6 +117,8 @@ public class PlayerInteraction : MonoBehaviour
             {
                 InteractWithInventoryItem();
             }
+
+            interactPressed = false; // Consumir el input
         }
     }
 

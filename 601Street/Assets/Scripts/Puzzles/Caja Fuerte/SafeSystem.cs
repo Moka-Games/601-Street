@@ -225,7 +225,7 @@ public class SafeSystem : MonoBehaviour
                 PlaySound(clearPasswordSound);
 
                 // Buscar y notificar al SafeGameplayManager para salir del modo
-                SafeGameplayManager gameplayManager = FindObjectOfType<SafeGameplayManager>();
+                SafeGameplayManager gameplayManager = FindAnyObjectByType<SafeGameplayManager>();
                 if (gameplayManager != null)
                 {
                     gameplayManager.ExitSafeMode();
