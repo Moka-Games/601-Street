@@ -139,11 +139,12 @@ public class FreeLookCameraController : MonoBehaviour
         // Primero verificamos si estamos usando el gamepad o el mouse
         bool isUsingMouse = !isUsingGamepad && usingMouse;
 
-        // Verificamos si podemos rotar con el botón del mouse si es necesario
+        // Verificamos si podemos rotar con el mouse según la configuración
         bool canRotateWithMouse = !requireMouseButtonToRotate ||
+                          (requireMouseButtonToRotate && (
                            (mouseButton == 0 && Mouse.current != null && Mouse.current.leftButton.isPressed) ||
                            (mouseButton == 1 && Mouse.current != null && Mouse.current.rightButton.isPressed) ||
-                           (mouseButton == 2 && Mouse.current != null && Mouse.current.middleButton.isPressed);
+                           (mouseButton == 2 && Mouse.current != null && Mouse.current.middleButton.isPressed)));
 
         // Si estamos usando el gamepad, usamos directamente el lookInput
         if (isUsingGamepad && lookInput.magnitude > 0.1f)
