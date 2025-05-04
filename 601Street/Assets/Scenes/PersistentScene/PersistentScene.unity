@@ -409,6 +409,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3345950034029099168, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ecc5a774897a5af4cb5fe964cb8349f2, type: 2}
     - target: {fileID: 3754790435304779438, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
       propertyPath: pensamientoUI
@@ -1227,7 +1232,7 @@ PrefabInstance:
     - target: {fileID: 7812203262356441411, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: mouseYSpeed
-      value: 15
+      value: -15
       objectReference: {fileID: 0}
     - target: {fileID: 7812203262356441411, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
