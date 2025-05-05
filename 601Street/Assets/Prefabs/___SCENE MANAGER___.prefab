@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3659049941987624587}
   - component: {fileID: 6414947861336129498}
+  - component: {fileID: 8632200243358777453}
   m_Layer: 0
   m_Name: ___SCENE MANAGER___
   m_TagString: Untagged
@@ -52,3 +53,15 @@ MonoBehaviour:
   applyGlobalFonts: 1
   fontApplicationDelay: 0.2
   showDetailedLogs: 0
+--- !u!114 &8632200243358777453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5766240829938491959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fa4099848c01014ea76ba4e26a34360, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
