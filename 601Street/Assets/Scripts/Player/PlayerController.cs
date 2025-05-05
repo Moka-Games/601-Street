@@ -28,8 +28,30 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
     private MovementState movementState;
     private RotationState rotationState;
     private Camera mainCamera;
-    private Animator animator;
 
+    [Header("Animation")]
+    private Animator animator;
+    [SerializeField] private float animationSmoothTime = 0.1f;
+    [SerializeField] private float afkTimeThreshold = 30f;
+
+
+    private int isWalkingHash;
+    private int isRunningHash;
+    private int isWalkingBackHash;
+    private int isWalkingLeftHash;
+    private int isWalkingRightHash;
+    private int triggerAfkHash; 
+
+
+    private bool isWalking = false;
+    private bool isRunning = false;
+    private bool isWalkingBack = false;
+    private bool isWalkingLeft = false;
+    private bool isWalkingRight = false;
+
+    private bool isPlayingAfkAnimation = false;
+    private float inactivityTimer = 0f;
+    private bool isAfk = false;
     private struct MovementState
     {
         public Vector3 Velocity;
@@ -56,6 +78,14 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
 
         InitializeComponents();
         InitializeStates();
+
+        isWalkingHash = Animator.StringToHash("isWalking");
+        isRunningHash = Animator.StringToHash("isRunning");
+        isWalkingBackHash = Animator.StringToHash("isWalkingBack");
+        isWalkingLeftHash = Animator.StringToHash("isWalkingLeft");
+        isWalkingRightHash = Animator.StringToHash("isWalkingRight");
+        triggerAfkHash = Animator.StringToHash("triggerAfk");
+
     }
 
     private void OnEnable()
@@ -103,7 +133,9 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
     private void InitializeComponents()
     {
         mainCamera = Camera.main;
-        animator = GetComponent<Animator>();
+
+        // Si el animator no está asignado, intentar obtenerlo
+        if (!animator) animator = GetComponent<Animator>();
 
         if (!characterController) characterController = GetComponent<CharacterController>();
         if (!characterController) Debug.LogError($"CharacterController not found on {gameObject.name}!");
@@ -129,6 +161,11 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
             CurrentRotationSpeed = baseRotationSpeed,
             TargetRotation = transform.rotation
         };
+    }
+    private void Update()
+    {
+        UpdateAnimationState();
+        CheckInactivity();
     }
 
     private void FixedUpdate()
@@ -378,5 +415,111 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
         {
             Debug.LogError("No se encontró 'CharacterController'!");
         }
+    }
+
+    private void UpdateAnimationState()
+    {
+        // Verificar si el CharacterController está habilitado
+        if (characterController == null || !characterController.enabled || !gameObject.activeInHierarchy)
+            return;
+
+        if (isPlayingAfkAnimation && animator.GetCurrentAnimatorStateInfo(0).IsName("Afk_Animation"))
+            return;
+
+        // Determinar el tipo de movimiento basado en los inputs
+        bool movingForward = currentMovementInput.y > 0;
+        bool movingBackward = currentMovementInput.y < 0;
+        bool movingLeft = currentMovementInput.x < 0;
+        bool movingRight = currentMovementInput.x > 0;
+        bool moving = currentMovementInput.magnitude > movementThreshold;
+
+        // Determinar si estamos corriendo
+        bool shouldRun = isSprinting && movingForward && Mathf.Approximately(currentMovementInput.x, 0);
+
+        // Actualizar los estados de animación
+        isWalking = moving && movingForward && !shouldRun && !movingLeft && !movingRight;
+        isRunning = shouldRun;
+        isWalkingBack = moving && movingBackward && !movingLeft && !movingRight;
+        isWalkingLeft = moving && movingLeft && !movingForward && !movingBackward;
+        isWalkingRight = moving && movingRight && !movingForward && !movingBackward;
+
+        // Para movimientos diagonales, priorizar adelante/atrás sobre izquierda/derecha
+        if ((movingForward || movingBackward) && (movingLeft || movingRight))
+        {
+            isWalkingLeft = false;
+            isWalkingRight = false;
+
+            if (movingForward)
+            {
+                isWalking = !shouldRun;
+                isRunning = shouldRun;
+                isWalkingBack = false;
+            }
+            else if (movingBackward)
+            {
+                isWalkingBack = true;
+                isWalking = false;
+                isRunning = false;
+            }
+        }
+
+        // Actualizar los parámetros del Animator
+        if (animator != null)
+        {
+            animator.SetBool(isWalkingHash, isWalking);
+            animator.SetBool(isRunningHash, isRunning);
+            animator.SetBool(isWalkingBackHash, isWalkingBack);
+            animator.SetBool(isWalkingLeftHash, isWalkingLeft);
+            animator.SetBool(isWalkingRightHash, isWalkingRight);
+        }
+    }
+    private void CheckInactivity()
+    {
+        // Verificamos si hay algún input de movimiento
+        bool isMoving = currentMovementInput.magnitude > movementThreshold;
+
+        // Si hay movimiento, resetear el timer y las flags
+        if (isMoving || isSprinting)
+        {
+            inactivityTimer = 0f;
+            isPlayingAfkAnimation = false;
+            return;
+        }
+
+        // Si estamos reproduciendo la animación AFK, no incrementamos el timer
+        if (isPlayingAfkAnimation && animator.GetCurrentAnimatorStateInfo(0).IsName("Afk_Animation"))
+        {
+            return;
+        }
+
+        // Incrementar el timer si no hay movimiento y no estamos en animación AFK
+        inactivityTimer += Time.deltaTime;
+
+        // Verificar si se alcanzó el límite de tiempo de inactividad
+        if (inactivityTimer >= afkTimeThreshold)
+        {
+            // Activar la animación AFK
+            TriggerAfkAnimation();
+            // Resetear el timer para que comience a contar de nuevo
+            inactivityTimer = 0f;
+        }
+    }
+
+    private void TriggerAfkAnimation()
+    {
+        if (animator != null)
+        {
+            // Activar el trigger para la animación AFK
+            animator.SetTrigger(triggerAfkHash);
+            isPlayingAfkAnimation = true;
+
+            Debug.Log("El jugador está AFK, activando animación");
+        }
+    }
+
+    public void OnAfkAnimationComplete()
+    {
+        isPlayingAfkAnimation = false;
+        isAfk = false;
     }
 }
