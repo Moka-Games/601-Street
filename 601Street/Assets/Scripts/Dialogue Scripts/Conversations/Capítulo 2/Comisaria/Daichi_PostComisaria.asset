@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 281b790b0324bdb49aca9bbad878a09c, type: 3}
+  m_Name: Daichi_PostComisaria
+  m_EditorClassIdentifier: 
+  actionId: Daichi_PostComisaria
+  dialogues:
+  - speakerName: Daichi
+    content: How's it going, little padawan? I heard that you went to the police
+      station to tell them about Umi.
+  - speakerName: Nyssa
+    content: Yes... I found something about my mother's case. Maybe it will be of
+      some use.
+  - speakerName: Daichi
+    content: Oh yeah? Wow, you're really motivated. Well, changing the subject...
+      About Umi, I found the page she was probably looking at before she disappeared.
+      A nest of hangers-on talking about paranormal stuff. A laugh, really.
+  - speakerName: Daichi
+    content: Anyway, I left it in the email, to keep you entertained for a while.
+      Go on, go home and look at it.
+  dialogueOptions: []

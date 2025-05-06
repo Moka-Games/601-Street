@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 281b790b0324bdb49aca9bbad878a09c, type: 3}
+  m_Name: Riku_Universidad
+  m_EditorClassIdentifier: 
+  actionId: Riku_Universidad
+  dialogues:
+  - speakerName: Nyssa
+    content: Riku... I need to talk to you. It's important.
+  - speakerName: Riku
+    content: You? The girl with the apple? What are you doing here?
+  - speakerName: Nyssa
+    content: 'I was in the abandoned house. I found a notebook with your name on
+      it. Your family... the Kurobane. It''s all there: rituals, symbols, dates.'
+  - speakerName: Riku
+    content: (surprised, lowering his voice) What are you saying? Have you been poking
+      around in things you don't understand?
+  - speakerName: Nyssa
+    content: I'm saying there is a portal, Riku. One that opened years ago in this
+      city. And you are connected to it, to all of this.
+  - speakerName: Riku
+    content: Why are you telling me? I don't know anything about portals or rituals.
+  - speakerName: Nyssa
+    content: My friend Umi disappeared a few days ago. And my mother... disappeared
+      years ago, under similar circumstances. There are no coincidences here, Riku.
+      It's all connected. I need to know what's going on. And you can help me.
+  - speakerName: Riku
+    content: (visibly uncomfortable) Look... I don't know if I want to get into all
+      this. If what you say is true, then this is beyond us.
+  dialogueOptions:
+  - optionText: I know you are afraid. I'm afraid too. But if we don't do it together,
+      maybe no one else will.
+    actionId: 
+    requiresDiceRoll: 1
+    difficultyClass: 0
+    nextDialogue: {fileID: 0}
+    successDialogue: {fileID: 0}
+    failureDialogue: {fileID: 0}
+  - optionText: This affects you as much as it does me. Your family is at the center
+      of it all. If you don't seek answers now, it may already be too late.
+    actionId: 
+    requiresDiceRoll: 1
+    difficultyClass: 0
+    nextDialogue: {fileID: 0}
+    successDialogue: {fileID: 0}
+    failureDialogue: {fileID: 0}
+  - optionText: You are part of this, whether you want to be or not. So you'd better
+      start cooperating, before someone else disappears.
+    actionId: 
+    requiresDiceRoll: 1
+    difficultyClass: 0
+    nextDialogue: {fileID: 0}
+    successDialogue: {fileID: 0}
+    failureDialogue: {fileID: 0}
