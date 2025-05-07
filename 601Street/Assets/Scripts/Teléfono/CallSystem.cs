@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class CallSystem : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class CallSystem : MonoBehaviour
     [SerializeField] private Animator callPanelAnimator;
     [SerializeField] private TMPro.TMP_Text callerNameText;
     [SerializeField] private TMPro.TMP_Text callerDescriptionText;
+    [Tooltip("Referencia directa a la imagen que mostrará el avatar del llamante")]
+    [SerializeField] private Image callerAvatarImage;
 
     [Header("Configuración")]
     [SerializeField] private KeyCode acceptCallKey = KeyCode.F;
@@ -38,6 +41,9 @@ public class CallSystem : MonoBehaviour
     private Coroutine activeCallCoroutine;
     private Coroutine popupTimerCoroutine;
 
+    private bool conversationEnded = false;
+    private Coroutine safetyCheckCoroutine;
+
     // Estructura para almacenar datos de la llamada
     [System.Serializable]
     public class CallData
@@ -45,6 +51,7 @@ public class CallSystem : MonoBehaviour
         public string callerName;
         public string callerDescription;
         public Conversation callConversation;
+        public Sprite callerAvatar;
         public UnityEvent onCallAccepted;
         public UnityEvent onCallRejected;
         public UnityEvent onCallFinished;
@@ -52,7 +59,6 @@ public class CallSystem : MonoBehaviour
 
     private void Awake()
     {
-        // Configuración del singleton
         if (Instance == null)
         {
             Instance = this;
@@ -92,6 +98,54 @@ public class CallSystem : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        StartCoroutine(FindAndSubscribeToDialogueManager());
+    }
+
+    private IEnumerator FindAndSubscribeToDialogueManager()
+    {
+        // Esperar dos frames para que otros objetos se inicialicen
+        yield return null;
+        yield return null;
+
+        Debug.Log("CallSystem: Buscando DialogueManager para suscribirse...");
+
+        DialogueManager dialogueManager = null;
+        int attempts = 0;
+
+        // Intentar encontrar el DialogueManager varias veces
+        while (dialogueManager == null && attempts < 5)
+        {
+            dialogueManager = DialogueManager.Instance;
+
+            if (dialogueManager == null)
+            {
+                // Intentar buscar en todos los objetos de todas las escenas cargadas
+                dialogueManager = FindFirstObjectByType<DialogueManager>();
+            }
+
+            if (dialogueManager != null)
+            {
+                Debug.Log("CallSystem: DialogueManager encontrado exitosamente.");
+
+                // Suscribirse al evento
+                dialogueManager.onConversationEnd.AddListener(HandleConversationEnd);
+                Debug.Log("CallSystem: Suscrito al evento onConversationEnd del DialogueManager");
+                break;
+            }
+
+            attempts++;
+            Debug.Log($"CallSystem: Intento {attempts}/5 fallido para encontrar DialogueManager");
+            yield return new WaitForSeconds(0.2f);
+        }
+
+        if (dialogueManager == null)
+        {
+            Debug.LogError("CallSystem: No se pudo encontrar el DialogueManager después de varios intentos. Las llamadas no terminarán correctamente.");
+        }
+    }
+
     private void OnEnable()
     {
         // Suscribirse al evento de diálogo finalizado para cerrar la llamada
@@ -108,9 +162,10 @@ public class CallSystem : MonoBehaviour
     private void OnDisable()
     {
         // Desuscribirse del evento
-        if (DialogueManager.Instance != null)
+        DialogueManager dialogueManager = DialogueManager.Instance;
+        if (dialogueManager != null)
         {
-            DialogueManager.Instance.onConversationEnd.RemoveListener(HandleConversationEnd);
+            dialogueManager.onConversationEnd.RemoveListener(HandleConversationEnd);
         }
     }
 
@@ -141,7 +196,8 @@ public class CallSystem : MonoBehaviour
         currentCallConversation = callData.callConversation;
 
         // Mostrar popup
-        ShowCallPopup(callData.callerName, callData.callerDescription);
+        Debug.Log($"CallSystem: Iniciando llamada con avatar: {(callData.callerAvatar != null ? "Presente" : "No proporcionado")}");
+        ShowCallPopup(callData.callerName, callData.callerDescription, callData.callerAvatar);
 
         // Iniciar temporizador para la llamada
         if (activeCallCoroutine != null)
@@ -152,7 +208,7 @@ public class CallSystem : MonoBehaviour
     }
 
     // Mostrar el popup de llamada
-    private void ShowCallPopup(string callerName, string description)
+    private void ShowCallPopup(string callerName, string description, Sprite avatar = null)
     {
         // Actualizar textos
         if (callerNameText != null)
@@ -163,6 +219,25 @@ public class CallSystem : MonoBehaviour
         if (callerDescriptionText != null)
         {
             callerDescriptionText.text = description;
+        }
+
+        // Actualizar avatar directamente usando la referencia
+        if (callerAvatarImage != null && avatar != null)
+        {
+            callerAvatarImage.sprite = avatar;
+            callerAvatarImage.gameObject.SetActive(true);
+            Debug.Log("CallSystem: Avatar configurado correctamente");
+        }
+        else if (callerAvatarImage != null)
+        {
+            // Si no hay avatar, podemos ocultar el elemento o usar uno predeterminado
+            // Por ahora, simplemente lo desactivamos
+            callerAvatarImage.gameObject.SetActive(false);
+            Debug.Log("CallSystem: No se proporcionó avatar, elemento desactivado");
+        }
+        else
+        {
+            Debug.LogWarning("CallSystem: No se ha asignado referencia a callerAvatarImage en el Inspector");
         }
 
         // Activar panel
@@ -177,12 +252,14 @@ public class CallSystem : MonoBehaviour
             }
         }
 
-        // Reproducir sonido
+        // Reproducir sonido de llamada entrante (con configuración clara del bucle)
         if (audioSource != null && incomingCallSound != null)
         {
+            audioSource.Stop(); // Detener cualquier sonido anterior
             audioSource.clip = incomingCallSound;
-            audioSource.loop = true;
+            audioSource.loop = true; // Configurar explícitamente para bucle
             audioSource.Play();
+            Debug.Log("CallSystem: Reproduciendo sonido de llamada entrante en bucle");
         }
 
         isPopupVisible = true;
@@ -216,10 +293,11 @@ public class CallSystem : MonoBehaviour
             callPopupPanel.SetActive(false);
         }
 
-        // Detener sonido
+        // Detener sonido explícitamente
         if (audioSource != null && audioSource.isPlaying)
         {
             audioSource.Stop();
+            Debug.Log("CallSystem: Deteniendo todos los sonidos");
         }
 
         isPopupVisible = false;
@@ -230,20 +308,25 @@ public class CallSystem : MonoBehaviour
     {
         if (!isPopupVisible) return;
 
-        // Reproducir sonido
-        if (audioSource != null && callAcceptedSound != null)
+        // Detener el sonido de llamada entrante
+        if (audioSource != null)
         {
-            audioSource.loop = false;
-            audioSource.clip = callAcceptedSound;
-            audioSource.Play();
+            audioSource.Stop(); // Primero detenemos cualquier sonido que esté reproduciéndose
+
+            // Ahora reproducimos el sonido de llamada aceptada una única vez
+            if (callAcceptedSound != null)
+            {
+                audioSource.loop = false; // Asegurar que no haga bucle
+                audioSource.clip = callAcceptedSound;
+                audioSource.PlayOneShot(callAcceptedSound); // Usamos PlayOneShot para asegurar una sola reproducción
+                Debug.Log("CallSystem: Reproduciendo sonido de llamada aceptada");
+            }
         }
 
-        // Marcar la llamada como activa
         isCallActive = true;
         OnCallStateChanged?.Invoke(true);
+        StartSafetyCheck();
 
-        // Ya no ocultamos el popup, permanecerá visible durante la conversación
-        // Podemos actualizar el texto o la interfaz para indicar que la llamada está en curso
         if (callerDescriptionText != null)
         {
             callerDescriptionText.text = "Llamada en curso...";
@@ -311,16 +394,23 @@ public class CallSystem : MonoBehaviour
     {
         if (!isPopupVisible) return;
 
+        // Detener el sonido de llamada entrante primero
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+
+            // Reproducir sonido de llamada rechazada una única vez
+            if (callRejectedSound != null)
+            {
+                audioSource.loop = false;
+                audioSource.clip = callRejectedSound;
+                audioSource.PlayOneShot(callRejectedSound);
+                Debug.Log("CallSystem: Reproduciendo sonido de llamada rechazada");
+            }
+        }
+
         // Ocultar popup
         HideCallPopup();
-
-        // Reproducir sonido
-        if (audioSource != null && callRejectedSound != null)
-        {
-            audioSource.loop = false;
-            audioSource.clip = callRejectedSound;
-            audioSource.Play();
-        }
 
         // Marcar llamada como rechazada
         if (activeCallCoroutine != null)
@@ -405,19 +495,16 @@ public class CallSystem : MonoBehaviour
         }
     }
 
-    // Manejar el fin de la conversación
     private void HandleConversationEnd()
     {
+        Debug.Log("CallSystem: Evento OnConversationEnd recibido desde DialogueManager");
+
         if (isCallActive)
         {
             Debug.Log("CallSystem: Finalizando llamada tras terminar la conversación");
 
-            // Liberar al jugador si se bloqueó durante la llamada
-            Enabler enabler = Enabler.Instance;
-            if (enabler != null)
-            {
-                enabler.ReleasePlayer();
-            }
+            // Liberar al jugador - Enfoque con múltiples métodos para garantizar que funcione
+            ReleasePlayerMultipleWays();
 
             // Actualizar el texto de estado antes de ocultar el popup
             if (callerDescriptionText != null)
@@ -425,17 +512,15 @@ public class CallSystem : MonoBehaviour
                 callerDescriptionText.text = "Llamada finalizada";
             }
 
-            // Ahora sí ocultamos el popup con la animación correspondiente
+            // Ocultar el popup
             HideCallPopup();
 
-            // Restablecer el estado del diálogo si es necesario
-            if (DialogueManager.Instance != null && DialogueManager.Instance.dialogueUI != null &&
-                DialogueManager.Instance.dialogueUI.activeSelf)
-            {
-                // Ya el DialogueManager se encarga de ocultar su interfaz, no necesitamos hacerlo aquí
-            }
-
+            // Finalizar la llamada
             EndCall();
+        }
+        else
+        {
+            Debug.Log("CallSystem: OnConversationEnd recibido pero isCallActive es false");
         }
     }
 
@@ -444,12 +529,36 @@ public class CallSystem : MonoBehaviour
     {
         Debug.Log("CallSystem: Llamada finalizada");
 
+        // Asegurarnos de que no hay sonidos reproduciéndose
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
+
         // Restablecer variables
         currentCallConversation = null;
         isCallActive = false;
 
         // Notificar
         OnCallStateChanged?.Invoke(false);
+    }
+
+    // Método público para forzar el final de una llamada
+    public void ForceEndCall()
+    {
+        Debug.Log("CallSystem: Finalizando llamada forzosamente");
+
+        // Asegurarse de ocultar el popup
+        HideCallPopup();
+
+        // Finalizar la llamada
+        EndCall();
+    }
+
+    // Método para verificar si hay una llamada activa (para el monitor)
+    public bool IsCallActive()
+    {
+        return isCallActive;
     }
 
     // Corrutina para manejar una secuencia de llamada
@@ -526,5 +635,95 @@ public class CallSystem : MonoBehaviour
         {
             callPopupPanel.SetActive(false);
         }
+    }
+
+    public void StartSafetyCheck()
+    {
+        if (safetyCheckCoroutine != null)
+        {
+            StopCoroutine(safetyCheckCoroutine);
+        }
+        safetyCheckCoroutine = StartCoroutine(SafetyCheckCoroutine());
+    }
+
+    private IEnumerator SafetyCheckCoroutine()
+    {
+        // Esperar un tiempo razonable para que la conversación termine
+        yield return new WaitForSeconds(0.5f);
+
+        // Si la llamada sigue activa pero el diálogo terminó, forzar la liberación del jugador
+        if (isCallActive && DialogueManager.Instance != null &&
+            DialogueManager.Instance.dialogueUI != null &&
+            !DialogueManager.Instance.dialogueUI.activeSelf)
+        {
+            Debug.LogWarning("CallSystem: Forzando liberación del jugador por seguridad");
+
+            // Liberar al jugador
+            Enabler enabler = Enabler.Instance;
+            if (enabler != null)
+            {
+                enabler.ReleasePlayer();
+            }
+
+            // Desbloquear directamente si es necesario
+            PlayerController playerController = FindAnyObjectByType<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.SetMovementEnabled(true);
+            }
+
+            Camera_Script cameraScript = FindAnyObjectByType<Camera_Script>();
+            if (cameraScript != null)
+            {
+                cameraScript.UnfreezeCamera();
+            }
+
+            // Finalizar la llamada
+            EndCall();
+        }
+        safetyCheckCoroutine = null;
+    }
+
+    private void ReleasePlayerMultipleWays()
+    {
+        Debug.Log("CallSystem: Intentando liberar al jugador por múltiples métodos...");
+
+        // 1. Método principal usando Enabler
+        Enabler enabler = Enabler.Instance;
+        if (enabler != null)
+        {
+            Debug.Log("CallSystem: Liberando al jugador con Enabler.ReleasePlayer()");
+            enabler.ReleasePlayer();
+        }
+        else
+        {
+            Debug.LogWarning("CallSystem: Enabler.Instance es null, intentando métodos alternativos");
+        }
+
+        // 2. Método alternativo - GameStateManager
+        if (GameStateManager.Instance != null)
+        {
+            Debug.Log("CallSystem: Cambiando estado a GameplayState");
+            GameStateManager.Instance.EnterGameplayState();
+        }
+
+        // 3. Método alternativo - Directo al PlayerController
+        PlayerController playerController = FindFirstObjectByType<PlayerController>();
+        if (playerController != null)
+        {
+            Debug.Log("CallSystem: Habilitando movimiento directamente con PlayerController");
+            playerController.SetMovementEnabled(true);
+        }
+
+        // 4. Método alternativo - Directo a la cámara
+        Camera_Script cameraScript = FindFirstObjectByType<Camera_Script>();
+        if (cameraScript != null)
+        {
+            Debug.Log("CallSystem: Desbloqueando cámara directamente");
+            cameraScript.UnfreezeCamera();
+        }
+
+        // 5. También notificar al PlayerInteraction para evitar conflictos
+        PlayerInteraction.SetSceneTransitionState(false);
     }
 }

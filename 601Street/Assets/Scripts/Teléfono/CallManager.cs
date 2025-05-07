@@ -17,11 +17,14 @@ public class CallManager : MonoBehaviour
         public string id;
         public string callerName;
         public string callerDescription;
+        [Tooltip("Conversación que se activará durante la llamada")]
         public Conversation callConversation;
-        public float delay; // Tiempo en segundos antes de que ocurra la llamada
-        public bool triggeredByEvent; // Si es false, se activará después del delay
-        public bool repeatable = false; // Si la llamada puede repetirse
-        public bool hasBeenTriggered = false; // Para controlar si ya se ha disparado
+        [Tooltip("Avatar personalizado para la llamada")]
+        public Sprite callerAvatar; 
+        public float delay;
+        public bool triggeredByEvent;
+        public bool repeatable = false; 
+        public bool hasBeenTriggered = false; 
         public UnityEvent onCallAccepted;
         public UnityEvent onCallRejected;
         public UnityEvent onCallFinished;
@@ -40,7 +43,6 @@ public class CallManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -140,6 +142,7 @@ public class CallManager : MonoBehaviour
             callerName = call.callerName,
             callerDescription = call.callerDescription,
             callConversation = call.callConversation,
+            callerAvatar = call.callerAvatar,
             onCallAccepted = call.onCallAccepted,
             onCallRejected = call.onCallRejected,
             onCallFinished = call.onCallFinished
@@ -148,7 +151,6 @@ public class CallManager : MonoBehaviour
         // Iniciar la llamada
         CallSystem.Instance.StartCall(callData);
     }
-
     /// <summary>
     /// Añade una nueva llamada programada en tiempo de ejecución.
     /// </summary>
@@ -208,11 +210,7 @@ public class CallManager : MonoBehaviour
         ScheduledCall call = scheduledCalls.Find(c => c.id == callId);
         return call != null && call.hasBeenTriggered;
     }
-
-    /// <summary>
-    /// Método conveniente para realizar una llamada inmediata.
-    /// </summary>
-    public void MakeImmediateCall(string callerName, string callerDescription, Conversation conversation)
+    public void MakeImmediateCall(string callerName, string callerDescription, Conversation conversation, Sprite avatar = null)
     {
         if (CallSystem.Instance == null)
         {
@@ -226,6 +224,7 @@ public class CallManager : MonoBehaviour
             callerName = callerName,
             callerDescription = callerDescription,
             callConversation = conversation,
+            callerAvatar = avatar, // Incluir el avatar
             onCallAccepted = new UnityEvent(),
             onCallRejected = new UnityEvent(),
             onCallFinished = new UnityEvent()
