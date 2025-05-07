@@ -101,6 +101,8 @@ public class CallUI : MonoBehaviour
     /// </summary>
     public void SetupIncomingCall(string callerName, string description, Sprite avatar = null)
     {
+        Debug.Log($"CallUI: Configurando llamada de {callerName} con avatar: {(avatar != null ? "Presente" : "No proporcionado")}");
+
         // Configurar nombre
         if (callerNameText != null)
         {
@@ -113,11 +115,26 @@ public class CallUI : MonoBehaviour
             callerDescriptionText.text = description;
         }
 
-        // Configurar avatar
+        // Configurar avatar - IMPORTANTE: Este es el punto clave
         if (callerAvatar != null)
         {
-            callerAvatar.sprite = avatar != null ? avatar : defaultCallerAvatar;
-            callerAvatar.gameObject.SetActive(true);
+            if (avatar != null)
+            {
+                callerAvatar.sprite = avatar;
+                callerAvatar.gameObject.SetActive(true);
+                Debug.Log("CallUI: Avatar configurado correctamente");
+            }
+            else
+            {
+                // Si no hay avatar específico, usar el predeterminado
+                callerAvatar.sprite = defaultCallerAvatar;
+                callerAvatar.gameObject.SetActive(defaultCallerAvatar != null);
+                Debug.Log("CallUI: Usando avatar predeterminado");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("CallUI: No se encontró componente Image para el avatar");
         }
 
         // Configurar estado de la llamada

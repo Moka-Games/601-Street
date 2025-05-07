@@ -41,6 +41,11 @@ public class CallSystem : MonoBehaviour
     private Coroutine activeCallCoroutine;
     private Coroutine popupTimerCoroutine;
 
+    // Referencia a los eventos de la llamada actual
+    private UnityEvent currentCallAcceptedEvent;
+    private UnityEvent currentCallRejectedEvent;
+    private UnityEvent currentCallFinishedEvent;
+
     private bool conversationEnded = false;
     private Coroutine safetyCheckCoroutine;
 
@@ -195,6 +200,11 @@ public class CallSystem : MonoBehaviour
         // Guardar datos de la llamada
         currentCallConversation = callData.callConversation;
 
+        // Guardar referencia a los eventos
+        currentCallAcceptedEvent = callData.onCallAccepted;
+        currentCallRejectedEvent = callData.onCallRejected;
+        currentCallFinishedEvent = callData.onCallFinished;
+
         // Mostrar popup
         Debug.Log($"CallSystem: Iniciando llamada con avatar: {(callData.callerAvatar != null ? "Presente" : "No proporcionado")}");
         ShowCallPopup(callData.callerName, callData.callerDescription, callData.callerAvatar);
@@ -323,6 +333,10 @@ public class CallSystem : MonoBehaviour
             }
         }
 
+        // Invocar el evento de llamada aceptada
+        currentCallAcceptedEvent?.Invoke();
+        Debug.Log("CallSystem: Evento OnCallAccepted invocado");
+
         isCallActive = true;
         OnCallStateChanged?.Invoke(true);
         StartSafetyCheck();
@@ -408,6 +422,10 @@ public class CallSystem : MonoBehaviour
                 Debug.Log("CallSystem: Reproduciendo sonido de llamada rechazada");
             }
         }
+
+        // Invocar el evento de llamada rechazada
+        currentCallRejectedEvent?.Invoke();
+        Debug.Log("CallSystem: Evento OnCallRejected invocado");
 
         // Ocultar popup
         HideCallPopup();
@@ -515,7 +533,7 @@ public class CallSystem : MonoBehaviour
             // Ocultar el popup
             HideCallPopup();
 
-            // Finalizar la llamada
+            // Finalizar la llamada - esto invocará el evento OnCallFinished
             EndCall();
         }
         else
@@ -535,8 +553,18 @@ public class CallSystem : MonoBehaviour
             audioSource.Stop();
         }
 
+        // Invocar el evento de finalización si existe y no es nulo
+        if (currentCallFinishedEvent != null)
+        {
+            currentCallFinishedEvent.Invoke();
+            Debug.Log("CallSystem: Evento OnCallFinished invocado");
+        }
+
         // Restablecer variables
         currentCallConversation = null;
+        currentCallAcceptedEvent = null;
+        currentCallRejectedEvent = null;
+        currentCallFinishedEvent = null;
         isCallActive = false;
 
         // Notificar
@@ -564,29 +592,20 @@ public class CallSystem : MonoBehaviour
     // Corrutina para manejar una secuencia de llamada
     private IEnumerator CallSequence(CallData callData)
     {
-        // Esperar a que el usuario acepte o rechace la llamada
-        while (isPopupVisible)
-        {
-            yield return null;
-        }
+        // Esperar hasta que la interacción con el popup finalice
+        yield return new WaitUntil(() => !isPopupVisible || isCallActive);
 
         // Si la llamada está activa, entonces fue aceptada
         if (isCallActive)
         {
-            // Invocar evento de llamada aceptada
-            callData.onCallAccepted?.Invoke();
-
-            // Esperar a que termine la conversación
+            // Esperar a que termine la conversación (la llamada ya no está activa)
             yield return new WaitUntil(() => !isCallActive);
 
-            // Invocar evento de finalización
-            callData.onCallFinished?.Invoke();
+            // No necesitamos invocar el evento de finalización aquí,
+            // ya se invoca en el método EndCall
         }
-        else
-        {
-            // La llamada fue rechazada
-            callData.onCallRejected?.Invoke();
-        }
+        // Si no está activa y no está visible, fue rechazada
+        // (no necesitamos hacer nada aquí, ya se maneja en RejectCall)
 
         activeCallCoroutine = null;
     }
