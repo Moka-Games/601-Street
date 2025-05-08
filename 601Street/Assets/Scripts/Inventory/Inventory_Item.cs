@@ -1,17 +1,24 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Events;
 using TMPro;
 
+/// <summary>
+/// Versión mejorada del componente Inventory_Item que utiliza prefabs para las interacciones
+/// </summary>
 public class Inventory_Item : MonoBehaviour
 {
     [Header("Datos del Item")]
     public ItemData itemData;
 
-    [Header("Función Item Recogido")]
-    public UnityEvent onItemClick; //Función que se realiza el pulsar el objeto en el inventario
-    public UnityEvent OnItemInteracted; //Función que se realiza interactuar con el objeto
-    public GameObject interactableObject;
+    [Header("Configuración de Interacción")]
+    [Tooltip("Prefab que se instanciará cuando se interactúe con este objeto o se seleccione en el inventario")]
+    public GameObject interactionPrefab;
+
+    [Tooltip("Función que se ejecuta al pulsar el objeto en el inventario")]
+    public UnityEvent onItemClick;
+
+    [Tooltip("Función que se ejecuta al interactuar con el objeto en el mundo")]
+    public UnityEvent OnItemInteracted;
 
     [Header("Configuración de Feedback")]
     public float edgeOffset = 50f; // Distancia desde el borde de la pantalla
@@ -63,7 +70,7 @@ public class Inventory_Item : MonoBehaviour
         // Verificación final
         if (playerInteraction == null)
         {
-            Debug.LogWarning("No se pudo encontrar UnifiedPlayerInteraction en la escena");
+            Debug.LogWarning("No se pudo encontrar PlayerInteraction en la escena");
         }
 
         isInitialized = true;
@@ -96,13 +103,15 @@ public class Inventory_Item : MonoBehaviour
                 interactIndicatorRect = interactIndicator.GetComponentInChildren<RectTransform>();
             }
         }
+
+        // Comprobar que todo está correcto
         if (rangeIndicator == null || interactIndicator == null ||
             rangeIndicatorRect == null || interactIndicatorRect == null)
-            {
-                Debug.LogError("No se pudieron crear o configurar los indicadores para " + gameObject.name);
-                enabled = false;
-                return;
-            }
+        {
+            Debug.LogError("No se pudieron crear o configurar los indicadores para " + gameObject.name);
+            enabled = false;
+            return;
+        }
 
         // Inicialmente desactivados
         rangeIndicator.SetActive(false);
@@ -314,13 +323,40 @@ public class Inventory_Item : MonoBehaviour
         }
     }
 
-    // Esta función puede ser llamada cuando el jugador interactúa con el objeto
+    /// <summary>
+    /// Método para procesar la interacción con este objeto
+    /// </summary>
     public void OnInteract()
     {
-        if (onItemClick != null)
+        if (itemData == null)
         {
-            onItemClick.Invoke();
+            Debug.LogError("No hay ItemData asignado a este Inventory_Item: " + gameObject.name);
+            return;
         }
+
+        // Invocar el evento de interacción
+        OnItemInteracted?.Invoke();
+
+        // Verificar si tenemos un prefab para instanciar
+        if (interactionPrefab != null)
+        {
+            // Añadir el ítem al inventario con su prefab de interacción
+            Inventory_Manager.Instance.AddItem(itemData, interactionPrefab, onItemClick);
+        }
+        else
+        {
+            // Mantener compatibilidad con el sistema anterior
+            Inventory_Manager.Instance.AddItem(itemData, onItemClick);
+        }
+
+        // Mostrar popup directamente si no hay prefab de interacción
+        if (interactionPrefab == null)
+        {
+            Inventory_Manager.Instance.DisplayPopUp(itemData.itemName);
+        }
+
+        // Destruir el objeto del mundo tras recogerlo
+        Destroy(gameObject);
     }
 
     private void CleanupIndicators()

@@ -2007,6 +2007,37 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &733720842
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 733720843}
+  m_Layer: 0
+  m_Name: Inventory_InterfacesContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &733720843
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733720842}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &750806824
 GameObject:
   m_ObjectHideFlags: 0
@@ -3260,6 +3291,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1535578048037481839, guid: d4d78472d779d5640be19606f12bbb0a,
+        type: 3}
+      propertyPath: m_Color.a
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4727190263164573654, guid: d4d78472d779d5640be19606f12bbb0a,
         type: 3}
       propertyPath: m_Pivot.x
@@ -4774,6 +4810,8 @@ MonoBehaviour:
     type: 3}
   popUpParent: {fileID: 1524181020}
   popUpText: {fileID: 1524181019}
+  popUpDuration: 4.5
+  prefabContainer: {fileID: 733720843}
 --- !u!1 &1818005304
 GameObject:
   m_ObjectHideFlags: 0
@@ -5514,3 +5552,4 @@ SceneRoots:
   - {fileID: 1746118858}
   - {fileID: 304497846}
   - {fileID: 1015636399}
+  - {fileID: 733720843}

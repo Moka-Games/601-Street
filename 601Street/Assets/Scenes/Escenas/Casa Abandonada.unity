@@ -3977,10 +3977,20 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7115754571694869235, guid: 91f4817c522196b42bcb001a368bda0e,
+        type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8621143615332506418, guid: 91f4817c522196b42bcb001a368bda0e,
         type: 3}
       propertyPath: m_Name
       value: Libreta
+      objectReference: {fileID: 0}
+    - target: {fileID: 8621143615332506418, guid: 91f4817c522196b42bcb001a368bda0e,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

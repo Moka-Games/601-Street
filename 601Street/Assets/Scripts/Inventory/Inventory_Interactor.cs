@@ -20,21 +20,22 @@ public class Inventory_Interactor : MonoBehaviour
 
     private void Update()
     {
-        if (lastInteractableObject != null)
+        // Si hay un objeto de interacción activo en el Inventory_Manager, usar eso en su lugar
+        if (Inventory_Manager.Instance != null && Inventory_Manager.Instance.HasActiveInteractionObject())
         {
             if (Input.GetKeyDown(inputKey_to_Interact))
             {
-                DeactivateObject();
+                Inventory_Manager.Instance.CloseActiveInteractionObject();
             }
+            return;
         }
-        else
-        {
-            CheckForInteractable();
 
-            if (Input.GetKeyDown(inputKey_to_Interact) && canInteract)
-            {
-                InteractWithObject();
-            }
+        // Comportamiento tradicional para compatibilidad
+        CheckForInteractable();
+
+        if (Input.GetKeyDown(inputKey_to_Interact) && canInteract)
+        {
+            InteractWithObject();
         }
     }
 
@@ -57,68 +58,21 @@ public class Inventory_Interactor : MonoBehaviour
     {
         if (currentInteractableItem != null && canInteract)
         {
+            // Guardar el nombre del item para posible uso posterior
             lastItemName = currentInteractableItem.itemData.itemName;
 
-            // Invocar el evento OnItemInteracted antes de cualquier otra acción
-            if (currentInteractableItem.OnItemInteracted != null)
-            {
-                currentInteractableItem.OnItemInteracted.Invoke();
-            }
-
-            if (currentInteractableItem.interactableObject != null)
-            {
-                lastInteractableObject = currentInteractableItem.interactableObject;
-                lastInteractableObject.SetActive(true);
-
-                // Buscar y asignar la función al botón de cerrar
-                AssignButtonFunction(lastInteractableObject);
-            }
-
-            Inventory_Manager.Instance.AddItem(currentInteractableItem.itemData, currentInteractableItem.onItemClick);
-            Destroy(currentInteractableItem.gameObject);
+            // Llamar al nuevo método OnInteract que maneja toda la lógica
+            currentInteractableItem.OnInteract();
         }
     }
 
-    private void AssignButtonFunction(GameObject parentObject)
-    {
-        // Buscar el botón en el objeto interactuable, incluso si está desactivado
-        Button closeButton = FindButtonInChildren(parentObject, "Close_Interacted_Button");
-
-        if (closeButton != null)
-        {
-            // Añadir la función sin eliminar las ya existentes
-            closeButton.onClick.AddListener(DeactivateObject);
-        }
-    }
-
-    private Button FindButtonInChildren(GameObject parent, string buttonName)
-    {
-        Transform[] allChildren = parent.GetComponentsInChildren<Transform>(true); // Buscar en hijos, incluyendo inactivos
-        foreach (Transform child in allChildren)
-        {
-            if (child.name == buttonName)
-            {
-                return child.GetComponent<Button>();
-            }
-        }
-        return null;
-    }
-
-
+    // Este método ya no es necesario en el nuevo sistema, pero lo mantenemos para compatibilidad
     public void DeactivateObject()
     {
-        if (lastInteractableObject == null) return;
-
-        lastInteractableObject.SetActive(false);
-
-        // Mostrar el pop-up solo la primera vez que se desactiva
-        if (!popUpShown.ContainsKey(lastInteractableObject) || !popUpShown[lastInteractableObject])
+        if (Inventory_Manager.Instance != null)
         {
-            Inventory_Manager.Instance.DisplayPopUp(lastItemName);
-            popUpShown[lastInteractableObject] = true;
+            Inventory_Manager.Instance.CloseActiveInteractionObject();
         }
-
-        lastInteractableObject = null;
     }
 
     private void OnDrawGizmos()

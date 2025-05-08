@@ -1,10 +1,10 @@
 using UnityEngine;
-using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Sistema unificado de interacción del jugador que maneja tanto IInteractable como Inventory_Item
+/// Sistema de interacción del jugador que maneja tanto IInteractable como Inventory_Item
+/// Adaptado para funcionar con el nuevo sistema basado en prefabs
 /// </summary>
 public class PlayerInteraction : MonoBehaviour
 {
@@ -26,8 +26,6 @@ public class PlayerInteraction : MonoBehaviour
 
     // Referencias para objetos de inventario
     private Inventory_Item currentInventoryItem;
-    private GameObject lastInteractableObject;
-    private string lastItemName;
 
     // Estado de interacción
     [HideInInspector] public bool canInteract = false;
@@ -35,9 +33,6 @@ public class PlayerInteraction : MonoBehaviour
 
     // Variable estática para controlar el estado global de transición
     public static bool IsSceneTransitioning = false;
-
-    // Diccionario para registrar si un objeto ya mostró su pop-up
-    private Dictionary<GameObject, bool> popUpShown = new Dictionary<GameObject, bool>();
 
     private void Awake()
     {
@@ -91,12 +86,14 @@ public class PlayerInteraction : MonoBehaviour
             return;
         }
 
-        // Si tenemos un objeto interactuable activado, manejarlo
-        if (lastInteractableObject != null)
+        // Si hay un objeto de interacción activo, la tecla E se usará para cerrarlo
+        if (Inventory_Manager.Instance != null &&
+            Inventory_Manager.Instance.HasActiveInteractionObject())
         {
+            // La tecla E para cerrar el objeto activo es manejada por el Inventory_Manager
             if (interactPressed)
             {
-                DeactivateObject();
+                Inventory_Manager.Instance.CloseActiveInteractionObject();
                 interactPressed = false; // Consumir el input
             }
             return;
@@ -198,67 +195,10 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (currentInventoryItem != null && canInteract)
         {
-            lastItemName = currentInventoryItem.itemData.itemName;
-
-            // Invocar el evento OnItemInteracted antes de cualquier otra acción
-            if (currentInventoryItem.OnItemInteracted != null)
-            {
-                currentInventoryItem.OnItemInteracted.Invoke();
-            }
-
-            if (currentInventoryItem.interactableObject != null)
-            {
-                lastInteractableObject = currentInventoryItem.interactableObject;
-                lastInteractableObject.SetActive(true);
-
-                // Buscar y asignar la función al botón de cerrar
-                AssignButtonFunction(lastInteractableObject);
-            }
-
-            Inventory_Manager.Instance.AddItem(currentInventoryItem.itemData, currentInventoryItem.onItemClick);
-            Destroy(currentInventoryItem.gameObject);
+            // Llamar al método OnInteract del Inventory_Item
+            // que ahora maneja toda la lógica de interacción
+            currentInventoryItem.OnInteract();
         }
-    }
-
-    private void AssignButtonFunction(GameObject parentObject)
-    {
-        // Buscar el botón en el objeto interactuable, incluso si está desactivado
-        Button closeButton = FindButtonInChildren(parentObject, "Close_Interacted_Button");
-
-        if (closeButton != null)
-        {
-            // Añadir la función sin eliminar las ya existentes
-            closeButton.onClick.AddListener(DeactivateObject);
-        }
-    }
-
-    private Button FindButtonInChildren(GameObject parent, string buttonName)
-    {
-        Transform[] allChildren = parent.GetComponentsInChildren<Transform>(true); // Buscar en hijos, incluyendo inactivos
-        foreach (Transform child in allChildren)
-        {
-            if (child.name == buttonName)
-            {
-                return child.GetComponent<Button>();
-            }
-        }
-        return null;
-    }
-
-    public void DeactivateObject()
-    {
-        if (lastInteractableObject == null) return;
-
-        lastInteractableObject.SetActive(false);
-
-        // Mostrar el pop-up solo la primera vez que se desactiva
-        if (!popUpShown.ContainsKey(lastInteractableObject) || !popUpShown[lastInteractableObject])
-        {
-            Inventory_Manager.Instance.DisplayPopUp(lastItemName);
-            popUpShown[lastInteractableObject] = true;
-        }
-
-        lastInteractableObject = null;
     }
 
     public void SetInteractionsEnabled(bool enabled)
