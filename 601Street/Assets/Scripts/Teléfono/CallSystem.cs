@@ -278,7 +278,7 @@ public class CallSystem : MonoBehaviour
         // El usuario solo tiene la opción de aceptar la llamada, así que mostramos un mensaje adecuado
         if (callerDescriptionText != null)
         {
-            callerDescriptionText.text = description + "\nPresiona " + acceptCallKey.ToString() + " para atender";
+            callerDescriptionText.text = description + "\nPress " + acceptCallKey.ToString() + " to accept";
         }
     }
 
@@ -343,7 +343,7 @@ public class CallSystem : MonoBehaviour
 
         if (callerDescriptionText != null)
         {
-            callerDescriptionText.text = "Llamada en curso...";
+            callerDescriptionText.text = "Ongoing call...";
         }
 
         // Detener el temporizador de cierre automático si existe
@@ -527,7 +527,7 @@ public class CallSystem : MonoBehaviour
             // Actualizar el texto de estado antes de ocultar el popup
             if (callerDescriptionText != null)
             {
-                callerDescriptionText.text = "Llamada finalizada";
+                callerDescriptionText.text = "Call ended";
             }
 
             // Ocultar el popup
@@ -707,7 +707,6 @@ public class CallSystem : MonoBehaviour
     {
         Debug.Log("CallSystem: Intentando liberar al jugador por múltiples métodos...");
 
-        // 1. Método principal usando Enabler
         Enabler enabler = Enabler.Instance;
         if (enabler != null)
         {
@@ -719,14 +718,12 @@ public class CallSystem : MonoBehaviour
             Debug.LogWarning("CallSystem: Enabler.Instance es null, intentando métodos alternativos");
         }
 
-        // 2. Método alternativo - GameStateManager
         if (GameStateManager.Instance != null)
         {
             Debug.Log("CallSystem: Cambiando estado a GameplayState");
             GameStateManager.Instance.EnterGameplayState();
         }
 
-        // 3. Método alternativo - Directo al PlayerController
         PlayerController playerController = FindFirstObjectByType<PlayerController>();
         if (playerController != null)
         {
@@ -734,7 +731,6 @@ public class CallSystem : MonoBehaviour
             playerController.SetMovementEnabled(true);
         }
 
-        // 4. Método alternativo - Directo a la cámara
         Camera_Script cameraScript = FindFirstObjectByType<Camera_Script>();
         if (cameraScript != null)
         {
@@ -742,7 +738,6 @@ public class CallSystem : MonoBehaviour
             cameraScript.UnfreezeCamera();
         }
 
-        // 5. También notificar al PlayerInteraction para evitar conflictos
         PlayerInteraction.SetSceneTransitionState(false);
     }
 }
