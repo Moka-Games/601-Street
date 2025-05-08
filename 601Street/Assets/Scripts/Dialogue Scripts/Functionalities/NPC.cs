@@ -18,6 +18,8 @@ public class NPC : MonoBehaviour
     public bool hasInteracted = false;
     private Animator animator;
 
+    [SerializeField] private bool interactOnce = false;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -40,12 +42,12 @@ public class NPC : MonoBehaviour
             HandleNakamuraConversation();
         }
         // Si no es Nakamura, usamos la lógica normal
-        else if (!hasInteracted)
+        else if (!hasInteracted && !interactOnce)
         {
             Debug.Log("Interactor Triggered");
             DialogueManager.Instance.StartConversation(conversation, this);
         }
-        else if (hasInteracted)
+        else if (hasInteracted && !interactOnce)
         {
             DialogueManager.Instance.StartConversation(funnyConversation, this);
         }
