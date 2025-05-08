@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &7125272824277244258
+--- !u!1 &8056617886594576764
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,49 +8,49 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7629522996373736951}
-  - component: {fileID: 8572678320788558647}
-  - component: {fileID: 2403476835460994267}
-  - component: {fileID: 3416207317952422469}
-  - component: {fileID: 5071625262002975445}
-  - component: {fileID: 8532003786964051582}
+  - component: {fileID: 2803327958177748084}
+  - component: {fileID: 8761339265513051451}
+  - component: {fileID: 7544629363412826552}
+  - component: {fileID: 2160922171605887817}
+  - component: {fileID: 1707019553482076407}
+  - component: {fileID: 8812816495661444323}
   m_Layer: 6
-  m_Name: Nota_1
+  m_Name: Trenecito
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7629522996373736951
+--- !u!4 &2803327958177748084
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7125272824277244258}
+  m_GameObject: {fileID: 8056617886594576764}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.21011637, z: -0, w: 0.9776764}
-  m_LocalPosition: {x: 49.309803, y: 1.48, z: 52.28819}
-  m_LocalScale: {x: 0.4785, y: 0.4785, z: 0.4785}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.38600174, y: 0.33723354, z: -1.6057863}
+  m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -24.258, z: 0}
---- !u!33 &8572678320788558647
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!33 &8761339265513051451
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7125272824277244258}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &2403476835460994267
+  m_GameObject: {fileID: 8056617886594576764}
+  m_Mesh: {fileID: -4168598713299360677, guid: 0ef5b84bea10db84390de272bab81183, type: 3}
+--- !u!23 &7544629363412826552
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7125272824277244258}
+  m_GameObject: {fileID: 8056617886594576764}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -89,13 +89,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &3416207317952422469
-SphereCollider:
+--- !u!136 &2160922171605887817
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7125272824277244258}
+  m_GameObject: {fileID: 8056617886594576764}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -104,70 +104,50 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 4
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &5071625262002975445
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7125272824277244258}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!114 &8532003786964051582
+  serializedVersion: 2
+  m_Radius: 0.02
+  m_Height: 0.006747496
+  m_Direction: 1
+  m_Center: {x: 0.0006898949, y: -2.328307e-10, z: 0.0007072351}
+--- !u!114 &1707019553482076407
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7125272824277244258}
+  m_GameObject: {fileID: 8056617886594576764}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aff1e4dc9433dd4ea123748bb058734, type: 3}
+  m_Script: {fileID: 11500000, guid: bdf2841cde257ce41a7e4884979576c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemData: {fileID: 11400000, guid: faee335d679f5f54e8dc9ba382a77cd1, type: 2}
-  onItemClick:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-  OnItemInteracted:
+  interactionID: 
+  interactionPrompt: Presiona E para interactuar
+  onInteraction:
     m_PersistentCalls:
       m_Calls: []
-  interactableObject: {fileID: 0}
+  onInteracted:
+    m_PersistentCalls:
+      m_Calls: []
+  singleUseInteraction: 1
+  disableAfterInteraction: 1
+  detectionRadius: 2.5
   edgeOffset: 50
-  detectionCollider: {fileID: 0}
+  objectInteracted: 0
+--- !u!114 &8812816495661444323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8056617886594576764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a36086273318f47459d78ad0db76fe64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectType: 1
+  collectMessage: Has recogido un objeto para el puzzle.

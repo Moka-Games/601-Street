@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &7125272824277244258
+--- !u!1 &7115754571694869235
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,49 +8,103 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7629522996373736951}
-  - component: {fileID: 8572678320788558647}
-  - component: {fileID: 2403476835460994267}
-  - component: {fileID: 3416207317952422469}
-  - component: {fileID: 5071625262002975445}
-  - component: {fileID: 8532003786964051582}
-  m_Layer: 6
-  m_Name: Nota_1
+  - component: {fileID: 2460047480915254477}
+  - component: {fileID: 416562748714816581}
+  m_Layer: 8
+  m_Name: DetectionCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7629522996373736951
+--- !u!4 &2460047480915254477
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7125272824277244258}
+  m_GameObject: {fileID: 7115754571694869235}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.21011637, z: -0, w: 0.9776764}
-  m_LocalPosition: {x: 49.309803, y: 1.48, z: 52.28819}
-  m_LocalScale: {x: 0.4785, y: 0.4785, z: 0.4785}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 10.913347, y: 10.913347, z: 10.913347}
   m_ConstrainProportionsScale: 0
   m_Children: []
+  m_Father: {fileID: 5377961081691220587}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &416562748714816581
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7115754571694869235}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &8621143615332506418
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5377961081691220587}
+  - component: {fileID: 7369964514832073884}
+  - component: {fileID: 7597030525005376438}
+  - component: {fileID: 2474791747409404168}
+  - component: {fileID: 7820530050635198361}
+  - component: {fileID: 330052977999043412}
+  m_Layer: 8
+  m_Name: Libreta
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &5377961081691220587
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8621143615332506418}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.70709026, y: -0.004849665, z: -0.0048496653, w: 0.70709014}
+  m_LocalPosition: {x: -0.0010222195, y: -0.00021904834, z: -0.00014896393}
+  m_LocalScale: {x: 0.009020683, y: 0.00046693304, z: 0.0047926744}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2460047480915254477}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -24.258, z: 0}
---- !u!33 &8572678320788558647
+  m_LocalEulerAnglesHint: {x: 0, y: -0.786, z: 0}
+--- !u!33 &7369964514832073884
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7125272824277244258}
+  m_GameObject: {fileID: 8621143615332506418}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &2403476835460994267
+--- !u!23 &7597030525005376438
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7125272824277244258}
+  m_GameObject: {fileID: 8621143615332506418}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -89,13 +143,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &3416207317952422469
+--- !u!135 &2474791747409404168
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7125272824277244258}
+  m_GameObject: {fileID: 8621143615332506418}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -108,15 +162,15 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 4
+  m_Radius: 1.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &5071625262002975445
+--- !u!54 &7820530050635198361
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7125272824277244258}
+  m_GameObject: {fileID: 8621143615332506418}
   serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
@@ -137,19 +191,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &8532003786964051582
+--- !u!114 &330052977999043412
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7125272824277244258}
+  m_GameObject: {fileID: 8621143615332506418}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1aff1e4dc9433dd4ea123748bb058734, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemData: {fileID: 11400000, guid: faee335d679f5f54e8dc9ba382a77cd1, type: 2}
+  itemData: {fileID: 11400000, guid: 7aff6f0e6aacab0428fb15ad1e208bf9, type: 2}
   onItemClick:
     m_PersistentCalls:
       m_Calls:
@@ -170,4 +224,4 @@ MonoBehaviour:
       m_Calls: []
   interactableObject: {fileID: 0}
   edgeOffset: 50
-  detectionCollider: {fileID: 0}
+  detectionCollider: {fileID: 416562748714816581}

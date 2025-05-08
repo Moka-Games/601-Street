@@ -15,7 +15,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
     [SerializeField] private string interactionID;
     [SerializeField] private string interactionPrompt = "Presiona E para interactuar";
     [Tooltip("Evento que se disparará cuando el jugador interactúe con este objeto")]
-    [SerializeField] private UnityEvent onInteraction;
+    public UnityEvent onInteraction;
     [SerializeField] private UnityEvent onInteracted; //Evento por si volvemos a interactuar con el mismo objeto
 
     [Header("Comportamiento de interacción")]
