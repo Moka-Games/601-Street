@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 281b790b0324bdb49aca9bbad878a09c, type: 3}
+  m_Name: Riku_Parque
+  m_EditorClassIdentifier: 
+  actionId: Riku_Parque
+  dialogues:
+  - speakerName: Riku
+    content: Hey! What are you doing? Oh... you came for this? Too bad, because I
+      just love her too.
+  - speakerName: Nyssa
+    content: Who are you?
+  - speakerName: Riku
+    content: I am Riku. I study at the university next door. I haven't seen you before...
+      And who are you?
+  - speakerName: Nyssa
+    content: Nyssa. I still go to school.
+  - speakerName: Riku
+    content: Wow, a rookie. Well... were you coming for the apple?
+  - speakerName: Nyssa
+    content: It's the last one. Couldn't you get another one somewhere? I really
+      need it.
+  - speakerName: Riku
+    content: Come on! Apple is my favorite fruit, why should I leave it to you?
+  dialogueOptions:
+  - optionText: I'm not asking for just any favor... It's important to me.
+    actionId: 
+    requiresDiceRoll: 1
+    difficultyClass: 9
+    nextDialogue: {fileID: 0}
+    successDialogue: {fileID: 0}
+    failureDialogue: {fileID: 0}
+  - optionText: If you let me have it now I will compensate you later, we can make
+      a deal.
+    actionId: 
+    requiresDiceRoll: 1
+    difficultyClass: 3
+    nextDialogue: {fileID: 0}
+    successDialogue: {fileID: 0}
+    failureDialogue: {fileID: 0}
+  - optionText: I don't have time for games, give me the apple or you will regret
+      it.
+    actionId: 
+    requiresDiceRoll: 1
+    difficultyClass: 6
+    nextDialogue: {fileID: 0}
+    successDialogue: {fileID: 0}
+    failureDialogue: {fileID: 0}

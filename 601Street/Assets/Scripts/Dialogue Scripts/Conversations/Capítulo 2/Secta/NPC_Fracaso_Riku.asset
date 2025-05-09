@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 281b790b0324bdb49aca9bbad878a09c, type: 3}
+  m_Name: NPC_Fracaso_Riku
+  m_EditorClassIdentifier: 
+  actionId: Fracaso_Riku
+  dialogues:
+  - speakerName: Sect Member
+    content: Password?
+  dialogueOptions:
+  - optionText: I'm looking for someone, I need your help please
+    actionId: 
+    requiresDiceRoll: 1
+    difficultyClass: 20
+    nextDialogue: {fileID: 0}
+    successDialogue: {fileID: 0}
+    failureDialogue: {fileID: 0}
+  - optionText: Listen to me, I don't have the password, but if you let me through,
+      we could both gain from this.
+    actionId: 
+    requiresDiceRoll: 1
+    difficultyClass: 20
+    nextDialogue: {fileID: 0}
+    successDialogue: {fileID: 0}
+    failureDialogue: {fileID: 0}
+  - optionText: I don't have the password... and I don't need it. Step aside.
+    actionId: 
+    requiresDiceRoll: 1
+    difficultyClass: 9
+    nextDialogue: {fileID: 0}
+    successDialogue: {fileID: 0}
+    failureDialogue: {fileID: 0}

@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 281b790b0324bdb49aca9bbad878a09c, type: 3}
+  m_Name: Bar-Post-Dado
+  m_EditorClassIdentifier: 
+  actionId: Post-Bar
+  dialogues:
+  - speakerName: Nakamura
+    content: (sighs, rubbing his face) Damn it... Of course, I remember. That case...
+      it marked me for life. It even haunted me in my dreams. It was too much, that's
+      why I retired.
+  - speakerName: Nyssa
+    content: "I knew it... I always felt the truth was buried. Now my friend has
+      disappeared, and I think there\u2019s a connection between both cases."
+  - speakerName: Nakamura
+    content: (blinks, surprised) A connection? How?
+  - speakerName: Nyssa
+    content: There are too many coincidences. The same patterns, the same intervals
+      of time. If you know anything that could help me, I need you to speak.
+  - speakerName: Nakamura
+    content: (takes a drink, thinking) Damn... If you're right, this is much bigger
+      than I thought.
+  - speakerName: Nyssa
+    content: What can I do then?
+  - speakerName: Nakamura
+    content: In my old office, there's a safe, you'll find all the case information
+      there. Take this.
+  dialogueOptions: []

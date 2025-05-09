@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 281b790b0324bdb49aca9bbad878a09c, type: 3}
+  m_Name: "Policia_Conversaci\xF3n"
+  m_EditorClassIdentifier: 
+  actionId: 1
+  dialogues:
+  - speakerName: Nyssa
+    content: Hello, I am here to report a missing person. It's a friend of mine,
+      she hasn't been coming to class for a week and is not answering my calls. I
+      am very worried.
+  - speakerName: Police Officer
+    content: Could you give me their name, description and any other information
+      that might help us?
+  - speakerName: Nyssa
+    content: Yes, her name is Umi. She is thin, has brown hair with bangs and is
+      my age.
+  - speakerName: Police Officer
+    content: 'Do you know if he was having problems with anyone or if there was anything
+      unusual in his life lately?
+
+'
+  - speakerName: Nyssa
+    content: 'No... She had no enemies or bad habits. I don''t understand what could
+      have happened.
+
+'
+  - speakerName: Police Officer
+    content: 'Hmmm... A few years ago there was a similar case, although it involved
+      an adult woman.
+
+
+'
+  - speakerName: Nyssa
+    content: 'My mother! She is still missing... She left no trace and no clues.
+      Please, may I know how your investigation is going?
+
+'
+  - speakerName: Police Officer
+    content: ' (Hesitates for a moment) I''m not sure....
+
+'
+  - speakerName: Nyssa
+    content: "Please tell me something!  \n"
+  dialogueOptions:
+  - optionText: It is very important to me, please.
+    actionId: Option_1
+    requiresDiceRoll: 1
+    difficultyClass: 1
+    nextDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    successDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    failureDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+  - optionText: Sharing what you know can help us both.
+    actionId: Option_2
+    requiresDiceRoll: 1
+    difficultyClass: 1
+    nextDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    successDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    failureDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+  - optionText: I have the right to know the truth
+    actionId: Option_3
+    requiresDiceRoll: 1
+    difficultyClass: 1
+    nextDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    successDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    failureDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}

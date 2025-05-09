@@ -21,6 +21,8 @@ public class CallTrigger : MonoBehaviour
     [SerializeField] private string callerName = "Desconocido";
     [SerializeField] private string callerDescription = "Número desconocido";
     [SerializeField] private Conversation callConversation;
+    [Tooltip("Avatar del llamante (opcional)")]
+    [SerializeField] private Sprite callerAvatar;
 
     [Header("Eventos")]
     [SerializeField] private UnityEvent onTriggerActivated;
@@ -55,7 +57,7 @@ public class CallTrigger : MonoBehaviour
         {
             if (CallManager.Instance != null && callConversation != null)
             {
-                CallManager.Instance.MakeImmediateCall(callerName, callerDescription, callConversation);
+                CallManager.Instance.MakeImmediateCall(callerName, callerDescription, callConversation, callerAvatar);
             }
             else
             {

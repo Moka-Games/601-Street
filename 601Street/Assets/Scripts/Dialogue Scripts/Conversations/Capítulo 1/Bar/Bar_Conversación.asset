@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 281b790b0324bdb49aca9bbad878a09c, type: 3}
+  m_Name: "Bar_Conversaci\xF3n"
+  m_EditorClassIdentifier: 
+  actionId: Bar
+  dialogues:
+  - speakerName: Nyssa
+    content: Are you Nakamura?
+  - speakerName: Nakamura
+    content: (with a slurred voice, affected by drink) Yes... Who's asking?
+  - speakerName: Nyssa
+    content: My name is Nyssa. I'm Nekisha's daughter. From what I understand, you
+      handled her case.
+  - speakerName: Nakamura
+    content: (averts his gaze, uncomfortable) I don't know what you're talking about...
+      I'm retired. Leave me alone.
+  dialogueOptions:
+  - optionText: I need to know what happened to my mother
+    actionId: 1
+    requiresDiceRoll: 1
+    difficultyClass: 10
+    nextDialogue: {fileID: 0}
+    successDialogue: {fileID: 11400000, guid: 8a6bd95861830ff4d8e7ef685635baf7, type: 2}
+    failureDialogue: {fileID: 0}
+  - optionText: You're not going to get rid of me that easy
+    actionId: 2
+    requiresDiceRoll: 1
+    difficultyClass: 10
+    nextDialogue: {fileID: 0}
+    successDialogue: {fileID: 11400000, guid: 8a6bd95861830ff4d8e7ef685635baf7, type: 2}
+    failureDialogue: {fileID: 0}
+  - optionText: I know you remember my mother's case, I want answers.
+    actionId: 3
+    requiresDiceRoll: 1
+    difficultyClass: 10
+    nextDialogue: {fileID: 0}
+    successDialogue: {fileID: 11400000, guid: 8a6bd95861830ff4d8e7ef685635baf7, type: 2}
+    failureDialogue: {fileID: 0}
