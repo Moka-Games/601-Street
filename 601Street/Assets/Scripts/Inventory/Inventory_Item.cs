@@ -3,7 +3,7 @@ using UnityEngine.Events;
 using TMPro;
 
 /// <summary>
-/// Versión mejorada del componente Inventory_Item que utiliza prefabs para las interacciones
+/// Versión mejorada del componente Inventory_Item que muestra un canvas de información al recogerlo
 /// </summary>
 public class Inventory_Item : MonoBehaviour
 {
@@ -337,22 +337,27 @@ public class Inventory_Item : MonoBehaviour
         // Invocar el evento de interacción
         OnItemInteracted?.Invoke();
 
-        // Verificar si tenemos un prefab para instanciar
-        if (interactionPrefab != null)
+        // Añadir el ítem al inventario con su prefab de interacción
+        // Usamos la opción suppressPopup=true para evitar que se muestre el popup ahora
+        if (Inventory_Manager.Instance != null)
         {
-            // Añadir el ítem al inventario con su prefab de interacción
-            Inventory_Manager.Instance.AddItem(itemData, interactionPrefab, onItemClick);
+            if (interactionPrefab != null)
+            {
+                Inventory_Manager.Instance.AddItem(itemData, interactionPrefab, onItemClick, true);
+
+                // Mostrar el prefab de interacción y configurarlo para que al cerrarlo muestre el popup
+                Inventory_Manager.Instance.ShowInteractionForNewItem(interactionPrefab, itemData.itemName);
+            }
+            else
+            {
+                // Mantener compatibilidad con el sistema anterior
+                Inventory_Manager.Instance.AddItem(itemData, onItemClick);
+                Inventory_Manager.Instance.DisplayPopUp(itemData.itemName);
+            }
         }
         else
         {
-            // Mantener compatibilidad con el sistema anterior
-            Inventory_Manager.Instance.AddItem(itemData, onItemClick);
-        }
-
-        // Mostrar popup directamente si no hay prefab de interacción
-        if (interactionPrefab == null)
-        {
-            Inventory_Manager.Instance.DisplayPopUp(itemData.itemName);
+            Debug.LogError("No se encontró instancia de Inventory_Manager");
         }
 
         // Destruir el objeto del mundo tras recogerlo

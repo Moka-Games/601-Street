@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Versión mejorada del gestor de inventario que soporta persistencia entre escenas
+/// y prefabs de interacción
 /// </summary>
 public class Inventory_Manager : MonoBehaviour
 {
@@ -28,6 +29,12 @@ public class Inventory_Manager : MonoBehaviour
     [Tooltip("Transform donde se instanciarán los prefabs de interacción. Debe estar en una escena persistente o en un Canvas DontDestroyOnLoad")]
     public Transform prefabContainer;
 
+    [Header("Interaction Settings")]
+    [Tooltip("Si está marcado, se mostrará automáticamente un popup al añadir un ítem al inventario")]
+    public bool showPopupOnAdd = true;
+    [Tooltip("Si está marcado, el popup no se mostrará si ya se está mostrando un prefab de interacción")]
+    public bool skipPopupIfInteractionActive = true;
+
     // Listas y diccionarios para mantener el inventario
     private List<ItemData> inventoryItems = new List<ItemData>();
     private Dictionary<ItemData, PrefabInteractionData> itemInteractions = new Dictionary<ItemData, PrefabInteractionData>();
@@ -38,6 +45,12 @@ public class Inventory_Manager : MonoBehaviour
 
     // Referencia al objeto interactivo actualmente activo
     private GameObject activeInteractionObject;
+
+    // Bandera para indicar si el objeto actual se acaba de añadir al inventario
+    private bool isNewlyAddedItem = false;
+
+    // Nombre del último ítem añadido (para el popup)
+    private string lastAddedItemName = "";
 
     // Clase para almacenar datos de interacción de prefabs
     [System.Serializable]
@@ -66,12 +79,27 @@ public class Inventory_Manager : MonoBehaviour
         InventoryInterface.SetActive(false);
         popUpParent.SetActive(false);
 
-        // Crear prefabContainer si no existe
+        // Configurar prefabContainer para que persista entre escenas
+        EnsurePrefabContainerPersistence();
+    }
+
+    /// <summary>
+    /// Asegura que el contenedor de prefabs exista y persista entre escenas
+    /// </summary>
+    private void EnsurePrefabContainerPersistence()
+    {
         if (prefabContainer == null)
         {
             GameObject containerObj = new GameObject("PrefabContainer");
             prefabContainer = containerObj.transform;
+            prefabContainer.SetParent(transform); // Hacerlo hijo de este objeto que ya usa DontDestroyOnLoad
+            Debug.Log("PrefabContainer creado y configurado para persistir entre escenas");
+        }
+        else if (prefabContainer.parent != transform)
+        {
+            // Hacer que el prefabContainer existente sea hijo de este objeto para que persista
             prefabContainer.SetParent(transform);
+            Debug.Log("PrefabContainer existente configurado para persistir entre escenas");
         }
     }
 
@@ -81,12 +109,6 @@ public class Inventory_Manager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.I))
         {
             ToggleInventory();
-        }
-
-        // Cerrar objeto interactivo activo con la tecla E
-        if (Input.GetKeyDown(KeyCode.E) && activeInteractionObject != null)
-        {
-            CloseActiveInteractionObject();
         }
 
         // Actualizar estado del popup
@@ -108,7 +130,7 @@ public class Inventory_Manager : MonoBehaviour
     /// <summary>
     /// Añade un nuevo ítem al inventario con un prefab de interacción específico
     /// </summary>
-    public void AddItem(ItemData item, GameObject interactionPrefab, UnityEvent onItemClick = null)
+    public void AddItem(ItemData item, GameObject interactionPrefab, UnityEvent onItemClick = null, bool suppressPopup = false)
     {
         if (item == null)
         {
@@ -135,6 +157,15 @@ public class Inventory_Manager : MonoBehaviour
 
         // Crear elemento UI en el inventario
         InstantiateItemInUI(item);
+
+        // Guardar el nombre del ítem para usarlo en el popup cuando se cierre la interacción
+        lastAddedItemName = item.itemName;
+
+        // Mostrar popup solo si no está suprimido y está habilitado
+        if (!suppressPopup && showPopupOnAdd && (!skipPopupIfInteractionActive || activeInteractionObject == null))
+        {
+            DisplayPopUp(item.itemName);
+        }
     }
 
     /// <summary>
@@ -152,6 +183,30 @@ public class Inventory_Manager : MonoBehaviour
 
         itemInteractions[item] = interactionData;
         InstantiateItemInUI(item);
+
+        // Mostrar popup siempre en la versión antigua
+        DisplayPopUp(item.itemName);
+    }
+
+    /// <summary>
+    /// Muestra el prefab de interacción para un ítem recién añadido
+    /// </summary>
+    public void ShowInteractionForNewItem(GameObject prefab, string itemName)
+    {
+        // Cerrar cualquier interacción activa primero
+        if (activeInteractionObject != null)
+        {
+            CloseActiveInteractionObject();
+        }
+
+        // Marcar que el ítem se acaba de añadir
+        isNewlyAddedItem = true;
+        lastAddedItemName = itemName;
+
+        // Instanciar el prefab
+        activeInteractionObject = InstantiateInteractionPrefab(prefab, itemName, true);
+
+        Debug.Log($"Mostrando prefab de interacción para el ítem recién añadido: {itemName}");
     }
 
     private void InstantiateItemInUI(ItemData item)
@@ -226,30 +281,67 @@ public class Inventory_Manager : MonoBehaviour
                 CloseActiveInteractionObject();
             }
 
-            // Instanciar nuevo objeto interactivo
-            activeInteractionObject = Instantiate(interactionData.prefab, prefabContainer);
+            // Marcar que NO es un ítem recién añadido (viene del inventario)
+            isNewlyAddedItem = false;
 
-            // Configurar botón de cierre si existe
-            SetupCloseButton(activeInteractionObject, item.itemName);
+            // Instanciar nuevo objeto interactivo
+            activeInteractionObject = InstantiateInteractionPrefab(interactionData.prefab, item.itemName, false);
+
+            Debug.Log($"Mostrando prefab de interacción para {item.itemName} desde el inventario");
         }
+    }
+
+    /// <summary>
+    /// Instancia un prefab de interacción y configura su botón de cierre
+    /// </summary>
+    public GameObject InstantiateInteractionPrefab(GameObject prefab, string itemName, bool isNewItem = false)
+    {
+        // Asegurar que el prefabContainer exista
+        EnsurePrefabContainerPersistence();
+
+        // Instanciar el prefab
+        GameObject instance = Instantiate(prefab, prefabContainer);
+
+        // Configurar botón de cierre si existe
+        SetupCloseButton(instance, itemName, isNewItem);
+
+        // Establecer como objeto activo
+        activeInteractionObject = instance;
+
+        return instance;
     }
 
     /// <summary>
     /// Configura el botón de cierre en el objeto interactivo
     /// </summary>
-    private void SetupCloseButton(GameObject interactionObject, string itemName)
+    private void SetupCloseButton(GameObject interactionObject, string itemName, bool isNewItem)
     {
         // Buscar botón por su nombre especial
         Button closeButton = FindButtonInChildren(interactionObject, "Close_Interacted_Button");
 
         if (closeButton != null)
         {
-            // Añadir listener para cerrar el objeto y mostrar popup
+            // Añadir listener para cerrar el objeto y mostrar popup solo si es nuevo
             closeButton.onClick.RemoveAllListeners();
             closeButton.onClick.AddListener(() => {
+                bool wasNewItem = isNewlyAddedItem;
+
+                // Destruir el objeto activo
                 DestroyActiveInteractionObject();
-                DisplayPopUp(itemName);
+
+                // CAMBIO: Mostrar popup SOLO si era un ítem recién añadido
+                if (wasNewItem)
+                {
+                    DisplayPopUp(lastAddedItemName + " added");
+                }
+                // No mostrar ningún popup para objetos del inventario
             });
+
+            Debug.Log($"Botón de cierre configurado para {itemName}");
+        }
+        else
+        {
+            Debug.LogWarning($"No se encontró botón de cierre en el prefab para {itemName}");
         }
     }
 
@@ -270,7 +362,14 @@ public class Inventory_Manager : MonoBehaviour
             else
             {
                 // Si no hay botón, destruir directamente
+                bool wasNewItem = isNewlyAddedItem;
                 DestroyActiveInteractionObject();
+
+                // Si era un ítem nuevo, mostrar popup
+                if (wasNewItem)
+                {
+                    DisplayPopUp(lastAddedItemName + " added");
+                }
             }
         }
     }
@@ -284,6 +383,7 @@ public class Inventory_Manager : MonoBehaviour
         {
             Destroy(activeInteractionObject);
             activeInteractionObject = null;
+            isNewlyAddedItem = false;
         }
     }
 
@@ -307,17 +407,36 @@ public class Inventory_Manager : MonoBehaviour
     }
 
     /// <summary>
-    /// Muestra un popup con el nombre del ítem recogido
+    /// Muestra un popup con el mensaje especificado
     /// </summary>
-    public void DisplayPopUp(string itemName)
+    public void DisplayPopUp(string message)
     {
         popUpParent.SetActive(true);
-        popUpText.text = itemName + " added";
+        popUpText.text = message;
         lastPickUpTime = Time.time;
     }
 
+    /// <summary>
+    /// Verifica si hay un objeto de interacción activo
+    /// </summary>
     public bool HasActiveInteractionObject()
     {
         return activeInteractionObject != null;
+    }
+
+    /// <summary>
+    /// Verifica si un ítem específico está en el inventario
+    /// </summary>
+    public bool HasItem(ItemData item)
+    {
+        return inventoryItems.Contains(item);
+    }
+
+    /// <summary>
+    /// Verifica si un ítem con un nombre específico está en el inventario
+    /// </summary>
+    public bool HasItemWithName(string itemName)
+    {
+        return inventoryItems.Exists(item => item.itemName == itemName);
     }
 }

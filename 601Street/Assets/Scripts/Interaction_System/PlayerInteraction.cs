@@ -86,11 +86,13 @@ public class PlayerInteraction : MonoBehaviour
             return;
         }
 
+        // Comprobar si hay un objeto de interacción activo en el Inventory_Manager
+        bool isInteractionObjectActive = Inventory_Manager.Instance != null &&
+                                       Inventory_Manager.Instance.HasActiveInteractionObject();
+
         // Si hay un objeto de interacción activo, la tecla E se usará para cerrarlo
-        if (Inventory_Manager.Instance != null &&
-            Inventory_Manager.Instance.HasActiveInteractionObject())
+        if (isInteractionObjectActive)
         {
-            // La tecla E para cerrar el objeto activo es manejada por el Inventory_Manager
             if (interactPressed)
             {
                 Inventory_Manager.Instance.CloseActiveInteractionObject();
