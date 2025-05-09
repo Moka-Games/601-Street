@@ -137,7 +137,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
             if (disableAfterInteraction)
             {
                 // Desactivar el objeto después de un breve retardo para permitir que las animaciones terminen
-                StartCoroutine(DisableAfterDelay(0.5f));
+                //StartCoroutine(DisableAfterDelay(0.5f));
             }
         }
     }
