@@ -162,11 +162,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Peluche
       objectReference: {fileID: 0}
-    - target: {fileID: 5264668553673617043, guid: ffab24593e699fb469bb6fe47519208f,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 9039625584749799413, guid: ffab24593e699fb469bb6fe47519208f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -220,11 +215,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 4715266118434683534, guid: ffab24593e699fb469bb6fe47519208f,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 999904957}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ffab24593e699fb469bb6fe47519208f, type: 3}
 --- !u!1001 &621120025
 PrefabInstance:
@@ -382,33 +373,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9cc504ae1dfefdc41ae2e6bf013c3ee0, type: 3}
---- !u!1 &999904950 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4715266118434683534, guid: ffab24593e699fb469bb6fe47519208f,
-    type: 3}
-  m_PrefabInstance: {fileID: 136092174}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &999904957
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 999904950}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.0163814, y: 0.015768828, z: 0.018044582}
-  m_Center: {x: 0.0008354792, y: -0.0008037611, z: 0.0064818044}
 --- !u!1001 &1370615567
 PrefabInstance:
   m_ObjectHideFlags: 0

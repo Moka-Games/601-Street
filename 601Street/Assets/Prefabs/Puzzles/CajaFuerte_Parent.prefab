@@ -1551,7 +1551,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   passwordDisplay: {fileID: 4689138548120169507}
-  correctPassword: 1234
+  correctPassword: 2557
   feedbackLight: {fileID: 1145890844375631245}
   defaultMaterial: {fileID: 2100000, guid: 4cc7596c3b7136640ac1b3215c687095, type: 2}
   redMaterial: {fileID: 2100000, guid: 062a107c44be1824ba4980db268ad102, type: 2}
@@ -1607,6 +1607,18 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
         m_CallState: 2
   OnWrongPassword:
     m_PersistentCalls:
@@ -1697,9 +1709,7 @@ MonoBehaviour:
       m_Calls: []
   singleUseInteraction: 0
   disableAfterInteraction: 0
-  rangeIndicator: {fileID: 0}
-  interactIndicator: {fileID: 0}
-  detectionRadius: 10
+  detectionRadius: 7.5
   edgeOffset: 50
   objectInteracted: 0
 --- !u!1 &2399520020107166119
@@ -2723,6 +2733,13 @@ MonoBehaviour:
     GateFit: 2
     FocusDistance: 10
     m_SensorSize: {x: 1, y: 1}
+    Iso: 200
+    ShutterSpeed: 0.005
+    Aperture: 16
+    BladeCount: 5
+    Curvature: {x: 2, y: 11}
+    BarrelClipping: 0.25
+    Anamorphism: 0
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -5405,6 +5422,13 @@ MonoBehaviour:
     GateFit: 2
     FocusDistance: 10
     m_SensorSize: {x: 1, y: 1}
+    Iso: 200
+    ShutterSpeed: 0.005
+    Aperture: 16
+    BladeCount: 5
+    Curvature: {x: 2, y: 11}
+    BarrelClipping: 0.25
+    Anamorphism: 0
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0

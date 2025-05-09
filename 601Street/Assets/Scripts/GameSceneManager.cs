@@ -208,6 +208,8 @@ public class GameSceneManager : MonoBehaviour
 
     private IEnumerator LoadSceneWithTransition(string sceneName, bool isBackward)
     {
+        WorldStateManager.Instance.ApplyStateToScene(sceneName);
+
         isTransitioning = true;
 
         if (showDetailedLogs)
@@ -334,6 +336,7 @@ public class GameSceneManager : MonoBehaviour
         {
             Debug.Log($"GameSceneManager: Transición a escena '{sceneName}' completada");
         }
+
     }
 
     private void DisablePlayerMovement()

@@ -2,9 +2,6 @@ using UnityEngine;
 
 public class ComisariManager : MonoBehaviour
 {
-    public GameObject policia1;
-    public GameObject policia2;
-
     public GameObject ganzúa;
     public GameObject puertaCaja;
     public GameObject contraseña;
@@ -16,18 +13,6 @@ public class ComisariManager : MonoBehaviour
     void Start()
     {
         pensamientosManager = FindAnyObjectByType<Pensamientos_Manager>();
-
-        print("Conversación con policia terminada = " + BarInterior.conversaciónPoliciaTerminada);
-        if(BarInterior.conversaciónPoliciaTerminada == true)
-        {
-            policia2.SetActive(true);
-            policia1.SetActive(false);
-        }
-        else
-        {
-            policia1.SetActive(true);
-            policia2.SetActive(false);
-        }
     }
 
     public void ObjetosPostPolicia()

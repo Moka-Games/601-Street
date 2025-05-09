@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1609976795307810989}
   - component: {fileID: 2013143691063555766}
   - component: {fileID: 5264668553673617043}
+  - component: {fileID: 828721559775435753}
   m_Layer: 6
   m_Name: Peluche
   m_TagString: Untagged
@@ -127,3 +128,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectType: 2
   collectMessage: Has recogido un objeto para el puzzle.
+--- !u!65 &828721559775435753
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4715266118434683534}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.0163814, y: 0.015768828, z: 0.018044582}
+  m_Center: {x: 0.0008354792, y: -0.0008037611, z: 0.0064818044}

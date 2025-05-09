@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 289500071776046101}
   - component: {fileID: 7404180985309168843}
-  - component: {fileID: 3079553400576404774}
+  - component: {fileID: 4968691260854914832}
   m_Layer: 6
   m_Name: "Ganz\xFAaParent"
   m_TagString: Untagged
@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdf2841cde257ce41a7e4884979576c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionID: 
+  interactionID: 1
   interactionPrompt: Presiona E para interactuar
   onInteraction:
     m_PersistentCalls:
@@ -75,28 +75,16 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 6021316375846908802}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
   onInteracted:
     m_PersistentCalls:
       m_Calls: []
-  rangeIndicator: {fileID: 0}
-  interactIndicator: {fileID: 0}
-  detectionRadius: 10
+  singleUseInteraction: 1
+  disableAfterInteraction: 0
+  detectionRadius: 20
   edgeOffset: 50
   objectInteracted: 0
---- !u!135 &3079553400576404774
-SphereCollider:
+--- !u!65 &4968691260854914832
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -114,8 +102,8 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 5.59455, y: 9.606095, z: 1}
+  m_Center: {x: -0.29479918, y: -1.4092836, z: -2.0666247e-15}
 --- !u!1001 &4179227581806027646
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -208,9 +196,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15688ed7a4877264d901a8c454c4e1d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &6021316375846908802 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7669518018305118460, guid: 575664d1c70e38243b91a0aa5ede8543,
-    type: 3}
-  m_PrefabInstance: {fileID: 4179227581806027646}
-  m_PrefabAsset: {fileID: 0}

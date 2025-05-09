@@ -95,24 +95,7 @@ public class LockPick : MonoBehaviour
     void Awake()
     {
         // Buscar la cámara principal si no está asignada
-        if (mainCamera == null)
-        {
-            mainCamera = Camera.main;
-            if (mainCamera == null)
-            {
-                // Como alternativa, buscamos por tag
-                GameObject mainCameraObj = GameObject.FindGameObjectWithTag("MainCamera");
-                if (mainCameraObj != null)
-                {
-                    mainCamera = mainCameraObj.GetComponent<Camera>();
-                }
-
-                if (mainCamera == null)
-                {
-                    Debug.LogError("No se encontró la cámara principal. Asegúrate de que exista una cámara con tag MainCamera.");
-                }
-            }
-        }
+        
 
         // Buscar la cámara del jugador (FreeLookCamera)
         FindPlayerCamera();
@@ -168,6 +151,24 @@ public class LockPick : MonoBehaviour
 
     void Start()
     {
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                // Como alternativa, buscamos por tag
+                GameObject mainCameraObj = GameObject.FindGameObjectWithTag("MainCamera");
+                if (mainCameraObj != null)
+                {
+                    mainCamera = mainCameraObj.GetComponent<Camera>();
+                }
+
+                if (mainCamera == null)
+                {
+                    Debug.LogError("No se encontró la cámara principal. Asegúrate de que exista una cámara con tag MainCamera.");
+                }
+            }
+        }
         // Guardamos la prioridad original
         if (lockpickVCam != null)
         {
