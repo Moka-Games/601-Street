@@ -75,6 +75,15 @@ public class GameSceneManager : MonoBehaviour
             {
                 Scene initialScene = SceneManager.GetActiveScene();
 
+                // Comprobar si estamos en un DirectLoad
+                bool isDirectLoad = PlayerPrefs.GetInt("DirectSceneLoad", 0) == 1;
+
+                // Si es carga directa, asegurar que mantenemos la pantalla negra durante toda la transición
+                if (isDirectLoad && fadeManager != null)
+                {
+                    fadeManager.ForceBlackScreen(); // Añadir este método a FadeManager
+                }
+
                 SceneManager.LoadSceneAsync("PersistentScene", LoadSceneMode.Additive).completed += (asyncOperation) =>
                 {
                     persistentSceneLoaded = true;
@@ -83,11 +92,17 @@ public class GameSceneManager : MonoBehaviour
 
                     currentSceneName = initialScene.name;
                     DisablePlayerMovement();
+
                     if (fadeManager != null)
                     {
+                        // Solo hacer fadeOut cuando todo esté listo
                         fadeManager.BlackScreenIntoFadeOut(fadeOutDuration);
                         fadeManager.OnFadeOutComplete += EnablePlayerMovementAfterFade;
+
+                        // Limpiar la bandera
+                        PlayerPrefs.DeleteKey("DirectSceneLoad");
                     }
+
                     StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
 
                     // Aplicar fuentes globales a la escena inicial
@@ -616,5 +631,13 @@ public class GameSceneManager : MonoBehaviour
     public string GetCurrentSceneName()
     {
         return currentSceneName;
+    }
+    public static void SetupForDirectLoad()
+    {
+        // Este método se puede llamar desde cualquier lugar antes de cargar la escena
+        // Configura una bandera que indica al GameSceneManager que mantenga la pantalla
+        // negra hasta que todo esté listo
+        PlayerPrefs.SetInt("DirectSceneLoad", 1);
+        PlayerPrefs.Save();
     }
 }

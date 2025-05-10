@@ -161,7 +161,14 @@ public class FadeManager : MonoBehaviour
             }
         }
     }
-
+    public void ForceBlackScreen()
+    {
+        if (targetImage != null)
+        {
+            Color color = targetImage.color;
+            targetImage.color = new Color(color.r, color.g, color.b, 1f);
+        }
+    }
     public bool IsFading()
     {
         return isFading;
