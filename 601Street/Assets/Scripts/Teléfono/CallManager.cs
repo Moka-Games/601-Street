@@ -31,7 +31,7 @@ public class CallManager : MonoBehaviour
     }
 
     [Header("Llamadas Programadas")]
-    [SerializeField] private List<ScheduledCall> scheduledCalls = new List<ScheduledCall>();
+    public List<ScheduledCall> scheduledCalls = new List<ScheduledCall>();
 
     // Llamadas en progreso y pendientes
     private Dictionary<string, Coroutine> activeCallRoutines = new Dictionary<string, Coroutine>();
@@ -232,5 +232,18 @@ public class CallManager : MonoBehaviour
 
         // Iniciar la llamada
         CallSystem.Instance.StartCall(callData);
+    }
+    public void SubscribeToCallFinishedEvent(string callId, UnityAction callback)
+    {
+        ScheduledCall call = scheduledCalls.Find(c => c.id == callId);
+        if (call != null)
+        {
+            call.onCallFinished.AddListener(callback);
+            Debug.Log($"CallManager: Suscrito al evento onCallFinished para la llamada {callId}");
+        }
+        else
+        {
+            Debug.LogWarning($"CallManager: No se encontró una llamada con ID: {callId}");
+        }
     }
 }
