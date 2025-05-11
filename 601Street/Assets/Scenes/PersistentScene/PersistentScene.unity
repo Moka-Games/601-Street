@@ -323,10 +323,190 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scheduledCalls:
-  - id: Daichi_1
+  - id: Daichi_1_SalidaColegio
     callerName: Daichi
     callerDescription: 
     callConversation: {fileID: 11400000, guid: adaa507322b49df43897256edbbb514d, type: 2}
+    callerAvatar: {fileID: -1964711353, guid: d924681df6f370c49be30aebbfd0f401, type: 3}
+    delay: 0.1
+    triggeredByEvent: 1
+    repeatable: 0
+    hasBeenTriggered: 0
+    onCallAccepted:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallRejected:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallFinished:
+      m_PersistentCalls:
+        m_Calls: []
+  - id: Daichi_1_PostEco1
+    callerName: Daichi
+    callerDescription: 
+    callConversation: {fileID: 11400000, guid: 8c83b060346bb3041a0aad12cce00457, type: 2}
+    callerAvatar: {fileID: -1964711353, guid: d924681df6f370c49be30aebbfd0f401, type: 3}
+    delay: 0.1
+    triggeredByEvent: 1
+    repeatable: 0
+    hasBeenTriggered: 0
+    onCallAccepted:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallRejected:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallFinished:
+      m_PersistentCalls:
+        m_Calls: []
+  - id: Daichi_1_CasaNyssa
+    callerName: Daichi
+    callerDescription: 
+    callConversation: {fileID: 11400000, guid: ef002c5293e60eb4888bf17b3346674f, type: 2}
+    callerAvatar: {fileID: -1964711353, guid: d924681df6f370c49be30aebbfd0f401, type: 3}
+    delay: 0.1
+    triggeredByEvent: 1
+    repeatable: 0
+    hasBeenTriggered: 0
+    onCallAccepted:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallRejected:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallFinished:
+      m_PersistentCalls:
+        m_Calls: []
+  - id: Daichi_2_PostComisaria
+    callerName: Daichi
+    callerDescription: 
+    callConversation: {fileID: 11400000, guid: fb1cb99eaf5a8914a9a44ff688983ed4, type: 2}
+    callerAvatar: {fileID: -1964711353, guid: d924681df6f370c49be30aebbfd0f401, type: 3}
+    delay: 0.1
+    triggeredByEvent: 1
+    repeatable: 0
+    hasBeenTriggered: 0
+    onCallAccepted:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallRejected:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallFinished:
+      m_PersistentCalls:
+        m_Calls: []
+  - id: Daichi_2_PostCasaNyssa
+    callerName: Daichi
+    callerDescription: 
+    callConversation: {fileID: 11400000, guid: fb1cb99eaf5a8914a9a44ff688983ed4, type: 2}
+    callerAvatar: {fileID: -1964711353, guid: d924681df6f370c49be30aebbfd0f401, type: 3}
+    delay: 0.1
+    triggeredByEvent: 1
+    repeatable: 0
+    hasBeenTriggered: 0
+    onCallAccepted:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallRejected:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallFinished:
+      m_PersistentCalls:
+        m_Calls: []
+  - id: Daichi_2_PostCasaNyssa
+    callerName: Daichi
+    callerDescription: 
+    callConversation: {fileID: 11400000, guid: 069e9d042fcbd464b913359dd82be6ca, type: 2}
+    callerAvatar: {fileID: -1964711353, guid: d924681df6f370c49be30aebbfd0f401, type: 3}
+    delay: 0.1
+    triggeredByEvent: 1
+    repeatable: 0
+    hasBeenTriggered: 0
+    onCallAccepted:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallRejected:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallFinished:
+      m_PersistentCalls:
+        m_Calls: []
+  - id: Daichi_2_SectaFracaso_1
+    callerName: Daichi
+    callerDescription: 
+    callConversation: {fileID: 11400000, guid: b3b4cefb1d6fbef4cb4aa3ce9fd987e2, type: 2}
+    callerAvatar: {fileID: -1964711353, guid: d924681df6f370c49be30aebbfd0f401, type: 3}
+    delay: 0.1
+    triggeredByEvent: 1
+    repeatable: 0
+    hasBeenTriggered: 0
+    onCallAccepted:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallRejected:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallFinished:
+      m_PersistentCalls:
+        m_Calls: []
+  - id: Daichi_2_SectaFracaso_2
+    callerName: Daichi
+    callerDescription: 
+    callConversation: {fileID: 11400000, guid: 1f243f3fbbabc1a44a01069b0c0f117c, type: 2}
+    callerAvatar: {fileID: -1964711353, guid: d924681df6f370c49be30aebbfd0f401, type: 3}
+    delay: 0.1
+    triggeredByEvent: 1
+    repeatable: 0
+    hasBeenTriggered: 0
+    onCallAccepted:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallRejected:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallFinished:
+      m_PersistentCalls:
+        m_Calls: []
+  - id: "Daichi_2_Secta\xC9xito"
+    callerName: Daichi
+    callerDescription: 
+    callConversation: {fileID: 11400000, guid: 7f55acc86af90db4b9716c3dbd2fd5d1, type: 2}
+    callerAvatar: {fileID: -1964711353, guid: d924681df6f370c49be30aebbfd0f401, type: 3}
+    delay: 0.1
+    triggeredByEvent: 1
+    repeatable: 0
+    hasBeenTriggered: 0
+    onCallAccepted:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallRejected:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallFinished:
+      m_PersistentCalls:
+        m_Calls: []
+  - id: Daichi_3_CasaAbandonada
+    callerName: Daichi
+    callerDescription: 
+    callConversation: {fileID: 11400000, guid: b645409cebf62a84495ede1808df82be, type: 2}
+    callerAvatar: {fileID: -1964711353, guid: d924681df6f370c49be30aebbfd0f401, type: 3}
+    delay: 0.1
+    triggeredByEvent: 1
+    repeatable: 0
+    hasBeenTriggered: 0
+    onCallAccepted:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallRejected:
+      m_PersistentCalls:
+        m_Calls: []
+    onCallFinished:
+      m_PersistentCalls:
+        m_Calls: []
+  - id: Daichi_3_PostUniversidad
+    callerName: Daichi
+    callerDescription: 
+    callConversation: {fileID: 11400000, guid: cd5fb6451227a0d4ca1bd167c11b7097, type: 2}
     callerAvatar: {fileID: -1964711353, guid: d924681df6f370c49be30aebbfd0f401, type: 3}
     delay: 0.1
     triggeredByEvent: 1
@@ -566,14 +746,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 451547217}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.5024926, y: 0.015738023, z: -0.0047888826}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -49.10249, y: 0.015738023, z: -47.604786}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 890649597}
   - {fileID: 519442935}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1942858743}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &486608885
 PrefabInstance:
@@ -5078,6 +5258,7 @@ Transform:
   - {fileID: 1748555776}
   - {fileID: 1223722557}
   - {fileID: 733720843}
+  - {fileID: 451547218}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1942858744
@@ -5882,5 +6063,4 @@ SceneRoots:
   - {fileID: 1746118858}
   - {fileID: 304497846}
   - {fileID: 584507667}
-  - {fileID: 451547218}
   - {fileID: 730379165}
