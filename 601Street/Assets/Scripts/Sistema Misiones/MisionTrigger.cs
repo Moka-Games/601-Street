@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class MisionTrigger : MonoBehaviour
@@ -6,7 +7,9 @@ public class MisionTrigger : MonoBehaviour
 
     public bool terminarMisión;
 
-    private void OnTriggerEnter(Collider other)
+    public float startDelay;
+
+    private void OnTriggerEnter(Collider other) 
     {
         if (other.CompareTag("Player"))
         {
@@ -17,11 +20,16 @@ public class MisionTrigger : MonoBehaviour
             }
             else
             {
-                MisionManager.Instance.IniciarMision(idMision);
+                StartCoroutine(StartMision());
             }
 
             Destroy(gameObject);
         }
     }
-
+    
+    IEnumerator StartMision()
+    {
+        yield return new WaitForSeconds(startDelay);
+        MisionManager.Instance.IniciarMision(idMision);
+    }
 }
