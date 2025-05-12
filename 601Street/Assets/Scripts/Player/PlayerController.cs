@@ -52,6 +52,12 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
     private bool isPlayingAfkAnimation = false;
     private float inactivityTimer = 0f;
     private bool isAfk = false;
+
+    private Vector3 fixedRightDirection; // Dirección "derecha" inicial
+    private Vector3 fixedLeftDirection;  // Dirección "izquierda" inicial
+    private bool isMovingPurelyHorizontal = false; // Indica si el movimiento es puramente horizontal
+    private bool lastMoveWasHorizontal = false;    // Indica si el último movimiento fue horizontal
+    private float lastHorizontalInput = 0f;
     private struct MovementState
     {
         public Vector3 Velocity;
@@ -191,6 +197,27 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
 
         (Vector3 forward, Vector3 right) = GetCameraDirections();
 
+        // Detectar si estamos empezando un movimiento puramente horizontal
+        bool isPurelyHorizontal = Mathf.Abs(input.x) > movementThreshold && Mathf.Abs(input.y) < movementThreshold;
+
+        // Si acabamos de empezar un movimiento puramente horizontal
+        if (isPurelyHorizontal && !lastMoveWasHorizontal)
+        {
+            // Guardar la dirección inicial
+            fixedRightDirection = right;
+            fixedLeftDirection = -right;
+            isMovingPurelyHorizontal = true;
+        }
+        // Si hemos dejado de movernos horizontalmente o hemos añadido movimiento vertical
+        else if (!isPurelyHorizontal)
+        {
+            isMovingPurelyHorizontal = false;
+        }
+
+        // Actualizar el estado del movimiento
+        lastMoveWasHorizontal = isPurelyHorizontal;
+
+        // Calcular dirección de movimiento, usando direcciones fijas si es necesario
         movementState.MoveDirection = CalculateMoveDirection(input, forward, right);
         movementState.IsMoving = movementState.MoveDirection.magnitude > movementThreshold;
         movementState.CurrentSpeed = CalculateCurrentSpeed(input.y);
@@ -199,6 +226,10 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
         {
             characterController.Move(movementState.MoveDirection * movementState.CurrentSpeed * Time.deltaTime);
         }
+
+        // Guardar el input horizontal para la próxima comparación
+        if (Mathf.Abs(input.x) > movementThreshold)
+            lastHorizontalInput = input.x;
     }
 
     private (Vector3 forward, Vector3 right) GetCameraDirections()
@@ -214,15 +245,30 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
 
     private Vector3 CalculateMoveDirection(Vector2 input, Vector3 forward, Vector3 right)
     {
-        Vector3 direction = right * input.x;
+        Vector3 direction = Vector3.zero;
 
-        if (input.y > 0)
+        // Si estamos en movimiento puramente horizontal y tenemos direcciones fijas
+        if (isMovingPurelyHorizontal && fixedRightDirection != Vector3.zero)
         {
-            direction += forward * input.y;
+            // Usar la dirección fija según el signo del input
+            if (input.x > 0)
+                direction = fixedRightDirection * input.x;
+            else
+                direction = fixedLeftDirection * -input.x; // Negativo porque fixedLeftDirection ya es negativa
         }
-        else if (input.y < 0)
+        else
         {
-            direction += -forward * Mathf.Abs(input.y);
+            // Comportamiento original para movimiento no puramente horizontal
+            direction = right * input.x;
+
+            if (input.y > 0)
+            {
+                direction += forward * input.y;
+            }
+            else if (input.y < 0)
+            {
+                direction += -forward * Mathf.Abs(input.y);
+            }
         }
 
         return direction;
@@ -244,12 +290,15 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
 
     private void UpdateRotation(Vector2 input)
     {
-        if (!movementState.IsMoving)
+        // Si no hay movimiento o es SOLO movimiento horizontal, no rotamos
+        if (!movementState.IsMoving || IsPurelyHorizontalMovement(input))
         {
+            // Mantener la rotación actual del personaje
             rotationState.TargetRotation = transform.rotation;
             return;
         }
 
+        // Solo procesamos rotación si hay movimiento vertical o diagonal
         HandleRotationStates(input);
         ApplyRotation();
         CheckRotationCompletion();
@@ -504,7 +553,13 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
             inactivityTimer = 0f;
         }
     }
-
+    private bool IsPurelyHorizontalMovement(Vector2 input)
+    {
+        // Consideramos movimiento puramente horizontal si:
+        // 1. Hay input horizontal significativo
+        // 2. No hay input vertical significativo
+        return Mathf.Abs(input.x) > movementThreshold && Mathf.Abs(input.y) < movementThreshold;
+    }
     private void TriggerAfkAnimation()
     {
         if (animator != null)
