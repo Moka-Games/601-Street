@@ -103,6 +103,7 @@ public class WorldStateManager : MonoBehaviour
     }
 
     // Establecer un estado booleano
+    // Establecer un estado booleano
     public void SetFlag(string flagID, bool value)
     {
         bool hasChanged = !flagStates.TryGetValue(flagID, out bool currentValue) || currentValue != value;
@@ -121,7 +122,10 @@ public class WorldStateManager : MonoBehaviour
             // Notificar listeners específicos
             if (flagListeners.TryGetValue(flagID, out var listeners))
             {
-                foreach (var listener in listeners)
+                // Crear una copia de la lista de listeners para evitar problemas de modificación durante la iteración
+                var listenersCopy = new List<Action<bool>>(listeners);
+
+                foreach (var listener in listenersCopy)
                 {
                     listener?.Invoke(value);
                 }
@@ -284,6 +288,12 @@ public class WorldStateManager : MonoBehaviour
 
     public void SetObjectActive(string sceneName, string objectID, bool active)
     {
+        // Si no se proporciona nombre de escena, usar la escena actual
+        if (string.IsNullOrEmpty(sceneName))
+        {
+            sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        }
+
         // Verificar si la escena está cargada
         bool isSceneLoaded = false;
         for (int i = 0; i < SceneManager.sceneCount; i++)
@@ -301,6 +311,20 @@ public class WorldStateManager : MonoBehaviour
             string stateKey = $"Object_{sceneName}_{objectID}";
             SetFlag(stateKey, active);
             Debug.Log($"Escena {sceneName} cargada, cambio aplicado inmediatamente: {objectID} = {active}");
+
+            // Si es la escena actual, intentar encontrar el objeto y aplicar el estado directamente
+            if (sceneName == UnityEngine.SceneManagement.SceneManager.GetActiveScene().name)
+            {
+                WorldStateListener[] listeners = FindObjectsByType<WorldStateListener>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+                foreach (var listener in listeners)
+                {
+                    if (listener.ObjectID == objectID)
+                    {
+                        listener.ApplyState();
+                        break;
+                    }
+                }
+            }
         }
         else
         {
@@ -483,6 +507,27 @@ public class WorldStateManager : MonoBehaviour
 
         // Limpiar los estados pendientes para esta escena
         pendingObjectStates.Remove(sceneName);
+    }
+    public void ApplyStateToObject(string objectID, bool active)
+    {
+        string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        string stateKey = $"Object_{currentSceneName}_{objectID}";
+
+        // Actualizar el estado
+        SetFlag(stateKey, active);
+
+        // Buscar el objeto y actualizar su estado
+        WorldStateListener[] listeners = FindObjectsByType<WorldStateListener>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+        foreach (var listener in listeners)
+        {
+            if (listener.ObjectID == objectID)
+            {
+                listener.ApplyState();
+                Debug.Log($"Estado aplicado inmediatamente a {objectID}: {active}");
+                break;
+            }
+        }
     }
     #endregion
 }

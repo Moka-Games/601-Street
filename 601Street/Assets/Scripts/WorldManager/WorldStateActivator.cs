@@ -45,6 +45,7 @@ public class WorldStateActivator : MonoBehaviour
     [SerializeField] private bool activateOnStart = false;
     [SerializeField] private bool activateOnInteract = true;
     [SerializeField] private bool activateOnce = false;
+    [SerializeField] private bool forceImmediateUpdate = true; // Nuevo: forzar actualización inmediata
 
     // Control de activación
     private bool hasActivated = false;
@@ -81,15 +82,31 @@ public class WorldStateActivator : MonoBehaviour
         if (WorldStateManager.Instance == null || stateModifications == null)
             return;
 
+        string currentSceneName = gameObject.scene.name;
+
         foreach (var mod in stateModifications)
         {
+            // Si objectSceneName está vacío, asumimos la escena actual
+            if (mod.type == ModificationType.SetObjectActive && string.IsNullOrEmpty(mod.objectSceneName))
+            {
+                mod.objectSceneName = currentSceneName;
+            }
+
             // Si es una modificación de objeto en otra escena, verifica si la escena está cargada
             if (mod.type == ModificationType.SetObjectActive)
             {
-                if (IsSceneLoaded(mod.objectSceneName))
+                bool sameScene = string.IsNullOrEmpty(mod.objectSceneName) || mod.objectSceneName == currentSceneName;
+
+                if (sameScene || IsSceneLoaded(mod.objectSceneName))
                 {
                     // La escena está cargada, aplica inmediatamente
                     ApplyModification(mod);
+
+                    // Si necesitamos forzar una actualización inmediata, buscamos el listener
+                    if (forceImmediateUpdate && sameScene)
+                    {
+                        ForceUpdateObjectInScene(mod.objectID, mod.flagValue);
+                    }
                 }
                 else
                 {
@@ -138,6 +155,24 @@ public class WorldStateActivator : MonoBehaviour
                 break;
         }
     }
+
+    // Forzar la actualización de un objeto en la escena actual
+    private void ForceUpdateObjectInScene(string objectID, bool active)
+    {
+        // Buscar el WorldStateListener con el ID correspondiente
+        WorldStateListener[] listeners = FindObjectsByType<WorldStateListener>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+        foreach (var listener in listeners)
+        {
+            if (listener.ObjectID == objectID)
+            {
+                listener.ApplyState();
+                Debug.Log($"Forzada actualización inmediata de {objectID} a {active}");
+                break;
+            }
+        }
+    }
+
     private bool IsSceneLoaded(string sceneName)
     {
         for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCount; i++)
@@ -149,6 +184,7 @@ public class WorldStateActivator : MonoBehaviour
         }
         return false;
     }
+
     public void ResetActivationState()
     {
         hasActivated = false;

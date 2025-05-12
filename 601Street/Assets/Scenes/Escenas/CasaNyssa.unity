@@ -4520,8 +4520,8 @@ Transform:
   m_GameObject: {fileID: 2032695339}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -7.1293526, y: 1.7775028, z: -13.558738}
-  m_LocalScale: {x: 1.1026, y: 1, z: 1}
+  m_LocalPosition: {x: -8.846, y: 1.964, z: -18.038}
+  m_LocalScale: {x: 1.9678015, y: 1.1478597, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 501252052}
@@ -4554,7 +4554,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2032695339}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bdf2841cde257ce41a7e4884979576c3, type: 3}
   m_Name: 
@@ -4573,7 +4573,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: CasaExterior
+          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
   onInteracted:
@@ -4593,9 +4593,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2032695339}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc36d99e88b6bd0449dc4c22f8e1842c, type: 3}
+  m_Script: {fileID: 11500000, guid: 14df5e5373baac54b9b676c309cb5df2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetSceneName: MapaExterior
+  spawnPointName: Salida_Casa
+  isExitToMainScene: 1
+  sceneChangeManager: {fileID: 0}
+  showDetailedLogs: 0
 --- !u!1001 &2042362673
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4713,6 +4718,7 @@ GameObject:
   - component: {fileID: 2056939751}
   - component: {fileID: 2056939753}
   - component: {fileID: 2056939754}
+  - component: {fileID: 2056939755}
   m_Layer: 6
   m_Name: OrdenadorParent
   m_TagString: Untagged
@@ -4740,7 +4746,7 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Radius: 0.5
-  m_Center: {x: -0.98, y: -0.25, z: 0.6}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &2056939752
 Transform:
   m_ObjectHideFlags: 0
@@ -4750,7 +4756,7 @@ Transform:
   m_GameObject: {fileID: 2056939750}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.5826726, y: 2.8495026, z: -13.796738}
+  m_LocalPosition: {x: -2.491, y: 2.366, z: -13.101}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4773,21 +4779,9 @@ MonoBehaviour:
   onInteraction:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 2056939754}
-        m_TargetAssemblyTypeName: Ordenador, Assembly-CSharp
-        m_MethodName: OrdenadorInteractuado
+      - m_Target: {fileID: 2056939755}
+        m_TargetAssemblyTypeName: WorldStateActivator, Assembly-CSharp
+        m_MethodName: OnInteract
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4795,47 +4789,11 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 2032695342}
-        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
-        m_MethodName: set_enabled
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
+          m_BoolArgument: 0
         m_CallState: 2
   onInteracted:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 2056939754}
-        m_TargetAssemblyTypeName: Ordenador, Assembly-CSharp
-        m_MethodName: PensamientoPostOrdenador
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   singleUseInteraction: 0
   disableAfterInteraction: 0
   detectionRadius: 5
@@ -4855,6 +4813,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textoPensamiento: 'It has been 6 days since this message, I should go to the police
     station. '
+--- !u!114 &2056939755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056939750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa7eee6eb12ee9744b28c7b4d22b4e9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stateModifications:
+  - type: 4
+    stateID: 
+    flagValue: 1
+    counterValue: 0
+    stringValue: 
+    objectSceneName: MapaExterior
+    objectID: Post-Casa-1
+  - type: 4
+    stateID: 
+    flagValue: 1
+    counterValue: 0
+    stringValue: 
+    objectSceneName: MapaExterior
+    objectID: Salida_Bar
+  activateOnStart: 0
+  activateOnInteract: 1
+  activateOnce: 0
+  forceImmediateUpdate: 1
 --- !u!1 &2073145269 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4067818517711116892, guid: 17db0cd694e84cf49b9fc0c842e6dc4d,
@@ -5211,6 +5200,7 @@ GameObject:
   - component: {fileID: 6878170232025778812}
   - component: {fileID: 6878170232025778813}
   - component: {fileID: 6878170232025778814}
+  - component: {fileID: 6878170232025778815}
   m_Layer: 6
   m_Name: Cerradura
   m_TagString: Untagged
@@ -5289,6 +5279,32 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &6878170232025778815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6878170232025778811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: Cerradura
+  useSceneName: 1
+  sceneName: CasaNyssa
+  defaultActiveState: 0
+  applyStateImmediately: 1
+  onActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  listenOnlyWhenActive: 0
+  useTransition: 0
+  transitionDuration: 0.5
 --- !u!33 &7688419701685249851
 MeshFilter:
   m_ObjectHideFlags: 0
