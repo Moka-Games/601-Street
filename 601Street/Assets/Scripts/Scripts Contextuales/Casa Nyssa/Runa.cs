@@ -1,36 +1,32 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 [RequireComponent(typeof(InteractableObject))]
 [RequireComponent(typeof(SceneTransitionPoint))]
 public class Runa : MonoBehaviour
 {
     [Header("Configuración de la Runa")]
-    [Tooltip("Nombre del capítulo que aparecerá en el título")]
     [SerializeField] private string chapterTitle = "CHAPTER 1";
-
-    [Tooltip("Descripción del capítulo")]
     [SerializeField] private string chapterDescription = "Umi's disappearance and Mom's case.";
-
-    [Tooltip("Prefab que se instanciará al recoger la runa")]
     [SerializeField] private GameObject chapterCompletedPrefab;
 
-    [Header("Referencias (opcional)")]
-    [Tooltip("Referencia al SceneTransitionPoint (se autocompletará si está vacío)")]
-    [SerializeField] private SceneTransitionPoint sceneTransitionPoint;
+    [Header("Runas Restantes")]
+    [Tooltip("Texto que se mostrará en el contador de runas restantes")]
+    [SerializeField] private string remainingRunesText = "1/3";
 
-    [Header("Configuración de Audio")]
+    [Header("Referencias")]
+    [SerializeField] private SceneTransitionPoint sceneTransitionPoint;
     [SerializeField] private AudioClip runeCollectedSound;
     [SerializeField] private float volume = 1f;
 
-    // Referencias a componentes
     private InteractableObject interactableObject;
     private bool hasBeenCollected = false;
+    private GameObject completionScreenInstance;
 
     private void Awake()
     {
-        // Obtener referencias a componentes
         interactableObject = GetComponent<InteractableObject>();
 
         if (sceneTransitionPoint == null)
@@ -38,7 +34,6 @@ public class Runa : MonoBehaviour
             sceneTransitionPoint = GetComponent<SceneTransitionPoint>();
         }
 
-        // Verificar que tenemos todas las referencias necesarias
         if (interactableObject == null || sceneTransitionPoint == null)
         {
             Debug.LogError("Falta algún componente requerido en el objeto Runa.");
@@ -46,42 +41,32 @@ public class Runa : MonoBehaviour
             return;
         }
 
-        // Suscribirse al evento de interacción
         interactableObject.onInteraction.AddListener(OnRuneInteracted);
     }
 
     private void OnDestroy()
     {
-        // Limpieza de eventos para evitar memory leaks
         if (interactableObject != null)
         {
             interactableObject.onInteraction.RemoveListener(OnRuneInteracted);
         }
     }
 
-    // Método llamado cuando el jugador interactúa con la runa
     private void OnRuneInteracted()
     {
         if (hasBeenCollected)
             return;
 
-        // Marcar como recogida
         hasBeenCollected = true;
 
-        // Reproducir sonido si hay uno configurado
         if (runeCollectedSound != null)
         {
             AudioSource.PlayClipAtPoint(runeCollectedSound, transform.position, volume);
         }
 
-        // Instanciar el prefab de capítulo completado
         ShowCompletionScreen();
-
-        // Opcional: Desactivar o destruir la runa
-        // gameObject.SetActive(false);
     }
 
-    // Mostrar la pantalla de capítulo completado
     private void ShowCompletionScreen()
     {
         if (chapterCompletedPrefab == null)
@@ -90,37 +75,39 @@ public class Runa : MonoBehaviour
             return;
         }
 
-        // Instanciar el prefab
-        GameObject completionScreen = Instantiate(chapterCompletedPrefab, Vector3.zero, Quaternion.identity);
+        // 1. Instanciar el prefab de completado
+        completionScreenInstance = Instantiate(chapterCompletedPrefab, Vector3.zero, Quaternion.identity);
 
-        // Configurar los textos del prefab
-        ConfigureCompletionTexts(completionScreen);
+        // 2. CONGELAR LA CÁMARA
+        Camera_Script cameraScript = FindAnyObjectByType<Camera_Script>();
+        if (cameraScript != null)
+        {
+            Debug.Log("Runa: Congelando cámara al mostrar prefab");
+            cameraScript.FreezeCamera();
+        }
 
-        // Configurar el botón para que llame a la transición de escena
-        ConfigureNextChapterButton(completionScreen);
+        // 3. Configurar los textos
+        ConfigureCompletionTexts(completionScreenInstance);
+        ConfigureNextChapterButton(completionScreenInstance);
 
-        // Bloquear el movimiento del jugador mientras se muestra la pantalla
-        DisablePlayerMovement();
+        // 4. Configurar el texto de runas restantes
+        ConfigureRemainingRunesText(completionScreenInstance);
     }
 
-    // Configurar los textos del prefab
     private void ConfigureCompletionTexts(GameObject completionScreen)
     {
-        // Buscar y configurar el título
         TextMeshProUGUI titleText = completionScreen.transform.Find("Animation_Parent/CHAPTER_TITLE_Title")?.GetComponent<TextMeshProUGUI>();
         if (titleText != null)
         {
             titleText.text = chapterTitle;
         }
 
-        // Buscar y configurar la descripción
         TextMeshProUGUI descriptionText = completionScreen.transform.Find("Animation_Parent/CHAPTER_DESCRIPTION")?.GetComponent<TextMeshProUGUI>();
         if (descriptionText != null)
         {
             descriptionText.text = chapterDescription;
         }
 
-        // Buscar y configurar el texto de completado (opcional)
         TextMeshProUGUI completedText = completionScreen.transform.Find("Animation_Parent/Completed_Txt")?.GetComponent<TextMeshProUGUI>();
         if (completedText != null)
         {
@@ -128,27 +115,57 @@ public class Runa : MonoBehaviour
         }
     }
 
-    // Configurar el botón de siguiente capítulo para que llame a la transición
+    // Método nuevo para configurar el texto de REMAINING_RUNES
+    private void ConfigureRemainingRunesText(GameObject completionScreen)
+    {
+        // Ruta completa al componente de texto REMAINING_RUNES
+        TextMeshProUGUI remainingRunesTextComponent = completionScreen.transform.Find(
+            "Animation_Parent/NEXT_CHAPTER_BUTTON/Rune-Pop-Up/Panel/REMAINING_RUNES")?.GetComponent<TextMeshProUGUI>();
+
+        if (remainingRunesTextComponent != null)
+        {
+            remainingRunesTextComponent.text = remainingRunesText;
+            Debug.Log($"Runa: Texto de runas restantes configurado a '{remainingRunesText}'");
+        }
+        else
+        {
+            Debug.LogWarning("Runa: No se encontró el componente REMAINING_RUNES en el prefab");
+
+            // Intento secundario con búsqueda parcial
+            TextMeshProUGUI[] allTexts = completionScreen.GetComponentsInChildren<TextMeshProUGUI>(true);
+            foreach (var text in allTexts)
+            {
+                if (text.name == "REMAINING_RUNES")
+                {
+                    text.text = remainingRunesText;
+                    Debug.Log($"Runa: Texto de runas restantes encontrado mediante búsqueda alternativa y configurado a '{remainingRunesText}'");
+                    break;
+                }
+            }
+        }
+    }
+
     private void ConfigureNextChapterButton(GameObject completionScreen)
     {
-        // Encontrar el botón en el prefab
         Button nextChapterButton = completionScreen.transform.Find("Animation_Parent/NEXT_CHAPTER_BUTTON")?.GetComponent<Button>();
 
         if (nextChapterButton != null)
         {
-            // Agregar listener al botón
             nextChapterButton.onClick.AddListener(() => {
-                // Destruir la pantalla de completado
-                Destroy(completionScreen);
-
-                // Habilitar nuevamente el movimiento del jugador
-                EnablePlayerMovement();
-
-                // Llamar al método de transición de escena
-                if (sceneTransitionPoint != null)
+                // 1. Descongelar la cámara ANTES de la transición
+                Camera_Script cameraScript = FindAnyObjectByType<Camera_Script>();
+                if (cameraScript != null)
                 {
-                    sceneTransitionPoint.TransitionToScene();
+                    Debug.Log("Runa: Descongelando cámara antes de la transición");
+                    cameraScript.UnfreezeCamera();
                 }
+
+                // 2. Destruir la pantalla de completado
+                Destroy(completionScreenInstance);
+                completionScreenInstance = null;
+
+                // 3. Esperar un frame y luego iniciar la transición
+                StartCoroutine(DelayedTransition());
             });
         }
         else
@@ -157,36 +174,43 @@ public class Runa : MonoBehaviour
         }
     }
 
-    // Métodos auxiliares para habilitar/deshabilitar el movimiento del jugador
-    private void DisablePlayerMovement()
+    private IEnumerator DelayedTransition()
     {
-        PlayerController player = FindFirstObjectByType<PlayerController>();
-        if (player != null)
-        {
-            player.SetMovementEnabled(false);
-        }
+        // Esperar un frame para asegurar que todo se actualice
+        yield return null;
 
-        // También podemos usar el Enabler si está disponible
-        Enabler enabler = Enabler.Instance;
-        if (enabler != null)
+        // Iniciar la transición
+        if (sceneTransitionPoint != null)
         {
-            enabler.BlockPlayer();
+            Debug.Log("Runa: Iniciando transición de escena");
+            sceneTransitionPoint.TransitionToScene();
+
+            // Verificación de seguridad para la cámara
+            StartCoroutine(SafetyCheckUnfreezeCamera());
+        }
+        else
+        {
+            Debug.LogError("SceneTransitionPoint es null en el momento de la transición");
         }
     }
 
-    private void EnablePlayerMovement()
+    private IEnumerator SafetyCheckUnfreezeCamera()
     {
-        PlayerController player = FindFirstObjectByType<PlayerController>();
-        if (player != null)
-        {
-            player.SetMovementEnabled(true);
-        }
+        // Esperar a que la transición esté avanzada
+        yield return new WaitForSeconds(3f);
 
-        // También podemos usar el Enabler si está disponible
-        Enabler enabler = Enabler.Instance;
-        if (enabler != null)
+        // Verificar si la cámara está bloqueada
+        Camera_Script cameraScript = FindAnyObjectByType<Camera_Script>();
+        if (cameraScript != null && cameraScript.freeLookCamera != null && !cameraScript.freeLookCamera.enabled)
         {
-            enabler.ReleasePlayer();
+            Debug.Log("Runa: Aplicando desbloqueo de seguridad a la cámara después de la transición");
+            cameraScript.UnfreezeCamera();
         }
+    }
+
+    // Método público para establecer el texto de runas restantes desde otros scripts
+    public void SetRemainingRunesText(string text)
+    {
+        remainingRunesText = text;
     }
 }

@@ -13,6 +13,7 @@ public class Camera_Script : MonoBehaviour
 
     private Transform currentLookAtTarget; 
     private Coroutine transitionCoroutine;
+    private float lastTransitionTime = 0f;
 
     void Awake()
     {
@@ -26,19 +27,17 @@ public class Camera_Script : MonoBehaviour
         }
     }
 
-    void Update()
+    private void Update()
     {
-        // Testing Inputs
-        if (Input.GetKeyDown(KeyCode.G))
+        if (Time.time - lastTransitionTime < 10f && Time.time - lastTransitionTime > 3f)
         {
-            FreezeCamera();
-        }
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            UnfreezeCamera();
+            if (freeLookCamera != null && !freeLookCamera.enabled)
+            {
+                Debug.Log("Auto-desbloqueo de cámara después de transición");
+                UnfreezeCamera();
+            }
         }
     }
-
     public void FreezeCamera()
     {
         if (freeLookCamera != null)
@@ -56,6 +55,15 @@ public class Camera_Script : MonoBehaviour
         {
             freeLookCamera.enabled = true;
             StartCoroutine(SmoothTransitionToFrozenPoint());
+
+            // Notificar al sistema de seguridad
+            CameraUnfreezeManager unfreezeManager = FindFirstObjectByType<CameraUnfreezeManager>();
+            if (unfreezeManager != null)
+            {
+                unfreezeManager.RegisterCameraUnfreeze();
+            }
+
+            Debug.Log("Cámara desbloqueada exitosamente");
         }
     }
 
@@ -130,5 +138,9 @@ public class Camera_Script : MonoBehaviour
 
         // Destruir el objeto temporal
         Destroy(tempTarget);
+    }
+    public void RegisterTransition()
+    {
+        lastTransitionTime = Time.time;
     }
 }

@@ -351,7 +351,15 @@ public class GameSceneManager : MonoBehaviour
         {
             Debug.Log($"GameSceneManager: Transición a escena '{sceneName}' completada");
         }
+        
+        Camera_Script finalCameraCheck = FindFirstObjectByType<Camera_Script>();
+        if (finalCameraCheck != null)
+        {
+            Debug.Log("GameSceneManager: Verificación final de desbloqueo de cámara");
+            finalCameraCheck.UnfreezeCamera();
+        }
 
+        isTransitioning = false;
     }
 
     private void DisablePlayerMovement()
@@ -371,6 +379,23 @@ public class GameSceneManager : MonoBehaviour
     {
         PlayerInteraction.SetSceneTransitionState(false);
 
+        // NUEVO: Desbloquear explícitamente la cámara
+        if (currentCamera != null)
+        {
+            Debug.Log("GameSceneManager: Desbloqueando cámara después del fade");
+            currentCamera.UnfreezeCamera();
+        }
+        else
+        {
+            // Buscar la cámara si no la tenemos
+            Camera_Script cameraScript = FindFirstObjectByType<Camera_Script>();
+            if (cameraScript != null)
+            {
+                Debug.Log("GameSceneManager: Cámara encontrada y desbloqueada después del fade");
+                cameraScript.UnfreezeCamera();
+            }
+        }
+
         if (currentPlayer != null)
         {
             PlayerController playerController = currentPlayer.GetComponent<PlayerController>();
@@ -384,6 +409,27 @@ public class GameSceneManager : MonoBehaviour
         if (fadeManager != null)
         {
             fadeManager.OnFadeOutComplete -= EnablePlayerMovementAfterFade;
+        }
+
+        // NUEVO: Iniciar comprobación de seguridad retrasada
+        StartCoroutine(SafetyCheckUnfreezeCamera());
+    }
+
+    // NUEVO: Método de seguridad para garantizar que la cámara se desbloquea
+    private IEnumerator SafetyCheckUnfreezeCamera()
+    {
+        // Esperar un poco para asegurar que todos los sistemas estén activos
+        yield return new WaitForSeconds(0.5f);
+
+        // Comprobar y desbloquear la cámara de nuevo
+        Camera_Script cameraScript = FindFirstObjectByType<Camera_Script>();
+        if (cameraScript != null && cameraScript.freeLookCamera != null)
+        {
+            if (!cameraScript.freeLookCamera.enabled)
+            {
+                Debug.Log("GameSceneManager: Desbloqueo de seguridad aplicado a la cámara");
+                cameraScript.UnfreezeCamera();
+            }
         }
     }
 
@@ -620,7 +666,23 @@ public class GameSceneManager : MonoBehaviour
             }
         }
     }
-
+    public void ForceUnfreezeCamera()
+    {
+        if (currentCamera != null)
+        {
+            Debug.Log("GameSceneManager: Forzando desbloqueo de cámara");
+            currentCamera.UnfreezeCamera();
+        }
+        else
+        {
+            Camera_Script cameraScript = FindFirstObjectByType<Camera_Script>();
+            if (cameraScript != null)
+            {
+                Debug.Log("GameSceneManager: Cámara encontrada y desbloqueada forzosamente");
+                cameraScript.UnfreezeCamera();
+            }
+        }
+    }
     // Método para verificar si estamos actualmente en una transición de escena
     public bool IsTransitioning()
     {

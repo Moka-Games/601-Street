@@ -328,6 +328,30 @@ public class SceneChange : MonoBehaviour
         {
             fontManager.RefreshAllFonts();
         }
+        if (cameraScript != null)
+        {
+            cameraScript.UnfreezeCamera();
+        }
+        else
+        {
+            // Buscar la cámara si no la tenemos
+            Camera_Script foundCamera = FindFirstObjectByType<Camera_Script>();
+            if (foundCamera != null)
+            {
+                Debug.Log("SceneChange: Cámara encontrada y desbloqueada");
+                foundCamera.UnfreezeCamera();
+            }
+        }
+
+        // NUEVO: Iniciar verificación de seguridad
+        StartCoroutine(EnsureCameraUnfrozen());
+
+        // Habilitar movimiento del jugador
+        EnablePlayerMovement();
+
+        // Terminar estado de transición
+        isTransitioning = false;
+        PlayerInteraction.SetSceneTransitionState(false);
     }
 
     // Mover jugador y cámara a sus posiciones
@@ -552,7 +576,23 @@ public class SceneChange : MonoBehaviour
             Debug.Log($"  - {scene.name} (Cargada: {scene.isLoaded}, Activa: {scene == SceneManager.GetActiveScene()})");
         }
     }
+    private IEnumerator EnsureCameraUnfrozen()
+    {
+        // Esperar para asegurarse de que todos los sistemas están estables
+        yield return new WaitForSeconds(0.5f);
 
+        // Comprobar el estado de la cámara
+        Camera_Script camera = FindFirstObjectByType<Camera_Script>();
+        if (camera != null && camera.freeLookCamera != null && !camera.freeLookCamera.enabled)
+        {
+            Debug.Log("SceneChange: Aplicando desbloqueo de seguridad a la cámara");
+            camera.UnfreezeCamera();
+
+            // Esperar un poco más y volver a comprobar
+            yield return new WaitForSeconds(0.2f);
+            camera.UnfreezeCamera();
+        }
+    }
     // Método para verificar si estamos en transición
     public bool IsTransitioning()
     {
