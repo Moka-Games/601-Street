@@ -2,13 +2,13 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.Rendering.Universal;
 using Cinemachine;
+using UnityEngine.Events;
 
 public class Eco_Callejon : MonoBehaviour
 {
     public float raycastDistance = 10f;
 
     public Transform ecoLookAt;
-    public string pensamientoNyssa;
     public string pensamientoNyssaPostInteracción;
 
     private Pensamientos_Manager pensamientosManager;
@@ -24,7 +24,7 @@ public class Eco_Callejon : MonoBehaviour
 
     public GameObject imagenEco;
 
-    public GameObject abuela;
+    public UnityEvent onEcoTriggered;
 
     private void Start()
     {
@@ -40,7 +40,6 @@ public class Eco_Callejon : MonoBehaviour
 
         callejonCamera.enabled = false;
 
-        abuela.SetActive(false);
     }
     void Update()
     {
@@ -73,9 +72,9 @@ public class Eco_Callejon : MonoBehaviour
 
     IEnumerator EcoSecuence()
     {
+        onEcoTriggered.Invoke();
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         callejonCamera.Follow = player.transform;
-        pensamientosManager.MostrarPensamiento(pensamientoNyssa);
         playerController.SetMovementEnabled(false);
         playerCamera.enabled = false;
         callejonCamera.enabled = true;
@@ -87,7 +86,6 @@ public class Eco_Callejon : MonoBehaviour
         
 
         playerController.SetMovementEnabled(true);
-        abuela.SetActive(true);
     }
 
     private void CameraSwap(CinemachineVirtualCamera virtualCamera_, CinemachineFreeLook playerCamera_, bool value_1, bool value_2)

@@ -49,15 +49,26 @@ public class InteractableObject : MonoBehaviour, IInteractable
     private float enterTime;
     private bool isExiting = false;
 
+    private Vector3 lastScale;
+
+
     private void Start()
     {
         // Crear y configurar el SphereCollider
         detectionCollider = gameObject.AddComponent<SphereCollider>();
         detectionCollider.radius = detectionRadius;
         detectionCollider.isTrigger = true;
+        
+        float maxScaleFactor = Mathf.Max(
+       Mathf.Abs(transform.lossyScale.x),
+       Mathf.Max(Mathf.Abs(transform.lossyScale.y), Mathf.Abs(transform.lossyScale.z))
+   );
+
+        detectionCollider.radius = detectionRadius / maxScaleFactor;
+        detectionCollider.isTrigger = true;
 
         mainCamera = Camera.main;
-
+        
         // Obtener el Canvas HUD a través del gestor
         hudCanvas = UIFeedbackManager.Instance.GetHUDCanvas();
         if (hudCanvas != null)
@@ -203,6 +214,16 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
     private void Update()
     {
+        if (transform.lossyScale != lastScale)
+        {
+            float maxScaleFactor = Mathf.Max(
+                Mathf.Abs(transform.lossyScale.x),
+                Mathf.Max(Mathf.Abs(transform.lossyScale.y), Mathf.Abs(transform.lossyScale.z))
+            );
+
+            detectionCollider.radius = detectionRadius / maxScaleFactor;
+            lastScale = transform.lossyScale;
+        }
         // Si es un objeto de un solo uso y ya fue interactuado, no hacer nada
         if (singleUseInteraction && objectInteracted)
         {
