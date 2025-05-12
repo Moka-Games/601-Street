@@ -2661,32 +2661,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4544292368145685861, guid: 93621be9eba5081418f49a0506ee7477, type: 3}
---- !u!1 &775993158 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5766240829938491959, guid: d5cf38b5acf25b545910dc39e3559fa7,
-    type: 3}
-  m_PrefabInstance: {fileID: 7707812023480896144}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &775993161
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 775993158}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c9f47a96d68ca44094961ae87aae421, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fadeInDuration: 1
-  fadeOutDuration: 1
-  blackScreenDuration: 0.5
-  defaultInitialSpawnPointName: Player_InitialPosition
-  defaultExitSpawnPointName: Player_ExitPosition
-  applyGlobalFonts: 1
-  fontApplicationDelay: 0.2
-  showDetailedLogs: 0
 --- !u!64 &809750771
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -5839,7 +5813,7 @@ MonoBehaviour:
   onInteraction:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1891648460}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SceneTransitionPoint, Assembly-CSharp
         m_MethodName: TransitionToScene
         m_Mode: 1
@@ -5868,9 +5842,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1891648455}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc36d99e88b6bd0449dc4c22f8e1842c, type: 3}
+  m_Script: {fileID: 11500000, guid: 14df5e5373baac54b9b676c309cb5df2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetSceneName: MapaExterior
+  spawnPointName: Player_InitialPosition
+  isExitToMainScene: 1
+  sceneChangeManager: {fileID: 0}
+  showDetailedLogs: 0
 --- !u!1001 &1896980293
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6054,7 +6033,7 @@ MonoBehaviour:
   onInteraction:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1891648460}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SceneTransitionPoint, Assembly-CSharp
         m_MethodName: TransitionToScene
         m_Mode: 1
@@ -6083,9 +6062,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1936779529}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc36d99e88b6bd0449dc4c22f8e1842c, type: 3}
+  m_Script: {fileID: 11500000, guid: 14df5e5373baac54b9b676c309cb5df2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetSceneName: MapaExterior
+  spawnPointName: Player_InitialPosition
+  isExitToMainScene: 1
+  sceneChangeManager: {fileID: 0}
+  showDetailedLogs: 0
 --- !u!64 &1967487549
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -6390,11 +6374,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5766240829938491959, guid: d5cf38b5acf25b545910dc39e3559fa7,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 775993161}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d5cf38b5acf25b545910dc39e3559fa7, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

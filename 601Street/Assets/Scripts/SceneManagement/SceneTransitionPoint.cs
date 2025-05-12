@@ -88,4 +88,13 @@ public class SceneTransitionPoint : MonoBehaviour
             sceneChangeManager.EntrarAInterior(targetSceneName);
         }
     }
+    public void SetTargetScene(string sceneName, string spawnPoint = "")
+    {
+        targetSceneName = sceneName;
+
+        if (!string.IsNullOrEmpty(spawnPoint))
+        {
+            spawnPointName = spawnPoint;
+        }
+    }
 }
