@@ -67,9 +67,15 @@ public class ActionController : MonoBehaviour
     null,
     null
 ));
-        RegisterAction("Riku_Parque", new DialogueAction(
+        RegisterAction("Riku_Universidad", new DialogueAction(
         () => print("Permormed Standard Action"),
         () => Riku_Parque.Instance.Follow_Riku(),
+        () => print("Permormed Fail Action")
+    ));
+        
+        RegisterAction("Riku_Parque", new DialogueAction(
+        () => print("Permormed Standard Action"),
+        () => PuzzleCollectionManager.Instance.ActivateApple(),
         () => print("Permormed Fail Action")
     ));
     }
