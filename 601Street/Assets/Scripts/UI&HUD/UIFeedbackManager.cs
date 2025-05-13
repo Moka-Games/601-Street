@@ -21,7 +21,6 @@ public class UIFeedbackManager : MonoBehaviour
                 {
                     GameObject managerObject = new GameObject("UIFeedbackManager");
                     _instance = managerObject.AddComponent<UIFeedbackManager>();
-                    DontDestroyOnLoad(managerObject); // Preservar entre escenas
                 }
             }
             return _instance;
@@ -49,7 +48,6 @@ public class UIFeedbackManager : MonoBehaviour
         }
 
         _instance = this;
-        DontDestroyOnLoad(gameObject);
 
         // Intentar encontrar el canvas si no está asignado
         if (hudCanvas == null)

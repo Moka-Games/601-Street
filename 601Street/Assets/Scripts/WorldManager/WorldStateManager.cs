@@ -55,7 +55,6 @@ public class WorldStateManager : MonoBehaviour
         }
 
         instance = this;
-        DontDestroyOnLoad(gameObject);
 
         // Suscribirse a eventos de cambio de escena
         SceneManager.sceneLoaded += OnSceneLoaded;

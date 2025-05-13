@@ -57,7 +57,6 @@ public class MisionManager : MonoBehaviour
         }
 
         instance = this;
-        DontDestroyOnLoad(gameObject);
 
         // Cargar misiones registradas en el proyecto
         CargarMisiones();

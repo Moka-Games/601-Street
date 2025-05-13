@@ -26,7 +26,6 @@ public class UITemplateManager : MonoBehaviour
                 {
                     GameObject obj = new GameObject("UITemplateManager");
                     instance = obj.AddComponent<UITemplateManager>();
-                    DontDestroyOnLoad(obj);
                 }
             }
             return instance;
@@ -38,7 +37,6 @@ public class UITemplateManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
             InitializeTemplates();
             SceneManager.sceneLoaded += OnSceneLoaded; // Suscribirse al evento de carga de escena
         }

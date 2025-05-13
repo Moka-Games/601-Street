@@ -65,7 +65,6 @@ public class Inventory_Manager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
             Debug.Log("Inventory_Manager instance created.");
         }
         else

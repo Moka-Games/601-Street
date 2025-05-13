@@ -35,7 +35,6 @@ public class GameStateManager : MonoBehaviour
         }
 
         instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     // Method to change the current game state
