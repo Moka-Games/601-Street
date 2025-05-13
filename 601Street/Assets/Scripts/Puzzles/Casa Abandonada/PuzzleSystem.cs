@@ -37,6 +37,8 @@ public class PuzzleSystem : MonoBehaviour
     private Dictionary<PuzzleObjectType, GameObject> placedObjects = new Dictionary<PuzzleObjectType, GameObject>();
     private bool puzzleCompleted = false;
 
+    private MisionManager misionManager;
+
     private void Awake()
     {
         // Singleton pattern
@@ -58,6 +60,10 @@ public class PuzzleSystem : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        misionManager = FindAnyObjectByType<MisionManager>();
+    }
     // Called when a puzzle object is collected
     public void CollectObject(PuzzleObjectType objectType)
     {
@@ -101,6 +107,7 @@ public class PuzzleSystem : MonoBehaviour
         if (puzzleCompleted)
         {
             OnShowMessage?.Invoke(puzzleCompletedMessage);
+            misionManager.CompletarMisionActual();
             return;
         }
 
