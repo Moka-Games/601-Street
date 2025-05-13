@@ -1836,6 +1836,152 @@ Transform:
   - {fileID: 1239353822}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &748243110
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1338670932}
+    m_Modifications:
+    - target: {fileID: 614168336658549726, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 0.08022675
+      objectReference: {fileID: 0}
+    - target: {fileID: 614168336658549726, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 0.03295997
+      objectReference: {fileID: 0}
+    - target: {fileID: 614168336658549726, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_Center.x
+      value: 0.036093336
+      objectReference: {fileID: 0}
+    - target: {fileID: 614168336658549726, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_Center.y
+      value: 0.002319084
+      objectReference: {fileID: 0}
+    - target: {fileID: 614168336658549726, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_Center.z
+      value: 0.002607205
+      objectReference: {fileID: 0}
+    - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 62.32
+      objectReference: {fileID: 0}
+    - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -5.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -5.34
+      objectReference: {fileID: 0}
+    - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.39520264
+      objectReference: {fileID: 0}
+    - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.39520237
+      objectReference: {fileID: 0}
+    - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.58635753
+      objectReference: {fileID: 0}
+    - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.5863573
+      objectReference: {fileID: 0}
+    - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -112.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 4839107122043451380, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: conversation
+      value: 
+      objectReference: {fileID: 11400000, guid: d52290e6501f0b64da64204a68520a9e,
+        type: 2}
+    - target: {fileID: 4839107122043451380, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: interactOnce
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8009979216645450960, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_Name
+      value: Riku_Portal
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8009979216645450960, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 748243113}
+  m_SourcePrefab: {fileID: 100100000, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3, type: 3}
+--- !u!4 &748243111 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+    type: 3}
+  m_PrefabInstance: {fileID: 748243110}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &748243112 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8009979216645450960, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+    type: 3}
+  m_PrefabInstance: {fileID: 748243110}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &748243113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748243112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: Riku_Portal
+  useSceneName: 1
+  sceneName: SalaPortal
+  defaultActiveState: 0
+  applyStateImmediately: 1
+  onActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  listenOnlyWhenActive: 0
+  useTransition: 0
+  transitionDuration: 0.5
 --- !u!64 &748839578
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2898,6 +3044,7 @@ Transform:
   - {fileID: 1440766854}
   - {fileID: 991258547}
   - {fileID: 1952103280}
+  - {fileID: 748243111}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1369147832

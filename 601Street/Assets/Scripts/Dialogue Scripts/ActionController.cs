@@ -67,6 +67,11 @@ public class ActionController : MonoBehaviour
     null,
     null
 ));
+        RegisterAction("Riku_Parque", new DialogueAction(
+        () => print("Permormed Standard Action"),
+        () => Riku_Parque.Instance.Follow_Riku(),
+        () => print("Permormed Fail Action")
+    ));
     }
     void Awake()
     {

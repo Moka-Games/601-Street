@@ -20,6 +20,7 @@ public class NPC : MonoBehaviour
 
     [SerializeField] private bool interactOnce = false;
 
+    public UnityEvent OnConversationEnded;
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -147,10 +148,5 @@ public class NPC : MonoBehaviour
                 Debug.LogWarning($"Acción desconocida: {action}");
                 break;
         }
-    }
-
-    public void InvokeOnConversationEnd()
-    {
-        // Implementación vacía para satisfacer cualquier llamada desde el DialogueManager
     }
 }
