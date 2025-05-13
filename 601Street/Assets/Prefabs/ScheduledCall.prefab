@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3477941085435601882}
   - component: {fileID: 7961254536067206711}
+  - component: {fileID: 5159651370630994739}
   m_Layer: 0
   m_Name: ScheduledCall
   m_TagString: Untagged
@@ -46,6 +47,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   callID: Daichi_1
   callDelay: 0
-  destroyAfterTrigger: 0
   callOnTrigger: 0
   callOnStart: 1
+  OnEndedCall:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!65 &5159651370630994739
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4894938081992467949}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}

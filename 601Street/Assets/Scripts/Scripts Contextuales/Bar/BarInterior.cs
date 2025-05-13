@@ -8,7 +8,7 @@ public class BarInterior : MonoBehaviour
 
     private void Update()
     {
-        if(conversaciónPoliciaTerminada)
+        if(conversaciónPoliciaTerminada) //Se cambia el valor a través de una acción del Action Manager
         {
             botellas.SetActive(true);
         }

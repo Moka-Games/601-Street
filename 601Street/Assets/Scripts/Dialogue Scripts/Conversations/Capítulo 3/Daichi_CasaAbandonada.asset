@@ -38,4 +38,18 @@ MonoBehaviour:
       to be a problem. Noises, lights, things that shouldn''t be there. If you have
       anything of value left, get it out now... Then you decide: close it, seal it...
       or burn it. No one will miss it.'
-  dialogueOptions: []
+  dialogueOptions:
+  - optionText: Quemar la casa
+    actionId: Quemar-Casa
+    requiresDiceRoll: 0
+    difficultyClass: 0
+    nextDialogue: {fileID: 0}
+    successDialogue: {fileID: 0}
+    failureDialogue: {fileID: 0}
+  - optionText: No quemar la casa
+    actionId: No-Quemar-Casa
+    requiresDiceRoll: 0
+    difficultyClass: 0
+    nextDialogue: {fileID: 0}
+    successDialogue: {fileID: 0}
+    failureDialogue: {fileID: 0}
