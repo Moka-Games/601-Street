@@ -58,7 +58,6 @@ public class GameSceneManager : MonoBehaviour
         }
 
         instance = this;
-        DontDestroyOnLoad(gameObject);
 
         string activeSceneName = SceneManager.GetActiveScene().name;
 

@@ -766,6 +766,11 @@ PrefabInstance:
       propertyPath: idMision
       value: Mision_Puzzle
       objectReference: {fileID: 0}
+    - target: {fileID: 1980472230792912192, guid: 966ba2a066f9f14458c03db045d8adc1,
+        type: 3}
+      propertyPath: startDelay
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3378748533538107753, guid: 966ba2a066f9f14458c03db045d8adc1,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -829,7 +834,7 @@ PrefabInstance:
     - target: {fileID: 4706274421044006994, guid: 966ba2a066f9f14458c03db045d8adc1,
         type: 3}
       propertyPath: m_Name
-      value: Mision_Puzzle
+      value: Mision_Casa
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -892,6 +897,11 @@ PrefabInstance:
         type: 3}
       propertyPath: detectionRadius
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2160922171605887817, guid: 5bf5fbd684e013f4287c8ce36b7de128,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0.015
       objectReference: {fileID: 0}
     - target: {fileID: 2160922171605887817, guid: 5bf5fbd684e013f4287c8ce36b7de128,
         type: 3}

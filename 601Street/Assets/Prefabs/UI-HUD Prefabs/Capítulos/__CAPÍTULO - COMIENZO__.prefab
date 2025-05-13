@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6899727794592159073}
   - component: {fileID: 4153199263828980297}
   - component: {fileID: 641586548495705841}
+  - component: {fileID: 2624578183858343996}
   m_Layer: 5
   m_Name: Animation_Parent
   m_TagString: Untagged
@@ -100,6 +101,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2624578183858343996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1462550691607836011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43420ccd6b6584c44b9ff7991220ca28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3154536075980022803
 GameObject:
   m_ObjectHideFlags: 0
@@ -167,8 +180,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: CHAPTER 1
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: dccdd88d5863ed4418defd92c19766e3, type: 2}
-  m_sharedMaterial: {fileID: -3570244970044620254, guid: dccdd88d5863ed4418defd92c19766e3,
+  m_fontAsset: {fileID: 11400000, guid: f604f86612bc96646ae78681a49b74ae, type: 2}
+  m_sharedMaterial: {fileID: 8193484040271093166, guid: f604f86612bc96646ae78681a49b74ae,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -406,8 +419,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Umi's disappearance and Mom's case.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: dccdd88d5863ed4418defd92c19766e3, type: 2}
-  m_sharedMaterial: {fileID: -3570244970044620254, guid: dccdd88d5863ed4418defd92c19766e3,
+  m_fontAsset: {fileID: 11400000, guid: f604f86612bc96646ae78681a49b74ae, type: 2}
+  m_sharedMaterial: {fileID: 8193484040271093166, guid: f604f86612bc96646ae78681a49b74ae,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}

@@ -22,7 +22,6 @@ public class FadeManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
 
             // Asegurar que la imagen comienza completamente negra (alpha = 1)
             if (targetImage != null)
