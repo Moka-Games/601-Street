@@ -102,11 +102,7 @@ public class ActionController : MonoBehaviour
         () => PuzzleCollectionManager.Instance.ActivateApple(),
         () => PuzzleCollectionManager.Instance.FracasoRiku()
     )); 
-        RegisterAction("Sectario_2", new DialogueAction(
-        () => print("Permormed Standard Action"),
-        () => PuzzleCollectionManager.Instance.ActivateApple(),
-        () => PuzzleCollectionManager.Instance.FracasoRiku()
-    ));
+        
     }
     void Awake()
     {

@@ -40,6 +40,8 @@ public class PuzzleCollectionManager : MonoBehaviour
     [Header("Elementos Fracaso Guardia 2")]
     public GameObject puertaSecta;
     public GameObject ganzua;
+
+    public GameObject misiónRikuFallado;
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -185,6 +187,7 @@ public class PuzzleCollectionManager : MonoBehaviour
     {
         sectGuard.SetActive(false);
         sectGuard_Fracaso.SetActive(true);
+        misiónRikuFallado.SetActive(true);
     }
 
     public void FracasoSectario_2()
@@ -194,4 +197,6 @@ public class PuzzleCollectionManager : MonoBehaviour
         puertaSecta.SetActive(false);
         ganzua.SetActive(true);
     }
+
+    
 }
