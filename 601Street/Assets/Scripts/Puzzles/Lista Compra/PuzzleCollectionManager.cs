@@ -32,7 +32,10 @@ public class PuzzleCollectionManager : MonoBehaviour
     private int collectedCount = 0;
 
     public GameObject aplleObject; //Para el puesto de la manzana
-    public GameObject sectGuard; //Para el puesto de la manzana
+    public GameObject sectGuard; 
+    public GameObject sectGuard_Fracaso;
+    public GameObject llamadaDaichi_Fracaso;
+    public GameObject colliderGuardia;
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -172,5 +175,17 @@ public class PuzzleCollectionManager : MonoBehaviour
     {
         aplleObject.SetActive(true);
         sectGuard.SetActive(false);
+    }
+
+    public void FracasoRiku()
+    {
+        sectGuard.SetActive(false);
+        sectGuard_Fracaso.SetActive(true);
+    }
+
+    public void FracasoSectario_2()
+    {
+        llamadaDaichi_Fracaso.SetActive(true);
+        colliderGuardia.SetActive(false);
     }
 }

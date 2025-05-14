@@ -67,6 +67,11 @@ public class ActionController : MonoBehaviour
     null,
     null
 ));
+        RegisterAction("Fracaso_Sectario_2", new DialogueAction(
+    () => PuzzleCollectionManager.Instance.FracasoSectario_2(),
+    null,
+    null
+));
         RegisterAction("Riku_Universidad", new DialogueAction(
         () => print("Permormed Standard Action"),
         () => Riku_Parque.Instance.Follow_Riku(),
@@ -76,7 +81,12 @@ public class ActionController : MonoBehaviour
         RegisterAction("Riku_Parque", new DialogueAction(
         () => print("Permormed Standard Action"),
         () => PuzzleCollectionManager.Instance.ActivateApple(),
-        () => print("Permormed Fail Action")
+        () => PuzzleCollectionManager.Instance.FracasoRiku()
+    )); 
+        RegisterAction("Sectario_2", new DialogueAction(
+        () => print("Permormed Standard Action"),
+        () => PuzzleCollectionManager.Instance.ActivateApple(),
+        () => PuzzleCollectionManager.Instance.FracasoRiku()
     ));
     }
     void Awake()

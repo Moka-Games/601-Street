@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 281b790b0324bdb49aca9bbad878a09c, type: 3}
+  m_Name: Daichi_2_Parque_Fracaso_Guardia_2
+  m_EditorClassIdentifier: 
+  actionId: Daichi_Parque_PostSecta_Fracaso
+  dialogues:
+  - speakerName: Daichi
+    content: "\xA1Hombre, si es la detective sobrenatural! \xBFQu\xE9 pas\xF3, eh?
+      \xBFTe quedaste fuera de la reuni\xF3n? Ay, qu\xE9 pena\u2026 Seguro que les
+      diste miedo con tus visiones de \"ecos c\xF3smicos\", \xBFno? Jajajaja."
+  - speakerName: Nyssa
+    content: No te pases.
+  - speakerName: Daichi
+    content: "Tranquila, no llores. Tengo algo que podr\xEDa animarte. Bueno\u2026
+      o frustrarte a\xFAn m\xE1s, eso ya depende de ti."
+  - speakerName: Daichi
+    content: The main door works with a simple lock, use your lock pick and you might
+      be able to get in.
+  dialogueOptions: []
