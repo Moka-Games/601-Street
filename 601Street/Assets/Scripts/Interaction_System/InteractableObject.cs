@@ -13,7 +13,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
 {
     [Header("Configuración básica")]
     [SerializeField] private string interactionID;
-    [SerializeField] private string interactionPrompt = "Presiona E para interactuar";
     [Tooltip("Evento que se disparará cuando el jugador interactúe con este objeto")]
     public UnityEvent onInteraction;
     [SerializeField] private UnityEvent onInteracted; //Evento por si volvemos a interactuar con el mismo objeto
@@ -172,20 +171,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
     public string GetInteractionID()
     {
         return interactionID;
-    }
-
-    public string GetInteractionPrompt()
-    {
-        return interactionPrompt;
-    }
-
-    // Corrutina para desactivar el objeto después de un retardo
-    private IEnumerator DisableAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-
-        // Desactivar el GameObject
-        gameObject.SetActive(false);
     }
 
     // Método para destruir los indicadores de feedback

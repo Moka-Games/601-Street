@@ -72,6 +72,16 @@ public class ActionController : MonoBehaviour
     null,
     null
 ));
+        RegisterAction("Quemar-Casa", new DialogueAction(
+    () => Actions_Script.Instance.QuemarCasaCall(),
+    null,
+    null
+));
+        RegisterAction("No-Quemar-Casa", new DialogueAction(
+    () => Actions_Script.Instance.NoQuemarCasaCall(),
+    null,
+    null
+));
         RegisterAction("Riku_Universidad", new DialogueAction(
         () => print("Permormed Standard Action"),
         () => Riku_Parque.Instance.Follow_Riku(),

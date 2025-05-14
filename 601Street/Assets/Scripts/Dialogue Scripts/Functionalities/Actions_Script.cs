@@ -4,14 +4,7 @@ using UnityEngine;
 
 public class Actions_Script : MonoBehaviour
 {
-    private Pensamientos_Manager pensamientosManager;
-    private ComisariManager comisariaManager;
     public static Actions_Script Instance { get; private set; }
-
-    private void Start()
-    {
-        pensamientosManager = FindAnyObjectByType<Pensamientos_Manager>();
-    }
     void Awake()
     {
         if (Instance == null)
@@ -40,6 +33,7 @@ public class Actions_Script : MonoBehaviour
 
     public void MostrarPensamiento(string pensamiento)
     {
+        Pensamientos_Manager pensamientosManager = FindAnyObjectByType<Pensamientos_Manager>();
         pensamientosManager.MostrarPensamiento(pensamiento);
     }
 
@@ -68,5 +62,17 @@ public class Actions_Script : MonoBehaviour
     {
         ComisariManager comisariaManager = FindAnyObjectByType<ComisariManager>();
         comisariaManager.ActivarLlamadaDaichi();
+    }
+
+    public void QuemarCasaCall()
+    {
+        QuemarCasaTrigger quemarCasaTrigger = FindAnyObjectByType<QuemarCasaTrigger>();
+        quemarCasaTrigger.QuemarCasa();
+    }
+
+    public void NoQuemarCasaCall()
+    {
+        QuemarCasaTrigger quemarCasaTrigger = FindAnyObjectByType<QuemarCasaTrigger>();
+        quemarCasaTrigger.NoQuemarCasa();
     }
 }

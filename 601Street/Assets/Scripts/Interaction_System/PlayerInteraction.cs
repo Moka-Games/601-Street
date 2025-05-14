@@ -131,6 +131,9 @@ public class PlayerInteraction : MonoBehaviour
             Debug.DrawRay(ray.origin, ray.direction * interactionRange, debugRayColor);
         }
 
+        // Guardar el interactable actual antes de actualizarlo
+        IInteractable previousInteractable = currentInteractable;
+
         // Resetear estado de interacción
         canInteract = false;
         currentInteractable = null;
@@ -151,8 +154,8 @@ public class PlayerInteraction : MonoBehaviour
             {
                 canInteract = true;
 
-                // Si cambiamos de objeto, resetear el estado de interacción
-                if (currentInteractable != hit.collider.GetComponent<IInteractable>())
+                // Comprobar si es un interactable diferente
+                if (currentInteractable != previousInteractable)
                 {
                     hasInteractedWithInteractable = false;
                 }
