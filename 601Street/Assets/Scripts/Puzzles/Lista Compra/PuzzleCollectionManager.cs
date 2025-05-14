@@ -36,6 +36,10 @@ public class PuzzleCollectionManager : MonoBehaviour
     public GameObject sectGuard_Fracaso;
     public GameObject llamadaDaichi_Fracaso;
     public GameObject colliderGuardia;
+
+    [Header("Elementos Fracaso Guardia 2")]
+    public GameObject puertaSecta;
+    public GameObject ganzua;
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -187,5 +191,7 @@ public class PuzzleCollectionManager : MonoBehaviour
     {
         llamadaDaichi_Fracaso.SetActive(true);
         colliderGuardia.SetActive(false);
+        puertaSecta.SetActive(false);
+        ganzua.SetActive(true);
     }
 }

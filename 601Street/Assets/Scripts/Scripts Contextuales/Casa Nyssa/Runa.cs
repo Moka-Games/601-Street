@@ -96,7 +96,7 @@ public class Runa : MonoBehaviour
 
     private void ConfigureCompletionTexts(GameObject completionScreen)
     {
-        TextMeshProUGUI titleText = completionScreen.transform.Find("Animation_Parent/CHAPTER_TITLE_Title")?.GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI titleText = completionScreen.transform.Find("Animation_Parent/CHAPTER_TITLE_Títle")?.GetComponent<TextMeshProUGUI>();
         if (titleText != null)
         {
             titleText.text = chapterTitle;

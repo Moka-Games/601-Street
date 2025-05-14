@@ -3025,6 +3025,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
+      propertyPath: itemData
+      value: 
+      objectReference: {fileID: 11400000, guid: 65d8378e269f92a4689aab8e0d53e96e,
+        type: 2}
+    - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
+        type: 3}
       propertyPath: interactionPrefab
       value: 
       objectReference: {fileID: 1253521352430949569, guid: 57a9f6678781d3d4b85dd738c4bf17a8,
@@ -6791,7 +6797,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2052084824
 RectTransform:
   m_ObjectHideFlags: 0

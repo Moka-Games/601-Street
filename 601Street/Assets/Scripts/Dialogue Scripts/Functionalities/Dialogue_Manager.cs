@@ -373,8 +373,10 @@ public class DialogueManager : MonoBehaviour
 
         if (currentNPC != null)
         {
+            // Pasamos la referencia de la conversación que terminó al NPC
+            currentNPC.ConversationEnded(currentConversation);
+
             currentNPC.SetInteracted();
-            // Agregar: Establecer flag de conversación activa en el NPC
             currentNPC.EndCurrentConversation();
 
             onConversationEnd.Invoke();

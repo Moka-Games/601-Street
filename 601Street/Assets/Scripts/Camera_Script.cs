@@ -13,7 +13,9 @@ public class Camera_Script : MonoBehaviour
 
     private Transform currentLookAtTarget; 
     private Coroutine transitionCoroutine;
-    private float lastTransitionTime = 0f;
+    private float lastTransitionTime = 0f; 
+    private float lastFreezeTime = 0f;
+    private bool wasRecentlyFrozen = false;
 
     void Awake()
     {
@@ -27,15 +29,17 @@ public class Camera_Script : MonoBehaviour
         }
     }
 
-    private void Update()
+    void Update()
     {
-        if (Time.time - lastTransitionTime < 10f && Time.time - lastTransitionTime > 3f)
+        // Auto-desbloqueo si la cámara ha estado congelada por más de 3 segundos
+        if (wasRecentlyFrozen && Time.time - lastFreezeTime > 2f)
         {
             if (freeLookCamera != null && !freeLookCamera.enabled)
             {
-                Debug.Log("Auto-desbloqueo de cámara después de transición");
+                Debug.Log("Auto-desbloqueo de cámara después de 3 segundos");
                 UnfreezeCamera();
             }
+            wasRecentlyFrozen = false;
         }
     }
     public void FreezeCamera()
@@ -43,20 +47,27 @@ public class Camera_Script : MonoBehaviour
         if (freeLookCamera != null)
         {
             isCameraFrozen = true;
+            lastFreezeTime = Time.time;
+            wasRecentlyFrozen = true;
             frozenPosition = freeLookCamera.transform.position;
             frozenRotation = freeLookCamera.transform.rotation;
             freeLookCamera.enabled = false;
         }
-
-        print("Cámara congelada exitosamente");
     }
 
     public void UnfreezeCamera()
     {
-        if (freeLookCamera != null && isCameraFrozen)
+        // Verificar si podemos descongelar la cámara
+        if (freeLookCamera != null)
         {
+            // Intentar habilitar la cámara independientemente del estado anterior
             freeLookCamera.enabled = true;
-            StartCoroutine(SmoothTransitionToFrozenPoint());
+
+            // Solo iniciar transición suave si estaba congelada
+            if (isCameraFrozen)
+            {
+                StartCoroutine(SmoothTransitionToFrozenPoint());
+            }
 
             // Notificar al sistema de seguridad
             CameraUnfreezeManager unfreezeManager = FindFirstObjectByType<CameraUnfreezeManager>();
@@ -66,9 +77,13 @@ public class Camera_Script : MonoBehaviour
             }
 
             Debug.Log("Cámara desbloqueada exitosamente");
+            isCameraFrozen = false;
+        }
+        else
+        {
+            Debug.LogWarning("Intento de desbloquear cámara con freeLookCamera nulo");
         }
     }
-
     private IEnumerator SmoothTransitionToFrozenPoint()
     {
         float transitionDuration = 1.5f;

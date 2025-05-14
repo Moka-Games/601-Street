@@ -199,4 +199,19 @@ public class NPC : MonoBehaviour
             myCollider.enabled = true;
         }
     }
+    public void ConversationEnded(Conversation endedConversation)
+    {
+        // Verificar si la conversación que terminó es la principal
+        if (endedConversation == conversation)
+        {
+            Debug.Log($"La conversación principal del NPC {gameObject.name} ha terminado");
+
+            // Invocar el evento solo si la conversación terminada es la principal
+            OnConversationEnded?.Invoke();
+        }
+        else
+        {
+            Debug.Log($"Otra conversación del NPC {gameObject.name} ha terminado");
+        }
+    }
 }

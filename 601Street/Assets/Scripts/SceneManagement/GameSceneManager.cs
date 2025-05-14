@@ -378,7 +378,7 @@ public class GameSceneManager : MonoBehaviour
     {
         PlayerInteraction.SetSceneTransitionState(false);
 
-        // NUEVO: Desbloquear explícitamente la cámara
+        // MEJORA: Desbloquear explícitamente la cámara
         if (currentCamera != null)
         {
             Debug.Log("GameSceneManager: Desbloqueando cámara después del fade");
@@ -414,7 +414,6 @@ public class GameSceneManager : MonoBehaviour
         StartCoroutine(SafetyCheckUnfreezeCamera());
     }
 
-    // NUEVO: Método de seguridad para garantizar que la cámara se desbloquea
     private IEnumerator SafetyCheckUnfreezeCamera()
     {
         // Esperar un poco para asegurar que todos los sistemas estén activos
