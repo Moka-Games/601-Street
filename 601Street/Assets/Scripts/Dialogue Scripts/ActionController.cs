@@ -65,11 +65,16 @@ public class ActionController : MonoBehaviour
     null,
     null
 ));
+        RegisterAction("Nakamura-Terminado", new DialogueAction(
+    () => Actions_Script.Instance.CambiarPoliciasComisaria(),
+    null,
+    null
+));
 
         RegisterAction("Policia_SegudoEncuentro", new DialogueAction(
     () => Actions_Script.Instance.ActivarLlamadaDaichiPostComisaria(),
     () => Actions_Script.Instance.ActivarObjetosPolicia2(),
-    null
+    () => Actions_Script.Instance.ActivarObjetosPolicia2_Fracaso()
 ));    
         RegisterAction("Fracaso_Sectario_2", new DialogueAction(
     () => PuzzleCollectionManager.Instance.FracasoSectario_2(),

@@ -1308,6 +1308,69 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 8445857315155752284, guid: 792b651e5fb780d4685bac494a9117ed, type: 3}
+--- !u!1 &619414805
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 619414806}
+  - component: {fileID: 619414807}
+  m_Layer: 0
+  m_Name: ActivadorPolicias
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &619414806
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 619414805}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 20.75259, y: 2.925183, z: -21.806845}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &619414807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 619414805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa7eee6eb12ee9744b28c7b4d22b4e9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stateModifications:
+  - type: 4
+    stateID: 
+    flagValue: 0
+    counterValue: 0
+    stringValue: 
+    objectSceneName: ComisariaInterior
+    objectID: Policia_1
+  - type: 4
+    stateID: 
+    flagValue: 1
+    counterValue: 0
+    stringValue: 
+    objectSceneName: ComisariaInterior
+    objectID: Policia_2
+  activateOnStart: 1
+  activateOnInteract: 0
+  activateOnce: 0
+  forceImmediateUpdate: 1
 --- !u!1 &654618601
 GameObject:
   m_ObjectHideFlags: 0
@@ -4655,6 +4718,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   botella: {fileID: 843214209964832931}
+  activadorPolicias: {fileID: 619414805}
+  salida: {fileID: 1629875642}
 --- !u!1 &2042574622
 GameObject:
   m_ObjectHideFlags: 0
@@ -5384,3 +5449,4 @@ SceneRoots:
   - {fileID: 483607367}
   - {fileID: 1476325955}
   - {fileID: 1547929629}
+  - {fileID: 619414806}

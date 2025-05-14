@@ -43,6 +43,12 @@ public class Actions_Script : MonoBehaviour
         barInterior.ActivarBotella();
     }
 
+    public void CambiarPoliciasComisaria()
+    {
+        BarInterior barInterior = FindAnyObjectByType<BarInterior>();
+        barInterior.CambiarPolicias();
+    }
+
     /// <summary>
     /// COMISARIA
     /// </summary>
@@ -50,6 +56,11 @@ public class Actions_Script : MonoBehaviour
     {
         ComisariManager comisariaManager = FindAnyObjectByType<ComisariManager>();
         comisariaManager.ObjetosPostPolicia();
+    }
+    public void ActivarObjetosPolicia2_Fracaso()
+    {
+        ComisariManager comisariaManager = FindAnyObjectByType<ComisariManager>();
+        comisariaManager.ObjetosPostPoliciaFracaso();
     }
     public void ActivarObjetosPolicia1()
     {
