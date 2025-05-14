@@ -18,7 +18,7 @@ MonoBehaviour:
     content: Have you already found out the password?
   dialogueOptions:
   - optionText: Not yet, but I'm looking for someone and I need your help. Please.
-    actionId: 
+    actionId: 1
     requiresDiceRoll: 1
     difficultyClass: 3
     nextDialogue: {fileID: 0}
@@ -26,14 +26,14 @@ MonoBehaviour:
     failureDialogue: {fileID: 11400000, guid: 2439f6a039dcc8540a901ab096be8a4e, type: 2}
   - optionText: Listen to me, I don't have the password, but if you let me through,
       we could both gain from this.
-    actionId: 
+    actionId: 2
     requiresDiceRoll: 1
     difficultyClass: 4
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: 05b8b744ad270c04886d525ac90facf4, type: 2}
     failureDialogue: {fileID: 11400000, guid: 2439f6a039dcc8540a901ab096be8a4e, type: 2}
   - optionText: I don't have the password... and I don't need it. Step aside.
-    actionId: 
+    actionId: 3
     requiresDiceRoll: 1
     difficultyClass: 2
     nextDialogue: {fileID: 0}

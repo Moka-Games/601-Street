@@ -25,6 +25,13 @@ public class Riku_Parque : MonoBehaviour
         }
     }
 
+    public GameObject puertaPortal;
+
+    public void PuertaPortal()
+    {
+        puertaPortal.SetActive(true);
+    }
+
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -40,6 +47,7 @@ public class Riku_Parque : MonoBehaviour
     {
         followActivator.SetActive(true);
         enableTrigger = true;
+        PuertaPortal();
     }
 
     public void DestroyRiku()
@@ -53,6 +61,6 @@ public class Riku_Parque : MonoBehaviour
         if (other.CompareTag("Player") && enableTrigger)
         {
             DestroyRiku();
-        }
+        } 
     }
 }

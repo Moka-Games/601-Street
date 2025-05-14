@@ -94,7 +94,7 @@ public class ActionController : MonoBehaviour
         RegisterAction("Riku_Universidad", new DialogueAction(
         () => print("Permormed Standard Action"),
         () => Riku_Parque.Instance.Follow_Riku(),
-        () => print("Permormed Fail Action")
+        () => Riku_Parque.Instance.PuertaPortal()
     ));
         
         RegisterAction("Riku_Parque", new DialogueAction(
