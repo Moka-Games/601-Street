@@ -222,7 +222,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionID: 1
-  interactionPrompt: Presiona E para interactuar
   onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -854,7 +853,7 @@ PrefabInstance:
     - target: {fileID: 4625153449018724322, guid: 4b20f13d419e62548994c2f1b8936253,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.008627
+      value: -3.37
       objectReference: {fileID: 0}
     - target: {fileID: 4625153449018724322, guid: 4b20f13d419e62548994c2f1b8936253,
         type: 3}
@@ -864,7 +863,7 @@ PrefabInstance:
     - target: {fileID: 4625153449018724322, guid: 4b20f13d419e62548994c2f1b8936253,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 16.37892
+      value: 31.45
       objectReference: {fileID: 0}
     - target: {fileID: 4625153449018724322, guid: 4b20f13d419e62548994c2f1b8936253,
         type: 3}
@@ -1435,8 +1434,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dd9d46f6913fe94391fd045be3a0f13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  "ganz\xFAa": {fileID: 867317112}
-  puertaCaja: {fileID: 2596957926160197021}
+  "ganz\xFAa": {fileID: 1473272163}
+  puertaCaja: {fileID: 504575326}
   "contrase\xF1a": {fileID: 1734883696}
   "pensamientoPostInteracci\xF3n": I will have to find another way to enter the office
   llamadaDaichi_Activator: {fileID: 2130022584}
@@ -1808,12 +1807,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -2477511411847689622, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
---- !u!1 &867317112 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2830979939959797174, guid: 10526014e2aca84438494ef6cb3d8e67,
-    type: 3}
-  m_PrefabInstance: {fileID: 1927226927}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &867317115 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 289500071776046101, guid: 10526014e2aca84438494ef6cb3d8e67,
@@ -2314,12 +2307,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -2228417370725966487, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
---- !u!1 &1242157725 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 496757632745989771, guid: f8e8612f46092c642850f3c0eb7e8d9b,
-    type: 3}
-  m_PrefabInstance: {fileID: 1636692843}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1338418651 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2449949028982663424, guid: 10526014e2aca84438494ef6cb3d8e67,
@@ -3363,7 +3350,7 @@ MonoBehaviour:
   pensamientoFalloTirada: "Parece que Nakamura no est\xE1 dispuesto a hablar. Quiz\xE1s
     si le doy algo de beber..."
   hasInteracted: 0
-  interactOnce: 0
+  singleInteraction: 0
   OnConversationEnded:
     m_PersistentCalls:
       m_Calls: []
@@ -3524,17 +3511,17 @@ PrefabInstance:
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.13044357
+      value: 4.702
       objectReference: {fileID: 0}
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.1969004
+      value: 2.162
       objectReference: {fileID: 0}
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 32.566917
+      value: 16.788
       objectReference: {fileID: 0}
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
@@ -3591,6 +3578,16 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 35d6f9bf3ed3f464ab3e88966b6fba54, type: 2}
+    - target: {fileID: 5840868460635798395, guid: f8e8612f46092c642850f3c0eb7e8d9b,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 2.5983715
+      objectReference: {fileID: 0}
+    - target: {fileID: 5840868460635798395, guid: f8e8612f46092c642850f3c0eb7e8d9b,
+        type: 3}
+      propertyPath: m_Center.y
+      value: 0.7991855
+      objectReference: {fileID: 0}
     - target: {fileID: 6064972215524283525, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
       propertyPath: bonusType
@@ -3599,11 +3596,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 496757632745989771, guid: f8e8612f46092c642850f3c0eb7e8d9b,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1842021191}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f8e8612f46092c642850f3c0eb7e8d9b, type: 3}
 --- !u!1 &1688041395
 GameObject:
@@ -4116,7 +4109,7 @@ MonoBehaviour:
   pensamientoFalloTirada: "Parece que Nakamura no est\xE1 dispuesto a hablar. Quiz\xE1s
     si le doy algo de beber..."
   hasInteracted: 0
-  interactOnce: 0
+  singleInteraction: 0
   OnConversationEnded:
     m_PersistentCalls:
       m_Calls: []
@@ -4291,28 +4284,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1636692843}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &1842021191
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1242157725}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1895934879 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6579667887309593739, guid: 4b20f13d419e62548994c2f1b8936253,
@@ -5570,25 +5541,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!1 &1686407436942279044
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5180708864067353466}
-  - component: {fileID: 6006026365350224172}
-  - component: {fileID: 7939463132594972909}
-  - component: {fileID: 7939463132594972910}
-  m_Layer: 0
-  m_Name: Puerta.002
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!23 &1695983889714509361
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -5812,7 +5764,7 @@ PrefabInstance:
     - target: {fileID: 3422021052348863179, guid: 4574cd6729a7c6242b69cde6c2faf26a,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.3717709
+      value: -3.006855
       objectReference: {fileID: 0}
     - target: {fileID: 3422021052348863179, guid: 4574cd6729a7c6242b69cde6c2faf26a,
         type: 3}
@@ -5822,7 +5774,7 @@ PrefabInstance:
     - target: {fileID: 3422021052348863179, guid: 4574cd6729a7c6242b69cde6c2faf26a,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 16.270657
+      value: 31.341738
       objectReference: {fileID: 0}
     - target: {fileID: 3422021052348863179, guid: 4574cd6729a7c6242b69cde6c2faf26a,
         type: 3}
@@ -6975,7 +6927,6 @@ Transform:
   - {fileID: 3998073266031931999}
   - {fileID: 5022089253560688399}
   - {fileID: 2635884912620608210}
-  - {fileID: 5180708864067353466}
   - {fileID: 1454917295048774899}
   - {fileID: 7701537413442517051}
   - {fileID: 3355989834858900823}
@@ -7073,21 +7024,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8037423925448494875, guid: d6571a8280c037a4896b782a1deb8042, type: 3}
---- !u!4 &5180708864067353466
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1686407436942279044}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: -58.80091, y: 4.1316085, z: -18.921173}
-  m_LocalScale: {x: 100, y: 100, z: 100}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5110221891313462608}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5205590041833839617
 GameObject:
   m_ObjectHideFlags: 0
@@ -7502,14 +7438,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 8547871386822337662, guid: d6571a8280c037a4896b782a1deb8042, type: 3}
---- !u!33 &6006026365350224172
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1686407436942279044}
-  m_Mesh: {fileID: 5709657159434205058, guid: d6571a8280c037a4896b782a1deb8042, type: 3}
 --- !u!4 &6045628831538694579
 Transform:
   m_ObjectHideFlags: 0
@@ -8333,73 +8261,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8622519549639354293}
   m_Mesh: {fileID: 213657445797490931, guid: d6571a8280c037a4896b782a1deb8042, type: 3}
---- !u!23 &7939463132594972909
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1686407436942279044}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 8973176718970361011, guid: d6571a8280c037a4896b782a1deb8042, type: 3}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &7939463132594972910
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1686407436942279044}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 5709657159434205058, guid: d6571a8280c037a4896b782a1deb8042, type: 3}
 --- !u!33 &8019660443891660535
 MeshFilter:
   m_ObjectHideFlags: 0

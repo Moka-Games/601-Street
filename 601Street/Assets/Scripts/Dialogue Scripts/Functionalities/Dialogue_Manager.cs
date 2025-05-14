@@ -123,11 +123,11 @@ public class DialogueManager : MonoBehaviour
 
     public void StartConversation(Conversation conversation, NPC npc)
     {
-        if (isInConversation || Time.time - lastConversationEndTime < conversationCooldown)
+        /*if (isInConversation || Time.time - lastConversationEndTime < conversationCooldown)
         {
             Debug.Log("No se puede iniciar una nueva conversación: ya hay una en curso o es demasiado pronto");
             return;
-        }
+        }*/
         if (conversation == null)
         {
             Debug.LogError("Conversation is null");

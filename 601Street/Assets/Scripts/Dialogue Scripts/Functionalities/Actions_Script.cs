@@ -31,6 +31,18 @@ public class Actions_Script : MonoBehaviour
 
     }
 
+    public void ActivarObjetosPolicia2()
+    {
+        ComisariManager comisariaManager = FindAnyObjectByType<ComisariManager>();
+        comisariaManager.ObjetosPostPolicia();
+    }
+
+    public void ActivarObjetosPolicia2Fail()
+    {
+        ComisariManager comisariaManager = FindAnyObjectByType<ComisariManager>();
+        comisariaManager.ObjetosPostPoliciaFracaso();
+    }
+
     public void MostrarPensamiento(string pensamiento)
     {
         Pensamientos_Manager pensamientosManager = FindAnyObjectByType<Pensamientos_Manager>();

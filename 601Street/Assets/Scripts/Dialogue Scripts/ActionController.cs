@@ -58,7 +58,7 @@ public class ActionController : MonoBehaviour
 
         RegisterAction("Policia_SegudoEncuentro", new DialogueAction(
     () => Actions_Script.Instance.ActivarLlamadaDaichiPostComisaria(),
-    null,
+    () => Actions_Script.Instance.ActivarObjetosPolicia2(),
     null
 ));
 
