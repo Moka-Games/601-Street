@@ -31,10 +31,30 @@ public class Actions_Script : MonoBehaviour
 
     }
 
+
+    /// <summary>
+    /// BAR
+    /// </summary>
+    /// 
+
+    public void ActivarObjetosBar()
+    {
+        BarInterior barInterior = FindAnyObjectByType<BarInterior>();
+        barInterior.ActivarBotella();
+    }
+
+    /// <summary>
+    /// COMISARIA
+    /// </summary>
     public void ActivarObjetosPolicia2()
     {
         ComisariManager comisariaManager = FindAnyObjectByType<ComisariManager>();
         comisariaManager.ObjetosPostPolicia();
+    }
+    public void ActivarObjetosPolicia1()
+    {
+        ComisariManager comisariaManager = FindAnyObjectByType<ComisariManager>();
+        comisariaManager.InteracciónPolicia();
     }
 
     public void ActivarObjetosPolicia2Fail()

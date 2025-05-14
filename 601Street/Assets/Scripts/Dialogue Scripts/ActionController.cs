@@ -47,11 +47,21 @@ public class ActionController : MonoBehaviour
         () => Actions_Script.Instance.PoliciaSucess(),
         () => Actions_Script.Instance.PoliciaSucess(),
         () => Actions_Script.Instance.PoliciaFail()  
-    )); 
+    ));
 
         //Ejemplo Acción registrada para final de conversación
         RegisterAction("ConversationEnd_1", new DialogueAction(
     () => Actions_Script.Instance.MostrarPensamiento(pensamientoPostInteracción),
+    null,
+    null
+));
+            RegisterAction("Conversacion_Policia_1", new DialogueAction(
+    () => Actions_Script.Instance.ActivarObjetosPolicia1(),
+    null,
+    null
+));
+        RegisterAction("FracasoBar", new DialogueAction(
+    () => Actions_Script.Instance.ActivarObjetosBar(),
     null,
     null
 ));
@@ -60,13 +70,7 @@ public class ActionController : MonoBehaviour
     () => Actions_Script.Instance.ActivarLlamadaDaichiPostComisaria(),
     () => Actions_Script.Instance.ActivarObjetosPolicia2(),
     null
-));
-
-        RegisterAction("Post-Bar", new DialogueAction(
-    () => BarInterior.conversaciónPoliciaTerminada = true,
-    null,
-    null
-));
+));    
         RegisterAction("Fracaso_Sectario_2", new DialogueAction(
     () => PuzzleCollectionManager.Instance.FracasoSectario_2(),
     null,

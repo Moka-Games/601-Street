@@ -2,24 +2,15 @@ using UnityEngine;
 
 public class BarInterior : MonoBehaviour
 {
-    public static bool conversaciónPoliciaTerminada = false;
 
-    public GameObject botellas;
+    public GameObject botella;
 
-    private void Update()
+    private void Start()
     {
-        if(conversaciónPoliciaTerminada) //Se cambia el valor a través de una acción del Action Manager
-        {
-            botellas.SetActive(true);
-        }
-        else
-        {
-            botellas.SetActive(false);
-        }
+        botella.SetActive(false);
     }
-
-    public void ConversaciónTerminada()
+    public void ActivarBotella()
     {
-        conversaciónPoliciaTerminada = true;
+        botella.SetActive(true);
     }
 }

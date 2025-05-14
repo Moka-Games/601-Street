@@ -6,6 +6,8 @@ public class ComisariManager : MonoBehaviour
     public GameObject puertaCaja;
     public GameObject contraseña;
 
+    public GameObject activadorPuertaBar;
+
     private Pensamientos_Manager pensamientosManager;
 
     public string pensamientoPostInteracción = "";
@@ -15,6 +17,11 @@ public class ComisariManager : MonoBehaviour
     {
         pensamientosManager = FindAnyObjectByType<Pensamientos_Manager>();
         llamadaDaichi_Activator.SetActive(false);
+    }
+
+    public void InteracciónPolicia()
+    {
+        activadorPuertaBar.SetActive(true);
     }
 
     public void ObjetosPostPolicia()
