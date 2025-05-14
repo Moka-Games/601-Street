@@ -5,6 +5,7 @@ using UnityEngine;
 public class Actions_Script : MonoBehaviour
 {
     private Pensamientos_Manager pensamientosManager;
+    private ComisariManager comisariaManager;
     public static Actions_Script Instance { get; private set; }
 
     private void Start()
@@ -61,5 +62,11 @@ public class Actions_Script : MonoBehaviour
         ComisariManager comisariaManager = FindAnyObjectByType<ComisariManager>();
 
         comisariaManager.ObjetosPostPoliciaFracaso();
+    }
+
+    public void ActivarLlamadaDaichiPostComisaria()
+    {
+        ComisariManager comisariaManager = FindAnyObjectByType<ComisariManager>();
+        comisariaManager.ActivarLlamadaDaichi();
     }
 }

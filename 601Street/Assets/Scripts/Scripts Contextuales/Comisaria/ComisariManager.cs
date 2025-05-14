@@ -9,10 +9,12 @@ public class ComisariManager : MonoBehaviour
     private Pensamientos_Manager pensamientosManager;
 
     public string pensamientoPostInteracción = "";
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    public GameObject llamadaDaichi_Activator;
     void Start()
     {
         pensamientosManager = FindAnyObjectByType<Pensamientos_Manager>();
+        llamadaDaichi_Activator.SetActive(false);
     }
 
     public void ObjetosPostPolicia()
@@ -29,4 +31,9 @@ public class ComisariManager : MonoBehaviour
 
     }
 
+
+    public void ActivarLlamadaDaichi()
+    {
+        llamadaDaichi_Activator.SetActive(true);
+    }
 }

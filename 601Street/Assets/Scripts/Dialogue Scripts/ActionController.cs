@@ -56,8 +56,8 @@ public class ActionController : MonoBehaviour
     null
 ));
 
-        RegisterAction("Bar", new DialogueAction(
-    () => BarInterior.conversaciónPoliciaTerminada = true,
+        RegisterAction("Policia_SegudoEncuentro", new DialogueAction(
+    () => Actions_Script.Instance.ActivarLlamadaDaichiPostComisaria(),
     null,
     null
 ));
