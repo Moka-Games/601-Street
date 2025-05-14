@@ -831,16 +831,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 138147909}
     m_Modifications:
-    - target: {fileID: 2403476835460994267, guid: 0d5500dc99f9c0843bd8767313e23a17,
-        type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 8487b8a7141373b489591a9d59eb78c6, type: 2}
-    - target: {fileID: 3416207317952422469, guid: 0d5500dc99f9c0843bd8767313e23a17,
-        type: 3}
-      propertyPath: m_Radius
-      value: 1.5
-      objectReference: {fileID: 0}
     - target: {fileID: 7125272824277244258, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: m_Name
@@ -908,12 +898,6 @@ PrefabInstance:
       objectReference: {fileID: 1713818346}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
-      propertyPath: interactionPrefab
-      value: 
-      objectReference: {fileID: 5516513481268374641, guid: 4bbbae5fbbaf98445bfd1ba0c1e939ac,
-        type: 3}
-    - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
-        type: 3}
       propertyPath: interactableObject
       value: 
       objectReference: {fileID: 0}
@@ -922,11 +906,6 @@ PrefabInstance:
       propertyPath: interactionCollider
       value: 
       objectReference: {fileID: 1066634368}
-    - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
-        type: 3}
-      propertyPath: onItemClick.m_PersistentCalls.m_Calls.Array.size
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: onItemClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
@@ -979,11 +958,7 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1713818343}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7125272824277244258, guid: 0d5500dc99f9c0843bd8767313e23a17,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1066634369}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0d5500dc99f9c0843bd8767313e23a17, type: 3}
 --- !u!1001 &311821368
 PrefabInstance:
@@ -3242,28 +3217,6 @@ SphereCollider:
     type: 3}
   m_PrefabInstance: {fileID: 304645402}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &1066634369
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1066634359}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1103288138
 GameObject:
   m_ObjectHideFlags: 0

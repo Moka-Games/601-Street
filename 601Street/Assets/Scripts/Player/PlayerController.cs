@@ -442,6 +442,25 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
     {
         if (characterController != null)
         {
+            // Si estamos desactivando el controlador, resetear también los inputs de movimiento
+            if (!enabled)
+            {
+                // Resetear los inputs de movimiento
+                currentMovementInput = Vector2.zero;
+                isSprinting = false;
+
+                // Forzar actualización de animación inmediatamente
+                if (animator != null)
+                {
+                    // Asegurar que todas las animaciones de movimiento estén desactivadas
+                    animator.SetBool(isWalkingHash, false);
+                    animator.SetBool(isRunningHash, false);
+                    animator.SetBool(isWalkingBackHash, false);
+                    animator.SetBool(isWalkingLeftHash, false);
+                    animator.SetBool(isWalkingRightHash, false);
+                }
+            }
+
             characterController.enabled = enabled;
         }
         else
@@ -470,7 +489,34 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
     {
         // Verificar si el CharacterController está habilitado
         if (characterController == null || !characterController.enabled || !gameObject.activeInHierarchy)
+        {
+            // NUEVO CÓDIGO: Cuando el CharacterController está desactivado,
+            // forzar el estado de idle reseteando todas las variables de animación
+            if (animator != null)
+            {
+                // Resetear todos los estados de animación a false
+                isWalking = false;
+                isRunning = false;
+                isWalkingBack = false;
+                isWalkingLeft = false;
+                isWalkingRight = false;
+
+                // Actualizar los parámetros del Animator para forzar estado idle
+                animator.SetBool(isWalkingHash, false);
+                animator.SetBool(isRunningHash, false);
+                animator.SetBool(isWalkingBackHash, false);
+                animator.SetBool(isWalkingLeftHash, false);
+                animator.SetBool(isWalkingRightHash, false);
+
+                // También asegurarnos de que no esté en estado AFK
+                isPlayingAfkAnimation = false;
+
+                // Si hay algún parámetro específico para el idle, podríamos activarlo aquí
+                // Por ejemplo: animator.SetBool("isIdle", true);
+            }
             return;
+        }
+
 
         if (isPlayingAfkAnimation && animator.GetCurrentAnimatorStateInfo(0).IsName("Afk_Animation"))
             return;

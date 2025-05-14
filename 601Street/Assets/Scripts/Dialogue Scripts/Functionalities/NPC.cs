@@ -1,4 +1,5 @@
 using Cinemachine;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -16,14 +17,21 @@ public class NPC : MonoBehaviour
 
     private bool tiradaFallada = false;
     public bool hasInteracted = false;
+    public bool singleInteraction = false;
     private Animator animator;
 
-    [SerializeField] private bool interactOnce = false;
 
     public UnityEvent OnConversationEnded;
+
+    [Header("Control de Interacción")]
+    private bool isInConversation = false;
+    private float conversationCooldown = 1.5f;
+    private float lastInteractionTime = 0f;
+    private Collider myCollider;
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        myCollider = GetComponent<Collider>();
 
         // Si es Nakamura, registramos las acciones específicas
         if (isNakamura)
@@ -34,23 +42,47 @@ public class NPC : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        // Verificar si podemos iniciar una nueva conversación
+        if (isInConversation || Time.time - lastInteractionTime < conversationCooldown)
+        {
+            return;
+        }
+
         if (!other.CompareTag("Player"))
             return;
 
-        // Si es Nakamura, usamos la lógica específica
+        // Verificar también si el DialogueManager ya está en una conversación
+        if (DialogueManager.Instance != null && DialogueManager.Instance.IsInConversation())
+        {
+            return;
+        }
+
+        // Marcar que estamos iniciando una conversación
+        isInConversation = true;
+        lastInteractionTime = Time.time;
+
+        // El resto del código de inicio de conversación...
         if (isNakamura)
         {
             HandleNakamuraConversation();
         }
-        // Si no es Nakamura, usamos la lógica normal
-        else if (!hasInteracted && !interactOnce)
+        else if (!hasInteracted && !singleInteraction)
         {
-            Debug.Log("Interactor Triggered");
             DialogueManager.Instance.StartConversation(conversation, this);
         }
-        else if (hasInteracted && !interactOnce)
+        else if (hasInteracted && !singleInteraction)
         {
             DialogueManager.Instance.StartConversation(funnyConversation, this);
+        }
+        else if (!hasInteracted && singleInteraction)
+        {
+            DialogueManager.Instance.StartConversation(conversation, this);
+            singleInteraction = true;
+        }
+        else if (hasInteracted && singleInteraction)
+        {
+            DialogueManager.Instance.StartConversation(funnyConversation, this);
+            singleInteraction = true;
         }
     }
 
@@ -147,6 +179,24 @@ public class NPC : MonoBehaviour
             default:
                 Debug.LogWarning($"Acción desconocida: {action}");
                 break;
+        }
+    }
+    public void EndCurrentConversation()
+    {
+        isInConversation = false;
+        lastInteractionTime = Time.time;
+
+        // Opcionalmente, deshabilitar temporalmente el collider para evitar reactivación
+        StartCoroutine(TemporarilyDisableCollider());
+    }
+
+    private IEnumerator TemporarilyDisableCollider()
+    {
+        if (myCollider != null)
+        {
+            myCollider.enabled = false;
+            yield return new WaitForSeconds(1.0f);
+            myCollider.enabled = true;
         }
     }
 }

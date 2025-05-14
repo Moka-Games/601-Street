@@ -34,11 +34,17 @@ public class DialogueManager : MonoBehaviour
     private bool? diceRollResult = null;
     private int selectedOptionIndex = -1;
 
-    [Header("Cinemachine Camera")]
-    private Camera_Script cameraScript;
-
     private Conversation nextContextualConversation;
 
+    // Referencias para el control del jugador y la cámara
+    private PlayerController playerController;
+    private GameObject npcCamera;
+    
+    private bool isInConversation = false;
+
+    // Agregar esta variable para un cooldown entre conversaciones
+    private float conversationCooldown = 1.5f;
+    private float lastConversationEndTime = 0f;
 
     void Awake()
     {
@@ -54,7 +60,12 @@ public class DialogueManager : MonoBehaviour
 
     void Start()
     {
-        cameraScript = FindAnyObjectByType<Camera_Script>();
+
+        playerController = FindAnyObjectByType<PlayerController>();
+        if (playerController == null)
+        {
+            Debug.LogWarning("No se encontró el PlayerController. No se podrá pausar el movimiento del jugador.");
+        }
 
         failObject.SetActive(false);
         sucessObject.SetActive(false);
@@ -72,14 +83,12 @@ public class DialogueManager : MonoBehaviour
             Next_bubble.SetActive(false);
         }
 
-        // Verifica que se haya asignado el componente textComponent en typewriterEffect
         if (typewriterEffect != null && typewriterEffect.textComponent == null)
         {
             Debug.LogError("TypewriterEffect no tiene asignado textComponent. Asignando contentText por defecto.");
             typewriterEffect.textComponent = contentText;
         }
 
-        // Asegúrate de que contentText tiene richText habilitado
         if (contentText != null)
         {
             contentText.richText = true;
@@ -114,12 +123,18 @@ public class DialogueManager : MonoBehaviour
 
     public void StartConversation(Conversation conversation, NPC npc)
     {
+        if (isInConversation || Time.time - lastConversationEndTime < conversationCooldown)
+        {
+            Debug.Log("No se puede iniciar una nueva conversación: ya hay una en curso o es demasiado pronto");
+            return;
+        }
         if (conversation == null)
         {
             Debug.LogError("Conversation is null");
             return;
         }
 
+        isInConversation = true;
         currentConversation = conversation;
         currentNPC = npc;
         currentDialogueIndex = 0;
@@ -128,11 +143,27 @@ public class DialogueManager : MonoBehaviour
         {
             GameStateManager.Instance.EnterDialogueState();
         }
-        // Cambiar el LookAt de la cámara al NPC con transición suave
-        Transform npcLookAtTarget = currentNPC.transform.Find("LookAt");
-        if (npcLookAtTarget != null && cameraScript != null)
+
+        // Pausar el movimiento del jugador
+        if (playerController != null)
         {
-            cameraScript.ChangeLookAtTarget(npcLookAtTarget);
+            playerController.SetMovementEnabled(false);
+            Debug.Log("Movimiento del jugador pausado durante la conversación");
+        }
+
+        npcCamera = null;
+        if (currentNPC != null)
+        {
+            npcCamera = currentNPC.transform.Find("NPC_Camera")?.gameObject;
+            if (npcCamera != null)
+            {
+                npcCamera.SetActive(true);
+                Debug.Log("Cámara del NPC activada: " + npcCamera.name);
+            }
+            else
+            {
+                Debug.LogWarning("No se encontró la cámara 'NPC_Camera' en el NPC: " + currentNPC.name);
+            }
         }
 
         // Reiniciar el TypewriterEffect antes de comenzar
@@ -326,24 +357,40 @@ public class DialogueManager : MonoBehaviour
             ActionController.Instance.InvokeAction(currentConversation.actionId);
         }
 
+        // Desactivar la cámara del NPC si está activa
+        if (npcCamera != null)
+        {
+            npcCamera.SetActive(false);
+            Debug.Log("Cámara del NPC desactivada");
+        }
+
+        // Reactivar el movimiento del jugador
+        if (playerController != null)
+        {
+            playerController.SetMovementEnabled(true);
+            Debug.Log("Movimiento del jugador reactivado después de la conversación");
+        }
+
         if (currentNPC != null)
         {
             currentNPC.SetInteracted();
+            // Agregar: Establecer flag de conversación activa en el NPC
+            currentNPC.EndCurrentConversation();
+
             onConversationEnd.Invoke();
         }
+
         if (GameStateManager.Instance != null)
         {
             GameStateManager.Instance.EnterGameplayState();
         }
-        // Restaurar el LookAt de la cámara al jugador con transición suave
-        if (cameraScript != null)
-        {
-            cameraScript.ChangeLookAtTarget(cameraScript.playerLookAtTarget);
-        }
 
-        Debug.Log("Conversación finalizada");
+        // Actualizar el tiempo de finalización y el estado de conversación
+        lastConversationEndTime = Time.time;
+        isInConversation = false;
+
+        Debug.Log("Conversación finalizada - Cooldown iniciado");
     }
-
     public void SelectDiceOption()
     {
         dialogueInterface.SetActive(false);
@@ -397,7 +444,10 @@ public class DialogueManager : MonoBehaviour
         diceInterface.SetActive(false);
     }
 
-
+    public bool IsInConversation()
+    {
+        return isInConversation;
+    }
 
 }
 
@@ -481,4 +531,5 @@ public static class TextFormatHelper
 
         return processed;
     }
+    
 }
