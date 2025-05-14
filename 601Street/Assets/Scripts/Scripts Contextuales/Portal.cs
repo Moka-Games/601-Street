@@ -3,13 +3,13 @@ using UnityEngine.SceneManagement; // Necesario para cargar escenas
 
 public class Portal : MonoBehaviour
 {
-    public GameObject panelFinal;
+    //public GameObject panelFinal;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            panelFinal.SetActive(true);
+            //panelFinal.SetActive(true);
         }
     }
 
