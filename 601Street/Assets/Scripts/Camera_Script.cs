@@ -47,6 +47,8 @@ public class Camera_Script : MonoBehaviour
             frozenRotation = freeLookCamera.transform.rotation;
             freeLookCamera.enabled = false;
         }
+
+        print("Cámara congelada exitosamente");
     }
 
     public void UnfreezeCamera()
