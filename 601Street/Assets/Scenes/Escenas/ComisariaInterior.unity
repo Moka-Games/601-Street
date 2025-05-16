@@ -119,6 +119,12 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &10764788 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 496757632745989771, guid: f8e8612f46092c642850f3c0eb7e8d9b,
+    type: 3}
+  m_PrefabInstance: {fileID: 1636692843}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &30597706
 GameObject:
   m_ObjectHideFlags: 0
@@ -3905,7 +3911,7 @@ PrefabInstance:
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4.46
+      value: 8.37
       objectReference: {fileID: 0}
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
@@ -3915,7 +3921,7 @@ PrefabInstance:
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 16.3
+      value: 21.01
       objectReference: {fileID: 0}
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
@@ -3967,6 +3973,41 @@ PrefabInstance:
       propertyPath: detectionRadius
       value: 3.74
       objectReference: {fileID: 0}
+    - target: {fileID: 3041951732959857947, guid: f8e8612f46092c642850f3c0eb7e8d9b,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3041951732959857947, guid: f8e8612f46092c642850f3c0eb7e8d9b,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3041951732959857947, guid: f8e8612f46092c642850f3c0eb7e8d9b,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 10764788}
+    - target: {fileID: 3041951732959857947, guid: f8e8612f46092c642850f3c0eb7e8d9b,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3041951732959857947, guid: f8e8612f46092c642850f3c0eb7e8d9b,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SetActive
+      objectReference: {fileID: 0}
+    - target: {fileID: 3041951732959857947, guid: f8e8612f46092c642850f3c0eb7e8d9b,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 3041951732959857947, guid: f8e8612f46092c642850f3c0eb7e8d9b,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 5677174527259387227, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -3975,12 +4016,12 @@ PrefabInstance:
     - target: {fileID: 5840868460635798395, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
       propertyPath: m_Size.y
-      value: 2.5983715
+      value: 2.746791
       objectReference: {fileID: 0}
     - target: {fileID: 5840868460635798395, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
       propertyPath: m_Center.y
-      value: 0.7991855
+      value: 0.873395
       objectReference: {fileID: 0}
     - target: {fileID: 6064972215524283525, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
