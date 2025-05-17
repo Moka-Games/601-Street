@@ -372,6 +372,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8206366941387034451}
   - component: {fileID: 9019253472080138907}
+  - component: {fileID: 6247943509836089358}
+  - component: {fileID: 3368379726779953958}
   m_Layer: 5
   m_Name: Input_Feedback
   m_TagString: Untagged
@@ -410,3 +412,39 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7068084133590669078}
   m_CullTransparentMesh: 1
+--- !u!114 &6247943509836089358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7068084133590669078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69eca3e0a8e84da448ce2b184bd588b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  promptCanvasGroup: {fileID: 3368379726779953958}
+  promptRectTransform: {fileID: 8206366941387034451}
+  fadeInDuration: 0.3
+  scaleUpDuration: 0.7
+  initialScale: 0
+  finalScale: 0.4
+  iconRect: {fileID: 2867892946867364732}
+  textRect: {fileID: 6694034400401254824}
+  basic_Animation: 1
+  slide_Animation: 0
+  pulse_Animation: 0
+  SeparatedElements_Animation: 0
+--- !u!225 &3368379726779953958
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7068084133590669078}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0

@@ -151,7 +151,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
             if (disableAfterInteraction)
             {
                 // Desactivar el objeto después de un breve retardo para permitir que las animaciones terminen
-                StartCoroutine(DisableAfterDelay(0.5f));
+                gameObject.SetActive(false);
             }
         }
     }
@@ -181,13 +181,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
     public string GetInteractionPrompt()
     {
         return interactionPrompt;
-    }
-
-    // Método para desactivar el GameObject después de un retraso
-    private IEnumerator DisableAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        gameObject.SetActive(false);
     }
 
     // Método para destruir los indicadores de feedback
