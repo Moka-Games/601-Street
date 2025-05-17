@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Collections;
-using DG.Tweening;
+using DG.Tweening; // Añadido para DOTween
 
 public class DialogueManager : MonoBehaviour
 {
@@ -40,12 +40,17 @@ public class DialogueManager : MonoBehaviour
     // Referencias para el control del jugador y la cámara
     private PlayerController playerController;
     private GameObject npcCamera;
-    
+
     private bool isInConversation = false;
 
     // Agregar esta variable para un cooldown entre conversaciones
     private float conversationCooldown = 1.5f;
     private float lastConversationEndTime = 0f;
+
+    // Nuevas variables para animación del diálogo
+    [Header("Dialog Animation Settings")]
+    [SerializeField] private float dialogEntryDuration = 0.3f;
+    [SerializeField] private Ease dialogEntryEase = Ease.OutBack;
 
     void Awake()
     {
@@ -61,7 +66,6 @@ public class DialogueManager : MonoBehaviour
 
     void Start()
     {
-
         playerController = FindAnyObjectByType<PlayerController>();
         if (playerController == null)
         {
@@ -122,13 +126,25 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // Nuevo método para animar la aparición del diálogo
+    private void AnimateDialogueEntry()
+    {
+        // Asegurarnos de que dialogueUI existe y está activo
+        if (dialogueUI == null || !dialogueUI.activeSelf) return;
+
+        // Configuramos la escala inicial en 0
+        dialogueUI.transform.localScale = Vector3.zero;
+
+        // Animamos la escala hasta 1 con un efecto de rebote
+        dialogueUI.transform.DOScale(1f, dialogEntryDuration)
+            .SetEase(dialogEntryEase)
+            .OnComplete(() => {
+                // Se puede agregar algún efecto adicional aquí si se desea
+            });
+    }
+
     public void StartConversation(Conversation conversation, NPC npc)
     {
-        /*if (isInConversation || Time.time - lastConversationEndTime < conversationCooldown)
-        {
-            Debug.Log("No se puede iniciar una nueva conversación: ya hay una en curso o es demasiado pronto");
-            return;
-        }*/
         if (conversation == null)
         {
             Debug.LogError("Conversation is null");
@@ -173,10 +189,14 @@ public class DialogueManager : MonoBehaviour
             typewriterEffect.Reset();
         }
 
+        // Activar la interfaz de diálogo
         if (dialogueUI != null)
         {
             dialogueUI.SetActive(true);
+            // Animar la entrada del diálogo
+            AnimateDialogueEntry();
         }
+
         if (optionsUI != null)
         {
             optionsUI.SetActive(false);
@@ -189,6 +209,7 @@ public class DialogueManager : MonoBehaviour
         // Pequeño delay para asegurar que la UI esté completamente activa antes de mostrar el diálogo
         StartCoroutine(DelayedShowDialogue());
     }
+
     private IEnumerator DelayedShowDialogue()
     {
         // Esperar un frame para asegurar que los componentes estén activos
@@ -197,6 +218,7 @@ public class DialogueManager : MonoBehaviour
         // Ahora mostrar el diálogo
         ShowDialogue();
     }
+
     public void ShowDialogue()
     {
         if (currentConversation != null && currentDialogueIndex < currentConversation.dialogues.Length)
@@ -316,7 +338,6 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-
     public void NextDialogue()
     {
         Debug.Log("Next Dialogue");
@@ -394,10 +415,20 @@ public class DialogueManager : MonoBehaviour
 
         Debug.Log("Conversación finalizada - Cooldown iniciado");
     }
+
     public void SelectDiceOption()
     {
-        TransitionToDiceInterface();
+        // Desactivar la interfaz de diálogo
+        dialogueInterface.SetActive(false);
+
+        // Activar la interfaz de dados
+        diceInterface.SetActive(true);
+
+        // Resetear la interfaz de dados
         diceManager.ResetUI();
+
+        // Configurar el DC para la tirada
+        diceManager.SetDifficultyClass(currentConversation.dialogueOptions[selectedOptionIndex].difficultyClass);
     }
 
     public void OnTypingComplete()
@@ -420,16 +451,22 @@ public class DialogueManager : MonoBehaviour
         {
             DialogueOption selectedOption = currentConversation.dialogueOptions[selectedOptionIndex];
 
+            // Ocultar la interfaz de dados
+            diceInterface.SetActive(false);
+
+            // Ocultar también el panel de opciones para evitar que aparezca brevemente
+            if (optionsUI != null)
+            {
+                optionsUI.SetActive(false);
+            }
+
             // Ejecutar la acción con el resultado de la tirada
             ActionController.Instance.InvokeAction(selectedOption.actionId, diceRollResult.Value);
-
-            // Transición de vuelta al diálogo
-            TransitionFromDiceInterface();
 
             // Iniciar la conversación que se asignó previamente
             if (nextContextualConversation != null)
             {
-                StartCoroutine(DelayedStartConversation(nextContextualConversation, currentNPC));
+                StartConversation(nextContextualConversation, currentNPC);
                 nextContextualConversation = null; // Limpiar la referencia tras usarla
             }
             else
@@ -444,52 +481,13 @@ public class DialogueManager : MonoBehaviour
         else
         {
             Debug.LogWarning("No hay resultado de dado disponible o ninguna opción seleccionada.");
-            TransitionFromDiceInterface();
+            diceInterface.SetActive(false);
         }
     }
 
     public bool IsInConversation()
     {
         return isInConversation;
-    }
-    // En la clase DialogueManager, añade estas funciones para mejorar las transiciones
-
-    private void TransitionToDiceInterface()
-    {
-        // Animar la salida del panel de diálogo
-        dialogueInterface.transform.DOScale(0.8f, 0.3f)
-            .SetEase(Ease.InBack)
-            .OnComplete(() => dialogueInterface.SetActive(false));
-
-        // Animar la entrada del panel de dados
-        diceInterface.SetActive(true);
-        diceInterface.transform.localScale = Vector3.zero;
-        diceInterface.transform.DOScale(1f, 0.4f)
-            .SetEase(Ease.OutBack);
-
-        // Resetear la interfaz de dados
-        diceManager.ResetUI();
-    }
-
-    private void TransitionFromDiceInterface()
-    {
-        // Animar la salida del panel de dados
-        diceInterface.transform.DOScale(0.8f, 0.3f)
-            .SetEase(Ease.InBack)
-            .OnComplete(() => diceInterface.SetActive(false));
-
-        // Animar la entrada del panel de diálogo
-        dialogueInterface.SetActive(true);
-        dialogueInterface.transform.localScale = Vector3.zero;
-        dialogueInterface.transform.DOScale(1f, 0.4f)
-            .SetEase(Ease.OutBack);
-    }
-
-    // Método auxiliar para iniciar la conversación con un pequeño retraso
-    private IEnumerator DelayedStartConversation(Conversation conversation, NPC npc)
-    {
-        yield return new WaitForSeconds(0.5f); // Breve retraso para la transición
-        StartConversation(conversation, npc);
     }
 }
 
