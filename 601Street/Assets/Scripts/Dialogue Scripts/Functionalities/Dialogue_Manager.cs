@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Collections;
+using DG.Tweening;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -395,8 +396,7 @@ public class DialogueManager : MonoBehaviour
     }
     public void SelectDiceOption()
     {
-        dialogueInterface.SetActive(false);
-        diceInterface.SetActive(true);
+        TransitionToDiceInterface();
         diceManager.ResetUI();
     }
 
@@ -423,10 +423,13 @@ public class DialogueManager : MonoBehaviour
             // Ejecutar la acción con el resultado de la tirada
             ActionController.Instance.InvokeAction(selectedOption.actionId, diceRollResult.Value);
 
+            // Transición de vuelta al diálogo
+            TransitionFromDiceInterface();
+
             // Iniciar la conversación que se asignó previamente
             if (nextContextualConversation != null)
             {
-                StartConversation(nextContextualConversation, currentNPC);
+                StartCoroutine(DelayedStartConversation(nextContextualConversation, currentNPC));
                 nextContextualConversation = null; // Limpiar la referencia tras usarla
             }
             else
@@ -441,16 +444,53 @@ public class DialogueManager : MonoBehaviour
         else
         {
             Debug.LogWarning("No hay resultado de dado disponible o ninguna opción seleccionada.");
+            TransitionFromDiceInterface();
         }
-
-        diceInterface.SetActive(false);
     }
 
     public bool IsInConversation()
     {
         return isInConversation;
     }
+    // En la clase DialogueManager, añade estas funciones para mejorar las transiciones
 
+    private void TransitionToDiceInterface()
+    {
+        // Animar la salida del panel de diálogo
+        dialogueInterface.transform.DOScale(0.8f, 0.3f)
+            .SetEase(Ease.InBack)
+            .OnComplete(() => dialogueInterface.SetActive(false));
+
+        // Animar la entrada del panel de dados
+        diceInterface.SetActive(true);
+        diceInterface.transform.localScale = Vector3.zero;
+        diceInterface.transform.DOScale(1f, 0.4f)
+            .SetEase(Ease.OutBack);
+
+        // Resetear la interfaz de dados
+        diceManager.ResetUI();
+    }
+
+    private void TransitionFromDiceInterface()
+    {
+        // Animar la salida del panel de dados
+        diceInterface.transform.DOScale(0.8f, 0.3f)
+            .SetEase(Ease.InBack)
+            .OnComplete(() => diceInterface.SetActive(false));
+
+        // Animar la entrada del panel de diálogo
+        dialogueInterface.SetActive(true);
+        dialogueInterface.transform.localScale = Vector3.zero;
+        dialogueInterface.transform.DOScale(1f, 0.4f)
+            .SetEase(Ease.OutBack);
+    }
+
+    // Método auxiliar para iniciar la conversación con un pequeño retraso
+    private IEnumerator DelayedStartConversation(Conversation conversation, NPC npc)
+    {
+        yield return new WaitForSeconds(0.5f); // Breve retraso para la transición
+        StartConversation(conversation, npc);
+    }
 }
 
 [System.Serializable]
