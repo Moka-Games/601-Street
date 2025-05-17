@@ -5967,6 +5967,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionID: 1
+  interactionPrompt: Use Computer
   onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -6394,6 +6395,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionID: 2
+  interactionPrompt: Go outside
   onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -6951,6 +6953,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionID: 1
+  interactionPrompt: Use Computer
   onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -7531,6 +7534,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 4d7255b80d6c9db49b473b953f128d80, type: 2}
+  interactionPrompt: Pick up Lockpick
   interactionPrefab: {fileID: 7054905189404585413, guid: 8c9df26e838886d469a4dfbdeb12cad0,
     type: 3}
   onItemClick:

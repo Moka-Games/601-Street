@@ -3131,7 +3131,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdf2841cde257ce41a7e4884979576c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionID: 2
+  interactionID: Salida-Bar
+  interactionPrompt: Go outside
   onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -5745,6 +5746,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionID: 1
+  interactionPrompt: Take Bottle
   onInteraction:
     m_PersistentCalls:
       m_Calls:

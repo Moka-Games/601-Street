@@ -152,6 +152,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1943902553}
+  - {fileID: 1666863197}
   - {fileID: 1017622490}
   - {fileID: 1109506060}
   - {fileID: 7610252827844440543}
@@ -239,7 +240,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1943902553}
+    m_TransformParent: {fileID: 69319796}
     m_Modifications:
     - target: {fileID: 210443270296714716, guid: ffab24593e699fb469bb6fe47519208f,
         type: 3}
@@ -293,6 +294,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2013143691063555766, guid: ffab24593e699fb469bb6fe47519208f,
         type: 3}
+      propertyPath: interactionPrompt
+      value: Collect Plush
+      objectReference: {fileID: 0}
+    - target: {fileID: 2013143691063555766, guid: ffab24593e699fb469bb6fe47519208f,
+        type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.size
       value: 0
       objectReference: {fileID: 0}
@@ -314,17 +320,17 @@ PrefabInstance:
     - target: {fileID: 9039625584749799413, guid: ffab24593e699fb469bb6fe47519208f,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.7453933
+      value: -0.5956476
       objectReference: {fileID: 0}
     - target: {fileID: 9039625584749799413, guid: ffab24593e699fb469bb6fe47519208f,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.115
+      value: -2.929951
       objectReference: {fileID: 0}
     - target: {fileID: 9039625584749799413, guid: ffab24593e699fb469bb6fe47519208f,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3.0247788
+      value: 2.877012
       objectReference: {fileID: 0}
     - target: {fileID: 9039625584749799413, guid: ffab24593e699fb469bb6fe47519208f,
         type: 3}
@@ -948,6 +954,11 @@ PrefabInstance:
       propertyPath: detectionRadius
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 686438656488966123, guid: 9cc504ae1dfefdc41ae2e6bf013c3ee0,
+        type: 3}
+      propertyPath: interactionPrompt
+      value: Collect Cube Toy
+      objectReference: {fileID: 0}
     - target: {fileID: 754750896406433449, guid: 9cc504ae1dfefdc41ae2e6bf013c3ee0,
         type: 3}
       propertyPath: m_Enabled
@@ -1204,6 +1215,11 @@ PrefabInstance:
         type: 3}
       propertyPath: detectionRadius
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1707019553482076407, guid: 5bf5fbd684e013f4287c8ce36b7de128,
+        type: 3}
+      propertyPath: interactionPrompt
+      value: Collect Toy Train
       objectReference: {fileID: 0}
     - target: {fileID: 2160922171605887817, guid: 5bf5fbd684e013f4287c8ce36b7de128,
         type: 3}
@@ -1819,7 +1835,6 @@ Transform:
   - {fileID: 3240848125599950619}
   - {fileID: 9039625585545450956}
   - {fileID: 344286526023883762}
-  - {fileID: 1666863197}
   m_Father: {fileID: 69319796}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1943902554
@@ -3619,6 +3634,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionID: Puerta-CasaAbandonada
+  interactionPrompt: Presiona E para interactuar
   onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -6748,6 +6764,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionID: PuzzleAbandonada
+  interactionPrompt: Presiona E para interactuar
   onInteraction:
     m_PersistentCalls:
       m_Calls:

@@ -898,6 +898,11 @@ PrefabInstance:
       objectReference: {fileID: 1713818346}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
+      propertyPath: interactionPrompt
+      value: Take Note
+      objectReference: {fileID: 0}
+    - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
+        type: 3}
       propertyPath: interactableObject
       value: 
       objectReference: {fileID: 0}
@@ -1768,6 +1773,11 @@ PrefabInstance:
         type: 3}
       propertyPath: OnSafeUnlocked.m_PersistentCalls.m_Calls.Array.data[4].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 1833477273651023365, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: interactionPrompt
+      value: Open Safe
       objectReference: {fileID: 0}
     - target: {fileID: 1833477273651023365, guid: 4b20f13d419e62548994c2f1b8936253,
         type: 3}
@@ -5892,7 +5902,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionID: 4
-  interactionPrompt: Presiona E para interactuar
+  interactionPrompt: Go outside
   onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -6054,7 +6064,7 @@ PrefabInstance:
     - target: {fileID: 8009979216645450960, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
         type: 3}
       propertyPath: m_Name
-      value: Profesaor
+      value: Profesor
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6135,7 +6145,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionID: 4
-  interactionPrompt: Presiona E para interactuar
+  interactionPrompt: Go outside
   onInteraction:
     m_PersistentCalls:
       m_Calls:
