@@ -142,7 +142,74 @@ public class UIFeedbackManager : MonoBehaviour
         // Inicialmente desactivado
         indicator.SetActive(false);
 
+        // Configurar el texto y el borde para que crezcan hacia la derecha
+        ConfigureInteractIndicatorForRightwardsExpansion(indicator);
+
         return indicator;
+    }
+
+    /// <summary>
+    /// Configura el indicador de interacción para que se expanda hacia la derecha
+    /// </summary>
+    private void ConfigureInteractIndicatorForRightwardsExpansion(GameObject indicator)
+    {
+        // Buscar componentes necesarios
+        Transform borderTransform = indicator.transform.Find("Interaction_Prompt_Border");
+        TMPro.TMP_Text descriptionText = indicator.transform.Find("Interaction_Description")?.GetComponent<TMPro.TMP_Text>();
+
+        // Configurar el borde
+        if (borderTransform != null)
+        {
+            RectTransform borderRect = borderTransform as RectTransform;
+            if (borderRect != null)
+            {
+                // Configurar pivot a la izquierda para que crezca hacia la derecha
+                borderRect.pivot = new Vector2(0f, 0.5f);
+
+                // Establecer anclajes a la izquierda
+                borderRect.anchorMin = new Vector2(0f, borderRect.anchorMin.y);
+                borderRect.anchorMax = new Vector2(0f, borderRect.anchorMax.y);
+
+                // Posición fija desde la izquierda
+                Vector2 anchoredPosition = borderRect.anchoredPosition;
+                anchoredPosition.x = 0f;
+                borderRect.anchoredPosition = anchoredPosition;
+            }
+        }
+
+        // Configurar el texto
+        if (descriptionText != null)
+        {
+            // Configurar el texto para que no haga wrapping
+            descriptionText.textWrappingMode = TMPro.TextWrappingModes.NoWrap; 
+            descriptionText.overflowMode = TMPro.TextOverflowModes.Overflow;
+
+            // Configurar pivot y anclajes
+            RectTransform textRect = descriptionText.rectTransform;
+            if (textRect != null)
+            {
+                // Pivot a la izquierda
+                textRect.pivot = new Vector2(0f, 0.5f);
+
+                // Anclajes a la izquierda
+                textRect.anchorMin = new Vector2(0f, textRect.anchorMin.y);
+                textRect.anchorMax = new Vector2(0f, textRect.anchorMax.y);
+
+                // Posición con un pequeño margen izquierdo
+                Vector2 textPosition = textRect.anchoredPosition;
+                textPosition.x = 10f; // Margen desde el borde
+                textRect.anchoredPosition = textPosition;
+            }
+
+            // No establecemos un texto inicial aquí, lo dejamos vacío o con un placeholder
+            // para que sea establecido por el componente del objeto interactuable
+            descriptionText.text = ""; // Esto será sobrescrito por el valor de interactionPrompt
+            
+            descriptionText.text = "[PENDING UPDATE]";
+
+            // Forzar actualización del texto para que se calcule el tamaño correcto
+            descriptionText.ForceMeshUpdate();
+        }
     }
 
     // Getter para el Canvas HUD

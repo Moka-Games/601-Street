@@ -5246,6 +5246,11 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
+      propertyPath: interactionPrompt
+      value: Take Password
+      objectReference: {fileID: 0}
+    - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
+        type: 3}
       propertyPath: interactableObject
       value: 
       objectReference: {fileID: 0}
@@ -5887,6 +5892,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionID: 4
+  interactionPrompt: Presiona E para interactuar
   onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -6129,6 +6135,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionID: 4
+  interactionPrompt: Presiona E para interactuar
   onInteraction:
     m_PersistentCalls:
       m_Calls:

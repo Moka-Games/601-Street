@@ -11,6 +11,8 @@ public class Inventory_Item : MonoBehaviour
     public ItemData itemData;
 
     [Header("Configuración de Interacción")]
+    [Tooltip("Texto que se mostrará en el indicador de interacción")]
+    [SerializeField] private string interactionPrompt = "Recoger"; // Nueva variable
     [Tooltip("Prefab que se instanciará cuando se interactúe con este objeto o se seleccione en el inventario")]
     public GameObject interactionPrefab;
 
@@ -72,6 +74,13 @@ public class Inventory_Item : MonoBehaviour
         {
             Debug.LogWarning("No se pudo encontrar PlayerInteraction en la escena");
         }
+       
+        if (interactIndicator != null)
+        {
+            UpdateInteractionPrompt(interactIndicator);
+            Debug.Log($"Inicialización de prompt para {gameObject.name}: '{interactionPrompt}'");
+        }
+
 
         isInitialized = true;
     }
@@ -140,6 +149,7 @@ public class Inventory_Item : MonoBehaviour
         UpdateFeedbackLogic();
     }
 
+    // En el método UpdateFeedbackLogic
     private void UpdateFeedbackLogic()
     {
         if (playerInDetectionRange)
@@ -150,17 +160,34 @@ public class Inventory_Item : MonoBehaviour
             // Verificar si el jugador está mirando este objeto específico y puede interactuar
             bool canInteractWithThis = IsTargetOfPlayerInteraction();
 
+            // Modificación clave: Primero actualizamos el texto del prompt SIEMPRE,
+            // independientemente de si se muestra o no
+            if (interactIndicator != null)
+            {
+                UpdateInteractionPrompt(interactIndicator);
+            }
+
             // Mostrar el indicador de interacción solo si se puede interactuar
-            interactIndicator.SetActive(canInteractWithThis);
+            if (canInteractWithThis && interactIndicator != null)
+            {
+                interactIndicator.SetActive(true);
+            }
+            else if (interactIndicator != null)
+            {
+                interactIndicator.SetActive(false);
+            }
 
             // Mostrar el indicador de detección solo si no se puede interactuar aún
-            rangeIndicator.SetActive(!canInteractWithThis);
+            if (rangeIndicator != null)
+            {
+                rangeIndicator.SetActive(!canInteractWithThis);
+            }
         }
         else
         {
             // El jugador no está en rango de detección
-            rangeIndicator.SetActive(false);
-            interactIndicator.SetActive(false);
+            if (rangeIndicator != null) rangeIndicator.SetActive(false);
+            if (interactIndicator != null) interactIndicator.SetActive(false);
         }
     }
 
@@ -249,6 +276,97 @@ public class Inventory_Item : MonoBehaviour
             // Apuntar hacia abajo (objeto está detrás)
             rangeIndicatorRect.rotation = Quaternion.Euler(0, 0, 180);
             interactIndicatorRect.rotation = Quaternion.Euler(0, 0, 180);
+        }
+    }
+
+    // Método para actualizar el prompt y redimensionar el indicador expandiendo solo hacia la derecha
+    private void UpdateInteractionPrompt(GameObject indicator)
+    {
+        if (indicator == null) return;
+
+        // Buscar los componentes necesarios de manera más robusta
+        Transform borderTransform = indicator.transform.Find("Interaction_Prompt_Border");
+        TMPro.TMP_Text descriptionText = indicator.transform.Find("Interaction_Description")?.GetComponent<TMPro.TMP_Text>();
+
+        if (descriptionText != null)
+        {
+            // Asignar el texto (usar itemData.itemName si está disponible)
+            string displayText = !string.IsNullOrEmpty(interactionPrompt) ?
+            interactionPrompt :
+            (itemData != null ? "Recoger " + itemData.itemName : "Recoger");
+
+            Debug.Log($"Actualizando texto prompt de {gameObject.name} a: '{displayText}'");
+            descriptionText.text = displayText;
+
+            // Forzar actualización del texto
+            descriptionText.ForceMeshUpdate(true);
+
+            // Obtener el ancho preferido del texto
+            float textWidth = descriptionText.preferredWidth;
+
+            // Añadir padding para el borde
+            float padding = 30f;
+            float borderWidth = textWidth + padding;
+
+            // Ajustar el ancho del borde
+            if (borderTransform != null)
+            {
+                RectTransform borderRect = borderTransform as RectTransform;
+                if (borderRect != null)
+                {
+                    // Asegurar que el pivote esté a la izquierda (para crecer hacia la derecha)
+                    borderRect.pivot = new Vector2(0f, 0.5f);
+
+                    // Mantener la altura actual, cambiar solo el ancho
+                    Vector2 sizeDelta = borderRect.sizeDelta;
+                    sizeDelta.x = Mathf.Max(100f, borderWidth); // Mínimo 100 unidades de ancho
+                    borderRect.sizeDelta = sizeDelta;
+
+                    // Si la posición del borde se basa en un anclaje que no es izquierdo,
+                    // ajustar la posición para mantenerla consistente
+                    if (borderRect.anchorMin.x != 0f || borderRect.anchorMax.x != 0f)
+                    {
+                        // Establecer anclajes a la izquierda
+                        borderRect.anchorMin = new Vector2(0f, borderRect.anchorMin.y);
+                        borderRect.anchorMax = new Vector2(0f, borderRect.anchorMax.y);
+
+                        // Asegurar que la posición sea correcta
+                        Vector2 anchoredPosition = borderRect.anchoredPosition;
+                        anchoredPosition.x = 0f; // Alinear con el borde izquierdo
+                        borderRect.anchoredPosition = anchoredPosition;
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"No se pudo encontrar 'Interaction_Description' en {indicator.name}");
+            }
+
+            // Ajustar el rectTransform del texto
+            RectTransform textRect = descriptionText.rectTransform;
+            if (textRect != null)
+            {
+                // Asegurar que el pivote del texto también esté a la izquierda
+                textRect.pivot = new Vector2(0f, 0.5f);
+
+                // Ajustar el ancho del texto (dejando un poco de margen interno)
+                Vector2 textSizeDelta = textRect.sizeDelta;
+                textSizeDelta.x = Mathf.Max(80f, textWidth + 10f);
+                textRect.sizeDelta = textSizeDelta;
+
+                // Si la posición del texto depende de un anclaje no izquierdo, ajustarla
+                if (textRect.anchorMin.x != 0f || textRect.anchorMax.x != 0f)
+                {
+                    // Establecer anclajes a la izquierda
+                    textRect.anchorMin = new Vector2(0f, textRect.anchorMin.y);
+                    textRect.anchorMax = new Vector2(0f, textRect.anchorMax.y);
+
+                    // Asegurar la posición correcta
+                    Vector2 textPosition = textRect.anchoredPosition;
+                    textPosition.x = 10f; // Un pequeño margen desde el borde izquierdo
+                    textRect.anchoredPosition = textPosition;
+                }
+            }
         }
     }
 

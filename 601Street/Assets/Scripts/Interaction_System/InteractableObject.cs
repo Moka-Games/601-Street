@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using TMPro;
 
 public interface IInteractable
 {
@@ -8,11 +9,15 @@ public interface IInteractable
     void SecondInteraction();
     string GetInteractionID();
     bool CanBeInteractedAgain();
+    string GetInteractionPrompt(); // Nuevo método para obtener el prompt
 }
+
 public class InteractableObject : MonoBehaviour, IInteractable
 {
     [Header("Configuración básica")]
     [SerializeField] private string interactionID;
+    [Tooltip("Texto que se mostrará en el indicador de interacción")]
+    [SerializeField] private string interactionPrompt = "Presiona E para interactuar"; // Nueva variable
     [Tooltip("Evento que se disparará cuando el jugador interactúe con este objeto")]
     public UnityEvent onInteraction;
     [SerializeField] private UnityEvent onInteracted; //Evento por si volvemos a interactuar con el mismo objeto
@@ -50,24 +55,23 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
     private Vector3 lastScale;
 
-
     private void Start()
     {
         // Crear y configurar el SphereCollider
         detectionCollider = gameObject.AddComponent<SphereCollider>();
         detectionCollider.radius = detectionRadius;
         detectionCollider.isTrigger = true;
-        
+
         float maxScaleFactor = Mathf.Max(
-       Mathf.Abs(transform.lossyScale.x),
-       Mathf.Max(Mathf.Abs(transform.lossyScale.y), Mathf.Abs(transform.lossyScale.z))
-   );
+            Mathf.Abs(transform.lossyScale.x),
+            Mathf.Max(Mathf.Abs(transform.lossyScale.y), Mathf.Abs(transform.lossyScale.z))
+        );
 
         detectionCollider.radius = detectionRadius / maxScaleFactor;
         detectionCollider.isTrigger = true;
 
         mainCamera = Camera.main;
-        
+
         // Obtener el Canvas HUD a través del gestor
         hudCanvas = UIFeedbackManager.Instance.GetHUDCanvas();
         if (hudCanvas != null)
@@ -147,7 +151,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
             if (disableAfterInteraction)
             {
                 // Desactivar el objeto después de un breve retardo para permitir que las animaciones terminen
-                //StartCoroutine(DisableAfterDelay(0.5f));
+                StartCoroutine(DisableAfterDelay(0.5f));
             }
         }
     }
@@ -171,6 +175,19 @@ public class InteractableObject : MonoBehaviour, IInteractable
     public string GetInteractionID()
     {
         return interactionID;
+    }
+
+    // Implementación del método de la interfaz para obtener el prompt
+    public string GetInteractionPrompt()
+    {
+        return interactionPrompt;
+    }
+
+    // Método para desactivar el GameObject después de un retraso
+    private IEnumerator DisableAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        gameObject.SetActive(false);
     }
 
     // Método para destruir los indicadores de feedback
@@ -238,7 +255,13 @@ public class InteractableObject : MonoBehaviour, IInteractable
             {
                 // Este objeto es el objetivo y el jugador puede interactuar: mostrar indicador de interacción
                 if (rangeIndicator != null) rangeIndicator.SetActive(false);
-                if (interactIndicator != null) interactIndicator.SetActive(true);
+                if (interactIndicator != null)
+                {
+                    // Primero actualizamos el texto del prompt
+                    UpdateInteractionPrompt(interactIndicator);
+                    // Luego activamos el indicador
+                    interactIndicator.SetActive(true);
+                }
             }
             else
             {
@@ -344,6 +367,86 @@ public class InteractableObject : MonoBehaviour, IInteractable
         }
     }
 
+    // Método para actualizar el texto del prompt y ajustar el tamaño del contenedor expandiendo solo hacia la derecha
+    private void UpdateInteractionPrompt(GameObject indicator)
+    {
+        // Buscar los componentes necesarios
+        Transform borderTransform = indicator.transform.Find("Interaction_Prompt_Border");
+        TMP_Text descriptionText = indicator.transform.Find("Interaction_Description")?.GetComponent<TMP_Text>();
+
+        if (descriptionText != null)
+        {
+            // Asignar el texto
+            descriptionText.text = interactionPrompt;
+
+            // Forzar actualización del texto para calcular el ancho preferido
+            descriptionText.ForceMeshUpdate();
+
+            // Obtener el ancho preferido del texto
+            float textWidth = descriptionText.preferredWidth;
+
+            // Añadir padding para el borde
+            float padding = 30f;
+            float borderWidth = textWidth + padding;
+
+            // Ajustar el ancho del borde
+            if (borderTransform != null)
+            {
+                RectTransform borderRect = borderTransform as RectTransform;
+                if (borderRect != null)
+                {
+                    // Asegurar que el pivote esté a la izquierda (para crecer hacia la derecha)
+                    borderRect.pivot = new Vector2(0f, 0.5f);
+
+                    // Mantener la altura actual, cambiar solo el ancho
+                    Vector2 sizeDelta = borderRect.sizeDelta;
+                    sizeDelta.x = Mathf.Max(100f, borderWidth); // Mínimo 100 unidades de ancho
+                    borderRect.sizeDelta = sizeDelta;
+
+                    // Si la posición del borde se basa en un anclaje que no es izquierdo,
+                    // ajustar la posición para mantenerla consistente
+                    if (borderRect.anchorMin.x != 0f || borderRect.anchorMax.x != 0f)
+                    {
+                        // Establecer anclajes a la izquierda
+                        borderRect.anchorMin = new Vector2(0f, borderRect.anchorMin.y);
+                        borderRect.anchorMax = new Vector2(0f, borderRect.anchorMax.y);
+
+                        // Asegurar que la posición sea correcta
+                        Vector2 anchoredPosition = borderRect.anchoredPosition;
+                        anchoredPosition.x = 0f; // Alinear con el borde izquierdo
+                        borderRect.anchoredPosition = anchoredPosition;
+                    }
+                }
+            }
+
+            // Ajustar el rectTransform del texto
+            RectTransform textRect = descriptionText.rectTransform;
+            if (textRect != null)
+            {
+                // Asegurar que el pivote del texto también esté a la izquierda
+                textRect.pivot = new Vector2(0f, 0.5f);
+
+                // Ajustar el ancho del texto (dejando un poco de margen interno)
+                Vector2 textSizeDelta = textRect.sizeDelta;
+                textSizeDelta.x = Mathf.Max(80f, textWidth + 10f);
+                textRect.sizeDelta = textSizeDelta;
+
+                // Si la posición del texto depende de un anclaje no izquierdo, ajustarla
+                if (textRect.anchorMin.x != 0f || textRect.anchorMax.x != 0f)
+                {
+                    // Establecer anclajes a la izquierda
+                    textRect.anchorMin = new Vector2(0f, textRect.anchorMin.y);
+                    textRect.anchorMax = new Vector2(0f, textRect.anchorMax.y);
+
+                    // Asegurar la posición correcta
+                    Vector2 textPosition = textRect.anchoredPosition;
+                    textPosition.x = 10f; // Un pequeño margen desde el borde izquierdo
+                    textRect.anchoredPosition = textPosition;
+                }
+            }
+        }
+    }
+
     private void SetUIPosition(RectTransform rectTransform, Vector2 screenPosition)
     {
         if (rectTransform == null)
@@ -442,7 +545,13 @@ public class InteractableObject : MonoBehaviour, IInteractable
             if (isTargetObject && playerInteraction != null && playerInteraction.canInteract)
             {
                 if (rangeIndicator != null) rangeIndicator.SetActive(false);
-                if (interactIndicator != null) interactIndicator.SetActive(true);
+                if (interactIndicator != null)
+                {
+                    // Primero actualizamos el texto y tamaño
+                    UpdateInteractionPrompt(interactIndicator);
+                    // Luego activamos el indicador
+                    interactIndicator.SetActive(true);
+                }
             }
             else
             {
