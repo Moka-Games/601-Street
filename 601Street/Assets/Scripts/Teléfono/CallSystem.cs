@@ -20,7 +20,6 @@ public class CallSystem : MonoBehaviour
 
     [Header("Configuración")]
     [SerializeField] private KeyCode acceptCallKey = KeyCode.F;
-    [SerializeField] private KeyCode rejectCallKey = KeyCode.Escape;
     [SerializeField] private string showPopupAnimName = "ShowCallPopup";
     [SerializeField] private string hidePopupAnimName = "HideCallPopup";
     [SerializeField] private float popupDuration = 15f; // Tiempo que se muestra el popup antes de cerrarse automáticamente
@@ -175,15 +174,14 @@ public class CallSystem : MonoBehaviour
 
     private void Update()
     {
-        // Solo procesar input para aceptar la llamada si el popup está visible
-        if (isPopupVisible)
+
+        if (isPopupVisible && !isCallActive)
         {
             // Aceptar llamada
             if (Input.GetKeyDown(acceptCallKey))
             {
                 AcceptCall();
             }
-            // Ya no tendremos opción de rechazar la llamada
         }
     }
 
@@ -315,9 +313,8 @@ public class CallSystem : MonoBehaviour
     // Aceptar llamada
     public void AcceptCall()
     {
-        if (!isPopupVisible) return;
+        if (!isPopupVisible || isCallActive) return;
 
-        // Detener el sonido de llamada entrante
         if (audioSource != null)
         {
             audioSource.Stop(); // Primero detenemos cualquier sonido que esté reproduciéndose

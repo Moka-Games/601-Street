@@ -16,7 +16,7 @@ public class NPC : MonoBehaviour
     public string pensamientoFalloTirada = "Parece que Nakamura no está dispuesto a hablar. Quizás si le doy algo de beber...";
 
     private bool tiradaFallada = false;
-    public bool hasInteracted = false;
+    public bool hasInteracted = false; // Cambiado de static a instancia para tracking individual
     public bool singleInteraction = false;
     private Animator animator;
 
@@ -77,12 +77,11 @@ public class NPC : MonoBehaviour
         else if (!hasInteracted && singleInteraction)
         {
             DialogueManager.Instance.StartConversation(conversation, this);
-            singleInteraction = true;
+            hasInteracted = true; // Marcar como interactuado inmediatamente
         }
         else if (hasInteracted && singleInteraction)
         {
             DialogueManager.Instance.StartConversation(funnyConversation, this);
-            singleInteraction = true;
         }
     }
 
@@ -140,13 +139,13 @@ public class NPC : MonoBehaviour
     public void SetInteracted()
     {
         hasInteracted = true;
-        Debug.Log("Conversación Terminada");
+        Debug.Log("Conversación Terminada - NPC marcado como interactuado: " + gameObject.name);
     }
 
     public void SetNOTInteracted()
     {
         hasInteracted = false;
-        Debug.Log("Conversación Terminada");
+        Debug.Log("Estado de interacción reiniciado - NPC: " + gameObject.name);
     }
 
     public void PerformEmotion(string emotion)
@@ -205,6 +204,9 @@ public class NPC : MonoBehaviour
         if (endedConversation == conversation)
         {
             Debug.Log($"La conversación principal del NPC {gameObject.name} ha terminado");
+
+            // Marcar como interactuado al finalizar la conversación principal
+            SetInteracted();
 
             // Invocar el evento solo si la conversación terminada es la principal
             OnConversationEnded?.Invoke();

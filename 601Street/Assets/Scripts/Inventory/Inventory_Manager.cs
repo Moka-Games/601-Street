@@ -12,6 +12,8 @@ public class Inventory_Manager : MonoBehaviour
 {
     public static Inventory_Manager Instance;
 
+    public KeyCode inventoryKey;
+
     public Transform noteContainer;
     public Transform objectContainer;
 
@@ -35,6 +37,19 @@ public class Inventory_Manager : MonoBehaviour
     [Tooltip("Si está marcado, el popup no se mostrará si ya se está mostrando un prefab de interacción")]
     public bool skipPopupIfInteractionActive = true;
 
+    [Header("Player Control")]
+    [Tooltip("Si está marcado, bloqueará automáticamente al jugador durante las interacciones")]
+    public bool blockPlayerDuringInteraction = true;
+    [Tooltip("Si está marcado, bloqueará automáticamente la cámara durante las interacciones")]
+    public bool blockCameraDuringInteraction = true;
+
+    // Control de estado para saber por qué están bloqueados
+    private bool blockedByInventory = false;
+    private bool blockedByInteraction = false;
+
+    // Referencias para bloquear al jugador y la cámara
+    private PlayerController playerController;
+    private Camera_Script cameraScript;
     // Listas y diccionarios para mantener el inventario
     private List<ItemData> inventoryItems = new List<ItemData>();
     private Dictionary<ItemData, PrefabInteractionData> itemInteractions = new Dictionary<ItemData, PrefabInteractionData>();
@@ -80,6 +95,16 @@ public class Inventory_Manager : MonoBehaviour
 
         // Configurar prefabContainer para que persista entre escenas
         EnsurePrefabContainerPersistence();
+
+        // Buscar referencias necesarias para bloquear al jugador
+        playerController = FindAnyObjectByType<PlayerController>();
+        cameraScript = FindAnyObjectByType<Camera_Script>();
+
+        if (playerController == null)
+            Debug.LogWarning("No se encontró PlayerController en la escena. No se podrá bloquear al jugador.");
+
+        if (cameraScript == null)
+            Debug.LogWarning("No se encontró Camera_Script en la escena. No se podrá bloquear la cámara.");
     }
 
     /// <summary>
@@ -105,7 +130,7 @@ public class Inventory_Manager : MonoBehaviour
     private void Update()
     {
         // Abrir/cerrar inventario
-        if (Input.GetKeyDown(KeyCode.I))
+        if (Input.GetKeyDown(inventoryKey))
         {
             ToggleInventory();
         }
@@ -116,14 +141,23 @@ public class Inventory_Manager : MonoBehaviour
             popUpParent.SetActive(false);
         }
     }
-
-    /// <summary>
-    /// Abre o cierra el inventario
-    /// </summary>
     public void ToggleInventory()
     {
         inventoryOpened = !inventoryOpened;
         InventoryInterface.SetActive(inventoryOpened);
+
+        // Si el inventario se acaba de abrir, bloquear al jugador y la cámara
+        if (inventoryOpened)
+        {
+            BlockPlayerAndCameraForInventory();
+            Debug.Log("Inventario abierto: Controlador y cámara bloqueados");
+        }
+        // Si el inventario se acaba de cerrar, desbloquear al jugador y la cámara
+        else
+        {
+            UnblockPlayerAndCameraFromInventory();
+            Debug.Log("Inventario cerrado: Controlador y cámara desbloqueados");
+        }
     }
 
     /// <summary>
@@ -307,6 +341,9 @@ public class Inventory_Manager : MonoBehaviour
         // Establecer como objeto activo
         activeInteractionObject = instance;
 
+        // Bloquear al jugador y la cámara por interacción
+        BlockPlayerAndCameraForInteraction();
+
         return instance;
     }
 
@@ -383,6 +420,9 @@ public class Inventory_Manager : MonoBehaviour
             Destroy(activeInteractionObject);
             activeInteractionObject = null;
             isNewlyAddedItem = false;
+
+            // Desbloquear al jugador y la cámara de la interacción
+            UnblockPlayerAndCameraFromInteraction();
         }
     }
 
@@ -437,5 +477,111 @@ public class Inventory_Manager : MonoBehaviour
     public bool HasItemWithName(string itemName)
     {
         return inventoryItems.Exists(item => item.itemName == itemName);
+    }
+    
+    /// <summary>
+     /// Bloquea al jugador y/o la cámara según la configuración
+     /// </summary>
+    private void BlockPlayerAndCamera()
+    {
+        if (blockPlayerDuringInteraction && playerController != null)
+        {
+            playerController.SetMovementEnabled(false);
+            Debug.Log("Movimiento del jugador bloqueado durante interacción");
+        }
+
+        if (blockCameraDuringInteraction && cameraScript != null)
+        {
+            cameraScript.FreezeCamera();
+            Debug.Log("Cámara bloqueada durante interacción");
+        }
+    }
+
+    /// <summary>
+    /// Desbloquea al jugador y/o la cámara
+    /// </summary>
+    private void UnblockPlayerAndCamera()
+    {
+        if (blockPlayerDuringInteraction && playerController != null)
+        {
+            playerController.SetMovementEnabled(true);
+            Debug.Log("Movimiento del jugador desbloqueado tras interacción");
+        }
+
+        if (blockCameraDuringInteraction && cameraScript != null)
+        {
+            cameraScript.UnfreezeCamera();
+            Debug.Log("Cámara desbloqueada tras interacción");
+        }
+    }/// <summary>
+     /// Bloquea al jugador y/o la cámara por razón de inventario
+     /// </summary>
+    private void BlockPlayerAndCameraForInventory()
+    {
+        blockedByInventory = true;
+        ApplyBlockingState();
+    }
+
+    /// <summary>
+    /// Bloquea al jugador y/o la cámara por razón de interacción
+    /// </summary>
+    private void BlockPlayerAndCameraForInteraction()
+    {
+        blockedByInteraction = true;
+        ApplyBlockingState();
+    }
+    private void UnblockPlayerAndCameraFromInventory()
+    {
+        blockedByInventory = false;
+        // Solo desbloqueamos si no hay otro motivo de bloqueo
+        if (!blockedByInteraction)
+        {
+            ApplyUnblockingState();
+        }
+    }
+
+    /// <summary>
+    /// Desbloquea elementos bloqueados por interacción
+    /// </summary>
+    private void UnblockPlayerAndCameraFromInteraction()
+    {
+        blockedByInteraction = false;
+        // Solo desbloqueamos si no hay otro motivo de bloqueo
+        if (!blockedByInventory)
+        {
+            ApplyUnblockingState();
+        }
+    }
+    
+    /// <summary>
+     /// Aplica el estado de bloqueo al jugador y la cámara
+     /// </summary>
+    private void ApplyBlockingState()
+    {
+        if (blockPlayerDuringInteraction && playerController != null)
+        {
+            playerController.SetMovementEnabled(false);
+        }
+
+        if (blockCameraDuringInteraction && cameraScript != null)
+        {
+            cameraScript.FreezeCamera();
+        }
+    }
+    
+    /// <summary>
+     /// Aplica el estado de desbloqueo al jugador y la cámara
+     /// </summary>
+    private void ApplyUnblockingState()
+    {
+        if (playerController != null)
+        {
+            playerController.SetMovementEnabled(true);
+        }
+
+        if (cameraScript != null)
+        {
+            cameraScript.UnfreezeCamera();
+        }
     }
 }

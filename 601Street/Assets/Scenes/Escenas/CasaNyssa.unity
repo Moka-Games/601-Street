@@ -708,7 +708,7 @@ GameObject:
   - component: {fileID: 265875417}
   - component: {fileID: 265875416}
   - component: {fileID: 265875415}
-  - component: {fileID: 265875418}
+  - component: {fileID: 265875419}
   m_Layer: 6
   m_Name: Salir_Button
   m_TagString: Untagged
@@ -780,37 +780,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 265875418}
-        m_TargetAssemblyTypeName: WorldStateActivator, Assembly-CSharp
-        m_MethodName: OnInteract
-        m_Mode: 1
+      - m_Target: {fileID: 265875419}
+        m_TargetAssemblyTypeName: FreezeOnInteract, Assembly-CSharp
+        m_MethodName: OnInteractCloseAndUnfreeze
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 2131207128}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1066112520}
-        m_TargetAssemblyTypeName: Inventory_Item, Assembly-CSharp
-        m_MethodName: OnInteract
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 2131207128}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -854,7 +830,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 265875413}
   m_CullTransparentMesh: 1
---- !u!114 &265875418
+--- !u!114 &265875419
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -863,21 +839,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 265875413}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa7eee6eb12ee9744b28c7b4d22b4e9e, type: 3}
+  m_Script: {fileID: 11500000, guid: 1488922c11ed97c44adf62efb96a16c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stateModifications:
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: CasaNyssa
-    objectID: Listener
-  activateOnStart: 0
-  activateOnInteract: 1
-  activateOnce: 0
-  forceImmediateUpdate: 1
+  freezePlayerMovement: 1
+  freezeCamera: 1
+  showDebugMessages: 1
 --- !u!1 &278474539
 GameObject:
   m_ObjectHideFlags: 0
@@ -5860,6 +5827,7 @@ GameObject:
   - component: {fileID: 1943567783}
   - component: {fileID: 1943567782}
   - component: {fileID: 1943567781}
+  - component: {fileID: 1943567786}
   m_Layer: 6
   m_Name: OrdenadorCorreo_2
   m_TagString: Untagged
@@ -5983,13 +5951,13 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2052084823}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 1943567786}
+        m_TargetAssemblyTypeName: FreezeOnInteract, Assembly-CSharp
+        m_MethodName: OnInteractOpenAndFreeze
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 2052084823}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -6024,6 +5992,21 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1943567786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1943567779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1488922c11ed97c44adf62efb96a16c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  freezePlayerMovement: 1
+  freezeCamera: 1
+  showDebugMessages: 1
 --- !u!1 &2001068958
 GameObject:
   m_ObjectHideFlags: 0
@@ -6185,14 +6168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa7eee6eb12ee9744b28c7b4d22b4e9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stateModifications:
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: CasaNyssa
-    objectID: Listener
+  stateModifications: []
   activateOnStart: 0
   activateOnInteract: 1
   activateOnce: 0
@@ -6253,13 +6229,13 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2052084823}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 1943567786}
+        m_TargetAssemblyTypeName: FreezeOnInteract, Assembly-CSharp
+        m_MethodName: OnInteractCloseAndUnfreeze
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 2052084823}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -6896,6 +6872,7 @@ GameObject:
   - component: {fileID: 2056939753}
   - component: {fileID: 2056939754}
   - component: {fileID: 2056939755}
+  - component: {fileID: 2056939756}
   m_Layer: 6
   m_Name: OrdenadorCorreo_1
   m_TagString: Untagged
@@ -6969,17 +6946,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2131207128}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 2056939756}
+        m_TargetAssemblyTypeName: FreezeOnInteract, Assembly-CSharp
+        m_MethodName: OnInteractOpenAndFreeze
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 2131207128}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 1
+          m_BoolArgument: 0
         m_CallState: 2
   onInteracted:
     m_PersistentCalls:
@@ -7034,6 +7011,21 @@ MonoBehaviour:
   activateOnInteract: 1
   activateOnce: 0
   forceImmediateUpdate: 1
+--- !u!114 &2056939756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056939750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1488922c11ed97c44adf62efb96a16c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  freezePlayerMovement: 1
+  freezeCamera: 1
+  showDebugMessages: 1
 --- !u!1 &2073145269 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4067818517711116892, guid: 17db0cd694e84cf49b9fc0c842e6dc4d,

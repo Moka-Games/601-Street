@@ -52,6 +52,10 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private float dialogEntryDuration = 0.3f;
     [SerializeField] private Ease dialogEntryEase = Ease.OutBack;
 
+    [Header("Dialog Animation Settings")]
+    [SerializeField] private float dialogExitDuration = 0.3f;
+    [SerializeField] private Ease dialogExitEase = Ease.InBack;
+    [SerializeField] private float slideDistance = 100f;
     void Awake()
     {
         if (Instance == null)
@@ -132,16 +136,24 @@ public class DialogueManager : MonoBehaviour
         // Asegurarnos de que dialogueUI existe y está activo
         if (dialogueUI == null || !dialogueUI.activeSelf) return;
 
-        // Configuramos la escala inicial en 0
-        dialogueUI.transform.localScale = Vector3.zero;
+        // Obtenemos el RectTransform
+        RectTransform dialogueRect = dialogueUI.GetComponent<RectTransform>();
+        if (dialogueRect == null) return;
 
-        // Animamos la escala hasta 1 con un efecto de rebote
-        dialogueUI.transform.DOScale(1f, dialogEntryDuration)
+        // Guardamos la posición original
+        Vector2 originalPosition = dialogueRect.anchoredPosition;
+
+        // Posición inicial (abajo de su posición final)
+        dialogueRect.anchoredPosition = new Vector2(originalPosition.x, originalPosition.y - slideDistance);
+
+        // Animamos hacia la posición original
+        dialogueRect.DOAnchorPos(originalPosition, dialogEntryDuration)
             .SetEase(dialogEntryEase)
             .OnComplete(() => {
                 // Se puede agregar algún efecto adicional aquí si se desea
             });
     }
+
 
     public void StartConversation(Conversation conversation, NPC npc)
     {
@@ -364,15 +376,6 @@ public class DialogueManager : MonoBehaviour
 
     public void EndConversation()
     {
-        if (dialogueUI != null)
-        {
-            dialogueUI.SetActive(false);
-        }
-        if (optionsUI != null)
-        {
-            optionsUI.SetActive(false);
-        }
-
         // Ejecutar la acción asociada a la conversación si existe
         if (currentConversation != null && !string.IsNullOrEmpty(currentConversation.actionId))
         {
@@ -409,13 +412,15 @@ public class DialogueManager : MonoBehaviour
             GameStateManager.Instance.EnterGameplayState();
         }
 
+        // Animar la salida del diálogo ANTES de desactivarlo
+        AnimateDialogueExit();
+
         // Actualizar el tiempo de finalización y el estado de conversación
         lastConversationEndTime = Time.time;
         isInConversation = false;
 
         Debug.Log("Conversación finalizada - Cooldown iniciado");
     }
-
     public void SelectDiceOption()
     {
         // Desactivar la interfaz de diálogo
@@ -483,6 +488,49 @@ public class DialogueManager : MonoBehaviour
             Debug.LogWarning("No hay resultado de dado disponible o ninguna opción seleccionada.");
             diceInterface.SetActive(false);
         }
+    }
+    private void AnimateDialogueExit()
+    {
+        // Verificar que dialogueUI existe y está activo
+        if (dialogueUI == null || !dialogueUI.activeSelf)
+        {
+            if (optionsUI != null)
+            {
+                optionsUI.SetActive(false);
+            }
+            return;
+        }
+
+        // Obtener el RectTransform
+        RectTransform dialogueRect = dialogueUI.GetComponent<RectTransform>();
+        if (dialogueRect == null)
+        {
+            dialogueUI.SetActive(false);
+            if (optionsUI != null) optionsUI.SetActive(false);
+            return;
+        }
+
+        // Detener cualquier animación actual
+        dialogueRect.DOKill();
+
+        // Posición destino (abajo de su posición actual)
+        Vector2 originalPosition = dialogueRect.anchoredPosition;
+        Vector2 targetPosition = new Vector2(originalPosition.x, originalPosition.y - slideDistance);
+
+        // Animar el movimiento hacia abajo
+        dialogueRect.DOAnchorPos(targetPosition, dialogExitDuration)
+            .SetEase(dialogExitEase)
+            .OnComplete(() => {
+                // Desactivar la interfaz de diálogo cuando la animación termine
+                if (dialogueUI != null)
+                {
+                    dialogueUI.SetActive(false);
+                }
+                if (optionsUI != null)
+                {
+                    optionsUI.SetActive(false);
+                }
+            });
     }
 
     public bool IsInConversation()
