@@ -336,7 +336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionID: 1
-  interactionPrompt: Presiona E para interactuar
+  interactionPrompt: Go Outside
   onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -947,6 +947,11 @@ PrefabInstance:
       propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3853657882450592258, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4625153449018724322, guid: 4b20f13d419e62548994c2f1b8936253,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1041,6 +1046,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.09643354
+      objectReference: {fileID: 0}
+    - target: {fileID: 8554641042585944807, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9062308487270539046, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1685,7 +1700,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &504575327
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -3891,7 +3906,7 @@ PrefabInstance:
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8.37
+      value: 4.561
       objectReference: {fileID: 0}
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
@@ -3901,7 +3916,7 @@ PrefabInstance:
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 21.01
+      value: 16.546
       objectReference: {fileID: 0}
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
