@@ -18,6 +18,10 @@ public class Dice_Manager : MonoBehaviour
     [SerializeField] private GameObject rollButton;
     [SerializeField] private GameObject diceObject;
     [SerializeField] private Transform diceTransform;
+    [SerializeField] private Transform diceModelTransform; // Nueva referencia al modelo del dado (hijo)
+    private Quaternion initialDiceModelRotation;
+
+
 
     [Header("Success/Fail Feedback")]
     [SerializeField] private GameObject failObject;
@@ -77,6 +81,11 @@ public class Dice_Manager : MonoBehaviour
         if (diceResultGroup == null && diceResultText != null)
             diceResultGroup = diceResultText.GetComponent<CanvasGroup>()
                 ?? diceResultText.gameObject.AddComponent<CanvasGroup>();
+
+        if (diceModelTransform != null)
+        {
+            initialDiceModelRotation = diceModelTransform.localRotation;
+        }
 
         ResetUI();
         InitializeAnimations();
@@ -174,7 +183,14 @@ public class Dice_Manager : MonoBehaviour
 
         // Asegurar que los tweens se detengan
         DOTween.Kill(diceTransform);
+        DOTween.Kill(diceModelTransform); 
         DOTween.Kill(diceResultText.transform);
+
+        // Restablecer la rotación inicial si es necesario
+        if (diceModelTransform != null)
+        {
+            diceModelTransform.localRotation = initialDiceModelRotation;
+        }
     }
 
     #endregion
@@ -211,13 +227,22 @@ public class Dice_Manager : MonoBehaviour
         // Crear una secuencia para la animación completa
         diceTweener = DOTween.Sequence();
 
-        // Añadir efecto de "punch" al lanzar el dado
+        // Añadir efecto de "punch" al lanzar el dado (afecta al padre)
         diceTweener.Append(diceTransform.DOPunchScale(new Vector3(0.3f, 0.3f, 0.3f), 0.5f, 5, 0.5f));
 
         // Rotaciones aleatorias rápidas para simular el lanzamiento
         for (int i = 0; i < 8; i++)
         {
-            diceTweener.Append(diceTransform.DORotate(new Vector3(
+            // Mover el padre (mantiene la funcionalidad de movimiento)
+            diceTweener.Append(diceTransform.DOMove(
+                diceTransform.position + new Vector3(
+                    UnityEngine.Random.Range(-0.1f, 0.1f),
+                    UnityEngine.Random.Range(-0.1f, 0.1f),
+                    UnityEngine.Random.Range(-0.1f, 0.1f)
+                ), 0.15f).SetEase(Ease.Linear));
+
+            // Rotar solo el modelo del dado
+            diceTweener.Join(diceModelTransform.DOLocalRotate(new Vector3(
                 UnityEngine.Random.Range(0, 360),
                 UnityEngine.Random.Range(0, 360),
                 UnityEngine.Random.Range(0, 360)
@@ -232,29 +257,53 @@ public class Dice_Manager : MonoBehaviour
             ));
         }
 
-        // Rotación final con rebote
-        diceTweener.Append(diceTransform.DORotate(new Vector3(
-            UnityEngine.Random.Range(-10, 10),
-            UnityEngine.Random.Range(-10, 10),
-            UnityEngine.Random.Range(-10, 10)
-        ), 0.5f).SetEase(Ease.OutBack));
+        // Volver a la posición original con rebote (para el padre)
+        diceTweener.Append(diceTransform.DOMove(
+            diceTransform.position, 0.5f).SetEase(Ease.OutBack));
 
-        // Generar el resultado real del dado
+        // Volver a la rotación inicial con rebote (para el modelo)
+        diceTweener.Join(diceModelTransform.DOLocalRotateQuaternion(
+            initialDiceModelRotation, 0.5f).SetEase(Ease.OutBack));
+
+        // Generar y mostrar el resultado real del dado (simplificado)
         diceTweener.AppendCallback(() => {
             baseRoll = UnityEngine.Random.Range(1, 21);
             totalRoll = baseRoll;
 
-            // Destacar el resultado con una animación
-            HighlightDiceResult(baseRoll);
+            // Mostrar directamente el número resultante sin animaciones adicionales
+            diceResultText.text = baseRoll.ToString();
         });
 
-        // Esperar un momento para apreciar el resultado base
+        // Pausa para apreciar el resultado base
         diceTweener.AppendInterval(1f);
 
-        // Aplicar bonuses
-        diceTweener.AppendCallback(() => ApplyBonuses());
+        // Aplicar bonuses de manera simplificada
+        diceTweener.AppendCallback(() => {
+            // Aplicar cada bonus activo de forma más directa
+            if (bonus1Activated)
+            {
+                totalRoll += bonus1;
+                ShowBonusPopup(bonus1Popup, bonus1);
+            }
+
+            if (bonus2Activated)
+            {
+                totalRoll += bonus2;
+                ShowBonusPopup(bonus2Popup, bonus2);
+            }
+
+            if (bonus3Activated)
+            {
+                totalRoll += bonus3;
+                ShowBonusPopup(bonus3Popup, bonus3);
+            }
+
+            // Actualizar el texto al valor total (sin animación)
+            diceResultText.text = totalRoll.ToString();
+        });
 
         // Comprobar el resultado final
+        diceTweener.AppendInterval(0.5f);
         diceTweener.AppendCallback(() => {
             bool isSuccess = totalRoll >= difficultyClass;
 
@@ -276,28 +325,34 @@ public class Dice_Manager : MonoBehaviour
         diceTweener.Play();
     }
 
-    private void HighlightDiceResult(int result)
-    {
-        // Guardar el color original
-        Color originalColor = diceResultText.color;
+    /* private void HighlightDiceResult(int result)
+     {
+         // Guardar el color original
+         Color originalColor = diceResultText.color;
 
-        // Crear secuencia para destacar el resultado
-        Sequence highlightSequence = DOTween.Sequence();
+         // Crear secuencia para destacar el resultado
+         Sequence highlightSequence = DOTween.Sequence();
 
-        // Actualizar el texto
-        diceResultText.text = result.ToString();
+         // Actualizar el texto
+         diceResultText.text = result.ToString();
 
-        // Hacer que el texto crezca y cambie a un color llamativo
-        highlightSequence.Append(diceResultText.transform.DOScale(1.5f, resultHighlightDuration).SetEase(Ease.OutBack));
-        highlightSequence.Join(diceResultText.DOColor(Color.yellow, resultHighlightDuration));
+         // Hacer que el texto crezca y cambie a un color llamativo
+         highlightSequence.Append(diceResultText.transform.DOScale(1.5f, resultHighlightDuration).SetEase(Ease.OutBack));
+         highlightSequence.Join(diceResultText.DOColor(Color.yellow, resultHighlightDuration));
 
-        // Volver al tamaño original manteniendo el color
-        highlightSequence.Append(diceResultText.transform.DOScale(1f, resultHighlightDuration / 2).SetEase(Ease.InOutQuad));
+         // Volver al tamaño original manteniendo el color
+         highlightSequence.Append(diceResultText.transform.DOScale(1f, resultHighlightDuration / 2).SetEase(Ease.InOutQuad));
 
-        // Hacer parpadear el texto para mayor énfasis
-        highlightSequence.Append(diceResultText.DOColor(originalColor, resultHighlightDuration / 2).SetLoops(3, LoopType.Yoyo));
-    }
+         // Hacer parpadear el texto para mayor énfasis - Modificar esto para asegurar visibilidad final
+         highlightSequence.Append(diceResultText.DOColor(originalColor, resultHighlightDuration / 2).SetLoops(2, LoopType.Yoyo));
 
+         // Asegurarse de que el texto termine con su color original y visible
+         highlightSequence.OnComplete(() => {
+             diceResultText.color = originalColor;
+             if (diceResultGroup != null) diceResultGroup.alpha = 1f;
+         });
+     }
+ */
     private void ApplyBonuses()
     {
         Sequence bonusSequence = DOTween.Sequence();
@@ -347,22 +402,20 @@ public class Dice_Manager : MonoBehaviour
         popup.SetActive(true);
         popup.transform.localScale = Vector3.zero;
 
-        // Texto del bonus (asumiendo que tiene un TMP_Text)
+        // Texto del bonus
         TMP_Text bonusText = popup.GetComponentInChildren<TMP_Text>();
         if (bonusText != null)
             bonusText.text = "+" + bonusValue;
 
-        // Animar la aparición
-        Sequence popupSequence = DOTween.Sequence();
-
-        // Aparecer con efecto de rebote
-        popupSequence.Append(popup.transform.DOScale(1.2f, 0.3f).SetEase(Ease.OutBack));
-        popupSequence.Append(popup.transform.DOScale(1f, 0.2f));
-
-        // Mantener visible brevemente y luego desaparecer
-        popupSequence.AppendInterval(0.5f);
-        popupSequence.Append(popup.transform.DOScale(0f, 0.3f).SetEase(Ease.InBack)
-            .OnComplete(() => popup.SetActive(false)));
+        // Animar la aparición de forma simple
+        popup.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack)
+            .OnComplete(() => {
+                // Hacer desaparecer después de un breve tiempo
+                DOVirtual.DelayedCall(0.7f, () => {
+                    popup.transform.DOScale(0f, 0.3f).SetEase(Ease.InBack)
+                        .OnComplete(() => popup.SetActive(false));
+                });
+            });
     }
 
     private void ShowResultIndicator(bool isSuccess)
