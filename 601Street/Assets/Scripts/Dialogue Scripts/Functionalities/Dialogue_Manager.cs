@@ -56,6 +56,9 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private float dialogExitDuration = 0.3f;
     [SerializeField] private Ease dialogExitEase = Ease.InBack;
     [SerializeField] private float slideDistance = 100f;
+
+    private Vector2 initialDialoguePosition = Vector2.zero;
+    private bool initialPositionSaved = false;
     void Awake()
     {
         if (Instance == null)
@@ -130,30 +133,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Nuevo método para animar la aparición del diálogo
-    private void AnimateDialogueEntry()
-    {
-        // Asegurarnos de que dialogueUI existe y está activo
-        if (dialogueUI == null || !dialogueUI.activeSelf) return;
-
-        // Obtenemos el RectTransform
-        RectTransform dialogueRect = dialogueUI.GetComponent<RectTransform>();
-        if (dialogueRect == null) return;
-
-        // Guardamos la posición original
-        Vector2 originalPosition = dialogueRect.anchoredPosition;
-
-        // Posición inicial (abajo de su posición final)
-        dialogueRect.anchoredPosition = new Vector2(originalPosition.x, originalPosition.y - slideDistance);
-
-        // Animamos hacia la posición original
-        dialogueRect.DOAnchorPos(originalPosition, dialogEntryDuration)
-            .SetEase(dialogEntryEase)
-            .OnComplete(() => {
-                // Se puede agregar algún efecto adicional aquí si se desea
-            });
-    }
-
+    
 
     public void StartConversation(Conversation conversation, NPC npc)
     {
@@ -201,10 +181,30 @@ public class DialogueManager : MonoBehaviour
             typewriterEffect.Reset();
         }
 
-        // Activar la interfaz de diálogo
+        // Activar la interfaz de diálogo y restaurar posición inicial
         if (dialogueUI != null)
         {
             dialogueUI.SetActive(true);
+
+            // Restaurar la posición del RectTransform si necesitamos resetear
+            RectTransform dialogueRect = dialogueUI.GetComponent<RectTransform>();
+            if (dialogueRect != null)
+            {
+                // Si es la primera vez, guardar la posición inicial
+                if (!initialPositionSaved)
+                {
+                    initialDialoguePosition = dialogueRect.anchoredPosition;
+                    initialPositionSaved = true;
+                    Debug.Log("Posición inicial del diálogo guardada: " + initialDialoguePosition);
+                }
+                else
+                {
+                    // Restaurar la posición original ANTES de cualquier animación
+                    dialogueRect.anchoredPosition = initialDialoguePosition;
+                    Debug.Log("Posición del diálogo restaurada a: " + initialDialoguePosition);
+                }
+            }
+
             // Animar la entrada del diálogo
             AnimateDialogueEntry();
         }
@@ -489,6 +489,31 @@ public class DialogueManager : MonoBehaviour
             diceInterface.SetActive(false);
         }
     }
+    private void AnimateDialogueEntry()
+    {
+        // Asegurarnos de que dialogueUI existe y está activo
+        if (dialogueUI == null || !dialogueUI.activeSelf) return;
+
+        // Obtenemos el RectTransform
+        RectTransform dialogueRect = dialogueUI.GetComponent<RectTransform>();
+        if (dialogueRect == null) return;
+
+        // IMPORTANTE: Asegurarnos de que cualquier animación anterior se cancele
+        dialogueRect.DOKill();
+
+        // Guardamos la posición inicial como referencia
+        Vector2 animationStartPosition = new Vector2(initialDialoguePosition.x, initialDialoguePosition.y - slideDistance);
+
+        // Posición inicial (abajo de su posición final)
+        dialogueRect.anchoredPosition = animationStartPosition;
+
+        // Animamos hacia la posición original guardada
+        dialogueRect.DOAnchorPos(initialDialoguePosition, dialogEntryDuration)
+            .SetEase(dialogEntryEase)
+            .OnComplete(() => {
+            });
+    }
+
     private void AnimateDialogueExit()
     {
         // Verificar que dialogueUI existe y está activo
@@ -513,9 +538,8 @@ public class DialogueManager : MonoBehaviour
         // Detener cualquier animación actual
         dialogueRect.DOKill();
 
-        // Posición destino (abajo de su posición actual)
-        Vector2 originalPosition = dialogueRect.anchoredPosition;
-        Vector2 targetPosition = new Vector2(originalPosition.x, originalPosition.y - slideDistance);
+        // Posición destino (abajo de su posición inicial)
+        Vector2 targetPosition = new Vector2(initialDialoguePosition.x, initialDialoguePosition.y - slideDistance);
 
         // Animar el movimiento hacia abajo
         dialogueRect.DOAnchorPos(targetPosition, dialogExitDuration)
@@ -525,6 +549,9 @@ public class DialogueManager : MonoBehaviour
                 if (dialogueUI != null)
                 {
                     dialogueUI.SetActive(false);
+
+                    // IMPORTANTE: Restauramos la posición inicial para el próximo uso
+                    dialogueRect.anchoredPosition = initialDialoguePosition;
                 }
                 if (optionsUI != null)
                 {

@@ -2469,7 +2469,7 @@ PrefabInstance:
     - target: {fileID: 4185262220942612075, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.00000007758331
       objectReference: {fileID: 0}
     - target: {fileID: 4185262220942612075, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
@@ -2479,7 +2479,7 @@ PrefabInstance:
     - target: {fileID: 4185262220942612075, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.00000016127854
       objectReference: {fileID: 0}
     - target: {fileID: 4185262220942612075, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
@@ -2564,57 +2564,57 @@ PrefabInstance:
     - target: {fileID: 6923898869867165407, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: field of view
-      value: 55
+      value: 60.000004
       objectReference: {fileID: 0}
     - target: {fileID: 6923898869867165407, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: far clip plane
-      value: 5000
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 6923898869867165407, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: near clip plane
-      value: 0.1
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 6923898869867165407, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: orthographic size
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7179143261369398533, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.06975648
+      value: 42.677002
       objectReference: {fileID: 0}
     - target: {fileID: 7179143261369398533, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.25
+      value: 8.419999
       objectReference: {fileID: 0}
     - target: {fileID: 7179143261369398533, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.9975641
+      value: 4.0559993
       objectReference: {fileID: 0}
     - target: {fileID: 7179143261369398533, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.93503195
+      value: 0.94832885
       objectReference: {fileID: 0}
     - target: {fileID: 7179143261369398533, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.27416873
+      value: 0.1320636
       objectReference: {fileID: 0}
     - target: {fileID: 7179143261369398533, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.21574314
+      value: 0.28846654
       objectReference: {fileID: 0}
     - target: {fileID: 7179143261369398533, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.06325989
+      value: 0.0043140277
       objectReference: {fileID: 0}
     - target: {fileID: 7341040501394673334, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
@@ -4713,6 +4713,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0.00000047684
       objectReference: {fileID: 0}
+    - target: {fileID: 4130731614660365038, guid: 8f4e14d956cc52a4b97a8a4992f17415,
+        type: 3}
+      propertyPath: elementWidth
+      value: 150
+      objectReference: {fileID: 0}
     - target: {fileID: 5743276537001577198, guid: 8f4e14d956cc52a4b97a8a4992f17415,
         type: 3}
       propertyPath: m_Name
@@ -4902,6 +4907,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1808981681}
   - component: {fileID: 1808981682}
+  - component: {fileID: 1808981683}
   m_Layer: 0
   m_Name: Inventory Manager
   m_TagString: Untagged
@@ -4952,6 +4958,23 @@ MonoBehaviour:
   skipPopupIfInteractionActive: 1
   blockPlayerDuringInteraction: 1
   blockCameraDuringInteraction: 1
+--- !u!114 &1808981683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1808981680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e35a176f709ec8428e1d4c067d5f742, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventoryManager: {fileID: 1808981682}
+  elementsPerRow: 1
+  elementWidth: 200
+  horizontalSpacing: 130
+  rightMargin: 100
 --- !u!1 &1818005304
 GameObject:
   m_ObjectHideFlags: 0

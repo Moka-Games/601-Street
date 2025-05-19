@@ -51,6 +51,18 @@ MonoBehaviour:
   onInteraction:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 9205039872376782523}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
       - m_Target: {fileID: 5512926879990944876}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
@@ -162,11 +174,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4639852276602444533, guid: 575664d1c70e38243b91a0aa5ede8543,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 1af7945579a628645addab5dfa114810, type: 2}
+    - target: {fileID: 5062406249484852677, guid: 575664d1c70e38243b91a0aa5ede8543,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5093668798901465085, guid: 575664d1c70e38243b91a0aa5ede8543,
         type: 3}
       propertyPath: m_Name
       value: "Ganz\xFAa"
       objectReference: {fileID: 0}
+    - target: {fileID: 6012103782509104507, guid: 575664d1c70e38243b91a0aa5ede8543,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 1af7945579a628645addab5dfa114810, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -190,9 +217,15 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 4179227581806027646}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 9205039872376782523}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 15688ed7a4877264d901a8c454c4e1d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &9205039872376782523 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5062406249484852677, guid: 575664d1c70e38243b91a0aa5ede8543,
+    type: 3}
+  m_PrefabInstance: {fileID: 4179227581806027646}
+  m_PrefabAsset: {fileID: 0}
