@@ -11,7 +11,14 @@ public class GameStateController : MonoBehaviour
         stateRunner = FindFirstObjectByType<WorldStateGraphRunner>();
     }
 
-    // Llamar a este método para cambiar a un nuevo estado
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            ChangeGameState("SecondState");
+        }
+        
+    }
     public void ChangeGameState(string stateID)
     {
         if (stateRunner != null)

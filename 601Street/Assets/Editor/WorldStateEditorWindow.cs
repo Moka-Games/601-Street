@@ -21,12 +21,32 @@ public class WorldStateEditorWindow : EditorWindow
     private bool isPanning = false; // Para detectar cuando estamos moviendo la vista
     private Vector2 lastMousePosition; // Para calcular el desplazamiento
 
+    private string graphAssetGUID;
+    private double lastRepaintTime;
+
+
+
     [MenuItem("Window/World State Editor")]
     public static void ShowWindow()
     {
         GetWindow<WorldStateEditorWindow>("World State Editor");
     }
 
+    private void Update()
+    {
+        // Solo actualizar en modo Play
+        if (EditorApplication.isPlaying)
+        {
+            double currentTime = EditorApplication.timeSinceStartup;
+
+            // Repintar cada 0.5 segundos
+            if (currentTime > lastRepaintTime + 0.5)
+            {
+                Repaint();
+                lastRepaintTime = currentTime;
+            }
+        }
+    }
     private void OnEnable()
     {
         // Asegurarse de que el cursor no se quede "pegado" al reiniciar
@@ -36,8 +56,63 @@ public class WorldStateEditorWindow : EditorWindow
 
         // Establece el callback para dibujo continuo cuando se crea una conexión
         wantsMouseMove = true;
-    }
+        
+        graphAssetGUID = EditorPrefs.GetString("WorldStateEditorGraphGUID", "");
 
+        if (!string.IsNullOrEmpty(graphAssetGUID))
+        {
+            string assetPath = AssetDatabase.GUIDToAssetPath(graphAssetGUID);
+            if (!string.IsNullOrEmpty(assetPath))
+            {
+                graph = AssetDatabase.LoadAssetAtPath<WorldStateGraph>(assetPath);
+            }
+        }
+
+        // Suscribirse al cambio de estado de Play Mode para mantener la referencia
+        EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+        
+        if (EditorApplication.isPlaying)
+        {
+            SubscribeToRunnerEvents();
+        }
+    }
+    private void OnDisable()
+    {
+        // Desuscribirse del evento al cerrar la ventana
+        EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+    }
+    private void OnPlayModeStateChanged(PlayModeStateChange state)
+    {
+        // Guardar la referencia del grafo antes de entrar a Play Mode
+        if (state == PlayModeStateChange.EnteredEditMode ||
+            state == PlayModeStateChange.EnteredPlayMode)
+        {
+            // Recargar la referencia al grafo si es necesario
+            if (graph == null && !string.IsNullOrEmpty(graphAssetGUID))
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(graphAssetGUID);
+                if (!string.IsNullOrEmpty(assetPath))
+                {
+                    graph = AssetDatabase.LoadAssetAtPath<WorldStateGraph>(assetPath);
+                    Repaint();
+                }
+            }
+        }
+
+        if (state == PlayModeStateChange.EnteredPlayMode)
+        {
+            SubscribeToRunnerEvents();
+        }
+        else if (state == PlayModeStateChange.ExitingPlayMode)
+        {
+            // Desuscribirse al salir del Play Mode
+            WorldStateGraphRunner runner = FindFirstObjectByType<WorldStateGraphRunner>();
+            if (runner != null)
+            {
+                runner.OnStateChanged -= OnRunnerStateChanged;
+            }
+        }
+    }
     private void OnGUI()
     {
         DrawToolbar();
@@ -159,6 +234,19 @@ public class WorldStateEditorWindow : EditorWindow
         {
             graph = newGraph;
             selectedNode = null;
+
+            // Guardar el GUID del grafo para persistencia
+            if (graph != null)
+            {
+                string assetPath = AssetDatabase.GetAssetPath(graph);
+                graphAssetGUID = AssetDatabase.AssetPathToGUID(assetPath);
+                EditorPrefs.SetString("WorldStateEditorGraphGUID", graphAssetGUID);
+            }
+            else
+            {
+                graphAssetGUID = "";
+                EditorPrefs.SetString("WorldStateEditorGraphGUID", "");
+            }
         }
 
         if (GUILayout.Button("Create New"))
@@ -167,44 +255,102 @@ public class WorldStateEditorWindow : EditorWindow
         }
         EditorGUILayout.EndHorizontal();
     }
+    // Modifica el método DrawNodes() en WorldStateEditorWindow.cs
 
     private void DrawNodes()
     {
         if (graph == null || graph.nodes == null) return;
 
+        // Obtener el ID del nodo activo durante el runtime
+        string activeNodeID = "";
+        if (EditorApplication.isPlaying)
+        {
+            WorldStateGraphRunner runner = FindFirstObjectByType<WorldStateGraphRunner>();
+            if (runner != null)
+            {
+                activeNodeID = runner.GetCurrentStateID();
+            }
+        }
+
         foreach (var node in graph.nodes)
         {
             // Definir colores para diferentes tipos de nodos
             Color nodeColor;
+            float borderWidth = 0f;
 
-            if (node.isInitialNode)
-                nodeColor = new Color(0.5f, 0.8f, 0.5f, 0.9f); // Verde para nodo inicial
+            bool isActiveInRuntime = EditorApplication.isPlaying && node.id == activeNodeID;
+
+            // Prioridad de colores: Activo en runtime > Seleccionado > Inicial > Normal
+            if (isActiveInRuntime)
+            {
+                // Naranja brillante para nodo activo en runtime
+                nodeColor = new Color(1.0f, 0.5f, 0.0f, 0.9f);
+                borderWidth = 3f; // Borde más grueso para destacar
+            }
             else if (selectedNode == node)
-                nodeColor = new Color(0.7f, 0.7f, 0.9f, 0.9f); // Azulado para nodo seleccionado
+            {
+                // Azulado para nodo seleccionado
+                nodeColor = new Color(0.7f, 0.7f, 0.9f, 0.9f);
+            }
+            else if (node.isInitialNode)
+            {
+                // Verde para nodo inicial
+                nodeColor = new Color(0.5f, 0.8f, 0.5f, 0.9f);
+            }
             else
-                nodeColor = new Color(0.3f, 0.3f, 0.3f, 0.9f); // Gris oscuro para nodos normales
+            {
+                // Gris oscuro para nodos normales
+                nodeColor = new Color(0.3f, 0.3f, 0.3f, 0.9f);
+            }
 
             // IMPORTANTE: Usamos GUI.Box que crea un área clickeable completa
-            // en lugar de GUI.Window que solo hace clickeable el título
             Rect nodeRect = node.position;
             GUIStyle boxStyle = new GUIStyle(GUI.skin.box);
             boxStyle.normal.background = CreateRoundedRectTexture(20, 20, nodeColor, 8);
             boxStyle.border = new RectOffset(8, 8, 8, 8);
 
-            // Dibujar el fondo del nodo como una caja que DEBE ser clickeable en toda su área
+            // Dibujar el fondo del nodo
             GUI.Box(nodeRect, "", boxStyle);
 
-            // Ahora dibujamos cada elemento del nodo manualmente usando GUI.Label
-            // (no GUILayout, que puede causar problemas de detección de clics)
+            // Si es el nodo activo en runtime, dibujar un borde destacado
+            if (isActiveInRuntime && borderWidth > 0)
+            {
+                // Dibujar un borde alrededor del nodo para destacarlo más
+                Color borderColor = Color.yellow;
+                Handles.BeginGUI();
+                Handles.color = borderColor;
 
+                // Dibujar el borde con un rectángulo expandido
+                Rect borderRect = new Rect(
+                    nodeRect.x - borderWidth,
+                    nodeRect.y - borderWidth,
+                    nodeRect.width + borderWidth * 2,
+                    nodeRect.height + borderWidth * 2
+                );
+
+                // Usar líneas gruesas para el borde
+                Handles.DrawSolidRectangleWithOutline(borderRect, new Color(0, 0, 0, 0), borderColor);
+                Handles.EndGUI();
+            }
+
+            // Ahora dibujamos cada elemento del nodo (igual que antes)
             // Título
             GUIStyle titleStyle = new GUIStyle(EditorStyles.boldLabel);
             titleStyle.alignment = TextAnchor.UpperCenter;
             titleStyle.normal.textColor = Color.white;
             GUI.Label(new Rect(nodeRect.x, nodeRect.y + 5, nodeRect.width, 20), node.name, titleStyle);
 
+            // Si es nodo activo, añadir una etiqueta "ACTIVE"
+            if (isActiveInRuntime)
+            {
+                GUIStyle activeStyle = new GUIStyle(EditorStyles.boldLabel);
+                activeStyle.alignment = TextAnchor.UpperCenter;
+                activeStyle.normal.textColor = Color.yellow;
+                GUI.Label(new Rect(nodeRect.x, nodeRect.y + 25, nodeRect.width, 20), "ACTIVE", activeStyle);
+            }
+
             // ID
-            float yPos = nodeRect.y + 30;
+            float yPos = nodeRect.y + (isActiveInRuntime ? 45 : 30);
             string displayID = node.id.Length > 15 ? node.id.Substring(0, 15) + "..." : node.id;
             GUI.Label(new Rect(nodeRect.x + 5, yPos, nodeRect.width - 10, 20), $"ID: {displayID}");
 
@@ -872,6 +1018,24 @@ public class WorldStateEditorWindow : EditorWindow
 
         Repaint();
     }
+    private void SubscribeToRunnerEvents()
+    {
+        if (EditorApplication.isPlaying)
+        {
+            WorldStateGraphRunner runner = FindFirstObjectByType<WorldStateGraphRunner>();
+            if (runner != null)
+            {
+                // Desuscribirse primero para evitar duplicados
+                runner.OnStateChanged -= OnRunnerStateChanged;
+                runner.OnStateChanged += OnRunnerStateChanged;
+            }
+        }
+    }
 
-    
+    private void OnRunnerStateChanged(string oldState, string newState)
+    {
+        // Repintar inmediatamente cuando cambia el estado
+        Repaint();
+    }
+
 }
