@@ -185,7 +185,7 @@ public class WorldStateEditorWindow : EditorWindow
         {
             EditorUtility.SetDirty(graph);
         }
-    }// Manejar eventos
+    }
     private void HandleCustomEvents(Rect graphArea)
     {
         Event e = Event.current;
@@ -251,10 +251,49 @@ public class WorldStateEditorWindow : EditorWindow
                     if (isOverNode)
                     {
                         selectedNode = nodeUnderMouse;
-                        startConnectionNode = nodeUnderMouse;
-                        isCreatingConnection = true;
-                        currentMousePosition = worldMousePos;
+
+                        // Mostrar menú contextual con opciones de misión
+                        GenericMenu contextMenu = new GenericMenu();
+
+                        // Opciones para misiones
+                        contextMenu.AddItem(new GUIContent("Assign Mission..."), false, () => {
+                            selectedNode = nodeUnderMouse;
+                            ShowMissionSelector();
+                        });
+
+                        if (nodeUnderMouse.misionAsociada != null)
+                        {
+                            contextMenu.AddItem(new GUIContent("Clear Mission"), false, () => {
+                                nodeUnderMouse.misionAsociada = null;
+                                EditorUtility.SetDirty(graph);
+                                Repaint();
+                            });
+                        }
+
+                        // Separador entre secciones del menú
+                        contextMenu.AddSeparator("");
+
+                        // Opción para iniciar una conexión
+                        contextMenu.AddItem(new GUIContent("Create Connection"), false, () => {
+                            startConnectionNode = nodeUnderMouse;
+                            isCreatingConnection = true;
+                            currentMousePosition = worldMousePos;
+                            Repaint();
+                        });
+
+                        contextMenu.ShowAsContext();
                         e.Use();
+                    }
+                    else
+                    {
+                        // Si no está sobre un nodo, iniciar una conexión desde el nodo seleccionado
+                        if (selectedNode != null)
+                        {
+                            startConnectionNode = selectedNode;
+                            isCreatingConnection = true;
+                            currentMousePosition = worldMousePos;
+                            e.Use();
+                        }
                     }
                 }
                 else if (e.button == 2) // Botón central - navegación
@@ -311,6 +350,33 @@ public class WorldStateEditorWindow : EditorWindow
                     GUI.changed = true;
                     e.Use();
                     Repaint();
+                }
+                break;
+
+            case EventType.DragUpdated:
+            case EventType.DragPerform:
+                // Manejar arrastrar y soltar para misiones
+                if (DragAndDrop.objectReferences.Length > 0 &&
+                    DragAndDrop.objectReferences[0] is Mision)
+                {
+                    if (isOverNode)
+                    {
+                        // Permitir soltar la misión sobre el nodo
+                        DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+
+                        if (e.type == EventType.DragPerform)
+                        {
+                            DragAndDrop.AcceptDrag();
+
+                            // Asignar la misión al nodo
+                            nodeUnderMouse.misionAsociada = DragAndDrop.objectReferences[0] as Mision;
+                            selectedNode = nodeUnderMouse; // Seleccionar el nodo
+                            EditorUtility.SetDirty(graph);
+                            Debug.Log($"Assigned mission '{nodeUnderMouse.misionAsociada.name}' to node '{nodeUnderMouse.name}'");
+                        }
+
+                        e.Use();
+                    }
                 }
                 break;
 
@@ -453,6 +519,72 @@ public class WorldStateEditorWindow : EditorWindow
     }
     private void DrawNodeInspector()
     {
+        // Lista de objetos inactivos 
+        GUILayout.Space(10);
+        GUILayout.Label("Inactive Objects", EditorStyles.boldLabel);
+        DrawObjectList(selectedNode.inactiveObjectIDs);
+
+        // NUEVA SECCIÓN: Misión asociada
+        GUILayout.Space(10);
+        GUILayout.Label("Associated Mission", EditorStyles.boldLabel);
+        EditorGUILayout.BeginHorizontal();
+
+        // Mostrar la misión actualmente seleccionada
+        Mision oldMission = selectedNode.misionAsociada;
+        Mision newMission = (Mision)EditorGUILayout.ObjectField(
+            selectedNode.misionAsociada, typeof(Mision), false);
+
+        // Si ha cambiado la misión
+        if (oldMission != newMission)
+        {
+            selectedNode.misionAsociada = newMission;
+            EditorUtility.SetDirty(graph);
+        }
+
+        // Botón para buscar misiones
+        if (GUILayout.Button("Find Mission", GUILayout.Width(100)))
+        {
+            ShowMissionSelector();
+        }
+
+        // Botón para eliminar la misión
+        if (GUILayout.Button("Clear", GUILayout.Width(50)) && selectedNode.misionAsociada != null)
+        {
+            selectedNode.misionAsociada = null;
+            EditorUtility.SetDirty(graph);
+        }
+
+        EditorGUILayout.EndHorizontal();
+
+        if (selectedNode.misionAsociada != null)
+        {
+            EditorGUILayout.HelpBox(
+                $"Mission: {selectedNode.misionAsociada.name}\nID: {selectedNode.misionAsociada.ID}",
+                MessageType.Info);
+
+            // Nuevo campo para el retraso de la misión
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Mission Delay (seconds):", GUILayout.Width(150));
+            float newDelay = EditorGUILayout.FloatField(selectedNode.misionDelay, GUILayout.Width(50));
+
+            if (newDelay != selectedNode.misionDelay)
+            {
+                selectedNode.misionDelay = Mathf.Max(0, newDelay); // Garantizar que no sea negativo
+                EditorUtility.SetDirty(graph);
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+        else
+        {
+            EditorGUILayout.HelpBox(
+                "No mission assigned. Drag a Mission asset here or use the Find button.",
+                MessageType.Info);
+        }
+
+        // Conexiones con mejoras visuales
+        GUILayout.Space(10);
+        GUILayout.Label("Connected To:", EditorStyles.boldLabel);
+
         GUILayout.Label("Node Inspector", EditorStyles.boldLabel);
 
         if (selectedNode == null)
@@ -1025,6 +1157,8 @@ public class WorldStateEditorWindow : EditorWindow
 
     private void DrawCustomNodes(Rect graphArea)
     {
+
+
         if (graph == null || graph.nodes == null) return;
 
         // Obtener el ID del nodo activo durante el runtime
@@ -1142,6 +1276,31 @@ public class WorldStateEditorWindow : EditorWindow
             GUI.Label(new Rect(nodeRect.x + 5, yPos, nodeRect.width - 10, 20),
                      $"Inactive Objects: {node.inactiveObjectIDs.Count}");
 
+            if (node.misionAsociada != null)
+            {
+                yPos += 20;
+                GUIStyle missionStyle = new GUIStyle(EditorStyles.boldLabel);
+                missionStyle.normal.textColor = new Color(1f, 0.8f, 0.2f); // Color dorado
+
+                string missionText = $"Mission: {node.misionAsociada.name}";
+                if (node.misionDelay > 0)
+                {
+                    missionText += $" ({node.misionDelay}s)";
+                }
+
+                GUI.Label(new Rect(nodeRect.x + 5, yPos, nodeRect.width - 10, 20),
+                         missionText, missionStyle);
+            }
+
+            if (node.isInitialNode)
+            {
+                yPos += 20;
+                GUIStyle initialStyle = new GUIStyle(EditorStyles.boldLabel);
+                initialStyle.normal.textColor = Color.green;
+                GUI.Label(new Rect(nodeRect.x + 5, yPos, nodeRect.width - 10, 20),
+                         "Initial Node", initialStyle);
+            }
+
             if (node.isInitialNode)
             {
                 yPos += 20;
@@ -1155,8 +1314,50 @@ public class WorldStateEditorWindow : EditorWindow
     
     private void OnRunnerStateChanged(string oldState, string newState)
     {
-        // Repintar inmediatamente cuando cambia el estado
         Repaint();
     }
+    private void ShowMissionSelector()
+    {
+        // Crear un menú contextual con todas las misiones del proyecto
+        GenericMenu menu = new GenericMenu();
 
+        // Opción para eliminar la misión
+        menu.AddItem(new GUIContent("None"), selectedNode.misionAsociada == null, () => {
+            selectedNode.misionAsociada = null;
+            EditorUtility.SetDirty(graph);
+            Repaint();
+        });
+
+        menu.AddSeparator("");
+
+        // Obtener todas las misiones del proyecto
+        string[] guids = AssetDatabase.FindAssets("t:Mision");
+        foreach (string guid in guids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            Mision mission = AssetDatabase.LoadAssetAtPath<Mision>(path);
+
+            if (mission != null)
+            {
+                // Construir ruta en el menú basada en la estructura de carpetas
+                string menuPath = path.Replace("Assets/", "");
+                menuPath = System.IO.Path.GetDirectoryName(menuPath).Replace("\\", "/");
+                string displayName = mission.name;
+
+                if (!string.IsNullOrEmpty(menuPath))
+                    displayName = menuPath + "/" + displayName;
+
+                menu.AddItem(
+                    new GUIContent(displayName),
+                    selectedNode.misionAsociada == mission,
+                    () => {
+                        selectedNode.misionAsociada = mission;
+                        EditorUtility.SetDirty(graph);
+                        Repaint();
+                    });
+            }
+        }
+
+        menu.ShowAsContext();
+    }
 }

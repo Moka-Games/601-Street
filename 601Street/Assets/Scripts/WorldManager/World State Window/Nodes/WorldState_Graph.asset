@@ -17,7 +17,7 @@ MonoBehaviour:
     name: InitialState_Colegio
     position:
       serializedVersion: 2
-      x: 13.850006
+      x: 12.850006
       y: 240.5
       width: 200
       height: 150
@@ -26,12 +26,14 @@ MonoBehaviour:
     connectedNodeIDs:
     - Police_Interacted
     isInitialNode: 1
+    misionAsociada: {fileID: 11400000, guid: 4dd5938a794163a4a8338844111dbcc9, type: 2}
+    misionDelay: 5
   - id: Police_Interacted
     name: PoliceInteracted
     position:
       serializedVersion: 2
-      x: 260.84998
-      y: 240.5
+      x: 262.84998
+      y: 238.5
       width: 200
       height: 150
     activeObjectIDs: []
@@ -39,12 +41,14 @@ MonoBehaviour:
     connectedNodeIDs:
     - Nakamura_Interacted
     isInitialNode: 0
+    misionAsociada: {fileID: 11400000, guid: bf58ec1aea566a74bac603b60e8a3f0e, type: 2}
+    misionDelay: 0
   - id: Nakamura_Interacted
     name: Nakamura Interacted
     position:
       serializedVersion: 2
-      x: 506.84998
-      y: 240.5
+      x: 510.84998
+      y: 238.5
       width: 200
       height: 150
     activeObjectIDs: []
@@ -52,25 +56,30 @@ MonoBehaviour:
     connectedNodeIDs:
     - Segundo_Policia_Interacted
     isInitialNode: 0
+    misionAsociada: {fileID: 0}
+    misionDelay: 0
   - id: Segundo_Policia_Interacted
     name: Segundo Policia Interacted
     position:
       serializedVersion: 2
-      x: 749
-      y: 240.5
+      x: 755
+      y: 241.5
       width: 200
       height: 150
     activeObjectIDs: []
     inactiveObjectIDs: []
     connectedNodeIDs:
     - Casa_Nyssa_1
+    - NewNode_7050
     isInitialNode: 0
+    misionAsociada: {fileID: 0}
+    misionDelay: 0
   - id: Casa_Nyssa_1
     name: Casa Nyssa_1
     position:
       serializedVersion: 2
-      x: 1003
-      y: 239.5
+      x: 1045
+      y: 155.5
       width: 200
       height: 150
     activeObjectIDs: []
@@ -78,6 +87,22 @@ MonoBehaviour:
     connectedNodeIDs:
     - Parque_Interacted
     isInitialNode: 0
+    misionAsociada: {fileID: 0}
+    misionDelay: 0
+  - id: NewNode_7050
+    name: New Node
+    position:
+      serializedVersion: 2
+      x: 1042.9249
+      y: 406.5
+      width: 200
+      height: 150
+    activeObjectIDs: []
+    inactiveObjectIDs: []
+    connectedNodeIDs: []
+    isInitialNode: 0
+    misionAsociada: {fileID: 0}
+    misionDelay: 0
   connections:
   - fromNodeID: InitialState_Colegio
     toNodeID: Police_Interacted
@@ -91,4 +116,6 @@ MonoBehaviour:
     toNodeID: Parque_Interacted
   - fromNodeID: Parque_Interacted
     toNodeID: Secta_Interacted
+  - fromNodeID: Segundo_Policia_Interacted
+    toNodeID: NewNode_7050
   initialNodeID: InitialState_Colegio

@@ -14,7 +14,11 @@ public class WorldStateGraphRunner : MonoBehaviour
     private Dictionary<string, WorldStateNode> nodeCache = new Dictionary<string, WorldStateNode>();
 
     // Evento para notificar cambios de estado
-    public event Action<string, string> OnStateChanged; // oldState, newState
+    public event Action<string, string> OnStateChanged; // oldState -> newState
+
+    [Header("Configuración de Misiones")]
+    [SerializeField] private bool completarMisionAlCambiarEstado = false;
+    [SerializeField] private bool soloCompletarMisionSiEsDelNodoActual = true;
 
     private void Start()
     {
@@ -103,17 +107,41 @@ public class WorldStateGraphRunner : MonoBehaviour
 
         string oldStateID = currentStateID;
         WorldStateNode newState = nodeCache[stateID];
+        WorldStateNode currentState = null;
 
         // Verifica si el cambio es válido (solo adyacentes)
         if (!string.IsNullOrEmpty(currentStateID))
         {
-            WorldStateNode currentState = nodeCache[currentStateID];
+            currentState = nodeCache[currentStateID];
 
             // Si no es adyacente, error
             if (!currentState.connectedNodeIDs.Contains(stateID))
             {
                 Debug.LogError($"Cannot transition from {currentState.name} to {newState.name} - not connected!");
                 return false;
+            }
+
+            // Completar misión actual si está configurado
+            if (completarMisionAlCambiarEstado && MisionManager.Instance != null && MisionManager.Instance.TieneMisionActiva)
+            {
+                // Si solo queremos completar cuando la misión es del nodo actual
+                if (soloCompletarMisionSiEsDelNodoActual)
+                {
+                    // Verificar si la misión actual es la misma que la asociada al nodo actual
+                    if (currentState.misionAsociada != null &&
+                        MisionManager.Instance.MisionActual != null &&
+                        MisionManager.Instance.MisionActual.ID == currentState.misionAsociada.ID)
+                    {
+                        Debug.Log($"Completando automáticamente misión '{MisionManager.Instance.MisionActual.Nombre}' al cambiar de estado");
+                        MisionManager.Instance.CompletarMisionActual();
+                    }
+                }
+                else
+                {
+                    // Completar cualquier misión activa
+                    Debug.Log($"Completando automáticamente misión '{MisionManager.Instance.MisionActual.Nombre}' al cambiar de estado");
+                    MisionManager.Instance.CompletarMisionActual();
+                }
             }
         }
 
@@ -129,7 +157,6 @@ public class WorldStateGraphRunner : MonoBehaviour
 
         return true;
     }
-
     public bool ActivateNextState()
     {
         if (string.IsNullOrEmpty(currentStateID))
@@ -158,7 +185,6 @@ public class WorldStateGraphRunner : MonoBehaviour
         return ActivateState(currentState.connectedNodeIDs[0]);
     }
 
-    // Método principal para aplicar un estado
     private void ApplyStateActivations(WorldStateNode state)
     {
         if (WorldStateManager.Instance == null)
@@ -181,9 +207,46 @@ public class WorldStateGraphRunner : MonoBehaviour
         {
             WorldStateManager.Instance.SetObjectActive(currentScene, objectID, false);
         }
-    }
-    // Añade esto a WorldStateGraphRunner.cs
 
+        // Iniciar la misión asociada al nodo si existe
+        if (state.misionAsociada != null)
+        {
+            // Verificar si MisionManager está disponible
+            if (MisionManager.Instance != null)
+            {
+                // Si hay un retraso, usar una corrutina
+                if (state.misionDelay > 0)
+                {
+                    StartCoroutine(IniciarMisionConDelay(state.misionAsociada, state.misionDelay, state.name));
+                }
+                else
+                {
+                    // Iniciar la misión inmediatamente
+                    Debug.Log($"Iniciando misión '{state.misionAsociada.Nombre}' asociada al estado '{state.name}'");
+                    MisionManager.Instance.IniciarMision(state.misionAsociada);
+                }
+            }
+            else
+            {
+                Debug.LogError("MisionManager no está disponible. No se puede iniciar la misión asociada.");
+            }
+        }
+    }
+
+    // Añadir esta nueva corrutina para manejar el retraso
+    private IEnumerator IniciarMisionConDelay(Mision mision, float delay, string nombreEstado)
+    {
+        Debug.Log($"Esperando {delay} segundos antes de iniciar la misión '{mision.Nombre}' asociada al estado '{nombreEstado}'");
+
+        yield return new WaitForSeconds(delay);
+
+        // Verificar que aún podemos iniciar la misión (el usuario podría haber cambiado de estado durante la espera)
+        if (MisionManager.Instance != null)
+        {
+            Debug.Log($"Iniciando misión '{mision.Nombre}' asociada al estado '{nombreEstado}' después de {delay} segundos");
+            MisionManager.Instance.IniciarMision(mision);
+        }
+    }
     public void OnSceneLoaded(string sceneName)
     {
         Debug.Log($"WorldStateGraphRunner: Actualizando estado para escena recién cargada: {sceneName}");
@@ -207,15 +270,7 @@ public class WorldStateGraphRunner : MonoBehaviour
             Debug.LogError($"No se pudo encontrar el nodo con ID: {currentStateID}");
         }
     }
-    private IEnumerator ApplyWorldStateWithDelay(string sceneName, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        WorldStateManager.Instance.ApplyStateToScene(sceneName);
-        Debug.Log($"Estado del mundo aplicado a escena: {sceneName}");
-    }
 
-
-    // Método para aplicar activaciones solo para una escena específica
     private void ApplyStateActivationsForScene(WorldStateNode state, string sceneName)
     {
         if (WorldStateManager.Instance == null)
@@ -239,8 +294,31 @@ public class WorldStateGraphRunner : MonoBehaviour
             WorldStateManager.Instance.SetObjectActive(sceneName, objectID, false);
             Debug.Log($"Desactivando objeto {objectID} en escena {sceneName}");
         }
+
+        // Iniciar la misión asociada al nodo si existe
+        if (state.misionAsociada != null)
+        {
+            // Verificar si MisionManager está disponible
+            if (MisionManager.Instance != null)
+            {
+                // Si hay un retraso, usar una corrutina
+                if (state.misionDelay > 0)
+                {
+                    StartCoroutine(IniciarMisionConDelay(state.misionAsociada, state.misionDelay, state.name));
+                }
+                else
+                {
+                    // Iniciar la misión inmediatamente
+                    Debug.Log($"Iniciando misión '{state.misionAsociada.Nombre}' asociada al estado '{state.name}'");
+                    MisionManager.Instance.IniciarMision(state.misionAsociada);
+                }
+            }
+            else
+            {
+                Debug.LogError("MisionManager no está disponible. No se puede iniciar la misión asociada.");
+            }
+        }
     }
-   
     public void TestStateSystem()
     {
         Debug.Log("Iniciando prueba del sistema de estados...");
@@ -309,6 +387,19 @@ public class WorldStateGraphRunner : MonoBehaviour
         {
             Debug.LogError($"WorldStateGraphRunner: No se encontró nodo con ID {currentStateID}");
         }
+    }
+    public bool CompletarMisionActualEIniciarSiguiente()
+    {
+        if (MisionManager.Instance != null && MisionManager.Instance.TieneMisionActiva)
+        {
+            // Completar misión actual
+            MisionManager.Instance.CompletarMisionActual();
+
+            // La siguiente misión será iniciada automáticamente por el nodo actual
+            return true;
+        }
+
+        return false;
     }
     public string GetCurrentStateID()
     {

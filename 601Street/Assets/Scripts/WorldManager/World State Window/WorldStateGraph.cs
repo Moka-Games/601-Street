@@ -12,6 +12,13 @@ public class WorldStateNode
     public List<string> connectedNodeIDs = new List<string>();
     public bool isInitialNode;
 
+    // Campo para la misión asociada
+    public Mision misionAsociada;
+
+    // Nuevo campo para el retraso de la misión
+    [Tooltip("Tiempo de espera (en segundos) antes de iniciar la misión asociada")]
+    public float misionDelay = 0f;
+
     // Constructor para crear nodos fácilmente
     public WorldStateNode(string nodeName, Vector2 pos)
     {
@@ -19,6 +26,8 @@ public class WorldStateNode
         name = nodeName;
         position = new Rect(pos.x, pos.y, 200, 150);
         isInitialNode = false;
+        misionAsociada = null;
+        misionDelay = 0f;
     }
 }
 
