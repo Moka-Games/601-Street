@@ -1,4 +1,3 @@
-// WorldStateNode.cs
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -23,7 +22,6 @@ public class WorldStateNode
     }
 }
 
-// WorldStateConnection.cs
 [System.Serializable]
 public class WorldStateConnection
 {

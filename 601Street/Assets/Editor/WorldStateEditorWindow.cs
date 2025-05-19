@@ -14,24 +14,17 @@ public class WorldStateEditorWindow : EditorWindow
     private bool isCreatingConnection = false;
     private Vector2 currentMousePosition;
 
-    // Constantes para el diseño visual
-    private const float NODE_WIDTH = 200f;
-    private const float NODE_HEIGHT = 150f;
-
     private bool isPanning = false; // Para detectar cuando estamos moviendo la vista
     private Vector2 lastMousePosition; // Para calcular el desplazamiento
 
     private string graphAssetGUID;
     private double lastRepaintTime;
 
-
-
     [MenuItem("Window/World State Editor")]
     public static void ShowWindow()
     {
         GetWindow<WorldStateEditorWindow>("World State Editor");
     }
-
     private void Update()
     {
         // Solo actualizar en modo Play
@@ -75,6 +68,20 @@ public class WorldStateEditorWindow : EditorWindow
         {
             SubscribeToRunnerEvents();
         }
+
+        isDragging = false;
+        startConnectionNode = null;
+        isCreatingConnection = false;
+        isPanning = false;
+
+        // Establecer un valor de scroll inicial razonable
+        scrollPosition = new Vector2(1000, 1000); // Punto de inicio más cercano al origen visual
+
+        // Forzar actualización inmediata de la ventana
+        wantsMouseMove = true;
+
+        // IMPORTANTE: Añadir botón para centrar en nodos existentes cuando se abra el editor
+        EditorApplication.delayCall += CenterOnAllNodes;
     }
     private void OnDisable()
     {
@@ -126,56 +133,40 @@ public class WorldStateEditorWindow : EditorWindow
         // Divide la ventana en área de grafo y área de inspección
         EditorGUILayout.BeginHorizontal();
 
-        // Área del grafo
-        Rect graphArea = GUILayoutUtility.GetRect(0, position.width * 0.7f, 0, position.height - 40);
-        GUI.Box(graphArea, "Graph View");
+        // Área del grafo - obtenemos el rectángulo para el área de visualización
+        Rect graphArea = GUILayoutUtility.GetRect(0, position.width * 0.7f, 0, position.height - 60);
+        GUI.Box(graphArea, "Graph View", EditorStyles.helpBox);
 
-        scrollPosition = GUI.BeginScrollView(
-            graphArea,
-            scrollPosition,
-            new Rect(0, 0, 3000, 3000),
-            false, // Ocultar barra horizontal
-            false  // Ocultar barra vertical
-        );
+        // ENFOQUE CRÍTICO: No usamos BeginScrollView, sino que dibujamos directamente en el área
+        // y manejamos el desplazamiento nosotros mismos
 
-        DrawGrid(20, 0.2f, Color.gray); // Cuadrícula fina
-        DrawGrid(100, 0.4f, Color.gray);
+        // Calcular la escala y transformación basada en scrollPosition
+        float halfWidth = graphArea.width * 0.5f;
+        float halfHeight = graphArea.height * 0.5f;
 
-        // PRIMERO dibujamos las conexiones
-        DrawConnections();
+        // Transformar todas las coordenadas basadas en scrollPosition
+        GUI.BeginClip(graphArea);
 
-        // DESPUÉS dibujamos la conexión en progreso si estamos creando una
+        // Dibujar el grid
+        DrawCustomGrid(graphArea, 20, 0.2f, Color.gray);
+        DrawCustomGrid(graphArea, 100, 0.4f, Color.gray);
+
+        // Dibujar las conexiones primero
+        DrawCustomConnections(graphArea);
+
+        // Dibujar conexión en progreso si estamos creando una
         if (isCreatingConnection && startConnectionNode != null)
         {
-            Vector2 startPos = new Vector2(
-                startConnectionNode.position.x + startConnectionNode.position.width,
-                startConnectionNode.position.y + startConnectionNode.position.height * 0.5f);
-
-            Handles.BeginGUI();
-            Handles.color = Color.white;
-            Handles.DrawLine(startPos, currentMousePosition);
-
-            // Flecha temporal
-            Vector2 direction = (currentMousePosition - startPos).normalized;
-            Vector2 perpendicular = new Vector2(-direction.y, direction.x) * 8f;
-
-            Vector2 arrowTip = currentMousePosition;
-            Vector2 arrowLeft = arrowTip - direction * 15f + perpendicular;
-            Vector2 arrowRight = arrowTip - direction * 15f - perpendicular;
-
-            Handles.DrawLine(arrowTip, arrowLeft);
-            Handles.DrawLine(arrowTip, arrowRight);
-            Handles.EndGUI();
+            DrawCustomConnectionInProgress(graphArea);
         }
 
+        // Dibujar los nodos
+        DrawCustomNodes(graphArea);
 
-        // FINALMENTE dibujamos los nodos (para que estén encima de las conexiones)
-        DrawNodes();
+        GUI.EndClip();
 
-        // Maneja eventos de ratón
-        HandleEvents(graphArea);
-
-        GUI.EndScrollView();
+        // Manejar eventos después de dibujar todo
+        HandleCustomEvents(graphArea);
 
         // Área de inspector para el nodo seleccionado
         EditorGUILayout.BeginVertical(GUILayout.Width(position.width * 0.3f));
@@ -187,40 +178,193 @@ public class WorldStateEditorWindow : EditorWindow
         // Botones de acción en la parte inferior
         DrawBottomButtons();
 
-        // Guarda los cambios
+        // Mostrar información de depuración
+
+        // Guardar cambios
         if (GUI.changed && graph != null)
         {
             EditorUtility.SetDirty(graph);
         }
-    }
-    private void DrawGrid(float gridSpacing, float gridOpacity, Color gridColor)
+    }// Manejar eventos
+    private void HandleCustomEvents(Rect graphArea)
     {
-        int widthDivs = Mathf.CeilToInt(5000f / gridSpacing);
-        int heightDivs = Mathf.CeilToInt(5000f / gridSpacing);
+        Event e = Event.current;
 
-        Handles.BeginGUI();
-        Handles.color = new Color(gridColor.r, gridColor.g, gridColor.b, gridOpacity);
+        // Si el ratón está fuera del área visible, solo procesar eventos Mouse Up
+        if (!graphArea.Contains(e.mousePosition) && e.type != EventType.MouseUp)
+            return;
 
-        // Líneas verticales
-        Vector3 newOffset = new Vector3(scrollPosition.x % gridSpacing, 0, 0);
-        for (int i = 0; i < widthDivs; i++)
+        // Calcular la posición real del mouse en el espacio del mundo
+        Vector2 worldMousePos = ScreenToWorldPoint(e.mousePosition, graphArea);
+
+        // Detectar nodo bajo el cursor
+        bool isOverNode = false;
+        WorldStateNode nodeUnderMouse = null;
+        const float nodePadding = 8f;
+
+        if (graph != null && graph.nodes != null)
         {
-            Vector3 lineStart = new Vector3(gridSpacing * i, -gridSpacing, 0) - newOffset;
-            Vector3 lineEnd = new Vector3(gridSpacing * i, 5000, 0) - newOffset;
-            Handles.DrawLine(lineStart, lineEnd);
+            foreach (var node in graph.nodes)
+            {
+                // Crear un rectángulo expandido para mejor detección
+                Rect expandedRect = new Rect(
+                    node.position.x - nodePadding,
+                    node.position.y - nodePadding,
+                    node.position.width + (nodePadding * 2),
+                    node.position.height + (nodePadding * 2)
+                );
+
+                if (expandedRect.Contains(worldMousePos))
+                {
+                    isOverNode = true;
+                    nodeUnderMouse = node;
+                    break;
+                }
+            }
         }
 
-        // Líneas horizontales
-        newOffset = new Vector3(0, scrollPosition.y % gridSpacing, 0);
-        for (int j = 0; j < heightDivs; j++)
+        // Para conexiones en progreso, actualizar posición
+        if (isCreatingConnection)
         {
-            Vector3 lineStart = new Vector3(-gridSpacing, gridSpacing * j, 0) - newOffset;
-            Vector3 lineEnd = new Vector3(5000, gridSpacing * j, 0) - newOffset;
-            Handles.DrawLine(lineStart, lineEnd);
+            currentMousePosition = worldMousePos;
+            Repaint();
         }
 
-        Handles.EndGUI();
+        // Manejar eventos según su tipo
+        switch (e.type)
+        {
+            case EventType.MouseDown:
+                if (e.button == 0) // Botón izquierdo
+                {
+                    if (isOverNode)
+                    {
+                        selectedNode = nodeUnderMouse;
+                        isDragging = true;
+                        GUI.FocusControl(null);
+                        e.Use();
+
+                        Debug.Log($"Seleccionado nodo: {nodeUnderMouse.name} en posición {nodeUnderMouse.position}");
+                    }
+                }
+                else if (e.button == 1) // Botón derecho
+                {
+                    if (isOverNode)
+                    {
+                        selectedNode = nodeUnderMouse;
+                        startConnectionNode = nodeUnderMouse;
+                        isCreatingConnection = true;
+                        currentMousePosition = worldMousePos;
+                        e.Use();
+                    }
+                }
+                else if (e.button == 2) // Botón central - navegación
+                {
+                    isPanning = true;
+                    lastMousePosition = e.mousePosition;
+                    e.Use();
+                }
+                break;
+
+            case EventType.MouseUp:
+                if (e.button == 0)
+                {
+                    if (isDragging)
+                    {
+                        isDragging = false;
+                        e.Use();
+                    }
+
+                    if (isCreatingConnection && startConnectionNode != null)
+                    {
+                        if (isOverNode && nodeUnderMouse != startConnectionNode)
+                        {
+                            CreateConnection(startConnectionNode, nodeUnderMouse);
+                        }
+                        isCreatingConnection = false;
+                        startConnectionNode = null;
+                        e.Use();
+                    }
+                }
+                else if (e.button == 2) // Finalizar navegación
+                {
+                    if (isPanning)
+                    {
+                        isPanning = false;
+                        e.Use();
+                    }
+                }
+                break;
+
+            case EventType.MouseDrag:
+                if (isDragging && selectedNode != null)
+                {
+                    // Arrastrar nodo - importante usar el delta directamente 
+                    selectedNode.position.x += e.delta.x;
+                    selectedNode.position.y += e.delta.y;
+                    GUI.changed = true;
+                    e.Use();
+                }
+                else if (isPanning)
+                {
+                    // Navegación - mover todo el viewport
+                    scrollPosition -= e.delta;
+                    GUI.changed = true;
+                    e.Use();
+                    Repaint();
+                }
+                break;
+
+            case EventType.ScrollWheel:
+                // Scroll vertical
+                scrollPosition.y += e.delta.y * 15f;
+                GUI.changed = true;
+                e.Use();
+                Repaint();
+                break;
+        }
     }
+    private Vector2 WorldToScreenPoint(Vector2 worldPoint, Rect graphArea)
+    {
+        return new Vector2(
+            worldPoint.x - scrollPosition.x,
+            worldPoint.y - scrollPosition.y
+        );
+    }
+    private Vector2 ScreenToWorldPoint(Vector2 screenPoint, Rect graphArea)
+    {
+        return new Vector2(
+            screenPoint.x + scrollPosition.x,
+            screenPoint.y + scrollPosition.y
+        );
+    } 
+    public void CenterOnAllNodes()
+    {
+        if (graph == null || graph.nodes == null || graph.nodes.Count == 0)
+            return;
+
+        // Calcular el centro de todos los nodos
+        Vector2 minPos = new Vector2(float.MaxValue, float.MaxValue);
+        Vector2 maxPos = new Vector2(float.MinValue, float.MinValue);
+
+        foreach (var node in graph.nodes)
+        {
+            minPos.x = Mathf.Min(minPos.x, node.position.x);
+            minPos.y = Mathf.Min(minPos.y, node.position.y);
+            maxPos.x = Mathf.Max(maxPos.x, node.position.x + node.position.width);
+            maxPos.y = Mathf.Max(maxPos.y, node.position.y + node.position.height);
+        }
+
+        // Calcular el centro de todos los nodos
+        Vector2 center = (minPos + maxPos) * 0.5f;
+
+        // Ajustar la posición de scroll para centrar todos los nodos
+        scrollPosition = center - new Vector2(position.width * 0.35f, position.height * 0.5f);
+
+        Debug.Log($"Centrando vista en todos los nodos. Centro: {center}, Scroll: {scrollPosition}");
+
+        // Forzar repintado
+        Repaint();
+    } 
     private void DrawToolbar()
     {
         // Título de la ventana
@@ -254,125 +398,6 @@ public class WorldStateEditorWindow : EditorWindow
             CreateNewGraph();
         }
         EditorGUILayout.EndHorizontal();
-    }
-    // Modifica el método DrawNodes() en WorldStateEditorWindow.cs
-
-    private void DrawNodes()
-    {
-        if (graph == null || graph.nodes == null) return;
-
-        // Obtener el ID del nodo activo durante el runtime
-        string activeNodeID = "";
-        if (EditorApplication.isPlaying)
-        {
-            WorldStateGraphRunner runner = FindFirstObjectByType<WorldStateGraphRunner>();
-            if (runner != null)
-            {
-                activeNodeID = runner.GetCurrentStateID();
-            }
-        }
-
-        foreach (var node in graph.nodes)
-        {
-            // Definir colores para diferentes tipos de nodos
-            Color nodeColor;
-            float borderWidth = 0f;
-
-            bool isActiveInRuntime = EditorApplication.isPlaying && node.id == activeNodeID;
-
-            // Prioridad de colores: Activo en runtime > Seleccionado > Inicial > Normal
-            if (isActiveInRuntime)
-            {
-                // Naranja brillante para nodo activo en runtime
-                nodeColor = new Color(1.0f, 0.5f, 0.0f, 0.9f);
-                borderWidth = 3f; // Borde más grueso para destacar
-            }
-            else if (selectedNode == node)
-            {
-                // Azulado para nodo seleccionado
-                nodeColor = new Color(0.7f, 0.7f, 0.9f, 0.9f);
-            }
-            else if (node.isInitialNode)
-            {
-                // Verde para nodo inicial
-                nodeColor = new Color(0.5f, 0.8f, 0.5f, 0.9f);
-            }
-            else
-            {
-                // Gris oscuro para nodos normales
-                nodeColor = new Color(0.3f, 0.3f, 0.3f, 0.9f);
-            }
-
-            // IMPORTANTE: Usamos GUI.Box que crea un área clickeable completa
-            Rect nodeRect = node.position;
-            GUIStyle boxStyle = new GUIStyle(GUI.skin.box);
-            boxStyle.normal.background = CreateRoundedRectTexture(20, 20, nodeColor, 8);
-            boxStyle.border = new RectOffset(8, 8, 8, 8);
-
-            // Dibujar el fondo del nodo
-            GUI.Box(nodeRect, "", boxStyle);
-
-            // Si es el nodo activo en runtime, dibujar un borde destacado
-            if (isActiveInRuntime && borderWidth > 0)
-            {
-                // Dibujar un borde alrededor del nodo para destacarlo más
-                Color borderColor = Color.yellow;
-                Handles.BeginGUI();
-                Handles.color = borderColor;
-
-                // Dibujar el borde con un rectángulo expandido
-                Rect borderRect = new Rect(
-                    nodeRect.x - borderWidth,
-                    nodeRect.y - borderWidth,
-                    nodeRect.width + borderWidth * 2,
-                    nodeRect.height + borderWidth * 2
-                );
-
-                // Usar líneas gruesas para el borde
-                Handles.DrawSolidRectangleWithOutline(borderRect, new Color(0, 0, 0, 0), borderColor);
-                Handles.EndGUI();
-            }
-
-            // Ahora dibujamos cada elemento del nodo (igual que antes)
-            // Título
-            GUIStyle titleStyle = new GUIStyle(EditorStyles.boldLabel);
-            titleStyle.alignment = TextAnchor.UpperCenter;
-            titleStyle.normal.textColor = Color.white;
-            GUI.Label(new Rect(nodeRect.x, nodeRect.y + 5, nodeRect.width, 20), node.name, titleStyle);
-
-            // Si es nodo activo, añadir una etiqueta "ACTIVE"
-            if (isActiveInRuntime)
-            {
-                GUIStyle activeStyle = new GUIStyle(EditorStyles.boldLabel);
-                activeStyle.alignment = TextAnchor.UpperCenter;
-                activeStyle.normal.textColor = Color.yellow;
-                GUI.Label(new Rect(nodeRect.x, nodeRect.y + 25, nodeRect.width, 20), "ACTIVE", activeStyle);
-            }
-
-            // ID
-            float yPos = nodeRect.y + (isActiveInRuntime ? 45 : 30);
-            string displayID = node.id.Length > 15 ? node.id.Substring(0, 15) + "..." : node.id;
-            GUI.Label(new Rect(nodeRect.x + 5, yPos, nodeRect.width - 10, 20), $"ID: {displayID}");
-
-            // Contadores
-            yPos += 20;
-            GUI.Label(new Rect(nodeRect.x + 5, yPos, nodeRect.width - 10, 20),
-                     $"Active Objects: {node.activeObjectIDs.Count}");
-
-            yPos += 20;
-            GUI.Label(new Rect(nodeRect.x + 5, yPos, nodeRect.width - 10, 20),
-                     $"Inactive Objects: {node.inactiveObjectIDs.Count}");
-
-            // Estado inicial
-            if (node.isInitialNode)
-            {
-                yPos += 20;
-                GUIStyle initialStyle = new GUIStyle(EditorStyles.boldLabel);
-                initialStyle.normal.textColor = Color.green;
-                GUI.Label(new Rect(nodeRect.x + 5, yPos, nodeRect.width - 10, 20),
-                         "Initial Node", initialStyle);
-            }
-        }
     }
     private Texture2D CreateRoundedRectTexture(int width, int height, Color color, int radius)
     {
@@ -426,47 +451,6 @@ public class WorldStateEditorWindow : EditorWindow
 
         return texture;
     }
-    private void DrawConnections()
-    {
-        if (graph == null || graph.connections == null) return;
-
-        foreach (var connection in graph.connections)
-        {
-            WorldStateNode fromNode = graph.FindNodeByID(connection.fromNodeID);
-            WorldStateNode toNode = graph.FindNodeByID(connection.toNodeID);
-
-            if (fromNode != null && toNode != null)
-            {
-                // Calcular puntos de conexión (ajustados para quedar en el borde)
-                Vector2 startPos = new Vector2(
-                    fromNode.position.x + fromNode.position.width,
-                    fromNode.position.y + fromNode.position.height * 0.5f);
-
-                // Ajustamos la posición final para que quede exactamente en el borde izquierdo del nodo
-                Vector2 endPos = new Vector2(
-                    toNode.position.x,
-                    toNode.position.y + toNode.position.height * 0.5f);
-
-                // Dibujar la línea y flecha
-                Handles.BeginGUI();
-                Handles.color = Color.white;
-
-                // Usar una curva Bezier para una mejor apariencia
-                Handles.DrawBezier(
-                    startPos,
-                    endPos,
-                    startPos + Vector2.right * 50f,
-                    endPos - Vector2.right * 50f,
-                    Color.white,
-                    null,
-                    2f);
-
-                // Dibujar flecha sin que entre en el nodo destino
-                DrawArrow(startPos, endPos, 15f);
-                Handles.EndGUI();
-            }
-        }
-    }
     private void DrawNodeInspector()
     {
         GUILayout.Label("Node Inspector", EditorStyles.boldLabel);
@@ -477,7 +461,21 @@ public class WorldStateEditorWindow : EditorWindow
             return;
         }
 
-        // Nombre del nodo
+        // NUEVO: Campo para editar el nombre del nodo
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Name", GUILayout.Width(50));
+        string oldName = selectedNode.name;
+        string newName = EditorGUILayout.TextField(selectedNode.name);
+
+        // Actualizar el nombre si ha cambiado
+        if (oldName != newName)
+        {
+            selectedNode.name = newName;
+            EditorUtility.SetDirty(graph);
+        }
+        EditorGUILayout.EndHorizontal();
+
+        // Campo para editar el ID del nodo
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("ID", GUILayout.Width(30));
         string oldID = selectedNode.id;
@@ -494,7 +492,6 @@ public class WorldStateEditorWindow : EditorWindow
         {
             UpdateNodeID(oldID, newID);
         }
-
 
         // Opción de nodo inicial
         bool wasInitialNode = selectedNode.isInitialNode;
@@ -563,7 +560,6 @@ public class WorldStateEditorWindow : EditorWindow
             EditorUtility.SetDirty(graph);
         }
     }
-
     private string GenerateFriendlyID(string nodeName)
     {
         // Limpiar el nombre (eliminar espacios, caracteres especiales, etc.)
@@ -577,7 +573,6 @@ public class WorldStateEditorWindow : EditorWindow
 
         return uniqueID;
     }
-    // Modifica en WorldStateEditorWindow.cs la función DrawObjectList, alrededor de la línea 447
     private void DrawObjectList(List<string> objectIDs)
     {
         int removeIndex = -1;
@@ -619,157 +614,39 @@ public class WorldStateEditorWindow : EditorWindow
     {
         EditorGUILayout.BeginHorizontal();
 
-        // Botones existentes...
-        if (GUILayout.Button("Add Node"))
+        // SECCIÓN DE MANIPULACIÓN DE NODOS
+        if (GUILayout.Button("Add Node", GUILayout.Width(80)))
         {
             AddNode();
         }
 
-        if (selectedNode != null && GUILayout.Button("Delete Node"))
+        if (selectedNode != null && GUILayout.Button("Delete Node", GUILayout.Width(80)))
         {
             DeleteNode(selectedNode);
         }
 
-        // Botones de navegación
-        EditorGUILayout.Space();
+        GUILayout.FlexibleSpace();
 
-        if (GUILayout.Button("Center on Selected", GUILayout.Width(120)))
+        // SECCIÓN DE NAVEGACIÓN
+        GUILayout.Label("Navigation:", GUILayout.Width(70));
+
+        if (GUILayout.Button("Center All", GUILayout.Width(80)))
         {
-            if (selectedNode != null)
-            {
-                CenterOnNode(selectedNode);
-            }
+            CenterOnAllNodes();
+        }
+
+        if (selectedNode != null && GUILayout.Button("Center Selected", GUILayout.Width(100)))
+        {
+            CenterOnNode(selectedNode);
         }
 
         if (GUILayout.Button("Reset View", GUILayout.Width(80)))
         {
-            scrollPosition = Vector2.zero;
+            scrollPosition = new Vector2(1000, 1000);
             Repaint();
         }
 
         EditorGUILayout.EndHorizontal();
-    }
-
-    private void HandleEvents(Rect graphArea)
-    {
-        Event e = Event.current;
-        Vector2 mousePos = e.mousePosition;
-        Vector2 scrolledMousePos = mousePos + scrollPosition;
-
-        // Verificar si el ratón está sobre algún nodo
-        bool isOverNode = false;
-        WorldStateNode nodeUnderMouse = null;
-
-        for (int i = graph.nodes.Count - 1; i >= 0; i--)
-        {
-            if (graph.nodes[i].position.Contains(scrolledMousePos))
-            {
-                isOverNode = true;
-                nodeUnderMouse = graph.nodes[i];
-                break;
-            }
-        }
-
-        // Actualizar la posición para la conexión en progreso
-        if (isCreatingConnection)
-        {
-            currentMousePosition = scrolledMousePos;
-            Repaint();
-        }
-
-        switch (e.type)
-        {
-            case EventType.MouseDown:
-                if (graphArea.Contains(mousePos))
-                {
-                    if (e.button == 0) // Botón izquierdo
-                    {
-                        if (isOverNode)
-                        {
-                            // Seleccionar y preparar para arrastrar nodo
-                            selectedNode = nodeUnderMouse;
-                            isDragging = true;
-                        }
-                        else
-                        {
-                            // Click en el fondo - iniciar movimiento de la vista
-                            isPanning = true;
-                            lastMousePosition = mousePos;
-                        }
-                    }
-                    else if (e.button == 1) // Botón derecho
-                    {
-                        if (isOverNode)
-                        {
-                            // Iniciar conexión desde este nodo
-                            selectedNode = nodeUnderMouse;
-                            startConnectionNode = nodeUnderMouse;
-                            isCreatingConnection = true;
-                            currentMousePosition = scrolledMousePos;
-                        }
-                    }
-                    else if (e.button == 2) // Click con la rueda del ratón
-                    {
-                        // Iniciar movimiento de vista con la rueda
-                        isPanning = true;
-                        lastMousePosition = mousePos;
-                    }
-
-                    e.Use(); // Importante: consumir el evento
-                }
-                break;
-
-            case EventType.MouseUp:
-                if (e.button == 0 || e.button == 2) // Izquierdo o rueda
-                {
-                    if (isCreatingConnection && startConnectionNode != null)
-                    {
-                        // Finalizar conexión
-                        if (isOverNode && nodeUnderMouse != startConnectionNode)
-                        {
-                            CreateConnection(startConnectionNode, nodeUnderMouse);
-                        }
-
-                        isCreatingConnection = false;
-                        startConnectionNode = null;
-                    }
-
-                    // Detener arrastre de nodo o movimiento de vista
-                    isDragging = false;
-                    isPanning = false;
-
-                    e.Use();
-                }
-                break;
-
-            case EventType.MouseDrag:
-                if (isDragging && selectedNode != null)
-                {
-                    // Arrastrar nodo
-                    selectedNode.position.x += e.delta.x;
-                    selectedNode.position.y += e.delta.y;
-                    e.Use();
-                }
-                else if (isPanning)
-                {
-                    // Mover la vista (esto es lo clave)
-                    scrollPosition -= e.delta;
-                    e.Use();
-                }
-
-                Repaint(); // Forzar repintado para actualizar la vista
-                break;
-
-            case EventType.ScrollWheel:
-                if (graphArea.Contains(mousePos))
-                {
-                    // Desplazamiento vertical con la rueda
-                    scrollPosition.y += e.delta.y * 15; // Multiplicador para ajustar velocidad
-                    e.Use();
-                    Repaint();
-                }
-                break;
-        }
     }
     private void CreateNewGraph()
     {
@@ -797,7 +674,7 @@ public class WorldStateEditorWindow : EditorWindow
     {
         if (graph == null) return;
 
-        // Crear un nuevo nodo en el centro de la vista
+        // Crear un nuevo nodo en el centro de la vista actual
         Vector2 center = scrollPosition + new Vector2(position.width * 0.35f, position.height * 0.5f);
         WorldStateNode newNode = new WorldStateNode("New Node", center);
 
@@ -897,7 +774,6 @@ public class WorldStateEditorWindow : EditorWindow
         Handles.DrawAAPolyLine(3f, arrowTip, arrowEnd2);
     }
 
-    // En WorldStateEditorWindow.cs, modifica ShowObjectSelector:
     private void ShowObjectSelector(System.Action<string> onSelected)
     {
         UniqueID[] allIDs = GameObject.FindObjectsByType<UniqueID>(FindObjectsInactive.Include, FindObjectsSortMode.None);
@@ -1002,19 +878,14 @@ public class WorldStateEditorWindow : EditorWindow
     {
         if (node == null) return;
 
-        Rect graphArea = GUILayoutUtility.GetRect(0, position.width * 0.7f, 0, position.height - 40);
-
-        // Calcular el centro del área visible
-        Vector2 viewCenter = new Vector2(graphArea.width * 0.5f, graphArea.height * 0.5f);
-
         // Calcular el centro del nodo
         Vector2 nodeCenter = new Vector2(
             node.position.x + node.position.width * 0.5f,
             node.position.y + node.position.height * 0.5f
         );
 
-        // Ajustar scrollPosition para centrar el nodo
-        scrollPosition = nodeCenter - viewCenter;
+        // Ajustar scrollPosition para centrar el nodo en la ventana
+        scrollPosition = nodeCenter - new Vector2(position.width * 0.35f, position.height * 0.5f);
 
         Repaint();
     }
@@ -1031,7 +902,257 @@ public class WorldStateEditorWindow : EditorWindow
             }
         }
     }
+    private void DrawCustomGrid(Rect graphArea, float gridSpacing, float gridOpacity, Color gridColor)
+    {
+        Handles.BeginGUI();
+        Handles.color = new Color(gridColor.r, gridColor.g, gridColor.b, gridOpacity);
 
+        // Calcular cuántas líneas necesitamos en cada dirección, basado en el área visible
+        float startX = scrollPosition.x - gridSpacing;
+        float startY = scrollPosition.y - gridSpacing;
+        float endX = scrollPosition.x + graphArea.width + gridSpacing;
+        float endY = scrollPosition.y + graphArea.height + gridSpacing;
+
+        // Ajustar a las líneas de la cuadrícula
+        startX = Mathf.Floor(startX / gridSpacing) * gridSpacing;
+        startY = Mathf.Floor(startY / gridSpacing) * gridSpacing;
+
+        // Dibujar líneas verticales
+        for (float x = startX; x <= endX; x += gridSpacing)
+        {
+            float screenX = x - scrollPosition.x;
+            Handles.DrawLine(
+                new Vector3(screenX, 0, 0),
+                new Vector3(screenX, graphArea.height, 0)
+            );
+        }
+
+        // Dibujar líneas horizontales
+        for (float y = startY; y <= endY; y += gridSpacing)
+        {
+            float screenY = y - scrollPosition.y;
+            Handles.DrawLine(
+                new Vector3(0, screenY, 0),
+                new Vector3(graphArea.width, screenY, 0)
+            );
+        }
+
+        Handles.EndGUI();
+    }
+
+    private void DrawCustomConnections(Rect graphArea)
+    {
+        if (graph == null || graph.connections == null) return;
+
+        Handles.BeginGUI();
+
+        foreach (var connection in graph.connections)
+        {
+            WorldStateNode fromNode = graph.FindNodeByID(connection.fromNodeID);
+            WorldStateNode toNode = graph.FindNodeByID(connection.toNodeID);
+
+            if (fromNode != null && toNode != null)
+            {
+                // Calcular puntos de conexión en el espacio de la pantalla
+                Vector2 startPos = WorldToScreenPoint(new Vector2(
+                    fromNode.position.x + fromNode.position.width,
+                    fromNode.position.y + fromNode.position.height * 0.5f
+                ), graphArea);
+
+                Vector2 endPos = WorldToScreenPoint(new Vector2(
+                    toNode.position.x,
+                    toNode.position.y + toNode.position.height * 0.5f
+                ), graphArea);
+
+                // Dibujar solo si al menos un punto está en pantalla (optimización)
+                Rect expandedArea = new Rect(
+                    -200, -200,
+                    graphArea.width + 400, graphArea.height + 400
+                );
+
+                if (expandedArea.Contains(startPos) || expandedArea.Contains(endPos))
+                {
+                    Handles.color = Color.white;
+
+                    // Usar una curva Bezier para una mejor apariencia
+                    Handles.DrawBezier(
+                        startPos,
+                        endPos,
+                        startPos + Vector2.right * 50f,
+                        endPos - Vector2.right * 50f,
+                        Color.white,
+                        null,
+                        2f
+                    );
+
+                    // Dibujar flecha
+                    DrawArrow(startPos, endPos, 15f);
+                }
+            }
+        }
+
+        Handles.EndGUI();
+    }
+
+    // Dibujar conexión en progreso
+    private void DrawCustomConnectionInProgress(Rect graphArea)
+    {
+        if (startConnectionNode == null) return;
+
+        Vector2 startPos = WorldToScreenPoint(new Vector2(
+            startConnectionNode.position.x + startConnectionNode.position.width,
+            startConnectionNode.position.y + startConnectionNode.position.height * 0.5f
+        ), graphArea);
+
+        Vector2 mousePos = Event.current.mousePosition;
+
+        Handles.BeginGUI();
+        Handles.color = Color.white;
+        Handles.DrawLine(startPos, mousePos);
+
+        // Flecha temporal
+        Vector2 direction = (mousePos - startPos).normalized;
+        Vector2 perpendicular = new Vector2(-direction.y, direction.x) * 8f;
+
+        Vector2 arrowTip = mousePos;
+        Vector2 arrowLeft = arrowTip - direction * 15f + perpendicular;
+        Vector2 arrowRight = arrowTip - direction * 15f - perpendicular;
+
+        Handles.DrawLine(arrowTip, arrowLeft);
+        Handles.DrawLine(arrowTip, arrowRight);
+        Handles.EndGUI();
+    }
+
+    private void DrawCustomNodes(Rect graphArea)
+    {
+        if (graph == null || graph.nodes == null) return;
+
+        // Obtener el ID del nodo activo durante el runtime
+        string activeNodeID = "";
+        if (EditorApplication.isPlaying)
+        {
+            WorldStateGraphRunner runner = FindFirstObjectByType<WorldStateGraphRunner>();
+            if (runner != null)
+            {
+                activeNodeID = runner.GetCurrentStateID();
+            }
+        }
+
+        // Calcular la posición del mouse para efectos de hover
+        Vector2 mousePos = Event.current.mousePosition;
+        Vector2 worldMousePos = ScreenToWorldPoint(mousePos, graphArea);
+
+        foreach (var node in graph.nodes)
+        {
+            // Convertir coordenadas del nodo al espacio de la pantalla
+            Vector2 screenPos = WorldToScreenPoint(new Vector2(node.position.x, node.position.y), graphArea);
+
+            // Verificar si el nodo está visible en la pantalla (o cerca)
+            Rect screenRect = new Rect(screenPos.x, screenPos.y, node.position.width, node.position.height);
+            Rect expandedGraphArea = new Rect(
+                -node.position.width,
+                -node.position.height,
+                graphArea.width + node.position.width * 2,
+                graphArea.height + node.position.height * 2
+            );
+
+            if (!expandedGraphArea.Overlaps(screenRect))
+                continue; // Skipear nodos que no son visibles
+
+            // Definir colores para diferentes tipos de nodos
+            Color nodeColor;
+            float borderWidth = 0f;
+
+            bool isActiveInRuntime = EditorApplication.isPlaying && node.id == activeNodeID;
+            bool isHovered = node.position.Contains(worldMousePos);
+
+            // Prioridad de colores
+            if (isActiveInRuntime)
+            {
+                nodeColor = new Color(1.0f, 0.5f, 0.0f, 0.9f);
+                borderWidth = 3f;
+            }
+            else if (selectedNode == node)
+            {
+                nodeColor = new Color(0.7f, 0.7f, 0.9f, 0.9f);
+            }
+            else if (isHovered)
+            {
+                nodeColor = new Color(0.4f, 0.4f, 0.4f, 0.9f);
+            }
+            else if (node.isInitialNode)
+            {
+                nodeColor = new Color(0.5f, 0.8f, 0.5f, 0.9f);
+            }
+            else
+            {
+                nodeColor = new Color(0.3f, 0.3f, 0.3f, 0.9f);
+            }
+
+            // Dibujar el fondo del nodo
+            Rect nodeRect = new Rect(screenPos.x, screenPos.y, node.position.width, node.position.height);
+            GUIStyle boxStyle = new GUIStyle(GUI.skin.box);
+            boxStyle.normal.background = CreateRoundedRectTexture(20, 20, nodeColor, 8);
+            boxStyle.border = new RectOffset(8, 8, 8, 8);
+
+            GUI.Box(nodeRect, "", boxStyle);
+
+            // Si es el nodo activo en runtime, dibujar un borde destacado
+            if (isActiveInRuntime && borderWidth > 0)
+            {
+                Handles.BeginGUI();
+                Handles.color = Color.yellow;
+
+                Rect borderRect = new Rect(
+                    nodeRect.x - borderWidth,
+                    nodeRect.y - borderWidth,
+                    nodeRect.width + borderWidth * 2,
+                    nodeRect.height + borderWidth * 2
+                );
+
+                Handles.DrawSolidRectangleWithOutline(borderRect, new Color(0, 0, 0, 0), Color.yellow);
+                Handles.EndGUI();
+            }
+
+            // Dibujar contenido del nodo
+            GUIStyle titleStyle = new GUIStyle(EditorStyles.boldLabel);
+            titleStyle.alignment = TextAnchor.UpperCenter;
+            titleStyle.normal.textColor = Color.white;
+            GUI.Label(new Rect(nodeRect.x, nodeRect.y + 5, nodeRect.width, 20), node.name, titleStyle);
+
+            // Si es nodo activo, añadir etiqueta "ACTIVE"
+            if (isActiveInRuntime)
+            {
+                GUIStyle activeStyle = new GUIStyle(EditorStyles.boldLabel);
+                activeStyle.alignment = TextAnchor.UpperCenter;
+                activeStyle.normal.textColor = Color.yellow;
+                GUI.Label(new Rect(nodeRect.x, nodeRect.y + 25, nodeRect.width, 20), "ACTIVE", activeStyle);
+            }
+
+            // ID y contenido adicional
+            float yPos = nodeRect.y + (isActiveInRuntime ? 45 : 30);
+            string displayID = node.id.Length > 15 ? node.id.Substring(0, 15) + "..." : node.id;
+            GUI.Label(new Rect(nodeRect.x + 5, yPos, nodeRect.width - 10, 20), $"ID: {displayID}");
+
+            yPos += 20;
+            GUI.Label(new Rect(nodeRect.x + 5, yPos, nodeRect.width - 10, 20),
+                     $"Active Objects: {node.activeObjectIDs.Count}");
+
+            yPos += 20;
+            GUI.Label(new Rect(nodeRect.x + 5, yPos, nodeRect.width - 10, 20),
+                     $"Inactive Objects: {node.inactiveObjectIDs.Count}");
+
+            if (node.isInitialNode)
+            {
+                yPos += 20;
+                GUIStyle initialStyle = new GUIStyle(EditorStyles.boldLabel);
+                initialStyle.normal.textColor = Color.green;
+                GUI.Label(new Rect(nodeRect.x + 5, yPos, nodeRect.width - 10, 20),
+                         "Initial Node", initialStyle);
+            }
+        }
+    }
+    
     private void OnRunnerStateChanged(string oldState, string newState)
     {
         // Repintar inmediatamente cuando cambia el estado

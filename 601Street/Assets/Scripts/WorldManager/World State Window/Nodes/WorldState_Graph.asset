@@ -17,28 +17,78 @@ MonoBehaviour:
     name: InitialState_Colegio
     position:
       serializedVersion: 2
-      x: 141.85
-      y: 280.5
+      x: 13.850006
+      y: 240.5
       width: 200
       height: 150
     activeObjectIDs: []
     inactiveObjectIDs: []
     connectedNodeIDs:
-    - SecondState
+    - Police_Interacted
     isInitialNode: 1
-  - id: SecondState
-    name: SecondState
+  - id: Police_Interacted
+    name: PoliceInteracted
     position:
       serializedVersion: 2
-      x: 435.84998
-      y: 285.5
+      x: 260.84998
+      y: 240.5
       width: 200
       height: 150
     activeObjectIDs: []
     inactiveObjectIDs: []
-    connectedNodeIDs: []
+    connectedNodeIDs:
+    - Nakamura_Interacted
+    isInitialNode: 0
+  - id: Nakamura_Interacted
+    name: Nakamura Interacted
+    position:
+      serializedVersion: 2
+      x: 506.84998
+      y: 240.5
+      width: 200
+      height: 150
+    activeObjectIDs: []
+    inactiveObjectIDs: []
+    connectedNodeIDs:
+    - Segundo_Policia_Interacted
+    isInitialNode: 0
+  - id: Segundo_Policia_Interacted
+    name: Segundo Policia Interacted
+    position:
+      serializedVersion: 2
+      x: 749
+      y: 240.5
+      width: 200
+      height: 150
+    activeObjectIDs: []
+    inactiveObjectIDs: []
+    connectedNodeIDs:
+    - Casa_Nyssa_1
+    isInitialNode: 0
+  - id: Casa_Nyssa_1
+    name: Casa Nyssa_1
+    position:
+      serializedVersion: 2
+      x: 1003
+      y: 239.5
+      width: 200
+      height: 150
+    activeObjectIDs: []
+    inactiveObjectIDs: []
+    connectedNodeIDs:
+    - Parque_Interacted
     isInitialNode: 0
   connections:
   - fromNodeID: InitialState_Colegio
-    toNodeID: SecondState
+    toNodeID: Police_Interacted
+  - fromNodeID: Police_Interacted
+    toNodeID: Nakamura_Interacted
+  - fromNodeID: Nakamura_Interacted
+    toNodeID: Segundo_Policia_Interacted
+  - fromNodeID: Segundo_Policia_Interacted
+    toNodeID: Casa_Nyssa_1
+  - fromNodeID: Casa_Nyssa_1
+    toNodeID: Parque_Interacted
+  - fromNodeID: Parque_Interacted
+    toNodeID: Secta_Interacted
   initialNodeID: InitialState_Colegio
