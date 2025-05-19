@@ -222,6 +222,12 @@ public class GameSceneManager : MonoBehaviour
 
     private IEnumerator LoadSceneWithTransition(string sceneName, bool isBackward)
     {
+        // En GameSceneManager.cs, busca el método LoadSceneWithTransition
+        // Añade este código justo antes del fadeOut (aproximadamente línea 256-260)
+
+        // IMPORTANTE: Añade este código exactamente aquí - justo antes del fadeOut
+        
+
         WorldStateManager.Instance.ApplyStateToScene(sceneName);
 
         isTransitioning = true;
@@ -328,7 +334,20 @@ public class GameSceneManager : MonoBehaviour
 
         // POSICIONAMIENTO DEL JUGADOR Y CÁMARA
         yield return StartCoroutine(MovePlayerAndCameraToSpawnPointWithDelay());
+        
+        if (WorldStateManager.Instance != null)
+        {
+            Debug.Log($"GameSceneManager: Aplicando estado del mundo a la escena recién cargada: {sceneName}");
+            WorldStateManager.Instance.ApplyStateToScene(sceneName);
 
+            // Avisamos también al WorldStateGraphRunner si existe
+            WorldStateGraphRunner runner = FindFirstObjectByType<WorldStateGraphRunner>();
+            if (runner != null)
+            {
+                Debug.Log($"GameSceneManager: Notificando al WorldStateGraphRunner sobre la nueva escena");
+                runner.ApplyCurrentStateToScene(sceneName);
+            }
+        }
         // FADE OUT Y FINALIZACIÓN
         if (fadeManager != null)
         {
@@ -360,7 +379,7 @@ public class GameSceneManager : MonoBehaviour
 
         isTransitioning = false;
     }
-
+    
     private void DisablePlayerMovement()
     {
         if (currentPlayer != null)

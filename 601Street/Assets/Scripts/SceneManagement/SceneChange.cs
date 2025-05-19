@@ -294,12 +294,26 @@ public class SceneChange : MonoBehaviour
             yield break;
         }
 
+        
         // Esperar para asegurar que todo esté inicializado
         yield return new WaitForSeconds(0.1f);
 
         // Posicionar jugador y cámara
         MovePlayerAndCamera(spawnPointName);
+        
+        if (WorldStateManager.Instance != null)
+        {
+            Debug.Log($"SceneChange: Aplicando estado del mundo a la escena recién cargada: {targetSceneName}");
+            WorldStateManager.Instance.ApplyStateToScene(targetSceneName);
 
+            // Notificar también al WorldStateGraphRunner
+            WorldStateGraphRunner runner = FindFirstObjectByType<WorldStateGraphRunner>();
+            if (runner != null)
+            {
+                Debug.Log($"SceneChange: Notificando al WorldStateGraphRunner sobre la nueva escena");
+                runner.ApplyCurrentStateToScene(targetSceneName);
+            }
+        }
         // Fade Out (a transparente)
         if (fadeManager != null)
         {

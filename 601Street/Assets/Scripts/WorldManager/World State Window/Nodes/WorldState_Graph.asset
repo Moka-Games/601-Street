@@ -13,16 +13,15 @@ MonoBehaviour:
   m_Name: WorldState_Graph
   m_EditorClassIdentifier: 
   nodes:
-  - id: Initial_State
-    name: Initial State
+  - id: InitialState_Colegio
+    name: InitialState_Colegio
     position:
       serializedVersion: 2
-      x: 155.85
-      y: 279.5
+      x: 152.85
+      y: 280.5
       width: 200
       height: 150
-    activeObjectIDs:
-    - Bar_Victim
+    activeObjectIDs: []
     inactiveObjectIDs: []
     connectedNodeIDs:
     - SecondState
@@ -31,7 +30,7 @@ MonoBehaviour:
     name: SecondState
     position:
       serializedVersion: 2
-      x: 417.84998
+      x: 416.84998
       y: 279.5
       width: 200
       height: 150
@@ -40,6 +39,6 @@ MonoBehaviour:
     connectedNodeIDs: []
     isInitialNode: 0
   connections:
-  - fromNodeID: Initial_State
+  - fromNodeID: InitialState_Colegio
     toNodeID: SecondState
-  initialNodeID: Initial_State
+  initialNodeID: InitialState_Colegio

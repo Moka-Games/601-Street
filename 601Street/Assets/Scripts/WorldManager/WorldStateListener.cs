@@ -44,14 +44,28 @@ public class WorldStateListener : MonoBehaviour
 
         lastKnownState = gameObject.activeSelf;
     }
-
     private void Start()
     {
-        // Asegurarnos de que estamos registrados y aplicamos el estado inicial
+        // Si no hay ID asignado, usar el nombre del objeto
+        if (string.IsNullOrEmpty(objectID))
+        {
+            objectID = gameObject.name;
+            Debug.LogWarning($"WorldStateListener en {gameObject.name}: No se especificó ID, usando nombre del objeto");
+        }
+
+        // Obtener el nombre de la escena
+        currentSceneName = useSceneName ? gameObject.scene.name : sceneName;
+
+        // Generar la clave de estado consistentemente
+        stateKey = $"Object_{currentSceneName}_{objectID}";
+
+        // Registrarse para escuchar cambios
         RegisterToWorldState();
 
-        if (applyStateImmediately)
+        // Aplicar estado inicial
+        if (applyStateImmediately && WorldStateManager.Instance != null)
         {
+            Debug.Log($"WorldStateListener: Aplicando estado inicial a {gameObject.name} (ID: {objectID}) en escena {currentSceneName}");
             ApplyState();
         }
 

@@ -431,6 +431,7 @@ public class WorldStateEditorWindow : EditorWindow
 
         return uniqueID;
     }
+    // Modifica en WorldStateEditorWindow.cs la función DrawObjectList, alrededor de la línea 447
     private void DrawObjectList(List<string> objectIDs)
     {
         int removeIndex = -1;
@@ -442,10 +443,13 @@ public class WorldStateEditorWindow : EditorWindow
 
             if (GUILayout.Button("Find", GUILayout.Width(50)))
             {
-                // Abre selector de objetos con UniqueID
+                int currentIndex = i; // Guarda el índice actual en una variable local
                 ShowObjectSelector(selectedID => {
-                    objectIDs[i] = selectedID;
-                    Repaint();
+                    if (currentIndex < objectIDs.Count)
+                    { // Verificar que el índice sigue siendo válido
+                        objectIDs[currentIndex] = selectedID;
+                        Repaint();
+                    }
                 });
             }
 
@@ -465,7 +469,6 @@ public class WorldStateEditorWindow : EditorWindow
         if (GUILayout.Button("Add Object"))
             objectIDs.Add("");
     }
-
     private void DrawBottomButtons()
     {
         EditorGUILayout.BeginHorizontal();
@@ -748,9 +751,10 @@ public class WorldStateEditorWindow : EditorWindow
         Handles.DrawAAPolyLine(3f, arrowTip, arrowEnd2);
     }
 
+    // En WorldStateEditorWindow.cs, modifica ShowObjectSelector:
     private void ShowObjectSelector(System.Action<string> onSelected)
     {
-        UniqueID[] allIDs = GameObject.FindObjectsByType<UniqueID>(FindObjectsInactive.Include, FindObjectsSortMode.None); // Includes inactive objects
+        UniqueID[] allIDs = GameObject.FindObjectsByType<UniqueID>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
         if (allIDs.Length == 0)
         {
@@ -760,7 +764,7 @@ public class WorldStateEditorWindow : EditorWindow
             return;
         }
 
-        // Crear ventana para mostrar y seleccionar
+        // Crear menú para mostrar y seleccionar
         GenericMenu menu = new GenericMenu();
 
         // Agrupar por jerarquía para mejor organización
@@ -768,6 +772,8 @@ public class WorldStateEditorWindow : EditorWindow
 
         foreach (var id in allIDs)
         {
+            if (id == null || id.gameObject == null) continue; // Evitar errores con objetos destruidos
+
             string path = GetGameObjectPath(id.gameObject);
             string group = path.Split('/')[0]; // Usar el primer nivel como grupo
 
@@ -782,19 +788,22 @@ public class WorldStateEditorWindow : EditorWindow
         {
             foreach (var id in groupedIDs[group])
             {
+                if (id == null || id.gameObject == null) continue; // Verificación adicional
+
                 string objectName = id.gameObject.name;
                 string idValue = id.GetID();
                 string fullPath = GetGameObjectPath(id.gameObject);
 
+                // Usar closure para capturar el idValue actual
+                string capturedID = idValue;
                 menu.AddItem(new GUIContent($"{group}/{fullPath}"), false, () => {
-                    onSelected?.Invoke(idValue);
+                    onSelected?.Invoke(capturedID);
                 });
             }
         }
 
         menu.ShowAsContext();
     }
-
     private string GetGameObjectPath(GameObject obj)
     {
         string path = obj.name;

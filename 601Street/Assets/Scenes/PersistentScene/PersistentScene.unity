@@ -1962,6 +1962,7 @@ GameObject:
   - component: {fileID: 584507667}
   - component: {fileID: 584507666}
   - component: {fileID: 584507668}
+  - component: {fileID: 584507669}
   m_Layer: 0
   m_Name: WorldStateManager
   m_TagString: Untagged
@@ -2010,6 +2011,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stateGraph: {fileID: 11400000, guid: 4f97480aad8f57046af6d9b0b408b481, type: 2}
   activateInitialStateOnStart: 1
+--- !u!114 &584507669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 584507665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4772c18ba1c9549bb1e6e3a8501188, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &661201951
 GameObject:
   m_ObjectHideFlags: 0

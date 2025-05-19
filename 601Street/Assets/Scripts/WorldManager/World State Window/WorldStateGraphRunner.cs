@@ -2,10 +2,12 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class WorldStateGraphRunner : MonoBehaviour
 {
-    [SerializeField] private WorldStateGraph stateGraph;
+    public WorldStateGraph stateGraph;
     [SerializeField] private bool activateInitialStateOnStart = true;
 
     private string currentStateID;
@@ -123,6 +125,7 @@ public class WorldStateGraphRunner : MonoBehaviour
 
         // Notifica el cambio
         OnStateChanged?.Invoke(oldStateID, currentStateID);
+        print("State Changed");
 
         return true;
     }
@@ -179,8 +182,134 @@ public class WorldStateGraphRunner : MonoBehaviour
             WorldStateManager.Instance.SetObjectActive(currentScene, objectID, false);
         }
     }
+    // Añade esto a WorldStateGraphRunner.cs
 
-    // Método para obtener el ID del estado actual
+    public void OnSceneLoaded(string sceneName)
+    {
+        Debug.Log($"WorldStateGraphRunner: Actualizando estado para escena recién cargada: {sceneName}");
+
+        if (string.IsNullOrEmpty(currentStateID))
+        {
+            Debug.LogWarning("No hay estado actual definido. Activando el estado inicial para la nueva escena.");
+            ActivateInitialState();
+            return;
+        }
+
+        // Buscar el nodo actual y reaplicarlo específicamente para esta escena
+        WorldStateNode currentNode = stateGraph.FindNodeByID(currentStateID);
+        if (currentNode != null)
+        {
+            Debug.Log($"Reaplicando estado '{currentNode.name}' a la escena: {sceneName}");
+            ApplyStateActivationsForScene(currentNode, sceneName);
+        }
+        else
+        {
+            Debug.LogError($"No se pudo encontrar el nodo con ID: {currentStateID}");
+        }
+    }
+    private IEnumerator ApplyWorldStateWithDelay(string sceneName, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        WorldStateManager.Instance.ApplyStateToScene(sceneName);
+        Debug.Log($"Estado del mundo aplicado a escena: {sceneName}");
+    }
+
+
+    // Método para aplicar activaciones solo para una escena específica
+    private void ApplyStateActivationsForScene(WorldStateNode state, string sceneName)
+    {
+        if (WorldStateManager.Instance == null)
+        {
+            Debug.LogError("WorldStateManager is not available!");
+            return;
+        }
+
+        Debug.Log($"Aplicando estado a escena {sceneName}: Activar {state.activeObjectIDs.Count} objetos, Desactivar {state.inactiveObjectIDs.Count} objetos");
+
+        // Activar objetos de la lista "activeObjectIDs" en la escena específica
+        foreach (var objectID in state.activeObjectIDs)
+        {
+            WorldStateManager.Instance.SetObjectActive(sceneName, objectID, true);
+            Debug.Log($"Activando objeto {objectID} en escena {sceneName}");
+        }
+
+        // Desactivar objetos de la lista "inactiveObjectIDs" en la escena específica
+        foreach (var objectID in state.inactiveObjectIDs)
+        {
+            WorldStateManager.Instance.SetObjectActive(sceneName, objectID, false);
+            Debug.Log($"Desactivando objeto {objectID} en escena {sceneName}");
+        }
+    }
+   
+    public void TestStateSystem()
+    {
+        Debug.Log("Iniciando prueba del sistema de estados...");
+
+        // Imprimir información del estado actual
+        string currentStateName = GetCurrentStateName();
+        Debug.Log($"Estado actual: {currentStateName} (ID: {currentStateID})");
+
+        // Listar todos los nodos en el grafo
+        if (stateGraph != null && stateGraph.nodes != null)
+        {
+            Debug.Log($"Nodos disponibles en el grafo ({stateGraph.nodes.Count}):");
+            foreach (var node in stateGraph.nodes)
+            {
+                string isInitial = node.isInitialNode ? " (INICIAL)" : "";
+                Debug.Log($"- {node.name} (ID: {node.id}){isInitial}");
+                Debug.Log($"  * Objetos activos: {string.Join(", ", node.activeObjectIDs)}");
+                Debug.Log($"  * Objetos inactivos: {string.Join(", ", node.inactiveObjectIDs)}");
+            }
+        }
+
+        // Buscar todos los listeners en todas las escenas
+        WorldStateListener[] allListeners = FindObjectsByType<WorldStateListener>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        Debug.Log($"WorldStateListeners encontrados: {allListeners.Length}");
+        foreach (var listener in allListeners)
+        {
+            Debug.Log($"- {listener.gameObject.name} (ID: {listener.ObjectID}) en escena: {listener.gameObject.scene.name}, Activo: {listener.gameObject.activeSelf}");
+        }
+
+        // Forzar actualización
+        Scene currentScene = SceneManager.GetActiveScene();
+        Debug.Log($"Forzando actualización para escena: {currentScene.name}");
+        WorldStateManager.Instance.ApplyStateToScene(currentScene.name);
+    }
+    public void ApplyCurrentStateToScene(string sceneName)
+    {
+        if (string.IsNullOrEmpty(currentStateID))
+        {
+            Debug.LogWarning($"WorldStateGraphRunner: No hay estado actual definido para aplicar a escena {sceneName}");
+            return;
+        }
+
+        WorldStateNode currentNode = stateGraph.FindNodeByID(currentStateID);
+        if (currentNode != null)
+        {
+            Debug.Log($"WorldStateGraphRunner: Aplicando estado '{currentNode.name}' a escena {sceneName}");
+
+            // Aplicar sólo a la escena especificada
+            string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+
+            // Activar objetos
+            foreach (var objectID in currentNode.activeObjectIDs)
+            {
+                Debug.Log($"WorldStateGraphRunner: Activando objeto {objectID} en escena {sceneName}");
+                WorldStateManager.Instance.SetObjectActive(sceneName, objectID, true);
+            }
+
+            // Desactivar objetos
+            foreach (var objectID in currentNode.inactiveObjectIDs)
+            {
+                Debug.Log($"WorldStateGraphRunner: Desactivando objeto {objectID} en escena {sceneName}");
+                WorldStateManager.Instance.SetObjectActive(sceneName, objectID, false);
+            }
+        }
+        else
+        {
+            Debug.LogError($"WorldStateGraphRunner: No se encontró nodo con ID {currentStateID}");
+        }
+    }
     public string GetCurrentStateID()
     {
         return currentStateID;

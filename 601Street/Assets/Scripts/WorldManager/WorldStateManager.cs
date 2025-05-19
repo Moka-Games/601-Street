@@ -79,14 +79,48 @@ public class WorldStateManager : MonoBehaviour
     }
 
     // Aplicar estados a objetos en una escena
+    // Reemplaza el método existente con esta versión mejorada
     public void ApplyStateToScene(string sceneName)
     {
-        // Encontrar todos los WorldStateListener en la escena
-        WorldStateListener[] listeners = FindObjectsByType<WorldStateListener>(FindObjectsInactive.Include, FindObjectsSortMode.None); 
-        foreach (var listener in listeners)
+        // Verificar si la escena está realmente cargada
+        bool isSceneLoaded = false;
+        for (int i = 0; i < SceneManager.sceneCount; i++)
         {
-            listener.ApplyState();
+            if (SceneManager.GetSceneAt(i).name == sceneName && SceneManager.GetSceneAt(i).isLoaded)
+            {
+                isSceneLoaded = true;
+                break;
+            }
         }
+
+        if (!isSceneLoaded)
+        {
+            Debug.LogWarning($"WorldStateManager: La escena {sceneName} no está cargada. No se pueden aplicar estados.");
+            return;
+        }
+
+        Debug.Log($"WorldStateManager: Buscando WorldStateListeners en escena: {sceneName}");
+
+        // Buscar todos los objetos con WorldStateListener en la escena específica
+        WorldStateListener[] allListeners = FindObjectsByType<WorldStateListener>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        int applyCount = 0;
+
+        foreach (var listener in allListeners)
+        {
+            // Verificar si el listener pertenece a la escena indicada
+            if (listener.gameObject.scene.name == sceneName)
+            {
+                // Actualizar el listener y hacerlo escuchar cambios futuros
+                Debug.Log($"Aplicando estado a listener: {listener.gameObject.name} con ID: {listener.ObjectID} en escena {sceneName}");
+                listener.ApplyState();
+                applyCount++;
+            }
+        }
+
+        Debug.Log($"WorldStateManager: Se aplicó estado a {applyCount} objetos en la escena {sceneName}");
+
+        // Aplicar también cualquier estado pendiente para esta escena
+        ApplyPendingObjectStates(sceneName);
     }
 
     #region Flag State Methods
@@ -528,5 +562,48 @@ public class WorldStateManager : MonoBehaviour
             }
         }
     }
+
+    // Añade este método a WorldStateManager.cs
+    public void ForceObjectState(string objectID, bool active, bool logDetails = true)
+    {
+        if (logDetails)
+        {
+            Debug.Log($"Forzando estado para objeto con ID {objectID} a {active}");
+        }
+
+        bool foundAny = false;
+
+        // Buscar en todas las escenas cargadas
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+        {
+            Scene scene = SceneManager.GetSceneAt(i);
+            string stateKey = $"Object_{scene.name}_{objectID}";
+
+            // Establecer el flag sin importar si el objeto existe actualmente
+            SetFlag(stateKey, active);
+
+            // Buscar el listener y aplicar el estado directamente
+            WorldStateListener[] listeners = FindObjectsByType<WorldStateListener>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            foreach (var listener in listeners)
+            {
+                if (listener.ObjectID == objectID)
+                {
+                    if (logDetails)
+                    {
+                        Debug.Log($"Aplicando estado forzado a {listener.gameObject.name} en escena {scene.name}");
+                    }
+                    listener.ApplyState();
+                    foundAny = true;
+                }
+            }
+        }
+
+        if (!foundAny && logDetails)
+        {
+            Debug.LogWarning($"No se encontró ningún objeto con ID {objectID} en las escenas cargadas");
+        }
+    }
+
+
     #endregion
 }
