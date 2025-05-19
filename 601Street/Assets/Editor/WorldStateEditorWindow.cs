@@ -1300,15 +1300,6 @@ public class WorldStateEditorWindow : EditorWindow
                 GUI.Label(new Rect(nodeRect.x + 5, yPos, nodeRect.width - 10, 20),
                          "Initial Node", initialStyle);
             }
-
-            if (node.isInitialNode)
-            {
-                yPos += 20;
-                GUIStyle initialStyle = new GUIStyle(EditorStyles.boldLabel);
-                initialStyle.normal.textColor = Color.green;
-                GUI.Label(new Rect(nodeRect.x + 5, yPos, nodeRect.width - 10, 20),
-                         "Initial Node", initialStyle);
-            }
         }
     }
     

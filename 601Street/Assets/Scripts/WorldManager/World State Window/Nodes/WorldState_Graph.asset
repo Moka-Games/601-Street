@@ -24,12 +24,12 @@ MonoBehaviour:
     activeObjectIDs: []
     inactiveObjectIDs: []
     connectedNodeIDs:
-    - Police_Interacted
+    - Nota_Interactuada
     isInitialNode: 1
     misionAsociada: {fileID: 11400000, guid: 4dd5938a794163a4a8338844111dbcc9, type: 2}
     misionDelay: 5
-  - id: Police_Interacted
-    name: PoliceInteracted
+  - id: Nota_Interactuada
+    name: Nota Interactuada
     position:
       serializedVersion: 2
       x: 262.84998
@@ -39,83 +39,114 @@ MonoBehaviour:
     activeObjectIDs: []
     inactiveObjectIDs: []
     connectedNodeIDs:
-    - Nakamura_Interacted
+    - Post_Colegio
     isInitialNode: 0
     misionAsociada: {fileID: 11400000, guid: bf58ec1aea566a74bac603b60e8a3f0e, type: 2}
     misionDelay: 0
-  - id: Nakamura_Interacted
-    name: Nakamura Interacted
+  - id: Post_Colegio
+    name: Post Colegio
     position:
       serializedVersion: 2
-      x: 510.84998
-      y: 238.5
+      x: 512.85
+      y: 240.5
       width: 200
       height: 150
     activeObjectIDs: []
     inactiveObjectIDs: []
     connectedNodeIDs:
-    - Segundo_Policia_Interacted
+    - Ordenador_Interactuado
     isInitialNode: 0
-    misionAsociada: {fileID: 0}
+    misionAsociada: {fileID: 11400000, guid: b47b4457661d38f428620f69ba2baba4, type: 2}
     misionDelay: 0
-  - id: Segundo_Policia_Interacted
-    name: Segundo Policia Interacted
+  - id: Ordenador_Interactuado
+    name: Ordenador Interactuado
     position:
       serializedVersion: 2
-      x: 755
-      y: 241.5
+      x: 776
+      y: 239.5
       width: 200
       height: 150
     activeObjectIDs: []
     inactiveObjectIDs: []
     connectedNodeIDs:
-    - Casa_Nyssa_1
-    - NewNode_7050
+    - Policia _nteractuado
     isInitialNode: 0
-    misionAsociada: {fileID: 0}
+    misionAsociada: {fileID: 11400000, guid: 38cc39fce7151f74f8ed131c20623fdd, type: 2}
     misionDelay: 0
-  - id: Casa_Nyssa_1
-    name: Casa Nyssa_1
+  - id: Policia _nteractuado
+    name: Policia Interactuado
     position:
       serializedVersion: 2
-      x: 1045
-      y: 155.5
+      x: 7.925049
+      y: 466
       width: 200
       height: 150
     activeObjectIDs: []
     inactiveObjectIDs: []
     connectedNodeIDs:
-    - Parque_Interacted
+    - Nakamura_Interactuado
     isInitialNode: 0
-    misionAsociada: {fileID: 0}
+    misionAsociada: {fileID: 11400000, guid: d7bbb4f566ba512479010179d8381c77, type: 2}
     misionDelay: 0
-  - id: NewNode_7050
-    name: New Node
+  - id: Nakamura_Interactuado
+    name: Nakamura Interactuado
     position:
       serializedVersion: 2
-      x: 1042.9249
-      y: 406.5
+      x: 263.92502
+      y: 466
+      width: 200
+      height: 150
+    activeObjectIDs: []
+    inactiveObjectIDs: []
+    connectedNodeIDs:
+    - Policia_Segunda_Interaccion
+    isInitialNode: 0
+    misionAsociada: {fileID: 11400000, guid: a86f7e00499f5c841aab0462aa806799, type: 2}
+    misionDelay: 0
+  - id: Policia_Segunda_Interaccion
+    name: Policia Segunda Interaccion
+    position:
+      serializedVersion: 2
+      x: 510.92505
+      y: 464
+      width: 200
+      height: 150
+    activeObjectIDs: []
+    inactiveObjectIDs: []
+    connectedNodeIDs:
+    - Post_Web_Secta
+    isInitialNode: 0
+    misionAsociada: {fileID: 11400000, guid: be735b46b3f149f45a4cc0132587e419, type: 2}
+    misionDelay: 0
+  - id: Post_Web_Secta
+    name: Post Web Secta
+    position:
+      serializedVersion: 2
+      x: 771.92505
+      y: 462
       width: 200
       height: 150
     activeObjectIDs: []
     inactiveObjectIDs: []
     connectedNodeIDs: []
     isInitialNode: 0
-    misionAsociada: {fileID: 0}
+    misionAsociada: {fileID: 11400000, guid: 0a7fd26fcec15ef42b1f2a143249b88a, type: 2}
     misionDelay: 0
   connections:
   - fromNodeID: InitialState_Colegio
-    toNodeID: Police_Interacted
-  - fromNodeID: Police_Interacted
-    toNodeID: Nakamura_Interacted
-  - fromNodeID: Nakamura_Interacted
-    toNodeID: Segundo_Policia_Interacted
-  - fromNodeID: Segundo_Policia_Interacted
-    toNodeID: Casa_Nyssa_1
-  - fromNodeID: Casa_Nyssa_1
-    toNodeID: Parque_Interacted
+    toNodeID: Nota_Interactuada
+  - fromNodeID: Nota_Interactuada
+    toNodeID: Post_Colegio
+  - fromNodeID: Post_Colegio
+    toNodeID: Ordenador_Interactuado
   - fromNodeID: Parque_Interacted
     toNodeID: Secta_Interacted
-  - fromNodeID: Segundo_Policia_Interacted
-    toNodeID: NewNode_7050
+  - fromNodeID: Ordenador_Interactuado
+    toNodeID: Policia _nteractuado
+  - fromNodeID: Policia _nteractuado
+    toNodeID: Nakamura_Interactuado
+  - fromNodeID: Nakamura_Interactuado
+    toNodeID: Policia_Segunda_Interaccion
+  - fromNodeID: Policia_Segunda_Interaccion
+    toNodeID: Post_Web_Secta
   initialNodeID: InitialState_Colegio
