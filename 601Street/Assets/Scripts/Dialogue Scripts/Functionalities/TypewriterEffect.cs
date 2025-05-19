@@ -12,8 +12,6 @@ public class TypewriterEffect : MonoBehaviour
     private float timer;
     private int charIndex;
     private Coroutine typingCoroutine;
-    private NPC currentNPC;
-    private bool isInitialized = false;
 
     private void Awake()
     {
@@ -43,14 +41,11 @@ public class TypewriterEffect : MonoBehaviour
             textComponent.maxVisibleCharacters = 0;
         }
 
-        isInitialized = false;
     }
 
     // Procesa el texto antes de iniciar la animación de escritura
     public void StartTyping(string text, NPC npc)
     {
-        currentNPC = npc;
-
         // Asegurarse de detener cualquier animación en curso
         if (typingCoroutine != null)
         {
@@ -76,7 +71,6 @@ public class TypewriterEffect : MonoBehaviour
         // Iniciamos la animación después de un breve delay para asegurar que todo esté configurado
         typingCoroutine = StartCoroutine(TypeText());
 
-        isInitialized = true;
     }
 
     private IEnumerator TypeText()

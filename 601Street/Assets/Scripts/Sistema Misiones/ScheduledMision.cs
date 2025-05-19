@@ -7,10 +7,8 @@ public class ScheduledMision : MonoBehaviour
 
     [SerializeField] private float startDelay;
 
-    private static bool misionEnabled = false;
     void Start()
     {
-        misionEnabled = false;
         StartCoroutine(StartMision());
     }
 
@@ -18,6 +16,5 @@ public class ScheduledMision : MonoBehaviour
     {
         yield return new WaitForSeconds(startDelay);
         MisionManager.Instance.IniciarMision(idMision);
-        misionEnabled = true;
     }
 }

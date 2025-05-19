@@ -14,29 +14,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nodes:
   - id: Initial_State
-    name: Initial_State
+    name: Initial State
     position:
       serializedVersion: 2
-      x: 566.2606
-      y: 415.5
+      x: 77.850006
+      y: 216.5
       width: 200
       height: 150
-    activeObjectIDs: []
+    activeObjectIDs:
+    - 
     inactiveObjectIDs: []
     connectedNodeIDs:
     - SecondState
     isInitialNode: 1
-  - id: Second_State
+  - id: SecondState
     name: SecondState
     position:
       serializedVersion: 2
-      x: 866.2606
-      y: 475.5
+      x: 552.85
+      y: 192.5
       width: 200
       height: 150
     activeObjectIDs: []
     inactiveObjectIDs: []
     connectedNodeIDs: []
     isInitialNode: 0
-  connections: []
-  initialNodeID: d742b019-b528-4f30-adf6-8687f90130b9
+  connections:
+  - fromNodeID: Initial_State
+    toNodeID: SecondState
+  initialNodeID: Initial_State
