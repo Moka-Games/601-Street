@@ -17,7 +17,7 @@ MonoBehaviour:
     name: InitialState_Colegio
     position:
       serializedVersion: 2
-      x: 12.850006
+      x: 11.850006
       y: 240.5
       width: 200
       height: 150
@@ -36,8 +36,10 @@ MonoBehaviour:
       y: 238.5
       width: 200
       height: 150
-    activeObjectIDs: []
-    inactiveObjectIDs: []
+    activeObjectIDs:
+    - Activar
+    inactiveObjectIDs:
+    - Victima
     connectedNodeIDs:
     - Post_Colegio
     isInitialNode: 0
@@ -62,7 +64,7 @@ MonoBehaviour:
     name: Ordenador Interactuado
     position:
       serializedVersion: 2
-      x: 776
+      x: 779
       y: 239.5
       width: 200
       height: 150
@@ -93,7 +95,7 @@ MonoBehaviour:
     position:
       serializedVersion: 2
       x: 263.92502
-      y: 466
+      y: 467
       width: 200
       height: 150
     activeObjectIDs: []
@@ -107,8 +109,8 @@ MonoBehaviour:
     name: Policia Segunda Interaccion
     position:
       serializedVersion: 2
-      x: 510.92505
-      y: 464
+      x: 507.92505
+      y: 466
       width: 200
       height: 150
     activeObjectIDs: []
@@ -122,7 +124,7 @@ MonoBehaviour:
     name: Post Web Secta
     position:
       serializedVersion: 2
-      x: 771.92505
+      x: 766.92505
       y: 462
       width: 200
       height: 150

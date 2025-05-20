@@ -243,7 +243,6 @@ public class WorldStateEditorWindow : EditorWindow
                         GUI.FocusControl(null);
                         e.Use();
 
-                        Debug.Log($"Seleccionado nodo: {nodeUnderMouse.name} en posición {nodeUnderMouse.position}");
                     }
                 }
                 else if (e.button == 1) // Botón derecho
@@ -372,7 +371,6 @@ public class WorldStateEditorWindow : EditorWindow
                             nodeUnderMouse.misionAsociada = DragAndDrop.objectReferences[0] as Mision;
                             selectedNode = nodeUnderMouse; // Seleccionar el nodo
                             EditorUtility.SetDirty(graph);
-                            Debug.Log($"Assigned mission '{nodeUnderMouse.misionAsociada.name}' to node '{nodeUnderMouse.name}'");
                         }
 
                         e.Use();
@@ -425,8 +423,6 @@ public class WorldStateEditorWindow : EditorWindow
 
         // Ajustar la posición de scroll para centrar todos los nodos
         scrollPosition = center - new Vector2(position.width * 0.35f, position.height * 0.5f);
-
-        Debug.Log($"Centrando vista en todos los nodos. Centro: {center}, Scroll: {scrollPosition}");
 
         // Forzar repintado
         Repaint();

@@ -15,7 +15,7 @@ public class GameStateController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.G))
         {
-            ChangeGameState("Police_Interacted");
+            ChangeGameState("Nota_Interactuada");
         }
         
     }

@@ -97,7 +97,6 @@ public class WorldStateGraphRunner : MonoBehaviour
     {
         if (!nodeCache.ContainsKey(stateID))
         {
-            Debug.LogError($"State with ID {stateID} not found!");
             return false;
         }
 
@@ -117,7 +116,6 @@ public class WorldStateGraphRunner : MonoBehaviour
             // Si no es adyacente, error
             if (!currentState.connectedNodeIDs.Contains(stateID))
             {
-                Debug.LogError($"Cannot transition from {currentState.name} to {newState.name} - not connected!");
                 return false;
             }
 
@@ -132,14 +130,11 @@ public class WorldStateGraphRunner : MonoBehaviour
                         MisionManager.Instance.MisionActual != null &&
                         MisionManager.Instance.MisionActual.ID == currentState.misionAsociada.ID)
                     {
-                        Debug.Log($"Completando automáticamente misión '{MisionManager.Instance.MisionActual.Nombre}' al cambiar de estado");
                         MisionManager.Instance.CompletarMisionActual();
                     }
                 }
                 else
                 {
-                    // Completar cualquier misión activa
-                    Debug.Log($"Completando automáticamente misión '{MisionManager.Instance.MisionActual.Nombre}' al cambiar de estado");
                     MisionManager.Instance.CompletarMisionActual();
                 }
             }
@@ -170,14 +165,12 @@ public class WorldStateGraphRunner : MonoBehaviour
         // Si hay múltiples conexiones, error
         if (currentState.connectedNodeIDs.Count > 1)
         {
-            Debug.LogError($"State {currentState.name} has multiple outgoing connections. Please specify a target state ID.");
             return false;
         }
 
         // Si no hay conexiones, es estado final
         if (currentState.connectedNodeIDs.Count == 0)
         {
-            Debug.LogWarning($"State {currentState.name} is a final state (no outgoing connections).");
             return false;
         }
 
@@ -189,7 +182,6 @@ public class WorldStateGraphRunner : MonoBehaviour
     {
         if (WorldStateManager.Instance == null)
         {
-            Debug.LogError("WorldStateManager is not available!");
             return;
         }
 
@@ -222,7 +214,6 @@ public class WorldStateGraphRunner : MonoBehaviour
                 else
                 {
                     // Iniciar la misión inmediatamente
-                    Debug.Log($"Iniciando misión '{state.misionAsociada.Nombre}' asociada al estado '{state.name}'");
                     MisionManager.Instance.IniciarMision(state.misionAsociada);
                 }
             }
@@ -236,8 +227,7 @@ public class WorldStateGraphRunner : MonoBehaviour
     // Añadir esta nueva corrutina para manejar el retraso
     private IEnumerator IniciarMisionConDelay(Mision mision, float delay, string nombreEstado)
     {
-        Debug.Log($"Esperando {delay} segundos antes de iniciar la misión '{mision.Nombre}' asociada al estado '{nombreEstado}'");
-
+                                                     
         yield return new WaitForSeconds(delay);
 
         // Verificar que aún podemos iniciar la misión (el usuario podría haber cambiado de estado durante la espera)
@@ -249,7 +239,6 @@ public class WorldStateGraphRunner : MonoBehaviour
     }
     public void OnSceneLoaded(string sceneName)
     {
-        Debug.Log($"WorldStateGraphRunner: Actualizando estado para escena recién cargada: {sceneName}");
 
         if (string.IsNullOrEmpty(currentStateID))
         {
@@ -279,7 +268,6 @@ public class WorldStateGraphRunner : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Aplicando estado a escena {sceneName}: Activar {state.activeObjectIDs.Count} objetos, Desactivar {state.inactiveObjectIDs.Count} objetos");
 
         // Activar objetos de la lista "activeObjectIDs" en la escena específica
         foreach (var objectID in state.activeObjectIDs)
@@ -321,7 +309,6 @@ public class WorldStateGraphRunner : MonoBehaviour
     }
     public void TestStateSystem()
     {
-        Debug.Log("Iniciando prueba del sistema de estados...");
 
         // Imprimir información del estado actual
         string currentStateName = GetCurrentStateName();

@@ -57,11 +57,9 @@ public class NPC : MonoBehaviour
             return;
         }
 
-        // Marcar que estamos iniciando una conversación
         isInConversation = true;
         lastInteractionTime = Time.time;
 
-        // El resto del código de inicio de conversación...
         if (isNakamura)
         {
             HandleNakamuraConversation();
