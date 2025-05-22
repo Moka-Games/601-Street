@@ -57,6 +57,12 @@ public class NPC : MonoBehaviour
             return;
         }
 
+        // Si singleInteraction es true y ya hemos interactuado, no hacer nada
+        if (singleInteraction && hasInteracted)
+        {
+            return;
+        }
+
         isInConversation = true;
         lastInteractionTime = Time.time;
 
@@ -66,21 +72,21 @@ public class NPC : MonoBehaviour
         }
         else if (!hasInteracted && !singleInteraction)
         {
+            // Interacción normal (múltiples interacciones permitidas)
             DialogueManager.Instance.StartConversation(conversation, this);
         }
         else if (hasInteracted && !singleInteraction)
         {
+            // Segunda+ interacción cuando se permiten múltiples interacciones
             DialogueManager.Instance.StartConversation(funnyConversation, this);
         }
         else if (!hasInteracted && singleInteraction)
         {
+            // Primera y única interacción cuando singleInteraction es true
             DialogueManager.Instance.StartConversation(conversation, this);
-            hasInteracted = true; // Marcar como interactuado inmediatamente
         }
-        else if (hasInteracted && singleInteraction)
-        {
-            DialogueManager.Instance.StartConversation(funnyConversation, this);
-        }
+        // Nota: Eliminamos el caso "else if (hasInteracted && singleInteraction)" 
+        // porque ahora está manejado por el return temprano arriba
     }
 
     private void HandleNakamuraConversation()

@@ -17,12 +17,17 @@ MonoBehaviour:
     name: InitialState_Colegio
     position:
       serializedVersion: 2
-      x: 11.850006
-      y: 240.5
+      x: -0.1499939
+      y: 244.5
       width: 200
       height: 150
-    activeObjectIDs: []
-    inactiveObjectIDs: []
+    activeObjectIDs:
+    - Profesor
+    - Nota_Umi
+    inactiveObjectIDs:
+    - Salida_2
+    - Salida_1
+    - Llamada_Daichi_Post_Colegio
     connectedNodeIDs:
     - Nota_Interactuada
     isInitialNode: 1
@@ -32,27 +37,37 @@ MonoBehaviour:
     name: Nota Interactuada
     position:
       serializedVersion: 2
-      x: 262.84998
-      y: 238.5
+      x: 260.84998
+      y: 239.5
       width: 200
       height: 150
-    activeObjectIDs: []
+    activeObjectIDs:
+    - Salida_2
+    - Mision_Salida_Colegio
+    - Salida_1
     inactiveObjectIDs: []
     connectedNodeIDs:
     - Post_Colegio
     isInitialNode: 0
     misionAsociada: {fileID: 11400000, guid: bf58ec1aea566a74bac603b60e8a3f0e, type: 2}
-    misionDelay: 0
+    misionDelay: 1
   - id: Post_Colegio
     name: Post Colegio
     position:
       serializedVersion: 2
-      x: 511.84998
-      y: 240.5
+      x: 515.85
+      y: 238.5
       width: 200
       height: 150
-    activeObjectIDs: []
-    inactiveObjectIDs: []
+    activeObjectIDs:
+    - Mision_Post_Colegio
+    - Eco
+    - Entrada_Casa_Nyssa
+    - Llamada_Daichi_Post_Colegio
+    inactiveObjectIDs:
+    - Entrada_Comisaria
+    - Entrada_Bar
+    - Obstaculos_Escalera
     connectedNodeIDs:
     - Ordenador_Interactuado
     isInitialNode: 0
@@ -62,12 +77,16 @@ MonoBehaviour:
     name: Ordenador Interactuado
     position:
       serializedVersion: 2
-      x: 779
+      x: 780
       y: 239.5
       width: 200
       height: 150
-    activeObjectIDs: []
-    inactiveObjectIDs: []
+    activeObjectIDs:
+    - Entrada_Comisaria
+    - Mision_Comisaria
+    - Policia_1
+    inactiveObjectIDs:
+    - Eco
     connectedNodeIDs:
     - Policia _nteractuado
     isInitialNode: 0
@@ -77,11 +96,13 @@ MonoBehaviour:
     name: Policia Interactuado
     position:
       serializedVersion: 2
-      x: 7.925049
-      y: 466
+      x: -4.074951
+      y: 471
       width: 200
       height: 150
-    activeObjectIDs: []
+    activeObjectIDs:
+    - Entrada_Bar
+    - Mision_Bar
     inactiveObjectIDs: []
     connectedNodeIDs:
     - Nakamura_Interactuado
@@ -92,45 +113,74 @@ MonoBehaviour:
     name: Nakamura Interactuado
     position:
       serializedVersion: 2
-      x: 263.92502
-      y: 467
+      x: 268.92502
+      y: 472
       width: 200
       height: 150
-    activeObjectIDs: []
-    inactiveObjectIDs: []
+    activeObjectIDs:
+    - Policia_2
+    - "Contrase\xF1a_Caja_Fuerte"
+    - Mision_Volver_Comisaria
+    inactiveObjectIDs:
+    - Policia_1
     connectedNodeIDs:
-    - Policia_Segunda_Interaccion
+    - Policia_2_Exito
+    - Policia_2_Fracaso
     isInitialNode: 0
     misionAsociada: {fileID: 11400000, guid: a86f7e00499f5c841aab0462aa806799, type: 2}
     misionDelay: 0
-  - id: Policia_Segunda_Interaccion
-    name: Policia Segunda Interaccion
+  - id: "Cap\xEDtulo_1_Completado"
+    name: "Cap\xEDtulo 1 Completado"
     position:
       serializedVersion: 2
-      x: 507.92505
-      y: 466
+      x: 849.4625
+      y: 477.75
       width: 200
       height: 150
-    activeObjectIDs: []
-    inactiveObjectIDs: []
-    connectedNodeIDs:
-    - Post_Web_Secta
+    activeObjectIDs:
+    - "Cap\xEDtulo_1_Terminado"
+    - "Cap\xEDtulo_2_Comenzado"
+    - Ordenador_2
+    - Mision_Volver_Casa
+    inactiveObjectIDs:
+    - Ordenador_1
+    connectedNodeIDs: []
     isInitialNode: 0
     misionAsociada: {fileID: 11400000, guid: be735b46b3f149f45a4cc0132587e419, type: 2}
     misionDelay: 0
-  - id: Post_Web_Secta
-    name: Post Web Secta
+  - id: Policia_2_Exito
+    name: "Policia 2 \xC9xito"
     position:
       serializedVersion: 2
-      x: 766.92505
-      y: 462
+      x: 564.4625
+      y: 412.75
       width: 200
       height: 150
-    activeObjectIDs: []
-    inactiveObjectIDs: []
-    connectedNodeIDs: []
+    activeObjectIDs:
+    - Runa_1
+    inactiveObjectIDs:
+    - Puerta_Despacho
+    connectedNodeIDs:
+    - "Cap\xEDtulo_1_Completado"
     isInitialNode: 0
-    misionAsociada: {fileID: 11400000, guid: 0a7fd26fcec15ef42b1f2a143249b88a, type: 2}
+    misionAsociada: {fileID: 0}
+    misionDelay: 0
+  - id: Policia_2_Fracaso
+    name: Policia 2 Fracaso
+    position:
+      serializedVersion: 2
+      x: 559.4625
+      y: 573.75
+      width: 200
+      height: 150
+    activeObjectIDs:
+    - Ganzua_Despacho
+    - Runa_1
+    inactiveObjectIDs: []
+    connectedNodeIDs:
+    - "Cap\xEDtulo_1_Completado"
+    isInitialNode: 0
+    misionAsociada: {fileID: 0}
     misionDelay: 0
   connections:
   - fromNodeID: InitialState_Colegio
@@ -146,7 +196,11 @@ MonoBehaviour:
   - fromNodeID: Policia _nteractuado
     toNodeID: Nakamura_Interactuado
   - fromNodeID: Nakamura_Interactuado
-    toNodeID: Policia_Segunda_Interaccion
-  - fromNodeID: Policia_Segunda_Interaccion
-    toNodeID: Post_Web_Secta
+    toNodeID: Policia_2_Exito
+  - fromNodeID: Nakamura_Interactuado
+    toNodeID: Policia_2_Fracaso
+  - fromNodeID: Policia_2_Exito
+    toNodeID: "Cap\xEDtulo_1_Completado"
+  - fromNodeID: Policia_2_Fracaso
+    toNodeID: "Cap\xEDtulo_1_Completado"
   initialNodeID: InitialState_Colegio

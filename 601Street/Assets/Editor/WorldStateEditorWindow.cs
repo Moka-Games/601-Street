@@ -520,7 +520,7 @@ public class WorldStateEditorWindow : EditorWindow
         GUILayout.Label("Inactive Objects", EditorStyles.boldLabel);
         DrawObjectList(selectedNode.inactiveObjectIDs);
 
-        // NUEVA SECCIÓN: Misión asociada
+        // Misión asociada
         GUILayout.Space(10);
         GUILayout.Label("Associated Mission", EditorStyles.boldLabel);
         EditorGUILayout.BeginHorizontal();

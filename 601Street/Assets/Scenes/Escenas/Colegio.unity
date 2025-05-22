@@ -1268,7 +1268,7 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.size
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -1288,7 +1288,7 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -1309,7 +1309,7 @@ PrefabInstance:
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1891648455}
+      objectReference: {fileID: 1066634375}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -1328,7 +1328,7 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SetActive
+      value: ChangeGameState
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -1353,7 +1353,7 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UnityEngine.GameObject, UnityEngine
+      value: GameStateController, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -1363,12 +1363,17 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_BoolArgument
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
+        type: 3}
+      propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
+      value: Nota_Interactuada
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -1392,7 +1397,19 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1713818343}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7125272824277244258, guid: 0d5500dc99f9c0843bd8767313e23a17,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1066634373}
+    - targetCorrespondingSourceObject: {fileID: 7125272824277244258, guid: 0d5500dc99f9c0843bd8767313e23a17,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1066634374}
+    - targetCorrespondingSourceObject: {fileID: 7125272824277244258, guid: 0d5500dc99f9c0843bd8767313e23a17,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1066634375}
   m_SourcePrefab: {fileID: 100100000, guid: 0d5500dc99f9c0843bd8767313e23a17, type: 3}
 --- !u!1001 &311821368
 PrefabInstance:
@@ -4863,37 +4880,57 @@ SphereCollider:
     type: 3}
   m_PrefabInstance: {fileID: 304645402}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1103288138
-GameObject:
+--- !u!114 &1066634373
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1103288139}
-  m_Layer: 0
-  m_Name: '||MISIONS||'
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1103288139
-Transform:
+  m_GameObject: {fileID: 1066634359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e64f5cbc289c58948a4d0c6173aeafe3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: Nota_Umi
+--- !u!114 &1066634374
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1103288138}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 43.412804, y: 17.236916, z: 9.084167}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_GameObject: {fileID: 1066634359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: Nota_Umi
+  useSceneName: 0
+  sceneName: Colegio
+  defaultActiveState: 1
+  applyStateImmediately: 1
+  onActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  listenOnlyWhenActive: 0
+  useTransition: 0
+  transitionDuration: 0.5
+--- !u!114 &1066634375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1066634359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4772c18ba1c9549bb1e6e3a8501188, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1130092831
 GameObject:
   m_ObjectHideFlags: 1
@@ -7549,7 +7586,7 @@ PrefabInstance:
     - target: {fileID: 7629522996373736951, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.6369152
+      value: -1.609
       objectReference: {fileID: 0}
     - target: {fileID: 7629522996373736951, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -7656,7 +7693,7 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -7691,7 +7728,7 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SetActive
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -7716,12 +7753,17 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UnityEngine.GameObject, UnityEngine
+      value: GameStateController, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_BoolArgument
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
+        type: 3}
+      propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
+      value: Nota_Interactuada
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -7749,7 +7791,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7125272824277244258, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1700969699}
+      addedObject: {fileID: 1700969705}
   m_SourcePrefab: {fileID: 100100000, guid: 0d5500dc99f9c0843bd8767313e23a17, type: 3}
 --- !u!1 &1700969696 stripped
 GameObject:
@@ -7769,28 +7811,32 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1700969695}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &1700969699
-MeshCollider:
+--- !u!114 &1700969705
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1700969696}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: Nota_Umi
+  useSceneName: 0
+  sceneName: Colegio
+  defaultActiveState: 0
+  applyStateImmediately: 1
+  onActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  listenOnlyWhenActive: 0
+  useTransition: 0
+  transitionDuration: 0.5
 --- !u!1 &1713818342
 GameObject:
   m_ObjectHideFlags: 0
@@ -8359,6 +8405,12 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 8552134717624371188, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
+--- !u!1 &1802918885 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8009979216645450960, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+    type: 3}
+  m_PrefabInstance: {fileID: 1896980293}
+  m_PrefabAsset: {fileID: 0}
 --- !u!64 &1810353144
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -8534,13 +8586,16 @@ GameObject:
   - component: {fileID: 1891648456}
   - component: {fileID: 1891648459}
   - component: {fileID: 1891648460}
+  - component: {fileID: 1891648462}
+  - component: {fileID: 1891648461}
+  - component: {fileID: 1891648463}
   m_Layer: 6
   m_Name: Salida_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &1891648456
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8606,6 +8661,18 @@ MonoBehaviour:
           m_StringArgument: ColegioExterior
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1891648463}
+        m_TargetAssemblyTypeName: GameStateController, Assembly-CSharp
+        m_MethodName: ChangeGameState
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Post_Colegio
+          m_BoolArgument: 0
+        m_CallState: 2
   onInteracted:
     m_PersistentCalls:
       m_Calls: []
@@ -8631,6 +8698,57 @@ MonoBehaviour:
   isExitToMainScene: 1
   sceneChangeManager: {fileID: 0}
   showDetailedLogs: 0
+--- !u!114 &1891648461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1891648455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e64f5cbc289c58948a4d0c6173aeafe3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: Salida_2
+--- !u!114 &1891648462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1891648455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: Salida_2
+  useSceneName: 0
+  sceneName: Colegio
+  defaultActiveState: 1
+  applyStateImmediately: 1
+  onActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  listenOnlyWhenActive: 1
+  useTransition: 0
+  transitionDuration: 0.5
+--- !u!114 &1891648463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1891648455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4772c18ba1c9549bb1e6e3a8501188, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1896980293
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8672,7 +8790,7 @@ PrefabInstance:
     - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.16
+      value: -0.02
       objectReference: {fileID: 0}
     - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
         type: 3}
@@ -8682,7 +8800,7 @@ PrefabInstance:
     - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.71083355
+      value: 0.36
       objectReference: {fileID: 0}
     - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
         type: 3}
@@ -8792,7 +8910,15 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8009979216645450960, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1896980305}
+    - targetCorrespondingSourceObject: {fileID: 8009979216645450960, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1896980306}
   m_SourcePrefab: {fileID: 100100000, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3, type: 3}
 --- !u!4 &1896980300 stripped
 Transform:
@@ -8800,6 +8926,45 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1896980293}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1896980305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802918885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e64f5cbc289c58948a4d0c6173aeafe3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: Profesor
+--- !u!114 &1896980306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802918885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: Profesor
+  useSceneName: 0
+  sceneName: Colegio
+  defaultActiveState: 0
+  applyStateImmediately: 1
+  onActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  listenOnlyWhenActive: 0
+  useTransition: 0
+  transitionDuration: 0.5
 --- !u!1001 &1908371450
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8906,13 +9071,16 @@ GameObject:
   - component: {fileID: 1936779530}
   - component: {fileID: 1936779533}
   - component: {fileID: 1936779534}
+  - component: {fileID: 1936779536}
+  - component: {fileID: 1936779535}
+  - component: {fileID: 1936779537}
   m_Layer: 6
   m_Name: Salida_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &1936779530
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8978,6 +9146,18 @@ MonoBehaviour:
           m_StringArgument: ColegioExterior
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1936779537}
+        m_TargetAssemblyTypeName: GameStateController, Assembly-CSharp
+        m_MethodName: ChangeGameState
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Post_Colegio
+          m_BoolArgument: 0
+        m_CallState: 2
   onInteracted:
     m_PersistentCalls:
       m_Calls: []
@@ -9003,6 +9183,57 @@ MonoBehaviour:
   isExitToMainScene: 1
   sceneChangeManager: {fileID: 0}
   showDetailedLogs: 0
+--- !u!114 &1936779535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1936779529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e64f5cbc289c58948a4d0c6173aeafe3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: Salida_1
+--- !u!114 &1936779536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1936779529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: Salida_1
+  useSceneName: 0
+  sceneName: Colegio
+  defaultActiveState: 1
+  applyStateImmediately: 1
+  onActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  listenOnlyWhenActive: 1
+  useTransition: 0
+  transitionDuration: 0.5
+--- !u!114 &1936779537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1936779529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4772c18ba1c9549bb1e6e3a8501188, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!64 &1967487549
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -9992,7 +10223,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 7707812023480896144}
   - {fileID: 349926481}
-  - {fileID: 1103288139}
   - {fileID: 366938616}
   - {fileID: 138147909}
   - {fileID: 1291360549111379746}

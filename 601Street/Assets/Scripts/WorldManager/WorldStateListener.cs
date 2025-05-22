@@ -5,65 +5,55 @@ using UnityEngine.Events;
 public class WorldStateListener : MonoBehaviour
 {
     [Header("Configuración Básica")]
-    [SerializeField] private string objectID; // ID único para este objeto
-    [SerializeField] private bool useSceneName = true; // Usar nombre de escena automáticamente
-    [SerializeField] private string sceneName; // Nombre de escena manual si useSceneName=false
-    [SerializeField] private bool defaultActiveState = true; // Estado por defecto del objeto
-    [SerializeField] private bool applyStateImmediately = true; // Nuevo: aplicar cambios inmediatamente
+    [SerializeField] private string objectID;
+    [SerializeField] private bool useSceneName = true;
+    [SerializeField] private string sceneName;
+    [SerializeField] private bool defaultActiveState = true;
+    [SerializeField] private bool applyStateImmediately = true;
 
     [Header("Eventos")]
-    [SerializeField] private UnityEvent onActivate; // Evento cuando el objeto se activa
-    [SerializeField] private UnityEvent onDeactivate; // Evento cuando el objeto se desactiva
+    [SerializeField] private UnityEvent onActivate;
+    [SerializeField] private UnityEvent onDeactivate;
 
     [Header("Opciones Avanzadas")]
-    [SerializeField] private bool listenOnlyWhenActive = false; // Escuchar eventos solo cuando está activo
-    [SerializeField] private bool useTransition = false; // Usar transición al cambiar estado
-    [SerializeField] private float transitionDuration = 0.5f; // Duración de la transición
+    [SerializeField] private bool listenOnlyWhenActive = false;
+    [SerializeField] private bool useTransition = false;
+    [SerializeField] private float transitionDuration = 0.5f;
 
-    private string currentSceneName; // Nombre de la escena actual
+    private string currentSceneName;
     private bool isInitialized = false;
-    private bool lastKnownState; // Último estado conocido para evitar activaciones repetidas
-    private string stateKey; // Clave para almacenar el estado
+    private bool lastKnownState;
+    private string stateKey;
+    private bool isDestroyed = false; // Nueva bandera para rastrear destrucción
 
-    // Propiedad para acceder al ID
     public string ObjectID => objectID;
 
     private void Awake()
     {
-        // Si no hay ID asignado, usar el nombre del objeto
         if (string.IsNullOrEmpty(objectID))
         {
             objectID = gameObject.name;
         }
 
-        // Obtener el nombre de la escena
         currentSceneName = useSceneName ? gameObject.scene.name : sceneName;
-
-        // Generar la clave de estado consistentemente
         stateKey = $"Object_{currentSceneName}_{objectID}";
-
         lastKnownState = gameObject.activeSelf;
     }
+
     private void Start()
     {
-        // Si no hay ID asignado, usar el nombre del objeto
         if (string.IsNullOrEmpty(objectID))
         {
             objectID = gameObject.name;
             Debug.LogWarning($"WorldStateListener en {gameObject.name}: No se especificó ID, usando nombre del objeto");
         }
 
-        // Obtener el nombre de la escena
         currentSceneName = useSceneName ? gameObject.scene.name : sceneName;
-
-        // Generar la clave de estado consistentemente
         stateKey = $"Object_{currentSceneName}_{objectID}";
 
-        // Registrarse para escuchar cambios
         RegisterToWorldState();
 
-        // Aplicar estado inicial
-        if (applyStateImmediately && WorldStateManager.Instance != null)
+        if (applyStateImmediately && WorldStateManager.IsAvailable())
         {
             Debug.Log($"WorldStateListener: Aplicando estado inicial a {gameObject.name} (ID: {objectID}) en escena {currentSceneName}");
             ApplyState();
@@ -74,8 +64,7 @@ public class WorldStateListener : MonoBehaviour
 
     private void OnEnable()
     {
-        // Si ya estamos inicializados, registrarnos para escuchar cambios
-        if (isInitialized)
+        if (isInitialized && !isDestroyed)
         {
             RegisterToWorldState();
         }
@@ -83,31 +72,39 @@ public class WorldStateListener : MonoBehaviour
 
     private void OnDisable()
     {
-        // Solo desregistrarse si es una desactivación real, no un cambio de escena
-        if (WorldStateManager.Instance != null && Application.isPlaying)
+        // Solo desregistrarse si no estamos siendo destruidos y el manager está disponible
+        if (!isDestroyed && WorldStateManager.IsAvailable())
         {
             UnregisterFromWorldState();
         }
     }
 
-    // Registrarse para escuchar cambios
-    private void RegisterToWorldState()
+    private void OnDestroy()
     {
-        if (WorldStateManager.Instance != null)
+        // Marcar como destruido para evitar accesos posteriores
+        isDestroyed = true;
+
+        // Intentar desregistrarse solo si el manager está disponible
+        if (WorldStateManager.IsAvailable())
         {
-            WorldStateManager.Instance.RegisterFlagListener(stateKey, OnWorldStateChanged);
-            Debug.Log($"WorldStateListener: {gameObject.name} registrado para escuchar cambios en {stateKey}");
-        }
-        else
-        {
-            Debug.LogWarning($"WorldStateManager no disponible para {gameObject.name}");
+            UnregisterFromWorldState();
         }
     }
 
-    // Desregistrarse
+    private void RegisterToWorldState()
+    {
+        // No registrarse si estamos destruidos o el manager no está disponible
+        if (isDestroyed || !WorldStateManager.IsAvailable())
+            return;
+
+        WorldStateManager.Instance.RegisterFlagListener(stateKey, OnWorldStateChanged);
+        Debug.Log($"WorldStateListener: {gameObject.name} registrado para escuchar cambios en {stateKey}");
+    }
+
     private void UnregisterFromWorldState()
     {
-        if (WorldStateManager.Instance != null)
+        // Solo desregistrarse si el manager está disponible
+        if (WorldStateManager.IsAvailable())
         {
             WorldStateManager.Instance.RemoveFlagListener(stateKey, OnWorldStateChanged);
         }
@@ -116,10 +113,10 @@ public class WorldStateListener : MonoBehaviour
     private void OnWorldStateChanged(bool active)
     {
         // Verificar si este gameObject todavía existe o está siendo destruido
-        if (this == null || gameObject == null)
+        if (isDestroyed || this == null || gameObject == null)
         {
             // Este objeto ya no existe, desregistrar este listener
-            if (WorldStateManager.Instance != null)
+            if (WorldStateManager.IsAvailable())
             {
                 WorldStateManager.Instance.RemoveFlagListener(stateKey, OnWorldStateChanged);
             }
@@ -139,13 +136,15 @@ public class WorldStateListener : MonoBehaviour
 
     public void ApplyState()
     {
-        if (this == null || gameObject == null)
+        // No hacer nada si estamos destruidos o el objeto es nulo
+        if (isDestroyed || this == null || gameObject == null)
         {
             Debug.LogWarning($"ApplyState llamado en objeto destruido o nulo");
             return;
         }
 
-        if (WorldStateManager.Instance == null)
+        // No hacer nada si el manager no está disponible
+        if (!WorldStateManager.IsAvailable())
         {
             Debug.LogWarning($"WorldStateManager no disponible para {gameObject.name}");
             return;
@@ -175,44 +174,57 @@ public class WorldStateListener : MonoBehaviour
             gameObject.SetActive(shouldBeActive);
 
             // Invocar evento correspondiente
-            if (shouldBeActive)
-                onActivate?.Invoke();
-            else
-                onDeactivate?.Invoke();
-        }
-    }
-
-    // Transición suave - método existente
-
-    // Método público para alternar el estado
-    public void ToggleState()
-    {
-        if (WorldStateManager.Instance != null)
-        {
-            bool currentState = WorldStateManager.Instance.GetObjectActive(
-                currentSceneName, objectID, defaultActiveState);
-
-            WorldStateManager.Instance.SetObjectActive(
-                currentSceneName, objectID, !currentState);
-
-            // Aplicar inmediatamente si es necesario
-            if (applyStateImmediately)
+            try
             {
-                ApplyState();
+                if (shouldBeActive)
+                    onActivate?.Invoke();
+                else
+                    onDeactivate?.Invoke();
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Error al invocar eventos en {gameObject.name}: {e.Message}");
             }
         }
     }
 
-    // Transición suave entre estados
+    public void ToggleState()
+    {
+        if (isDestroyed || !WorldStateManager.IsAvailable())
+            return;
+
+        bool currentState = WorldStateManager.Instance.GetObjectActive(
+            currentSceneName, objectID, defaultActiveState);
+
+        WorldStateManager.Instance.SetObjectActive(
+            currentSceneName, objectID, !currentState);
+
+        if (applyStateImmediately)
+        {
+            ApplyState();
+        }
+    }
+
     private IEnumerator TransitionState(bool activate)
     {
+        // Verificar que no estamos destruidos antes de empezar
+        if (isDestroyed || this == null || gameObject == null)
+            yield break;
+
         if (activate)
         {
             // Primero activar el objeto
             gameObject.SetActive(true);
 
             // Invocar evento de activación
-            onActivate?.Invoke();
+            try
+            {
+                onActivate?.Invoke();
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Error al invocar evento de activación: {e.Message}");
+            }
 
             // Efecto de entrada
             CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
@@ -221,16 +233,18 @@ public class WorldStateListener : MonoBehaviour
                 canvasGroup.alpha = 0;
                 float elapsedTime = 0;
 
-                while (elapsedTime < transitionDuration)
+                while (elapsedTime < transitionDuration && !isDestroyed && this != null && gameObject != null)
                 {
                     canvasGroup.alpha = Mathf.Lerp(0, 1, elapsedTime / transitionDuration);
                     elapsedTime += Time.deltaTime;
                     yield return null;
                 }
 
-                canvasGroup.alpha = 1;
+                if (!isDestroyed && canvasGroup != null)
+                {
+                    canvasGroup.alpha = 1;
+                }
             }
-            // Si no hay CanvasGroup, podemos usar otros efectos opcionales
             else
             {
                 // Opcional: Escala suave desde 0 a 1
@@ -239,20 +253,30 @@ public class WorldStateListener : MonoBehaviour
                 targetTransform.localScale = Vector3.zero;
 
                 float elapsedTime = 0;
-                while (elapsedTime < transitionDuration)
+                while (elapsedTime < transitionDuration && !isDestroyed && this != null && gameObject != null)
                 {
                     targetTransform.localScale = Vector3.Lerp(Vector3.zero, originalScale, elapsedTime / transitionDuration);
                     elapsedTime += Time.deltaTime;
                     yield return null;
                 }
 
-                targetTransform.localScale = originalScale;
+                if (!isDestroyed && targetTransform != null)
+                {
+                    targetTransform.localScale = originalScale;
+                }
             }
         }
         else
         {
             // Invocar evento de desactivación
-            onDeactivate?.Invoke();
+            try
+            {
+                onDeactivate?.Invoke();
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Error al invocar evento de desactivación: {e.Message}");
+            }
 
             // Efecto de salida
             CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
@@ -261,14 +285,13 @@ public class WorldStateListener : MonoBehaviour
                 canvasGroup.alpha = 1;
                 float elapsedTime = 0;
 
-                while (elapsedTime < transitionDuration)
+                while (elapsedTime < transitionDuration && !isDestroyed && this != null && gameObject != null)
                 {
                     canvasGroup.alpha = Mathf.Lerp(1, 0, elapsedTime / transitionDuration);
                     elapsedTime += Time.deltaTime;
                     yield return null;
                 }
             }
-            // Si no hay CanvasGroup, intentar otros efectos
             else
             {
                 // Opcional: Escala suave desde tamaño actual a 0
@@ -276,7 +299,7 @@ public class WorldStateListener : MonoBehaviour
                 Vector3 originalScale = targetTransform.localScale;
 
                 float elapsedTime = 0;
-                while (elapsedTime < transitionDuration)
+                while (elapsedTime < transitionDuration && !isDestroyed && this != null && gameObject != null)
                 {
                     targetTransform.localScale = Vector3.Lerp(originalScale, Vector3.zero, elapsedTime / transitionDuration);
                     elapsedTime += Time.deltaTime;
@@ -284,8 +307,11 @@ public class WorldStateListener : MonoBehaviour
                 }
             }
 
-            // Finalmente desactivar el objeto
-            gameObject.SetActive(false);
+            // Finalmente desactivar el objeto (solo si no está destruido)
+            if (!isDestroyed && this != null && gameObject != null)
+            {
+                gameObject.SetActive(false);
+            }
         }
     }
 }

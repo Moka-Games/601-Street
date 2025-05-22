@@ -53,11 +53,6 @@ public class CallScheduledCall : MonoBehaviour
         {
             Debug.LogError("CallScheduledCall: No se puede activar la llamada, CallManager no encontrado");
         }
-
-        /*if (destroyAfterTrigger)
-        {
-            Destroy(gameObject);
-        }*/
     }
 
     // Método que se llamará cuando termine la llamada
