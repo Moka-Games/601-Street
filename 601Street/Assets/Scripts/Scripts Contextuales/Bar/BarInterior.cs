@@ -1,28 +1,44 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class BarInterior : MonoBehaviour
 {
 
     public GameObject botella;
+    public GameObject misiónBotella;
     public GameObject activadorPolicias;
     public GameObject salida;
-    public GameObject códigoCajaFuerte;
 
+    public UnityEvent OnNakamuraEnded;
+    public GameStateController gameStateController;
+    [SerializeField] private string SiguienteEstado = "Nakamura_Interactuado";
     private void Start()
     {
         botella.SetActive(false);
         activadorPolicias.SetActive(false);
-        códigoCajaFuerte.SetActive(false);
     }
     public void ActivarBotella()
     {
         botella.SetActive(true);
+        misiónBotella.SetActive(true);
     }
 
     public void CambiarPolicias()
     {
         activadorPolicias.SetActive(true);
         salida.SetActive(true);
-        códigoCajaFuerte.SetActive(true);
+        OnNakamuraEnded.Invoke();
+        gameStateController.ChangeGameState(SiguienteEstado);
+        StartCoroutine(NoteWithDelay(1.5f));
+    }
+
+
+    private IEnumerator NoteWithDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        OnNakamuraEnded.Invoke();
+
     }
 }

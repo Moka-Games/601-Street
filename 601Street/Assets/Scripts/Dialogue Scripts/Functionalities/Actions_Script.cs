@@ -65,6 +65,7 @@ public class Actions_Script : MonoBehaviour
     public void ActivarObjetosPolicia1()
     {
         ComisariManager comisariaManager = FindAnyObjectByType<ComisariManager>();
+        comisariaManager.Policia_1_Interactuado();
     }
 
     public void ActivarObjetosPolicia2Fail()
@@ -98,11 +99,6 @@ public class Actions_Script : MonoBehaviour
         ComisariManager comisariaManager = FindAnyObjectByType<ComisariManager>();
 
         comisariaManager.ObjetosPostPoliciaFracaso();
-    }
-
-    public void ActivarLlamadaDaichiPostComisaria()
-    {
-        ComisariManager comisariaManager = FindAnyObjectByType<ComisariManager>();
     }
 
     public void QuemarCasaCall()

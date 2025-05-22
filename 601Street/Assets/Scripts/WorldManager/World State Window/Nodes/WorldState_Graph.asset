@@ -17,8 +17,8 @@ MonoBehaviour:
     name: InitialState_Colegio
     position:
       serializedVersion: 2
-      x: -3.149994
-      y: 244.5
+      x: 4.850006
+      y: 234.5
       width: 200
       height: 150
     activeObjectIDs:
@@ -38,7 +38,7 @@ MonoBehaviour:
     position:
       serializedVersion: 2
       x: 260.84998
-      y: 239.5
+      y: 235.5
       width: 200
       height: 150
     activeObjectIDs:
@@ -54,7 +54,7 @@ MonoBehaviour:
     name: Post Colegio
     position:
       serializedVersion: 2
-      x: 515.85
+      x: 516.85
       y: 236.5
       width: 200
       height: 150
@@ -85,15 +85,15 @@ MonoBehaviour:
     inactiveObjectIDs:
     - Eco
     connectedNodeIDs:
-    - Policia_nteractuado
+    - Policia_Interactuado
     isInitialNode: 0
     misionAsociada: {fileID: 11400000, guid: 38cc39fce7151f74f8ed131c20623fdd, type: 2}
     misionDelay: 0
-  - id: Policia_nteractuado
+  - id: Policia_Interactuado
     name: Policia Interactuado
     position:
       serializedVersion: 2
-      x: -3.0749512
+      x: -6.074951
       y: 470
       width: 200
       height: 150
@@ -110,7 +110,7 @@ MonoBehaviour:
     position:
       serializedVersion: 2
       x: 268.92502
-      y: 473
+      y: 474
       width: 200
       height: 150
     activeObjectIDs:
@@ -162,7 +162,7 @@ MonoBehaviour:
     name: Policia 2 Fracaso
     position:
       serializedVersion: 2
-      x: 563.4625
+      x: 562.4625
       y: 573.75
       width: 200
       height: 150
@@ -185,8 +185,8 @@ MonoBehaviour:
   - fromNodeID: Parque_Interacted
     toNodeID: Secta_Interacted
   - fromNodeID: Ordenador_Interactuado
-    toNodeID: Policia_nteractuado
-  - fromNodeID: Policia_nteractuado
+    toNodeID: Policia_Interactuado
+  - fromNodeID: Policia_Interactuado
     toNodeID: Nakamura_Interactuado
   - fromNodeID: Nakamura_Interactuado
     toNodeID: Policia_2_Exito
