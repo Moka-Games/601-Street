@@ -85,16 +85,16 @@ MonoBehaviour:
     inactiveObjectIDs:
     - Eco
     connectedNodeIDs:
-    - Policia _nteractuado
+    - Policia_nteractuado
     isInitialNode: 0
     misionAsociada: {fileID: 11400000, guid: 38cc39fce7151f74f8ed131c20623fdd, type: 2}
     misionDelay: 0
-  - id: Policia _nteractuado
+  - id: Policia_nteractuado
     name: Policia Interactuado
     position:
       serializedVersion: 2
       x: -3.0749512
-      y: 471
+      y: 470
       width: 200
       height: 150
     activeObjectIDs:
@@ -110,7 +110,7 @@ MonoBehaviour:
     position:
       serializedVersion: 2
       x: 268.92502
-      y: 472
+      y: 473
       width: 200
       height: 150
     activeObjectIDs:
@@ -185,8 +185,8 @@ MonoBehaviour:
   - fromNodeID: Parque_Interacted
     toNodeID: Secta_Interacted
   - fromNodeID: Ordenador_Interactuado
-    toNodeID: Policia _nteractuado
-  - fromNodeID: Policia _nteractuado
+    toNodeID: Policia_nteractuado
+  - fromNodeID: Policia_nteractuado
     toNodeID: Nakamura_Interactuado
   - fromNodeID: Nakamura_Interactuado
     toNodeID: Policia_2_Exito

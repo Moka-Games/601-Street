@@ -1964,8 +1964,8 @@ MonoBehaviour:
   "ganz\xFAa": {fileID: 1473272163}
   puertaCaja: {fileID: 504575326}
   "contrase\xF1a": {fileID: 0}
-  activadorPuertaBar: {fileID: 1201363637}
-  llamadaDaichi_Activator: {fileID: 2130022584}
+  activadorPuertaBar: {fileID: 0}
+  llamadaDaichi_Activator: {fileID: 0}
 --- !u!4 &583523088
 Transform:
   m_ObjectHideFlags: 0
@@ -2632,62 +2632,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -2746142260806068395, guid: 6f17625d27ddfa04997fb62231de7222, type: 3}
---- !u!1 &1201363637
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1201363639}
-  - component: {fileID: 1201363638}
-  m_Layer: 0
-  m_Name: Puerta-Bar
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1201363638
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1201363637}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa7eee6eb12ee9744b28c7b4d22b4e9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stateModifications:
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: MapaExterior
-    objectID: Puerta-Bar
-  activateOnStart: 1
-  activateOnInteract: 0
-  activateOnce: 0
-  forceImmediateUpdate: 1
---- !u!4 &1201363639
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1201363637}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.0738664, y: 0.094823785, z: -130.09807}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1228158078 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 224140955854437439, guid: 4b20f13d419e62548994c2f1b8936253,
@@ -3726,6 +3670,7 @@ GameObject:
   - component: {fileID: 1626415191}
   - component: {fileID: 1626415195}
   - component: {fileID: 1626415196}
+  - component: {fileID: 1626415198}
   m_Layer: 0
   m_Name: Policia_1
   m_TagString: Untagged
@@ -3778,7 +3723,19 @@ MonoBehaviour:
   singleInteraction: 0
   OnConversationEnded:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1626415198}
+        m_TargetAssemblyTypeName: GameStateController, Assembly-CSharp
+        m_MethodName: ChangeGameState
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Policia_nteractuado
+          m_BoolArgument: 1
+        m_CallState: 2
 --- !u!23 &1626415192
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3910,6 +3867,18 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -5495902117074765545, guid: 0c466efab4640c84d9cf56e52fe3b422, type: 3}
+--- !u!114 &1626415198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1626415189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4772c18ba1c9549bb1e6e3a8501188, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1636692843
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4250,7 +4219,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1771493771
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4966,76 +4935,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 2092719801}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2130022584
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2130022586}
-  - component: {fileID: 2130022585}
-  m_Layer: 0
-  m_Name: Daichi_Call_Activator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &2130022585
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2130022584}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa7eee6eb12ee9744b28c7b4d22b4e9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stateModifications:
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: MapaExterior
-    objectID: Daichi_Call_PostComisaria
-  - type: 4
-    stateID: 
-    flagValue: 0
-    counterValue: 0
-    stringValue: 
-    objectSceneName: CasaNyssa
-    objectID: Ordenador_1_CasaNyysa
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: CasaNyssa
-    objectID: Ordenador_2_CasaNyysa
-  activateOnStart: 1
-  activateOnInteract: 0
-  activateOnce: 0
-  forceImmediateUpdate: 1
---- !u!4 &2130022586
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2130022584}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -15.526601, y: 1.280484, z: -13.175797}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2136340152
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5979,12 +5878,12 @@ PrefabInstance:
         type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 2130022584}
+      objectReference: {fileID: 0}
     - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
         type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
-      objectReference: {fileID: 2130022584}
+      objectReference: {fileID: 0}
     - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
         type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -9404,5 +9303,3 @@ SceneRoots:
   - {fileID: 1426775456}
   - {fileID: 604789288}
   - {fileID: 279673293}
-  - {fileID: 2130022586}
-  - {fileID: 1201363639}

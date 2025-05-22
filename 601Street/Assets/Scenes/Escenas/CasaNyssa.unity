@@ -6871,8 +6871,8 @@ GameObject:
   - component: {fileID: 2056939751}
   - component: {fileID: 2056939753}
   - component: {fileID: 2056939754}
-  - component: {fileID: 2056939755}
   - component: {fileID: 2056939756}
+  - component: {fileID: 2056939757}
   m_Layer: 6
   m_Name: OrdenadorCorreo_1
   m_TagString: Untagged
@@ -6934,18 +6934,6 @@ MonoBehaviour:
   onInteraction:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2056939755}
-        m_TargetAssemblyTypeName: WorldStateActivator, Assembly-CSharp
-        m_MethodName: OnInteract
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 2056939756}
         m_TargetAssemblyTypeName: FreezeOnInteract, Assembly-CSharp
         m_MethodName: OnInteractOpenAndFreeze
@@ -6956,6 +6944,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2056939757}
+        m_TargetAssemblyTypeName: GameStateController, Assembly-CSharp
+        m_MethodName: ChangeGameState
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Ordenador_Interactuado
           m_BoolArgument: 0
         m_CallState: 2
   onInteracted:
@@ -6980,37 +6980,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textoPensamiento: 'It has been 6 days since this message, I should go to the police
     station. '
---- !u!114 &2056939755
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2056939750}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa7eee6eb12ee9744b28c7b4d22b4e9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stateModifications:
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: MapaExterior
-    objectID: Mision-Post-Casa-1
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: MapaExterior
-    objectID: Salida_Bar
-  activateOnStart: 0
-  activateOnInteract: 1
-  activateOnce: 0
-  forceImmediateUpdate: 1
 --- !u!114 &2056939756
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7026,6 +6995,18 @@ MonoBehaviour:
   freezePlayerMovement: 1
   freezeCamera: 1
   showDebugMessages: 1
+--- !u!114 &2056939757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056939750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4772c18ba1c9549bb1e6e3a8501188, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2073145269 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4067818517711116892, guid: 17db0cd694e84cf49b9fc0c842e6dc4d,
