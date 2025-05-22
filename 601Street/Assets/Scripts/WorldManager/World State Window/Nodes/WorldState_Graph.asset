@@ -17,7 +17,7 @@ MonoBehaviour:
     name: InitialState_Colegio
     position:
       serializedVersion: 2
-      x: -0.1499939
+      x: -3.149994
       y: 244.5
       width: 200
       height: 150
@@ -43,7 +43,6 @@ MonoBehaviour:
       height: 150
     activeObjectIDs:
     - Salida_2
-    - Mision_Salida_Colegio
     - Salida_1
     inactiveObjectIDs: []
     connectedNodeIDs:
@@ -56,11 +55,10 @@ MonoBehaviour:
     position:
       serializedVersion: 2
       x: 515.85
-      y: 238.5
+      y: 236.5
       width: 200
       height: 150
     activeObjectIDs:
-    - Mision_Post_Colegio
     - Eco
     - Entrada_Casa_Nyssa
     - Llamada_Daichi_Post_Colegio
@@ -83,7 +81,6 @@ MonoBehaviour:
       height: 150
     activeObjectIDs:
     - Entrada_Comisaria
-    - Mision_Comisaria
     - Policia_1
     inactiveObjectIDs:
     - Eco
@@ -96,13 +93,12 @@ MonoBehaviour:
     name: Policia Interactuado
     position:
       serializedVersion: 2
-      x: -4.074951
+      x: -3.0749512
       y: 471
       width: 200
       height: 150
     activeObjectIDs:
     - Entrada_Bar
-    - Mision_Bar
     inactiveObjectIDs: []
     connectedNodeIDs:
     - Nakamura_Interactuado
@@ -120,7 +116,6 @@ MonoBehaviour:
     activeObjectIDs:
     - Policia_2
     - "Contrase\xF1a_Caja_Fuerte"
-    - Mision_Volver_Comisaria
     inactiveObjectIDs:
     - Policia_1
     connectedNodeIDs:
@@ -138,10 +133,8 @@ MonoBehaviour:
       width: 200
       height: 150
     activeObjectIDs:
-    - "Cap\xEDtulo_1_Terminado"
     - "Cap\xEDtulo_2_Comenzado"
     - Ordenador_2
-    - Mision_Volver_Casa
     inactiveObjectIDs:
     - Ordenador_1
     connectedNodeIDs: []
@@ -169,7 +162,7 @@ MonoBehaviour:
     name: Policia 2 Fracaso
     position:
       serializedVersion: 2
-      x: 559.4625
+      x: 563.4625
       y: 573.75
       width: 200
       height: 150
