@@ -3,21 +3,19 @@ using UnityEngine.Events;
 using TMPro;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 /// <summary>
-/// Versión mejorada del gestor de inventario que soporta persistencia entre escenas
-/// y prefabs de interacción
+/// Versión mejorada del gestor de inventario que soporta persistencia entre escenas,
+/// prefabs de interacción e integración con el Input System
 /// </summary>
 public class Inventory_Manager : MonoBehaviour
 {
     public static Inventory_Manager Instance;
 
-    public KeyCode inventoryKey;
-
+    [Header("Inventory UI")]
     public Transform noteContainer;
     public Transform objectContainer;
-
-    [Header("Inventory UI")]
     public GameObject InventoryInterface;
     public GameObject noteTemplate;
     public GameObject objectTemplate;
@@ -43,6 +41,10 @@ public class Inventory_Manager : MonoBehaviour
     [Tooltip("Si está marcado, bloqueará automáticamente la cámara durante las interacciones")]
     public bool blockCameraDuringInteraction = true;
 
+    // Input System
+    private PlayerControls playerControls;
+    private InputAction toggleInventoryAction;
+
     // Control de estado para saber por qué están bloqueados
     private bool blockedByInventory = false;
     private bool blockedByInteraction = false;
@@ -50,6 +52,7 @@ public class Inventory_Manager : MonoBehaviour
     // Referencias para bloquear al jugador y la cámara
     private PlayerController playerController;
     private Camera_Script cameraScript;
+
     // Listas y diccionarios para mantener el inventario
     private List<ItemData> inventoryItems = new List<ItemData>();
     private Dictionary<ItemData, PrefabInteractionData> itemInteractions = new Dictionary<ItemData, PrefabInteractionData>();
@@ -85,7 +88,40 @@ public class Inventory_Manager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
         }
+
+        // Inicializar Input System
+        InitializeInputSystem();
+    }
+
+    private void InitializeInputSystem()
+    {
+        playerControls = new PlayerControls();
+        toggleInventoryAction = playerControls.Gameplay.ToggleInventory;
+
+        // Suscribirse al evento de toggle inventory
+        toggleInventoryAction.performed += OnToggleInventoryInput;
+    }
+
+    private void OnEnable()
+    {
+        playerControls?.Gameplay.Enable();
+    }
+
+    private void OnDisable()
+    {
+        playerControls?.Gameplay.Disable();
+    }
+
+    private void OnDestroy()
+    {
+        if (toggleInventoryAction != null)
+        {
+            toggleInventoryAction.performed -= OnToggleInventoryInput;
+        }
+
+        playerControls?.Dispose();
     }
 
     private void Start()
@@ -107,6 +143,12 @@ public class Inventory_Manager : MonoBehaviour
             Debug.LogWarning("No se encontró Camera_Script en la escena. No se podrá bloquear la cámara.");
     }
 
+    // Callback para el Input System
+    private void OnToggleInventoryInput(InputAction.CallbackContext context)
+    {
+        ToggleInventory();
+    }
+
     /// <summary>
     /// Asegura que el contenedor de prefabs exista y persista entre escenas
     /// </summary>
@@ -116,12 +158,11 @@ public class Inventory_Manager : MonoBehaviour
         {
             GameObject containerObj = new GameObject("PrefabContainer");
             prefabContainer = containerObj.transform;
-            prefabContainer.SetParent(transform); // Hacerlo hijo de este objeto que ya usa DontDestroyOnLoad
+            prefabContainer.SetParent(transform);
             Debug.Log("PrefabContainer creado y configurado para persistir entre escenas");
         }
         else if (prefabContainer.parent != transform)
         {
-            // Hacer que el prefabContainer existente sea hijo de este objeto para que persista
             prefabContainer.SetParent(transform);
             Debug.Log("PrefabContainer existente configurado para persistir entre escenas");
         }
@@ -129,18 +170,13 @@ public class Inventory_Manager : MonoBehaviour
 
     private void Update()
     {
-        // Abrir/cerrar inventario
-        if (Input.GetKeyDown(inventoryKey))
-        {
-            ToggleInventory();
-        }
-
         // Actualizar estado del popup
         if (popUpParent.activeSelf && Time.time - lastPickUpTime >= popUpDuration)
         {
             popUpParent.SetActive(false);
         }
     }
+
     public void ToggleInventory()
     {
         inventoryOpened = !inventoryOpened;
@@ -365,7 +401,7 @@ public class Inventory_Manager : MonoBehaviour
                 // Destruir el objeto activo
                 DestroyActiveInteractionObject();
 
-                // CAMBIO: Mostrar popup SOLO si era un ítem recién añadido
+                // Mostrar popup SOLO si era un ítem recién añadido
                 if (wasNewItem)
                 {
                     DisplayPopUp(lastAddedItemName + " added");
@@ -478,44 +514,10 @@ public class Inventory_Manager : MonoBehaviour
     {
         return inventoryItems.Exists(item => item.itemName == itemName);
     }
-    
-    /// <summary>
-     /// Bloquea al jugador y/o la cámara según la configuración
-     /// </summary>
-    private void BlockPlayerAndCamera()
-    {
-        if (blockPlayerDuringInteraction && playerController != null)
-        {
-            playerController.SetMovementEnabled(false);
-            Debug.Log("Movimiento del jugador bloqueado durante interacción");
-        }
-
-        if (blockCameraDuringInteraction && cameraScript != null)
-        {
-            cameraScript.FreezeCamera();
-            Debug.Log("Cámara bloqueada durante interacción");
-        }
-    }
 
     /// <summary>
-    /// Desbloquea al jugador y/o la cámara
+    /// Bloquea al jugador y/o la cámara por razón de inventario
     /// </summary>
-    private void UnblockPlayerAndCamera()
-    {
-        if (blockPlayerDuringInteraction && playerController != null)
-        {
-            playerController.SetMovementEnabled(true);
-            Debug.Log("Movimiento del jugador desbloqueado tras interacción");
-        }
-
-        if (blockCameraDuringInteraction && cameraScript != null)
-        {
-            cameraScript.UnfreezeCamera();
-            Debug.Log("Cámara desbloqueada tras interacción");
-        }
-    }/// <summary>
-     /// Bloquea al jugador y/o la cámara por razón de inventario
-     /// </summary>
     private void BlockPlayerAndCameraForInventory()
     {
         blockedByInventory = true;
@@ -530,6 +532,7 @@ public class Inventory_Manager : MonoBehaviour
         blockedByInteraction = true;
         ApplyBlockingState();
     }
+
     private void UnblockPlayerAndCameraFromInventory()
     {
         blockedByInventory = false;
@@ -552,10 +555,10 @@ public class Inventory_Manager : MonoBehaviour
             ApplyUnblockingState();
         }
     }
-    
+
     /// <summary>
-     /// Aplica el estado de bloqueo al jugador y la cámara
-     /// </summary>
+    /// Aplica el estado de bloqueo al jugador y la cámara
+    /// </summary>
     private void ApplyBlockingState()
     {
         if (blockPlayerDuringInteraction && playerController != null)
@@ -568,10 +571,10 @@ public class Inventory_Manager : MonoBehaviour
             cameraScript.FreezeCamera();
         }
     }
-    
+
     /// <summary>
-     /// Aplica el estado de desbloqueo al jugador y la cámara
-     /// </summary>
+    /// Aplica el estado de desbloqueo al jugador y la cámara
+    /// </summary>
     private void ApplyUnblockingState()
     {
         if (playerController != null)
@@ -583,5 +586,13 @@ public class Inventory_Manager : MonoBehaviour
         {
             cameraScript.UnfreezeCamera();
         }
+    }
+
+    /// <summary>
+    /// Obtiene el estado actual del inventario
+    /// </summary>
+    public bool IsInventoryOpen()
+    {
+        return inventoryOpened;
     }
 }

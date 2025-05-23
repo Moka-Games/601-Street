@@ -423,7 +423,6 @@ MonoBehaviour:
   callerNameText: {fileID: 2087714239}
   callerDescriptionText: {fileID: 298243095}
   callerAvatarImage: {fileID: 848439732}
-  acceptCallKey: 102
   showPopupAnimName: ShowCallPopup
   hidePopupAnimName: HideCallPopup
   popupDuration: 15
@@ -1012,6 +1011,11 @@ PrefabInstance:
     - target: {fileID: 3562500195166490893, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
       propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3754790435304779438, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3754790435304779438, guid: c33191c6797853f4d8cb4de889205796,
@@ -2684,7 +2688,7 @@ PrefabInstance:
     - target: {fileID: 7812203262356441411, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
       propertyPath: gamepadLookSpeed
-      value: 175
+      value: 350
       objectReference: {fileID: 0}
     - target: {fileID: 7812203262356441411, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
@@ -4972,7 +4976,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ecc532e4c745864aa7a558df0fc2d96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inventoryKey: 116
   noteContainer: {fileID: 1756287153}
   objectContainer: {fileID: 1756287152}
   InventoryInterface: {fileID: 1756287151}
@@ -5985,7 +5988,6 @@ MonoBehaviour:
   pauseMenuUI: {fileID: 5941675162426853521}
   controlsUI: {fileID: 3099917954148361430}
   mainMenuSceneName: InitialMenu
-  pauseKey: 27
   delayBeforeSceneChange: 0.5
 --- !u!1 &5941675162426853521 stripped
 GameObject:

@@ -129,7 +129,7 @@ MonoBehaviour:
     position:
       serializedVersion: 2
       x: 850.4625
-      y: 477.75
+      y: 476.75
       width: 200
       height: 150
     activeObjectIDs:
@@ -137,7 +137,8 @@ MonoBehaviour:
     - Ordenador_2
     inactiveObjectIDs:
     - Ordenador_1
-    connectedNodeIDs: []
+    connectedNodeIDs:
+    - Post-Comisaria-2
     isInitialNode: 0
     misionAsociada: {fileID: 11400000, guid: be735b46b3f149f45a4cc0132587e419, type: 2}
     misionDelay: 0
@@ -162,7 +163,7 @@ MonoBehaviour:
     name: Policia 2 Fracaso
     position:
       serializedVersion: 2
-      x: 562.4625
+      x: 560.4625
       y: 573.75
       width: 200
       height: 150
@@ -172,6 +173,21 @@ MonoBehaviour:
     inactiveObjectIDs: []
     connectedNodeIDs:
     - "Cap\xEDtulo_1_Completado"
+    isInitialNode: 0
+    misionAsociada: {fileID: 0}
+    misionDelay: 0
+  - id: Post-Comisaria-2
+    name: Post Comisaria Cap 2
+    position:
+      serializedVersion: 2
+      x: -4.90625
+      y: 769.625
+      width: 200
+      height: 150
+    activeObjectIDs: []
+    inactiveObjectIDs:
+    - "Cap\xEDtulo_2_Comenzado"
+    connectedNodeIDs: []
     isInitialNode: 0
     misionAsociada: {fileID: 0}
     misionDelay: 0
@@ -196,4 +212,6 @@ MonoBehaviour:
     toNodeID: "Cap\xEDtulo_1_Completado"
   - fromNodeID: Policia_2_Fracaso
     toNodeID: "Cap\xEDtulo_1_Completado"
+  - fromNodeID: "Cap\xEDtulo_1_Completado"
+    toNodeID: Post-Comisaria-2
   initialNodeID: InitialState_Colegio

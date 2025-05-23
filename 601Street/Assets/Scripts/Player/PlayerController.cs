@@ -10,70 +10,69 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
     [SerializeField] private float gravity = -9.81f;
     [SerializeField] private float movementThreshold = 0.1f;
 
+    [Header("Gamepad Movement Settings")]
+    [Tooltip("Zona muerta para el stick de movimiento del gamepad")]
+    [Range(0f, 1f)]
+    [SerializeField] private float gamepadMovementDeadzone = 0.15f;
+
+    [Tooltip("Multiplicador de velocidad cuando se usa gamepad")]
+    [SerializeField] private float gamepadSpeedMultiplier = 1f;
+
+    [Tooltip("Curva de aceleración para el movimiento con gamepad")]
+    [SerializeField] private AnimationCurve gamepadMovementCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
+    [Tooltip("Velocidad de parada cuando no hay input (más alto = para más rápido)")]
+    [SerializeField] private float gamepadStopSpeed = 10f;
+
     [Header("Rotation Settings")]
-    [SerializeField] private float baseRotationSpeed = 5f;
-    [SerializeField] private float initialRotationMultiplier = 0.5f;
-    [SerializeField] private float transitionRotationMultiplier = 0.3f;
-    [SerializeField] private float diagonalRotationAngle = 45f;
-    [SerializeField] private float rotationThreshold = 0.1f;
+    [SerializeField] private float rotationSpeed = 8f;
+    [Tooltip("Si está activado, el personaje rotará hacia la dirección de movimiento")]
+    [SerializeField] private bool rotateTowardsMovement = true;
 
     [Header("Required Components")]
     [SerializeField] private CharacterController characterController;
-
-    // New Input System
-    private PlayerControls playerControls;
-    private Vector2 currentMovementInput;
-    private bool isSprinting = false;
-
-    private MovementState movementState;
-    private RotationState rotationState;
-    private Camera mainCamera;
 
     [Header("Animation")]
     private Animator animator;
     [SerializeField] private float animationSmoothTime = 0.1f;
     [SerializeField] private float afkTimeThreshold = 30f;
 
+    // New Input System
+    private PlayerControls playerControls;
+    private Vector2 currentMovementInput;
+    private Vector2 rawMovementInput;
+    private bool isSprinting = false;
+    private bool isUsingGamepad = false;
 
+    private MovementState movementState;
+    private Camera mainCamera;
+
+    // Animation hashes
     private int isWalkingHash;
     private int isRunningHash;
     private int isWalkingBackHash;
-    private int isWalkingLeftHash;
-    private int isWalkingRightHash;
-    private int triggerAfkHash; 
+    private int triggerAfkHash;
 
-
+    // Animation states
     private bool isWalking = false;
     private bool isRunning = false;
     private bool isWalkingBack = false;
-    private bool isWalkingLeft = false;
-    private bool isWalkingRight = false;
 
+    // AFK system
     private bool isPlayingAfkAnimation = false;
     private float inactivityTimer = 0f;
     private bool isAfk = false;
 
-    private Vector3 fixedRightDirection; // Dirección "derecha" inicial
-    private Vector3 fixedLeftDirection;  // Dirección "izquierda" inicial
-    private bool isMovingPurelyHorizontal = false; // Indica si el movimiento es puramente horizontal
-    private bool lastMoveWasHorizontal = false;    // Indica si el último movimiento fue horizontal
-    private float lastHorizontalInput = 0f;
+    // Gamepad-specific variables
+    private Vector2 smoothedGamepadInput;
+    private float gamepadInputSmoothTime = 0.1f;
+
     private struct MovementState
     {
         public Vector3 Velocity;
         public Vector3 MoveDirection;
         public bool IsMoving;
         public float CurrentSpeed;
-    }
-
-    private struct RotationState
-    {
-        public bool ForwardPressed;
-        public bool HorizontalPressedAfterForward;
-        public bool WasMovingForwardAndHorizontal;
-        public bool IsTransitioning;
-        public float CurrentRotationSpeed;
-        public Quaternion TargetRotation;
     }
 
     private void Awake()
@@ -84,66 +83,164 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
 
         InitializeComponents();
         InitializeStates();
+        InitializeAnimationHashes();
+    }
 
+    private void InitializeAnimationHashes()
+    {
         isWalkingHash = Animator.StringToHash("isWalking");
         isRunningHash = Animator.StringToHash("isRunning");
         isWalkingBackHash = Animator.StringToHash("isWalkingBack");
-        isWalkingLeftHash = Animator.StringToHash("isWalkingLeft");
-        isWalkingRightHash = Animator.StringToHash("isWalkingRight");
         triggerAfkHash = Animator.StringToHash("triggerAfk");
-
     }
 
     private void OnEnable()
     {
-        // Enable the input actions
         playerControls.Gameplay.Enable();
     }
 
     private void OnDisable()
     {
-        // Disable the input actions
         playerControls.Gameplay.Disable();
     }
 
     private void OnDestroy()
     {
-        // Dispose of the input action asset
         playerControls.Dispose();
     }
 
-    // Input System callbacks implementation
+    #region Input System Callbacks
+
     public void OnWalking(InputAction.CallbackContext context)
     {
-        currentMovementInput = context.ReadValue<Vector2>();
+        if (context.canceled)
+        {
+            // Cuando se cancela el input, resetear inmediatamente
+            rawMovementInput = Vector2.zero;
+            if (!isUsingGamepad)
+            {
+                currentMovementInput = Vector2.zero;
+            }
+        }
+        else
+        {
+            rawMovementInput = context.ReadValue<Vector2>();
+        }
+
+        isUsingGamepad = IsCurrentlyUsingGamepad();
+
+        // Procesar el input según el dispositivo
+        if (isUsingGamepad)
+        {
+            ProcessGamepadMovementInput();
+        }
+        else
+        {
+            currentMovementInput = rawMovementInput;
+        }
     }
 
     public void OnSprint(InputAction.CallbackContext context)
     {
-        // For a button action, we can check if it's pressed using ReadValueAsButton()
         isSprinting = context.ReadValueAsButton();
     }
 
     public void OnInteract(InputAction.CallbackContext context)
     {
-        // Este método necesita ser implementado debido a la interfaz,
-        // pero la lógica real está en PlayerInteraction
+        // Este método se implementa en PlayerInteraction
+        // Lo dejamos vacío aquí para cumplir con la interfaz
     }
 
     public void OnLook(InputAction.CallbackContext context)
     {
         // La lógica de rotación de cámara se maneja en el FreeLookCameraController
-        // Si no existe ese script, esta implementación vacía evita el error
+        // Lo dejamos vacío aquí para cumplir con la interfaz
+    }
+
+    // Nuevos métodos requeridos por la interfaz (no los usa PlayerController)
+    public void OnAcceptCall(InputAction.CallbackContext context)
+    {
+        // No se usa en PlayerController - se maneja en CallSystem
+    }
+
+    public void OnToggleInventory(InputAction.CallbackContext context)
+    {
+        // No se usa en PlayerController - se maneja en Inventory_Manager
+    }
+
+    public void OnPause(InputAction.CallbackContext context)
+    {
+        // No se usa en PlayerController - se maneja en PauseMenu
+    }
+
+    #endregion
+
+    private bool IsCurrentlyUsingGamepad()
+    {
+        if (Gamepad.current != null)
+        {
+            // Verificar si el input actual viene del gamepad
+            return rawMovementInput.magnitude > 0.01f &&
+                   (Gamepad.current.leftStick.ReadValue().magnitude > 0.01f ||
+                    Gamepad.current.wasUpdatedThisFrame);
+        }
+        return false;
+    }
+
+    private void ProcessGamepadMovementInput()
+    {
+        // Aplicar zona muerta circular
+        Vector2 processedInput = ApplyCircularDeadzone(rawMovementInput, gamepadMovementDeadzone);
+
+        // Si no hay input significativo, detener inmediatamente
+        if (processedInput.magnitude < 0.01f)
+        {
+            // Detener rápidamente pero suavemente
+            smoothedGamepadInput = Vector2.Lerp(smoothedGamepadInput, Vector2.zero,
+                Time.unscaledDeltaTime * gamepadStopSpeed);
+
+            // Si ya estamos muy cerca de cero, forzar a cero
+            if (smoothedGamepadInput.magnitude < 0.05f)
+            {
+                smoothedGamepadInput = Vector2.zero;
+            }
+        }
+        else
+        {
+            // Aplicar curva de respuesta para movimiento más natural
+            float magnitude = processedInput.magnitude;
+            float curveValue = gamepadMovementCurve.Evaluate(magnitude);
+            processedInput = processedInput.normalized * curveValue * gamepadSpeedMultiplier;
+
+            // Suavizar el input del gamepad para movimiento más fluido
+            smoothedGamepadInput = Vector2.Lerp(smoothedGamepadInput, processedInput,
+                Time.unscaledDeltaTime / gamepadInputSmoothTime);
+        }
+
+        currentMovementInput = smoothedGamepadInput;
+    }
+
+    private Vector2 ApplyCircularDeadzone(Vector2 input, float deadzone)
+    {
+        float magnitude = input.magnitude;
+
+        if (magnitude < deadzone)
+        {
+            return Vector2.zero;
+        }
+
+        // Remapear el rango [deadzone, 1] a [0, 1]
+        float normalizedMagnitude = (magnitude - deadzone) / (1f - deadzone);
+        return input.normalized * normalizedMagnitude;
     }
 
     private void InitializeComponents()
     {
         mainCamera = Camera.main;
 
-        // Si el animator no está asignado, intentar obtenerlo
         if (!animator) animator = GetComponent<Animator>();
-
         if (!characterController) characterController = GetComponent<CharacterController>();
+
         if (!characterController) Debug.LogError($"CharacterController not found on {gameObject.name}!");
         if (!animator) Debug.LogWarning($"Animator not assigned on {gameObject.name}");
     }
@@ -157,19 +254,16 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
             IsMoving = false,
             CurrentSpeed = baseSpeed
         };
-
-        rotationState = new RotationState
-        {
-            ForwardPressed = false,
-            HorizontalPressedAfterForward = false,
-            WasMovingForwardAndHorizontal = false,
-            IsTransitioning = false,
-            CurrentRotationSpeed = baseRotationSpeed,
-            TargetRotation = transform.rotation
-        };
     }
+
     private void Update()
     {
+        // Procesar input de gamepad continuamente para manejo de parada suave
+        if (isUsingGamepad)
+        {
+            ProcessGamepadMovementInput();
+        }
+
         UpdateAnimationState();
         CheckInactivity();
     }
@@ -179,259 +273,72 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
         // Verificar si el CharacterController está habilitado antes de ejecutar la lógica
         if (characterController == null || !characterController.enabled || !gameObject.activeInHierarchy)
         {
-            return; // No ejecutar la lógica de movimiento si el controller está desactivado
-        }
-
-        // Use the input from the Input System
-        Vector2 input = currentMovementInput;
-
-        UpdateMovement(input);
-        UpdateRotation(input);
-        ApplyGravity();
-    }
-
-    private void UpdateMovement(Vector2 input)
-    {
-        // Verificación adicional por seguridad
-        if (!characterController.enabled) return;
-
-        (Vector3 forward, Vector3 right) = GetCameraDirections();
-
-        // Detectar si estamos empezando un movimiento puramente horizontal
-        bool isPurelyHorizontal = Mathf.Abs(input.x) > movementThreshold && Mathf.Abs(input.y) < movementThreshold;
-
-        // Si acabamos de empezar un movimiento puramente horizontal
-        if (isPurelyHorizontal && !lastMoveWasHorizontal)
-        {
-            // Guardar la dirección inicial
-            fixedRightDirection = right;
-            fixedLeftDirection = -right;
-            isMovingPurelyHorizontal = true;
-        }
-        // Si hemos dejado de movernos horizontalmente o hemos añadido movimiento vertical
-        else if (!isPurelyHorizontal)
-        {
-            isMovingPurelyHorizontal = false;
-        }
-
-        // Actualizar el estado del movimiento
-        lastMoveWasHorizontal = isPurelyHorizontal;
-
-        // Calcular dirección de movimiento, usando direcciones fijas si es necesario
-        movementState.MoveDirection = CalculateMoveDirection(input, forward, right);
-        movementState.IsMoving = movementState.MoveDirection.magnitude > movementThreshold;
-        movementState.CurrentSpeed = CalculateCurrentSpeed(input.y);
-
-        if (movementState.IsMoving && characterController.enabled)
-        {
-            characterController.Move(movementState.MoveDirection * movementState.CurrentSpeed * Time.deltaTime);
-        }
-
-        // Guardar el input horizontal para la próxima comparación
-        if (Mathf.Abs(input.x) > movementThreshold)
-            lastHorizontalInput = input.x;
-    }
-
-    private (Vector3 forward, Vector3 right) GetCameraDirections()
-    {
-        Vector3 forward = mainCamera.transform.forward;
-        Vector3 right = mainCamera.transform.right;
-
-        forward.y = 0f;
-        right.y = 0f;
-
-        return (forward.normalized, right.normalized);
-    }
-
-    private Vector3 CalculateMoveDirection(Vector2 input, Vector3 forward, Vector3 right)
-    {
-        Vector3 direction = Vector3.zero;
-
-        // Si estamos en movimiento puramente horizontal y tenemos direcciones fijas
-        if (isMovingPurelyHorizontal && fixedRightDirection != Vector3.zero)
-        {
-            // Usar la dirección fija según el signo del input
-            if (input.x > 0)
-                direction = fixedRightDirection * input.x;
-            else
-                direction = fixedLeftDirection * -input.x; // Negativo porque fixedLeftDirection ya es negativa
-        }
-        else
-        {
-            // Comportamiento original para movimiento no puramente horizontal
-            direction = right * input.x;
-
-            if (input.y > 0)
-            {
-                direction += forward * input.y;
-            }
-            else if (input.y < 0)
-            {
-                direction += -forward * Mathf.Abs(input.y);
-            }
-        }
-
-        return direction;
-    }
-
-    private float CalculateCurrentSpeed(float verticalInput)
-    {
-        // Use the sprint status from the Input System instead of the old Input.GetKey
-        if (verticalInput > 0 && isSprinting && Mathf.Approximately(currentMovementInput.x, 0))
-        {
-            return sprintSpeed;
-        }
-        else if (verticalInput < 0)
-        {
-            return baseSpeed * backwardsSpeedMultiplier;
-        }
-        return baseSpeed;
-    }
-
-    private void UpdateRotation(Vector2 input)
-    {
-        // Si no hay movimiento o es SOLO movimiento horizontal, no rotamos
-        if (!movementState.IsMoving || IsPurelyHorizontalMovement(input))
-        {
-            // Mantener la rotación actual del personaje
-            rotationState.TargetRotation = transform.rotation;
             return;
         }
 
-        // Solo procesamos rotación si hay movimiento vertical o diagonal
-        HandleRotationStates(input);
-        ApplyRotation();
-        CheckRotationCompletion();
+        UpdateMovement();
+        UpdateRotation();
+        ApplyGravity();
     }
 
-    private void HandleRotationStates(Vector2 input)
+    private void UpdateMovement()
     {
-        if (input.y != 0)
+        if (!characterController.enabled) return;
+
+        // Obtener direcciones de la cámara
+        Vector3 cameraForward = mainCamera.transform.forward;
+        Vector3 cameraRight = mainCamera.transform.right;
+
+        // Proyectar en el plano horizontal
+        cameraForward.y = 0f;
+        cameraRight.y = 0f;
+        cameraForward.Normalize();
+        cameraRight.Normalize();
+
+        // Calcular dirección de movimiento basada en el input y la cámara
+        movementState.MoveDirection = (cameraForward * currentMovementInput.y + cameraRight * currentMovementInput.x).normalized;
+        movementState.IsMoving = currentMovementInput.magnitude > movementThreshold;
+
+        // Calcular velocidad
+        movementState.CurrentSpeed = CalculateCurrentSpeed();
+
+        // Aplicar movimiento
+        if (movementState.IsMoving && characterController.enabled)
         {
-            HandleVerticalRotation(input);
-        }
-        else
-        {
-            HandleHorizontalOnlyRotation(input.x);
+            Vector3 moveVector = movementState.MoveDirection * movementState.CurrentSpeed * Time.deltaTime;
+            characterController.Move(moveVector);
         }
     }
 
-    private void HandleVerticalRotation(Vector2 input)
+    private void UpdateRotation()
     {
-        if (!rotationState.ForwardPressed)
+        if (!rotateTowardsMovement || !movementState.IsMoving) return;
+
+        if (movementState.MoveDirection != Vector3.zero)
         {
-            InitializeForwardMovement();
-        }
+            // Detectar si se está moviendo hacia atrás
+            bool isMovingBackward = currentMovementInput.y < -0.1f;
 
-        if (input.x != 0)
-        {
-            HandleDiagonalMovement(input);
-        }
-        else
-        {
-            HandleStraightMovement(input.y);
-        }
-    }
+            Quaternion targetRotation;
 
-    private void InitializeForwardMovement()
-    {
-        rotationState.ForwardPressed = true;
-        rotationState.HorizontalPressedAfterForward = false;
-        rotationState.WasMovingForwardAndHorizontal = false;
-        rotationState.IsTransitioning = true;
-        rotationState.CurrentRotationSpeed = baseRotationSpeed * initialRotationMultiplier;
-    }
-
-    private void HandleDiagonalMovement(Vector2 input)
-    {
-        rotationState.HorizontalPressedAfterForward = true;
-        rotationState.WasMovingForwardAndHorizontal = true;
-
-        Vector3 forward = mainCamera.transform.forward;
-        forward.y = 0;
-        forward.Normalize();
-
-        if (input.y < 0)
-        {
-            rotationState.TargetRotation = Quaternion.LookRotation(forward);
-            rotationState.TargetRotation *= Quaternion.Euler(0, -diagonalRotationAngle * Mathf.Sign(input.x), 0);
-        }
-        else
-        {
-            Vector3 rotatedDirection = Quaternion.Euler(0, diagonalRotationAngle * Mathf.Sign(input.x), 0) * forward;
-            rotationState.TargetRotation = Quaternion.LookRotation(rotatedDirection);
-        }
-
-        rotationState.CurrentRotationSpeed = Mathf.Lerp(rotationState.CurrentRotationSpeed, baseRotationSpeed, Time.deltaTime);
-    }
-
-    private void HandleStraightMovement(float verticalInput)
-    {
-        Vector3 forward = mainCamera.transform.forward;
-        forward.y = 0;
-        forward.Normalize();
-
-        rotationState.TargetRotation = Quaternion.LookRotation(forward);
-        rotationState.HorizontalPressedAfterForward = false;
-        rotationState.CurrentRotationSpeed = Mathf.Lerp(rotationState.CurrentRotationSpeed, baseRotationSpeed, Time.deltaTime);
-    }
-
-    private void HandleHorizontalOnlyRotation(float horizontalInput)
-    {
-        if (rotationState.WasMovingForwardAndHorizontal && horizontalInput != 0)
-        {
-            if (!rotationState.IsTransitioning)
+            if (isMovingBackward)
             {
-                rotationState.IsTransitioning = true;
-                rotationState.CurrentRotationSpeed = baseRotationSpeed * transitionRotationMultiplier;
+                // Para movimiento hacia atrás: la espalda debe apuntar hacia la dirección de movimiento
+                // Esto significa que el frente (cara) debe apuntar en la dirección OPUESTA
+                targetRotation = Quaternion.LookRotation(-movementState.MoveDirection);
             }
-            Vector3 forward = mainCamera.transform.forward;
-            forward.y = 0;
-            forward.Normalize();
-            rotationState.TargetRotation = Quaternion.LookRotation(forward);
-        }
-        else if (horizontalInput == 0)
-        {
-            ResetMovementState();
-        }
+            else
+            {
+                // Para movimiento hacia adelante/lateral: comportamiento normal
+                targetRotation = Quaternion.LookRotation(movementState.MoveDirection);
+            }
 
-        rotationState.CurrentRotationSpeed = Mathf.Lerp(rotationState.CurrentRotationSpeed, baseRotationSpeed, Time.deltaTime);
-    }
-
-    private void ResetMovementState()
-    {
-        rotationState.ForwardPressed = false;
-        rotationState.HorizontalPressedAfterForward = false;
-        rotationState.WasMovingForwardAndHorizontal = false;
-
-        Vector3 forward = mainCamera.transform.forward;
-        forward.y = 0;
-        forward.Normalize();
-        rotationState.TargetRotation = Quaternion.LookRotation(forward);
-        rotationState.CurrentRotationSpeed = baseRotationSpeed;
-    }
-
-    private void ApplyRotation()
-    {
-        transform.rotation = Quaternion.Slerp(
-            transform.rotation,
-            rotationState.TargetRotation,
-            Time.deltaTime * rotationState.CurrentRotationSpeed
-        );
-    }
-
-    private void CheckRotationCompletion()
-    {
-        if (Quaternion.Angle(transform.rotation, rotationState.TargetRotation) < rotationThreshold)
-        {
-            rotationState.IsTransitioning = false;
-            rotationState.CurrentRotationSpeed = baseRotationSpeed;
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
     }
 
     private void ApplyGravity()
     {
-        // Verificación adicional por seguridad
         if (!characterController.enabled) return;
 
         movementState.Velocity.y += gravity * Time.deltaTime;
@@ -442,22 +349,19 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
     {
         if (characterController != null)
         {
-            // Si estamos desactivando el controlador, resetear también los inputs de movimiento
             if (!enabled)
             {
-                // Resetear los inputs de movimiento
+                // Resetear TODOS los inputs de movimiento inmediatamente
                 currentMovementInput = Vector2.zero;
+                rawMovementInput = Vector2.zero;
+                smoothedGamepadInput = Vector2.zero;
                 isSprinting = false;
+                isUsingGamepad = false;
 
                 // Forzar actualización de animación inmediatamente
                 if (animator != null)
                 {
-                    // Asegurar que todas las animaciones de movimiento estén desactivadas
-                    animator.SetBool(isWalkingHash, false);
-                    animator.SetBool(isRunningHash, false);
-                    animator.SetBool(isWalkingBackHash, false);
-                    animator.SetBool(isWalkingLeftHash, false);
-                    animator.SetBool(isWalkingRightHash, false);
+                    ResetAllAnimationStates();
                 }
             }
 
@@ -467,6 +371,17 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
         {
             Debug.LogError($"CharacterController not found on {gameObject.name}!");
         }
+    }
+
+    private void ResetAllAnimationStates()
+    {
+        isWalking = false;
+        isRunning = false;
+        isWalkingBack = false;
+
+        animator.SetBool(isWalkingHash, false);
+        animator.SetBool(isRunningHash, false);
+        animator.SetBool(isWalkingBackHash, false);
     }
 
     public void Respawn(Vector3 spawnPosition, Quaternion spawnRotation)
@@ -490,71 +405,45 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
         // Verificar si el CharacterController está habilitado
         if (characterController == null || !characterController.enabled || !gameObject.activeInHierarchy)
         {
-            // NUEVO CÓDIGO: Cuando el CharacterController está desactivado,
-            // forzar el estado de idle reseteando todas las variables de animación
             if (animator != null)
             {
-                // Resetear todos los estados de animación a false
-                isWalking = false;
-                isRunning = false;
-                isWalkingBack = false;
-                isWalkingLeft = false;
-                isWalkingRight = false;
-
-                // Actualizar los parámetros del Animator para forzar estado idle
-                animator.SetBool(isWalkingHash, false);
-                animator.SetBool(isRunningHash, false);
-                animator.SetBool(isWalkingBackHash, false);
-                animator.SetBool(isWalkingLeftHash, false);
-                animator.SetBool(isWalkingRightHash, false);
-
-                // También asegurarnos de que no esté en estado AFK
+                ResetAllAnimationStates();
                 isPlayingAfkAnimation = false;
-
-                // Si hay algún parámetro específico para el idle, podríamos activarlo aquí
-                // Por ejemplo: animator.SetBool("isIdle", true);
             }
             return;
         }
-
 
         if (isPlayingAfkAnimation && animator.GetCurrentAnimatorStateInfo(0).IsName("Afk_Animation"))
             return;
 
         // Determinar el tipo de movimiento basado en los inputs
-        bool movingForward = currentMovementInput.y > 0;
-        bool movingBackward = currentMovementInput.y < 0;
-        bool movingLeft = currentMovementInput.x < 0;
-        bool movingRight = currentMovementInput.x > 0;
-        bool moving = currentMovementInput.magnitude > movementThreshold;
+        Vector2 input = currentMovementInput;
+        bool moving = input.magnitude > movementThreshold;
 
-        // Determinar si estamos corriendo
-        bool shouldRun = isSprinting && movingForward && Mathf.Approximately(currentMovementInput.x, 0);
+        // Resetear todos los estados
+        isWalking = false;
+        isRunning = false;
+        isWalkingBack = false;
 
-        // Actualizar los estados de animación
-        isWalking = moving && movingForward && !shouldRun && !movingLeft && !movingRight;
-        isRunning = shouldRun;
-        isWalkingBack = moving && movingBackward && !movingLeft && !movingRight;
-        isWalkingLeft = moving && movingLeft && !movingForward && !movingBackward;
-        isWalkingRight = moving && movingRight && !movingForward && !movingBackward;
-
-        // Para movimientos diagonales, priorizar adelante/atrás sobre izquierda/derecha
-        if ((movingForward || movingBackward) && (movingLeft || movingRight))
+        if (moving)
         {
-            isWalkingLeft = false;
-            isWalkingRight = false;
+            // Determinar la dirección principal del movimiento
+            bool movingBackward = input.y < -0.1f;
 
-            if (movingForward)
+            // Si está sprintando (y no va hacia atrás)
+            if (isSprinting && !movingBackward)
             {
-                isWalking = !shouldRun;
-                isRunning = shouldRun;
-                isWalkingBack = false;
+                isRunning = true;
             }
+            // Movimiento hacia atrás
             else if (movingBackward)
             {
                 isWalkingBack = true;
-                isWalking = false;
-                isRunning = false;
+            }
+            // Cualquier otro movimiento (adelante, lateral, diagonal)
+            else
+            {
+                isWalking = true;
             }
         }
 
@@ -564,16 +453,14 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
             animator.SetBool(isWalkingHash, isWalking);
             animator.SetBool(isRunningHash, isRunning);
             animator.SetBool(isWalkingBackHash, isWalkingBack);
-            animator.SetBool(isWalkingLeftHash, isWalkingLeft);
-            animator.SetBool(isWalkingRightHash, isWalkingRight);
         }
     }
+
     private void CheckInactivity()
     {
-        // Verificamos si hay algún input de movimiento
+        // Verificar si hay algún input de movimiento
         bool isMoving = currentMovementInput.magnitude > movementThreshold;
 
-        // Si hay movimiento, resetear el timer y las flags
         if (isMoving || isSprinting)
         {
             inactivityTimer = 0f;
@@ -581,39 +468,26 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
             return;
         }
 
-        // Si estamos reproduciendo la animación AFK, no incrementamos el timer
         if (isPlayingAfkAnimation && animator.GetCurrentAnimatorStateInfo(0).IsName("Afk_Animation"))
         {
             return;
         }
 
-        // Incrementar el timer si no hay movimiento y no estamos en animación AFK
         inactivityTimer += Time.deltaTime;
 
-        // Verificar si se alcanzó el límite de tiempo de inactividad
         if (inactivityTimer >= afkTimeThreshold)
         {
-            // Activar la animación AFK
             TriggerAfkAnimation();
-            // Resetear el timer para que comience a contar de nuevo
             inactivityTimer = 0f;
         }
     }
-    private bool IsPurelyHorizontalMovement(Vector2 input)
-    {
-        // Consideramos movimiento puramente horizontal si:
-        // 1. Hay input horizontal significativo
-        // 2. No hay input vertical significativo
-        return Mathf.Abs(input.x) > movementThreshold && Mathf.Abs(input.y) < movementThreshold;
-    }
+
     private void TriggerAfkAnimation()
     {
         if (animator != null)
         {
-            // Activar el trigger para la animación AFK
             animator.SetTrigger(triggerAfkHash);
             isPlayingAfkAnimation = true;
-
             Debug.Log("El jugador está AFK, activando animación");
         }
     }
@@ -623,4 +497,78 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
         isPlayingAfkAnimation = false;
         isAfk = false;
     }
+
+    #region Public Methods for Configuration
+
+    /// <summary>
+    /// Configura los parámetros de movimiento del gamepad
+    /// </summary>
+    public void SetGamepadMovementSettings(float deadzone, float speedMultiplier, float smoothTime)
+    {
+        gamepadMovementDeadzone = Mathf.Clamp01(deadzone);
+        gamepadSpeedMultiplier = Mathf.Max(0.1f, speedMultiplier);
+        gamepadInputSmoothTime = Mathf.Max(0.01f, smoothTime);
+    }
+
+    /// <summary>
+    /// Configura la velocidad de rotación
+    /// </summary>
+    public void SetRotationSpeed(float speed)
+    {
+        rotationSpeed = Mathf.Max(0.1f, speed);
+    }
+
+    /// <summary>
+    /// Habilita o deshabilita la rotación automática hacia la dirección de movimiento
+    /// </summary>
+    public void SetRotateTowardsMovement(bool enable)
+    {
+        rotateTowardsMovement = enable;
+    }
+
+    /// <summary>
+    /// Obtiene información sobre el dispositivo de entrada actual
+    /// </summary>
+    public bool IsCurrentlyUsingGamepadMovement()
+    {
+        return isUsingGamepad;
+    }
+
+    /// <summary>
+    /// Fuerza el reseteo del estado de entrada
+    /// </summary>
+    public void ResetInputState()
+    {
+        currentMovementInput = Vector2.zero;
+        rawMovementInput = Vector2.zero;
+        smoothedGamepadInput = Vector2.zero;
+        isSprinting = false;
+        isUsingGamepad = false;
+    }
+    private float CalculateCurrentSpeed()
+    {
+        // Calcular velocidad base según la dirección
+        float baseSpeedToUse = baseSpeed;
+
+        // Si va hacia atrás, aplicar multiplicador
+        if (currentMovementInput.y < 0)
+        {
+            baseSpeedToUse *= backwardsSpeedMultiplier;
+        }
+
+        // Si está sprintando, aplicar velocidad de sprint
+        if (isSprinting && movementState.IsMoving)
+        {
+            baseSpeedToUse = sprintSpeed;
+        }
+
+        // Aplicar multiplicador de gamepad si es necesario
+        if (isUsingGamepad)
+        {
+            baseSpeedToUse *= gamepadSpeedMultiplier;
+        }
+
+        return baseSpeedToUse;
+    }
+    #endregion
 }
