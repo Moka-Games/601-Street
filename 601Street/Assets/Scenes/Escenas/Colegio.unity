@@ -7826,7 +7826,7 @@ MonoBehaviour:
   objectID: Nota_Umi
   useSceneName: 0
   sceneName: Colegio
-  defaultActiveState: 0
+  defaultActiveState: 1
   applyStateImmediately: 1
   onActivate:
     m_PersistentCalls:
@@ -8906,6 +8906,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Profesor
+      objectReference: {fileID: 0}
+    - target: {fileID: 8009979216645450960, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

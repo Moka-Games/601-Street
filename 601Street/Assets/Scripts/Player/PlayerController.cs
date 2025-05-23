@@ -173,6 +173,11 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
         // No se usa en PlayerController - se maneja en PauseMenu
     }
 
+    public void OnSkipDialogue(InputAction.CallbackContext context)
+    {
+        // No se usa en PlayerController - se maneja en DialogueManager
+    }
+
     #endregion
 
     private bool IsCurrentlyUsingGamepad()

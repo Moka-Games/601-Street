@@ -3,7 +3,8 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Collections;
-using DG.Tweening; // Añadido para DOTween
+using DG.Tweening;
+using UnityEngine.InputSystem;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -59,6 +60,11 @@ public class DialogueManager : MonoBehaviour
 
     private Vector2 initialDialoguePosition = Vector2.zero;
     private bool initialPositionSaved = false;
+
+    // Input System
+    private PlayerControls playerControls;
+    private InputAction skipDialogueAction;
+
     void Awake()
     {
         if (Instance == null)
@@ -68,6 +74,64 @@ public class DialogueManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
+        }
+
+        // Inicializar Input System
+        InitializeInputSystem();
+    }
+
+    private void InitializeInputSystem()
+    {
+        playerControls = new PlayerControls();
+        skipDialogueAction = playerControls.Gameplay.SkipDialogue;
+
+        // Suscribirse al evento de skip dialogue
+        skipDialogueAction.performed += OnSkipDialogueInput;
+    }
+
+    private void OnEnable()
+    {
+        playerControls?.Gameplay.Enable();
+    }
+
+    private void OnDisable()
+    {
+        playerControls?.Gameplay.Disable();
+    }
+
+    private void OnDestroy()
+    {
+        if (skipDialogueAction != null)
+        {
+            skipDialogueAction.performed -= OnSkipDialogueInput;
+        }
+
+        playerControls?.Dispose();
+    }
+
+    // Callback para el Input System
+    private void OnSkipDialogueInput(InputAction.CallbackContext context)
+    {
+        // Solo procesar el input si estamos en conversación y el diálogo está activo
+        if (dialogueUI != null && dialogueUI.activeSelf && isInConversation)
+        {
+            if (isTyping)
+            {
+                if (typewriterEffect != null)
+                {
+                    typewriterEffect.StopTyping();
+                }
+                isTyping = false;
+            }
+            else
+            {
+                if (Next_bubble != null)
+                {
+                    Next_bubble.SetActive(false);
+                }
+                NextDialogue();
+            }
         }
     }
 
@@ -106,34 +170,6 @@ public class DialogueManager : MonoBehaviour
             contentText.richText = true;
         }
     }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            if (dialogueUI != null && dialogueUI.activeSelf)
-            {
-                if (isTyping)
-                {
-                    if (typewriterEffect != null)
-                    {
-                        typewriterEffect.StopTyping();
-                    }
-                    isTyping = false;
-                }
-                else
-                {
-                    if (Next_bubble != null)
-                    {
-                        Next_bubble.SetActive(false);
-                    }
-                    NextDialogue();
-                }
-            }
-        }
-    }
-
-    
 
     public void StartConversation(Conversation conversation, NPC npc)
     {
@@ -421,6 +457,7 @@ public class DialogueManager : MonoBehaviour
 
         Debug.Log("Conversación finalizada - Cooldown iniciado");
     }
+
     public void SelectDiceOption()
     {
         // Desactivar la interfaz de diálogo
@@ -489,6 +526,7 @@ public class DialogueManager : MonoBehaviour
             diceInterface.SetActive(false);
         }
     }
+
     private void AnimateDialogueEntry()
     {
         // Asegurarnos de que dialogueUI existe y está activo
@@ -564,6 +602,40 @@ public class DialogueManager : MonoBehaviour
     {
         return isInConversation;
     }
+
+    /// <summary>
+    /// Obtiene el texto de la tecla de skip dialogue para mostrar al usuario
+    /// </summary>
+    public string GetSkipDialogueKeyDisplayText()
+    {
+        if (skipDialogueAction != null && skipDialogueAction.bindings.Count > 0)
+        {
+            // Obtener el primer binding para mostrar
+            var binding = skipDialogueAction.bindings[0];
+            string displayString = InputControlPath.ToHumanReadableString(binding.effectivePath,
+                InputControlPath.HumanReadableStringOptions.OmitDevice);
+            return displayString;
+        }
+        return "E"; // Fallback
+    }
+
+    /// <summary>
+    /// Habilita o deshabilita temporalmente el input de skip dialogue
+    /// </summary>
+    public void SetSkipDialogueInputEnabled(bool enabled)
+    {
+        if (skipDialogueAction != null)
+        {
+            if (enabled)
+            {
+                skipDialogueAction.Enable();
+            }
+            else
+            {
+                skipDialogueAction.Disable();
+            }
+        }
+    }
 }
 
 [System.Serializable]
@@ -573,6 +645,7 @@ public class Dialogue
     [TextArea(4, 4)]
     public string content;
 }
+
 public static class TextFormatHelper
 {
     public static string ProcessTextTags(string input)
@@ -646,5 +719,4 @@ public static class TextFormatHelper
 
         return processed;
     }
-    
 }

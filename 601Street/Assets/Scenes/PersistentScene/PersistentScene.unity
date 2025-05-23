@@ -2687,8 +2687,28 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7812203262356441411, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
+      propertyPath: lookSmoothing
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 7812203262356441411, guid: 7685b785844a38049a4bf1af2d883a49,
+        type: 3}
       propertyPath: gamepadLookSpeed
-      value: 350
+      value: 425
+      objectReference: {fileID: 0}
+    - target: {fileID: 7812203262356441411, guid: 7685b785844a38049a4bf1af2d883a49,
+        type: 3}
+      propertyPath: gamepadSpeedMultiplier
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7812203262356441411, guid: 7685b785844a38049a4bf1af2d883a49,
+        type: 3}
+      propertyPath: gamepadAccelerationTime
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7812203262356441411, guid: 7685b785844a38049a4bf1af2d883a49,
+        type: 3}
+      propertyPath: gamepadDecelerationTime
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7812203262356441411, guid: 7685b785844a38049a4bf1af2d883a49,
         type: 3}
@@ -3990,7 +4010,7 @@ PrefabInstance:
     - target: {fileID: 4791773876486863550, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_PlaneDistance
-      value: 0.8
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 4791773876486863550, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
