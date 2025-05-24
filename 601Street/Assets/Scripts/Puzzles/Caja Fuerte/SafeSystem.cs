@@ -29,6 +29,9 @@ public class SafeSystem : MonoBehaviour
     [Tooltip("Sonido al pulsar un botón numérico")]
     public AudioClip buttonPressSound;
 
+    [Tooltip("Sonido al navegar/seleccionar un botón con gamepad (más sutil)")]
+    public AudioClip buttonNavigationSound;
+
     [Tooltip("Sonido al pulsar Enter con contraseña correcta")]
     public AudioClip correctPasswordSound;
 
@@ -51,6 +54,13 @@ public class SafeSystem : MonoBehaviour
     [Tooltip("Duración del parpadeo de la luz en segundos")]
     public float blinkDuration = 1f;
 
+    [Header("Input Configuration")]
+    [Tooltip("¿Habilitar input con mouse?")]
+    public bool enableMouseInput = true;
+
+    [Tooltip("¿Habilitar navegación con gamepad?")]
+    public bool enableGamepadNavigation = true;
+
     [Header("Eventos")]
     public UnityEvent OnSafeUnlocked;
     public UnityEvent OnWrongPassword;
@@ -67,6 +77,9 @@ public class SafeSystem : MonoBehaviour
 
     // Para controlar la corrutina del parpadeo
     private Coroutine blinkCoroutine;
+
+    // Referencia al controlador de navegación
+    private SafeNavigationController navigationController;
 
     void Start()
     {
@@ -112,16 +125,27 @@ public class SafeSystem : MonoBehaviour
             }
         }
 
+        // Obtener referencia al controlador de navegación
+        navigationController = GetComponent<SafeNavigationController>();
+        if (navigationController == null && enableGamepadNavigation)
+        {
+            Debug.LogWarning("No se encontró SafeNavigationController. La navegación con gamepad no funcionará.");
+        }
+
         // Inicializar el display de la contraseña
         UpdatePasswordDisplay();
     }
 
     void Update()
     {
-        // Detectar entrada del mouse
-        if (Input.GetMouseButtonDown(0))
+        // Solo procesar input de mouse si está habilitado
+        if (enableMouseInput)
         {
-            HandleMouseClick();
+            // Detectar entrada del mouse
+            if (Input.GetMouseButtonDown(0))
+            {
+                HandleMouseClick();
+            }
         }
     }
 
@@ -149,7 +173,10 @@ public class SafeSystem : MonoBehaviour
         }
     }
 
-    void ProcessButtonPress(SafeButton button)
+    /// <summary>
+    /// Procesa la pulsación de un botón (público para uso con navegación)
+    /// </summary>
+    public void ProcessButtonPress(SafeButton button)
     {
         // Activar la animación o efecto del botón si tiene uno
         button.PressButton();
@@ -178,7 +205,7 @@ public class SafeSystem : MonoBehaviour
                 {
                     Debug.Log("Se requieren " + maxDigits + " dígitos para verificar la contraseña.");
 
-                    // Reproducir sonido de contraseña incorrecta (mismo que para contraseña errónea)
+                    // Reproducir sonido de contraseña incorrecta
                     PlaySound(wrongPasswordSound);
 
                     // Mostrar luz roja parpadeante si faltan dígitos
@@ -220,8 +247,9 @@ public class SafeSystem : MonoBehaviour
                     StartCoroutine(ResetLightAfterDelay(blinkDuration));
                 }
                 break;
+
             case SafeButtonType.Exit:
-                // Reproducir sonido (puedes usar el mismo que Clear u otro)
+                // Reproducir sonido
                 PlaySound(clearPasswordSound);
 
                 // Buscar y notificar al SafeGameplayManager para salir del modo
@@ -243,13 +271,11 @@ public class SafeSystem : MonoBehaviour
         // Actualizar el texto en el display
         if (passwordDisplay != null)
         {
-            // Podemos mostrar asteriscos para mayor seguridad, o los dígitos reales
-            // passwordDisplay.text = new string('*', currentPassword.Length);
+            // Mostrar los dígitos reales
             passwordDisplay.text = currentPassword;
 
-            // Alternativa: Rellenar con espacios o guiones hasta maxDigits
-            // string displayText = currentPassword.PadRight(maxDigits, '_');
-            // passwordDisplay.text = displayText;
+            // Alternativa con asteriscos para mayor seguridad:
+            // passwordDisplay.text = new string('*', currentPassword.Length);
         }
     }
 
@@ -272,13 +298,20 @@ public class SafeSystem : MonoBehaviour
                 feedbackLight.material = greenMaterial;
             }
 
-            // Opcionalmente, actualizar el display para mostrar algo como "ABIERTO"
+            // Actualizar el display para mostrar "OPEN"
             if (passwordDisplay != null)
             {
                 passwordDisplay.text = "OPEN";
             }
 
+            // Desactivar navegación inmediatamente
+            if (navigationController != null)
+            {
+                navigationController.SetNavigationActive(false);
+            }
+
             // Disparar el evento para que se active la secuencia de desbloqueo
+            // Esto eventualmente llamará a SafeGameplayManager.ExitSafeMode() que reactivará el movimiento
             OnSafeUnlocked?.Invoke();
         }
         else
@@ -297,6 +330,51 @@ public class SafeSystem : MonoBehaviour
             // Limpiar la contraseña tras el intento fallido
             currentPassword = "";
             UpdatePasswordDisplay();
+        }
+    }
+
+    /// <summary>
+    /// Método público para reproducir sonidos
+    /// </summary>
+    public void PlaySound(AudioClip clip)
+    {
+        if (audioSource != null && clip != null)
+        {
+            audioSource.clip = clip;
+            audioSource.Play();
+        }
+    }
+
+    /// <summary>
+    /// Método específico para reproducir el sonido de navegación
+    /// </summary>
+    public void PlayNavigationSound()
+    {
+        if (buttonNavigationSound != null)
+        {
+            PlaySound(buttonNavigationSound);
+        }
+        else
+        {
+            // Fallback al sonido de botón normal pero con menor volumen
+            if (audioSource != null && buttonPressSound != null)
+            {
+                float originalVolume = audioSource.volume;
+                audioSource.volume = originalVolume * 0.5f; // 50% del volumen original
+                PlaySound(buttonPressSound);
+                audioSource.volume = originalVolume; // Restaurar volumen
+            }
+        }
+    }
+
+    /// <summary>
+    /// Activa o desactiva el sistema de navegación con gamepad
+    /// </summary>
+    public void SetNavigationActive(bool active)
+    {
+        if (navigationController != null && enableGamepadNavigation)
+        {
+            navigationController.SetNavigationActive(active);
         }
     }
 
@@ -351,23 +429,13 @@ public class SafeSystem : MonoBehaviour
         }
     }
 
-    // Método para reproducir un sonido
-    void PlaySound(AudioClip clip)
-    {
-        if (audioSource != null && clip != null)
-        {
-            audioSource.clip = clip;
-            audioSource.Play();
-        }
-    }
-
     // Método público para verificar si la caja fuerte está desbloqueada
     public bool IsSafeUnlocked()
     {
         return isSafeUnlocked;
     }
 
-    // Método público para reiniciar la caja fuerte (puede ser llamado desde otros scripts)
+    // Método público para reiniciar la caja fuerte
     public void ResetSafe()
     {
         // Solo permitir resetear si la caja no está desbloqueada
@@ -376,7 +444,7 @@ public class SafeSystem : MonoBehaviour
             currentPassword = "";
             UpdatePasswordDisplay();
 
-            // Opcional: restablecer la luz a su estado por defecto
+            // Restablecer la luz a su estado por defecto
             if (feedbackLight != null && defaultMaterial != null)
             {
                 feedbackLight.material = defaultMaterial;
@@ -388,7 +456,6 @@ public class SafeSystem : MonoBehaviour
     }
 
     // Método público para resetear completamente la caja fuerte
-    // Esto permitiría volver a usarla incluso después de haber sido desbloqueada
     public void HardResetSafe()
     {
         isSafeUnlocked = false;

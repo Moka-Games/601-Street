@@ -21,17 +21,33 @@ public class SafeGameplayManager : MonoBehaviour
     [Tooltip("Tiempo a esperar después de la secuencia de desbloqueo para volver al gameplay")]
     public float returnToGameplayDelay = 2.0f;
 
-    [Tooltip("¿Es una interacción única? Si es true, solo se podrá interactuar una vez con la caja fuerte")]
-    public bool oneTimeInteraction = true;
+    [Header("Interacción")]
+    [Tooltip("Referencia al InteractableObject de la caja fuerte")]
+    public InteractableObject safeInteractableObject;
+
+    [Tooltip("¿Desactivar temporalmente la interacción mientras se resuelve la caja fuerte?")]
+    public bool disableInteractionDuringSafeMode = true;
+
+    [Header("Player Controller Integration")]
+    [Tooltip("Referencia al PlayerController para desactivar movimiento")]
+    public PlayerController playerController;
+
+    [Tooltip("¿Desactivar movimiento del jugador en modo safe?")]
+    public bool disablePlayerMovement = true;
+
+    [Header("Input Configuration")]
+    [Tooltip("¿Habilitar automáticamente la navegación con gamepad?")]
+    public bool enableGamepadNavigationInSafeMode = true;
 
     // Estado actual
     private bool isSafeMode = false;
 
-    // Indica si ya se ha interactuado con la caja fuerte
-    private bool hasInteracted = false;
-
     // Para controlar el retorno al gameplay después de desbloquear
     private Coroutine returnToGameplayCoroutine;
+
+    // Estados previos del cursor para restaurar
+    private bool previousCursorVisible;
+    private CursorLockMode previousCursorLockState;
 
     private void Awake()
     {
@@ -61,6 +77,16 @@ public class SafeGameplayManager : MonoBehaviour
         {
             unlockSequence = GetComponent<SafeUnlockSequence>();
         }
+
+        // Buscar el InteractableObject si no está asignado
+        if (safeInteractableObject == null)
+        {
+            safeInteractableObject = GetComponent<InteractableObject>();
+            if (safeInteractableObject == null)
+            {
+                Debug.LogWarning("No se encontró InteractableObject. La desactivación de interacción no funcionará.");
+            }
+        }
     }
 
     private void Start()
@@ -70,28 +96,46 @@ public class SafeGameplayManager : MonoBehaviour
         {
             safeSystem.OnSafeUnlocked.AddListener(HandleSafeUnlocked);
         }
+
+        // Buscar el PlayerController si no está asignado
+        if (playerController == null)
+        {
+            playerController = FindAnyObjectByType<PlayerController>();
+            if (playerController == null && disablePlayerMovement)
+            {
+                Debug.LogWarning("No se encontró PlayerController. No se podrá desactivar el movimiento del jugador.");
+            }
+        }
     }
 
     // Método para activar el modo de interacción con la caja fuerte
     public void EnterSafeMode()
     {
-        // Si está configurado para interacción única y ya se ha interactuado, no hacer nada
-        if (oneTimeInteraction && hasInteracted)
-        {
-            Debug.Log("La caja fuerte ya ha sido interactuada. No se permite una segunda interacción.");
-            return;
-        }
-
         if (!isSafeMode && safeVCam != null)
         {
-            // Marcar como interactuada
-            hasInteracted = true;
-
             // Cancelar cualquier corrutina de retorno al gameplay si estaba en marcha
             if (returnToGameplayCoroutine != null)
             {
                 StopCoroutine(returnToGameplayCoroutine);
                 returnToGameplayCoroutine = null;
+            }
+
+            // Guardar estado previo del cursor
+            previousCursorVisible = Cursor.visible;
+            previousCursorLockState = Cursor.lockState;
+
+            // DESACTIVAR MOVIMIENTO DEL JUGADOR
+            if (disablePlayerMovement && playerController != null)
+            {
+                playerController.SetMovementEnabled(false);
+                Debug.Log("Movimiento del jugador desactivado para modo caja fuerte");
+            }
+
+            // DESACTIVAR INTERACCIÓN CON LA CAJA FUERTE
+            if (disableInteractionDuringSafeMode && safeInteractableObject != null)
+            {
+                safeInteractableObject.enabled = false;
+                Debug.Log("InteractableObject desactivado durante modo caja fuerte");
             }
 
             // Activar la cámara de la caja fuerte
@@ -100,33 +144,80 @@ public class SafeGameplayManager : MonoBehaviour
 
             isSafeMode = true;
 
-            // Mostrar el cursor
+            // Configurar cursor para interacción con UI
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
 
-            Debug.Log("Modo de interacción con caja fuerte activado");
+            // Activar navegación con gamepad si está habilitado
+            if (enableGamepadNavigationInSafeMode && safeSystem != null)
+            {
+                safeSystem.SetNavigationActive(true);
+            }
+
+            Debug.Log("Modo de interacción con caja fuerte activado - Jugador no puede moverse");
         }
     }
 
     // Método para desactivar el modo de interacción con la caja fuerte
     public void ExitSafeMode()
     {
-        print("Llanado Extit Safe Mode");
-       
-        // Desactivar la cámara de la caja fuerte
-        safeVCam.gameObject.SetActive(false);
+        Debug.Log("Llamado Exit Safe Mode");
 
-        isSafeMode = false;
+        if (isSafeMode)
+        {
+            // Desactivar navegación si está activa
+            if (safeSystem != null)
+            {
+                safeSystem.SetNavigationActive(false);
+            }
 
-        Debug.Log("Modo de interacción con caja fuerte desactivado");
+            // Desactivar la cámara de la caja fuerte
+            safeVCam.gameObject.SetActive(false);
 
+            // REACTIVAR MOVIMIENTO DEL JUGADOR
+            if (disablePlayerMovement && playerController != null)
+            {
+                playerController.SetMovementEnabled(true);
+                Debug.Log("Movimiento del jugador reactivado");
+            }
 
+            // REACTIVAR INTERACCIÓN CON LA CAJA FUERTE (solo si no está desbloqueada)
+            if (disableInteractionDuringSafeMode && safeInteractableObject != null)
+            {
+                // Solo reactivar si la caja fuerte no ha sido desbloqueada
+                if (safeSystem == null || !safeSystem.IsSafeUnlocked())
+                {
+                    safeInteractableObject.enabled = true;
+                    Debug.Log("InteractableObject reactivado - se puede volver a interactuar");
+                }
+                else
+                {
+                    Debug.Log("InteractableObject no reactivado - caja fuerte ya desbloqueada");
+                }
+            }
 
+            isSafeMode = false;
+
+            // Restaurar estado previo del cursor
+            Cursor.visible = previousCursorVisible;
+            Cursor.lockState = previousCursorLockState;
+
+            Debug.Log("Modo de interacción con caja fuerte desactivado - Jugador puede moverse nuevamente");
+        }
     }
 
     // Método que se llama cuando se desbloquea la caja fuerte
     private void HandleSafeUnlocked()
     {
+        Debug.Log("Caja fuerte desbloqueada - manejando secuencia de salida");
+
+        // DESACTIVAR PERMANENTEMENTE LA INTERACCIÓN (la caja ya está abierta)
+        if (safeInteractableObject != null)
+        {
+            safeInteractableObject.enabled = false;
+            Debug.Log("InteractableObject desactivado permanentemente - caja fuerte desbloqueada");
+        }
+
         // Si hay una secuencia de desbloqueo, dejamos que ella maneje las cámaras
         // Si no, programamos el retorno al gameplay después del retraso
         if (unlockSequence == null)
@@ -185,41 +276,72 @@ public class SafeGameplayManager : MonoBehaviour
             return;
         }
 
-        // Si está configurado para interacción única y ya se ha interactuado, no hacer nada
-        if (oneTimeInteraction && hasInteracted)
-        {
-            Debug.Log("La caja fuerte ya ha sido interactuada. No se permite una segunda interacción.");
-            return;
-        }
-
         // Activar el modo de interacción con la caja fuerte
         EnterSafeMode();
     }
 
-    // Para manejar la tecla de escape o cancelar
-    private void Update()
+    /// <summary>
+    /// Verifica si actualmente estamos en modo caja fuerte
+    /// </summary>
+    public bool IsInSafeMode()
     {
-        // Solo procesamos input si estamos en modo de caja fuerte
-        if (isSafeMode)
+        return isSafeMode;
+    }
+
+    /// <summary>
+    /// Método para forzar la activación/desactivación de la navegación
+    /// </summary>
+    public void SetGamepadNavigationEnabled(bool enabled)
+    {
+        enableGamepadNavigationInSafeMode = enabled;
+
+        // Si estamos en modo safe, aplicar el cambio inmediatamente
+        if (isSafeMode && safeSystem != null)
         {
-            // Salir del modo con Escape
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                ExitSafeMode();
-            }
+            safeSystem.SetNavigationActive(enabled);
         }
     }
 
-    // Método para reiniciar el estado de interacción (para pruebas o para casos especiales)
-    public void ResetInteractionState()
+    /// <summary>
+    /// Configura la referencia al PlayerController externamente
+    /// </summary>
+    public void SetPlayerController(PlayerController controller)
     {
-        hasInteracted = false;
-        Debug.Log("Estado de interacción de la caja fuerte reiniciado.");
+        playerController = controller;
     }
 
-    // Método para verificar si ya se ha interactuado con la caja fuerte
-    public bool HasInteracted()
+    /// <summary>
+    /// Configura la referencia al InteractableObject externamente
+    /// </summary>
+    public void SetSafeInteractableObject(InteractableObject interactable)
     {
-        return hasInteracted;
+        safeInteractableObject = interactable;
+    }
+
+    /// <summary>
+    /// Método para reiniciar completamente el estado de la caja fuerte (para pruebas)
+    /// </summary>
+    [ContextMenu("Reiniciar Estado Completo")]
+    public void ResetCompleteState()
+    {
+        // Salir del modo safe si estamos en él
+        if (isSafeMode)
+        {
+            ExitSafeMode();
+        }
+
+        // Reiniciar el sistema de la caja fuerte
+        if (safeSystem != null)
+        {
+            safeSystem.HardResetSafe();
+        }
+
+        // Reactivar el InteractableObject
+        if (safeInteractableObject != null)
+        {
+            safeInteractableObject.enabled = true;
+        }
+
+        Debug.Log("Estado completo de la caja fuerte reiniciado.");
     }
 }
