@@ -78,6 +78,16 @@ public class InventoryNavigationManager : MonoBehaviour
     public System.Action<Button> OnElementSubmitted;
     public System.Action<InventorySection> OnSectionChanged;
 
+    [Header("Configuración de Auto-Scroll")]
+    [SerializeField] private bool enableAutoScrollOnNavigation = true;
+    [SerializeField] private bool onlyScrollIfElementNotVisible = true;
+    [SerializeField] private float visibilityMargin = 50f; // Margen para considerar un elemento "visible"
+
+    // Variable para rastrear si el usuario ha hecho scroll manual recientemente
+    private bool userHasScrolledManually = false;
+    private float lastManualScrollTime = 0f;
+    private float manualScrollGracePeriod = 2f;
+
     private void Awake()
     {
         // Inicializar componentes
@@ -184,6 +194,9 @@ public class InventoryNavigationManager : MonoBehaviour
         {
             ProcessNavigation();
         }
+
+        // ESTE MÉTODO NO EXISTE
+        ProcessScrollInput(); // <-- Esta línea está causando errores
     }
 
     private void ProcessNavigation()
@@ -305,10 +318,33 @@ public class InventoryNavigationManager : MonoBehaviour
 
     private void ScrollToButton(Button button)
     {
+        if (!enableAutoScrollOnNavigation) return;
+
         ScrollRect scrollRect = GetCurrentScrollRect();
         if (scrollRect == null || button == null) return;
 
-        // Calcular posición del botón en el scroll
+        // Si el usuario ha hecho scroll manual recientemente, no hacer auto-scroll
+        if (userHasScrolledManually && (Time.time - lastManualScrollTime) < manualScrollGracePeriod)
+        {
+            Debug.Log("Auto-scroll omitido: Usuario hizo scroll manual recientemente");
+            return;
+        }
+
+        // Si solo queremos hacer scroll cuando el elemento no es visible, verificar visibilidad
+        if (onlyScrollIfElementNotVisible)
+        {
+            if (IsButtonVisible(button, scrollRect, visibilityMargin))
+            {
+                Debug.Log($"Auto-scroll omitido: Elemento {button.name} ya está visible");
+                return;
+            }
+            else
+            {
+                Debug.Log($"Auto-scroll activado: Elemento {button.name} no está completamente visible");
+            }
+        }
+
+        // Proceder con el scroll automático
         RectTransform content = scrollRect.content;
         RectTransform buttonRect = button.GetComponent<RectTransform>();
 
@@ -323,7 +359,7 @@ public class InventoryNavigationManager : MonoBehaviour
 
         if (contentWidth <= viewportWidth) return; // No necesita scroll
 
-        // Calcular posición normalizada
+        // Calcular posición normalizada para centrar el elemento
         float normalizedPosition = Mathf.Clamp01(-buttonPosition.x / (contentWidth - viewportWidth));
 
         // Animar scroll
@@ -334,6 +370,8 @@ public class InventoryNavigationManager : MonoBehaviour
             normalizedPosition,
             scrollAnimationDuration
         ).SetEase(Ease.OutCubic).SetUpdate(true);
+
+        Debug.Log($"Auto-scroll aplicado a elemento: {button.name}, Nueva posición: {normalizedPosition:F3}");
     }
 
     private void OnNavigate(InputAction.CallbackContext context)
@@ -362,21 +400,30 @@ public class InventoryNavigationManager : MonoBehaviour
 
     private void OnScroll(InputAction.CallbackContext context)
     {
-        if (!enableScrollWithInput) return;
+        if (!enableScrollWithInput)
+        {
+            Debug.Log("Scroll deshabilitado por configuración");
+            return;
+        }
 
-        // Capturar input de scroll - puede ser Vector2 o float dependiendo de la configuración
+        // Marcar que el usuario ha hecho scroll manual
+        userHasScrolledManually = true;
+        lastManualScrollTime = Time.time;
+
+        // Debug: Verificar qué tipo de valor estamos recibiendo
+        Debug.Log($"Scroll Manual Detectado - Tipo: {context.valueType}, Valor Raw: {context.ReadValueAsObject()}");
+
+        // Capturar input de scroll
         if (context.valueType == typeof(Vector2))
         {
             scrollInput = context.ReadValue<Vector2>();
         }
         else if (context.valueType == typeof(float))
         {
-            // Si es un float (botón), convertir a Vector2
             float value = context.ReadValue<float>();
             scrollInput = new Vector2(value, 0);
         }
     }
-
     private void OnScrollCanceled(InputAction.CallbackContext context)
     {
         scrollInput = Vector2.zero;
@@ -635,7 +682,64 @@ public class InventoryNavigationManager : MonoBehaviour
         float newPos = Mathf.Clamp01(currentPos + scrollAmount);
         scrollRect.horizontalNormalizedPosition = newPos;
     }
+    private bool IsButtonVisible(Button button, ScrollRect scrollRect, float margin = 0f)
+    {
+        if (button == null || scrollRect == null) return false;
 
+        RectTransform buttonRect = button.GetComponent<RectTransform>();
+        RectTransform viewportRect = scrollRect.viewport;
+        RectTransform contentRect = scrollRect.content;
+
+        if (buttonRect == null || viewportRect == null || contentRect == null) return false;
+
+        // Obtener los límites del viewport en coordenadas del content
+        Vector3[] viewportCorners = new Vector3[4];
+        viewportRect.GetWorldCorners(viewportCorners);
+
+        Vector3 viewportMin = contentRect.InverseTransformPoint(viewportCorners[0]);
+        Vector3 viewportMax = contentRect.InverseTransformPoint(viewportCorners[2]);
+
+        // Obtener los límites del botón en coordenadas del content
+        Vector3[] buttonCorners = new Vector3[4];
+        buttonRect.GetWorldCorners(buttonCorners);
+
+        Vector3 buttonMin = contentRect.InverseTransformPoint(buttonCorners[0]);
+        Vector3 buttonMax = contentRect.InverseTransformPoint(buttonCorners[2]);
+
+        // Verificar si el botón está completamente visible (con margen)
+        bool isVisible = (buttonMin.x >= viewportMin.x - margin) &&
+                         (buttonMax.x <= viewportMax.x + margin);
+
+        return isVisible;
+    }
+
+    public void ResetManualScrollState()
+    {
+        userHasScrolledManually = false;
+        lastManualScrollTime = 0f;
+        Debug.Log("Estado de scroll manual reseteado");
+    }
+
+    // Métodos públicos para configurar el comportamiento
+    public void SetAutoScrollEnabled(bool enabled)
+    {
+        enableAutoScrollOnNavigation = enabled;
+    }
+
+    public void SetScrollOnlyIfNotVisible(bool enabled)
+    {
+        onlyScrollIfElementNotVisible = enabled;
+    }
+
+    public void SetManualScrollGracePeriod(float seconds)
+    {
+        manualScrollGracePeriod = Mathf.Max(0f, seconds);
+    }
+
+    public void SetVisibilityMargin(float margin)
+    {
+        visibilityMargin = Mathf.Max(0f, margin);
+    }
     // Método de debug
     [ContextMenu("Debug Inventory Navigation")]
     public void DebugCurrentState()

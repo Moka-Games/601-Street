@@ -22,6 +22,13 @@ public class InventoryNavigationIntegration : MonoBehaviour
     // Referencias para intercambio de controles
     private bool originalInventoryState = false;
 
+    [Header("Configuración de Auto-Scroll")]
+    [SerializeField] private bool enableAutoScrollOnNavigation = true;
+    [SerializeField] private bool onlyScrollIfElementNotVisible = true;
+    [SerializeField] private float manualScrollGracePeriod = 2f;
+    [SerializeField] private float visibilityMargin = 50f;
+
+
     private void Awake()
     {
         // Obtener componentes
@@ -69,9 +76,6 @@ public class InventoryNavigationIntegration : MonoBehaviour
         playerControls?.Dispose();
     }
 
-    /// <summary>
-    /// Configura la integración automática entre los sistemas
-    /// </summary>
     public void SetupIntegration()
     {
         Debug.Log("Configurando integración de navegación para inventario...");
@@ -79,10 +83,11 @@ public class InventoryNavigationIntegration : MonoBehaviour
         // Auto-configurar referencias del navegador
         if (inventoryManager != null && navigationManager != null)
         {
-            // Usar reflexión para acceder a campos privados si es necesario
-            // O configurar manualmente las referencias públicas
             ConfigureNavigationReferences();
             ConfigureScrollRects();
+
+            // NUEVO: Configurar el comportamiento de auto-scroll
+            ConfigureAutoScroll();
         }
 
         // Configurar eventos
@@ -205,6 +210,9 @@ public class InventoryNavigationIntegration : MonoBehaviour
         {
             navigationManager.SetNavigationEnabled(true);
 
+            // NUEVO: Resetear el estado de scroll manual para permitir auto-scroll inicial
+            navigationManager.ResetManualScrollState();
+
             // Forzar refresco para detectar elementos actuales
             navigationManager.ForceRefresh();
         }
@@ -323,5 +331,16 @@ public class InventoryNavigationIntegration : MonoBehaviour
         navigationManager.SetScrollDeadZone(0.3f);
 
         Debug.Log("Configuración de scroll completada");
+    }
+
+    public void ConfigureAutoScroll()
+    {
+        if (navigationManager != null)
+        {
+            navigationManager.SetAutoScrollEnabled(enableAutoScrollOnNavigation);
+            navigationManager.SetScrollOnlyIfNotVisible(onlyScrollIfElementNotVisible);
+            navigationManager.SetManualScrollGracePeriod(manualScrollGracePeriod);
+            navigationManager.SetVisibilityMargin(visibilityMargin);
+        }
     }
 }
