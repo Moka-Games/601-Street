@@ -779,7 +779,7 @@ Transform:
   m_GameObject: {fileID: 279673292}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.42720008, z: 0, w: 0.9041571}
-  m_LocalPosition: {x: -29.334, y: 1.242, z: -10.996}
+  m_LocalPosition: {x: -26.65, y: 1.242, z: -16.61}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1000,7 +1000,7 @@ PrefabInstance:
         type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
-      objectReference: {fileID: 1332483697}
+      objectReference: {fileID: 0}
     - target: {fileID: 1833477273651023365, guid: 4b20f13d419e62548994c2f1b8936253,
         type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
@@ -2789,37 +2789,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -2228417370725966487, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
---- !u!1 &1332483697
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1332483698}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1332483698
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1332483697}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -32.508247, y: 0.75881064, z: -8.527424}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1338418651 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2449949028982663424, guid: 10526014e2aca84438494ef6cb3d8e67,
@@ -9482,4 +9451,3 @@ SceneRoots:
   - {fileID: 1426775456}
   - {fileID: 604789288}
   - {fileID: 279673293}
-  - {fileID: 1332483698}
