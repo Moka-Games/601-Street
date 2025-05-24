@@ -6781,6 +6781,7 @@ GameObject:
   - component: {fileID: 2052084827}
   - component: {fileID: 2052084826}
   - component: {fileID: 2052084825}
+  - component: {fileID: 2052084828}
   m_Layer: 6
   m_Name: '||CANVAS-CORREO-UMI||'
   m_TagString: Untagged
@@ -6871,6 +6872,34 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &2052084828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2052084823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e67ea3df3af1e5e4f9ae56f089a8b8a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navigationDelay: 0.15
+  autoSelectFirstButton: 1
+  navigationSound: {fileID: 8300000, guid: 0d9fcf08b627dcc4d84f08219e203d5f, type: 3}
+  selectSound: {fileID: 8300000, guid: 2e49fb4d20f896e4f9bd2d8366469d92, type: 3}
+  firstSelected: {fileID: 1140370443}
+  isFirstSelected: 1
+  animationDuration: 0.3
+  selectedScale: 1.2
+  scaleInEase: 27
+  scaleOutEase: 26
+  enablePulseEffect: 1
+  pulseIntensity: 0.05
+  pulseDuration: 1.5
+  navigableElements:
+  - {fileID: 2002370054}
+  - {fileID: 1140370443}
 --- !u!1 &2056939750
 GameObject:
   m_ObjectHideFlags: 0
@@ -7047,6 +7076,7 @@ GameObject:
   - component: {fileID: 2131207132}
   - component: {fileID: 2131207131}
   - component: {fileID: 2131207130}
+  - component: {fileID: 2131207133}
   m_Layer: 6
   m_Name: '||CANVAS-CORREO-UMI||'
   m_TagString: Untagged
@@ -7137,6 +7167,33 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &2131207133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2131207128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e67ea3df3af1e5e4f9ae56f089a8b8a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navigationDelay: 0.15
+  autoSelectFirstButton: 1
+  navigationSound: {fileID: 8300000, guid: 0d9fcf08b627dcc4d84f08219e203d5f, type: 3}
+  selectSound: {fileID: 8300000, guid: 2e49fb4d20f896e4f9bd2d8366469d92, type: 3}
+  firstSelected: {fileID: 265875415}
+  isFirstSelected: 1
+  animationDuration: 0.3
+  selectedScale: 1.2
+  scaleInEase: 27
+  scaleOutEase: 26
+  enablePulseEffect: 1
+  pulseIntensity: 0.05
+  pulseDuration: 1.5
+  navigableElements:
+  - {fileID: 265875415}
 --- !u!4 &695268711259970820
 Transform:
   m_ObjectHideFlags: 0

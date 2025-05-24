@@ -70,7 +70,6 @@ public class Inventory_Manager : MonoBehaviour
     // Nombre del último ítem añadido (para el popup)
     private string lastAddedItemName = "";
 
-    // Clase para almacenar datos de interacción de prefabs
     [System.Serializable]
     public class PrefabInteractionData
     {

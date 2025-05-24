@@ -605,6 +605,7 @@ GameObject:
   - component: {fileID: 2198068879145832530}
   - component: {fileID: 2709807051701849143}
   - component: {fileID: 1171272331626706208}
+  - component: {fileID: 8356022592186844775}
   m_Layer: 5
   m_Name: "CONTRASE\xD1A CAJA FUERTE"
   m_TagString: Untagged
@@ -696,3 +697,30 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &8356022592186844775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7309195513340929731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e67ea3df3af1e5e4f9ae56f089a8b8a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navigationDelay: 0.15
+  autoSelectFirstButton: 1
+  navigationSound: {fileID: 8300000, guid: 0d9fcf08b627dcc4d84f08219e203d5f, type: 3}
+  selectSound: {fileID: 8300000, guid: 2e49fb4d20f896e4f9bd2d8366469d92, type: 3}
+  firstSelected: {fileID: 2619559168767029503}
+  isFirstSelected: 1
+  animationDuration: 0.3
+  selectedScale: 1.5
+  scaleInEase: 27
+  scaleOutEase: 26
+  enablePulseEffect: 1
+  pulseIntensity: 0.05
+  pulseDuration: 1.5
+  navigableElements:
+  - {fileID: 2619559168767029503}

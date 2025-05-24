@@ -893,7 +893,7 @@ PrefabInstance:
         type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 485234158}
+      objectReference: {fileID: 0}
     - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
         type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -1057,62 +1057,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15688ed7a4877264d901a8c454c4e1d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &485234157
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 485234159}
-  - component: {fileID: 485234158}
-  m_Layer: 0
-  m_Name: Cap-3-Comenzado_Activator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &485234158
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 485234157}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa7eee6eb12ee9744b28c7b4d22b4e9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stateModifications:
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: MapaExterior
-    objectID: Cap_3_Started
-  activateOnStart: 1
-  activateOnInteract: 0
-  activateOnce: 0
-  forceImmediateUpdate: 1
---- !u!4 &485234159
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 485234157}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.045291476, y: 1.2589282, z: -0.031618726}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &517242571
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2896,7 +2840,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &1850725879
 Light:
   m_ObjectHideFlags: 0
@@ -3589,7 +3533,7 @@ Transform:
   m_GameObject: {fileID: 8843830054491425394}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: -0.67884, y: -0.5847635, z: 0.15677047}
+  m_LocalPosition: {x: -0.807, y: -0.5847635, z: 0.15677047}
   m_LocalScale: {x: 45, y: 45, z: 45}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7903,7 +7847,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionID: PuzzleAbandonada
-  interactionPrompt: Presiona E para interactuar
+  interactionPrompt: Solve Puzzle
   onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -7949,7 +7893,7 @@ CapsuleCollider:
   m_Radius: 0.025
   m_Height: 0.04713827
   m_Direction: 1
-  m_Center: {x: -4.656613e-10, y: 0, z: 0.0018858517}
+  m_Center: {x: 0, y: 0, z: 0.0018858517}
 --- !u!114 &8843830054491425397
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8245,7 +8189,7 @@ Transform:
   m_GameObject: {fileID: 4715266118720719031}
   serializedVersion: 2
   m_LocalRotation: {x: -0.5, y: 0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: -0.6588437, y: -0.08011198, z: 0.83571196}
+  m_LocalPosition: {x: -0.6588437, y: -0.105, z: 0.88}
   m_LocalScale: {x: 60, y: 60, z: 60}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -8509,4 +8453,3 @@ SceneRoots:
   - {fileID: 1391650088}
   - {fileID: 1046539177}
   - {fileID: 478103055}
-  - {fileID: 485234159}
