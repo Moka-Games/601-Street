@@ -7522,7 +7522,6 @@ GameObject:
   - component: {fileID: 6878170232025778812}
   - component: {fileID: 6878170232025778813}
   - component: {fileID: 6878170232025778814}
-  - component: {fileID: 6878170232025778815}
   m_Layer: 6
   m_Name: Cerradura
   m_TagString: Untagged
@@ -7602,32 +7601,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &6878170232025778815
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6878170232025778811}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectID: Cerradura
-  useSceneName: 1
-  sceneName: CasaNyssa
-  defaultActiveState: 0
-  applyStateImmediately: 1
-  onActivate:
-    m_PersistentCalls:
-      m_Calls: []
-  onDeactivate:
-    m_PersistentCalls:
-      m_Calls: []
-  listenOnlyWhenActive: 0
-  useTransition: 0
-  transitionDuration: 0.5
 --- !u!33 &7688419701685249851
 MeshFilter:
   m_ObjectHideFlags: 0
