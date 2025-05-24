@@ -178,6 +178,22 @@ public class PlayerController : MonoBehaviour, PlayerControls.IGameplayActions
         // No se usa en PlayerController - se maneja en DialogueManager
     }
 
+    public void OnLockpick(InputAction.CallbackContext context)
+    {
+        // No se usa en PlayerController - se maneja en LockPick
+    }
+
+    // Métodos adicionales para los nuevos inputs (si existen)
+    public void OnTurn_Lockpick(InputAction.CallbackContext context)
+    {
+        // No se usa en PlayerController - se maneja en LockPick
+    }
+
+    public void OnTry_LockPick(InputAction.CallbackContext context)
+    {
+        // No se usa en PlayerController - se maneja en LockPick
+    }
+
     #endregion
 
     private bool IsCurrentlyUsingGamepad()

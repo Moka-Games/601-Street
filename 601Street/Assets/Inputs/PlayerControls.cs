@@ -162,6 +162,24 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Turn_Lockpick"",
+                    ""type"": ""Value"",
+                    ""id"": ""e60e3710-5149-497f-ac4f-c55858fafb86"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Try_LockPick"",
+                    ""type"": ""Button"",
+                    ""id"": ""613e07d9-389c-4ba2-8416-07d5f1124639"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -582,6 +600,50 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""SkipDialogue"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c8f020e1-d467-40da-ae33-8e78933682e8"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Turn_Lockpick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c04ee5b3-c73c-4c33-8b6f-119a575645bd"",
+                    ""path"": ""<DualShockGamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Turn_Lockpick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4c46b9c4-aff7-4d9d-a214-13d1937b2aed"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Try_LockPick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e7fcae0e-fa3c-45f7-9285-f2a8565cf02b"",
+                    ""path"": ""<DualShockGamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Try_LockPick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -829,6 +891,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Gameplay_ToggleInventory = m_Gameplay.FindAction("ToggleInventory", throwIfNotFound: true);
         m_Gameplay_Pause = m_Gameplay.FindAction("Pause", throwIfNotFound: true);
         m_Gameplay_SkipDialogue = m_Gameplay.FindAction("SkipDialogue", throwIfNotFound: true);
+        m_Gameplay_Turn_Lockpick = m_Gameplay.FindAction("Turn_Lockpick", throwIfNotFound: true);
+        m_Gameplay_Try_LockPick = m_Gameplay.FindAction("Try_LockPick", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -924,6 +988,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_ToggleInventory;
     private readonly InputAction m_Gameplay_Pause;
     private readonly InputAction m_Gameplay_SkipDialogue;
+    private readonly InputAction m_Gameplay_Turn_Lockpick;
+    private readonly InputAction m_Gameplay_Try_LockPick;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -967,6 +1033,14 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/SkipDialogue".
         /// </summary>
         public InputAction @SkipDialogue => m_Wrapper.m_Gameplay_SkipDialogue;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/Turn_Lockpick".
+        /// </summary>
+        public InputAction @Turn_Lockpick => m_Wrapper.m_Gameplay_Turn_Lockpick;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/Try_LockPick".
+        /// </summary>
+        public InputAction @Try_LockPick => m_Wrapper.m_Gameplay_Try_LockPick;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1017,6 +1091,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @SkipDialogue.started += instance.OnSkipDialogue;
             @SkipDialogue.performed += instance.OnSkipDialogue;
             @SkipDialogue.canceled += instance.OnSkipDialogue;
+            @Turn_Lockpick.started += instance.OnTurn_Lockpick;
+            @Turn_Lockpick.performed += instance.OnTurn_Lockpick;
+            @Turn_Lockpick.canceled += instance.OnTurn_Lockpick;
+            @Try_LockPick.started += instance.OnTry_LockPick;
+            @Try_LockPick.performed += instance.OnTry_LockPick;
+            @Try_LockPick.canceled += instance.OnTry_LockPick;
         }
 
         /// <summary>
@@ -1052,6 +1132,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @SkipDialogue.started -= instance.OnSkipDialogue;
             @SkipDialogue.performed -= instance.OnSkipDialogue;
             @SkipDialogue.canceled -= instance.OnSkipDialogue;
+            @Turn_Lockpick.started -= instance.OnTurn_Lockpick;
+            @Turn_Lockpick.performed -= instance.OnTurn_Lockpick;
+            @Turn_Lockpick.canceled -= instance.OnTurn_Lockpick;
+            @Try_LockPick.started -= instance.OnTry_LockPick;
+            @Try_LockPick.performed -= instance.OnTry_LockPick;
+            @Try_LockPick.canceled -= instance.OnTry_LockPick;
         }
 
         /// <summary>
@@ -1277,6 +1363,20 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSkipDialogue(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Turn_Lockpick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTurn_Lockpick(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Try_LockPick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTry_LockPick(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
