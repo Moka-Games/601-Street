@@ -65,6 +65,10 @@ public class DialogueManager : MonoBehaviour
     private PlayerControls playerControls;
     private InputAction skipDialogueAction;
 
+    [Header("Navigation Integration - AÑADIR AL INSPECTOR")]
+    [SerializeField]
+    private UINavigationManager uiNavigationManager;
+
     void Awake()
     {
         if (Instance == null)
@@ -168,6 +172,15 @@ public class DialogueManager : MonoBehaviour
         if (contentText != null)
         {
             contentText.richText = true;
+        }
+
+        if (uiNavigationManager == null)
+        {
+            uiNavigationManager = FindAnyObjectByType<UINavigationManager>();
+            if (uiNavigationManager == null)
+            {
+                Debug.LogWarning("UINavigationManager no encontrado. Las protecciones anti-doble input no funcionarán.");
+            }
         }
     }
 
@@ -460,6 +473,15 @@ public class DialogueManager : MonoBehaviour
 
     public void SelectDiceOption()
     {
+        Debug.Log("Seleccionando opción de dados - Implementando protecciones anti-doble input");
+
+        // PROTECCIÓN CRÍTICA: Bloquear inputs del sistema de navegación temporalmente
+        if (uiNavigationManager != null)
+        {
+            uiNavigationManager.BlockInputTemporarily(1.0f); // Bloquear por 1 segundo
+            Debug.Log("Sistema de navegación bloqueado temporalmente");
+        }
+
         // Desactivar la interfaz de diálogo
         dialogueInterface.SetActive(false);
 
@@ -471,6 +493,8 @@ public class DialogueManager : MonoBehaviour
 
         // Configurar el DC para la tirada
         diceManager.SetDifficultyClass(currentConversation.dialogueOptions[selectedOptionIndex].difficultyClass);
+
+        Debug.Log("Interfaz de dados activada con protecciones");
     }
 
     public void OnTypingComplete()
