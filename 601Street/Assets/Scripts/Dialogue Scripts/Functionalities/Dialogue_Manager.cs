@@ -3,7 +3,8 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Collections;
-using DG.Tweening; // Añadido para DOTween
+using DG.Tweening;
+using UnityEngine.InputSystem;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -59,6 +60,15 @@ public class DialogueManager : MonoBehaviour
 
     private Vector2 initialDialoguePosition = Vector2.zero;
     private bool initialPositionSaved = false;
+
+    // Input System
+    private PlayerControls playerControls;
+    private InputAction skipDialogueAction;
+
+    [Header("Navigation Integration - AÑADIR AL INSPECTOR")]
+    [SerializeField]
+    private UINavigationManager uiNavigationManager;
+
     void Awake()
     {
         if (Instance == null)
@@ -68,6 +78,64 @@ public class DialogueManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
+        }
+
+        // Inicializar Input System
+        InitializeInputSystem();
+    }
+
+    private void InitializeInputSystem()
+    {
+        playerControls = new PlayerControls();
+        skipDialogueAction = playerControls.Gameplay.SkipDialogue;
+
+        // Suscribirse al evento de skip dialogue
+        skipDialogueAction.performed += OnSkipDialogueInput;
+    }
+
+    private void OnEnable()
+    {
+        playerControls?.Gameplay.Enable();
+    }
+
+    private void OnDisable()
+    {
+        playerControls?.Gameplay.Disable();
+    }
+
+    private void OnDestroy()
+    {
+        if (skipDialogueAction != null)
+        {
+            skipDialogueAction.performed -= OnSkipDialogueInput;
+        }
+
+        playerControls?.Dispose();
+    }
+
+    // Callback para el Input System
+    private void OnSkipDialogueInput(InputAction.CallbackContext context)
+    {
+        // Solo procesar el input si estamos en conversación y el diálogo está activo
+        if (dialogueUI != null && dialogueUI.activeSelf && isInConversation)
+        {
+            if (isTyping)
+            {
+                if (typewriterEffect != null)
+                {
+                    typewriterEffect.StopTyping();
+                }
+                isTyping = false;
+            }
+            else
+            {
+                if (Next_bubble != null)
+                {
+                    Next_bubble.SetActive(false);
+                }
+                NextDialogue();
+            }
         }
     }
 
@@ -105,35 +173,16 @@ public class DialogueManager : MonoBehaviour
         {
             contentText.richText = true;
         }
-    }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (uiNavigationManager == null)
         {
-            if (dialogueUI != null && dialogueUI.activeSelf)
+            uiNavigationManager = FindAnyObjectByType<UINavigationManager>();
+            if (uiNavigationManager == null)
             {
-                if (isTyping)
-                {
-                    if (typewriterEffect != null)
-                    {
-                        typewriterEffect.StopTyping();
-                    }
-                    isTyping = false;
-                }
-                else
-                {
-                    if (Next_bubble != null)
-                    {
-                        Next_bubble.SetActive(false);
-                    }
-                    NextDialogue();
-                }
+                Debug.LogWarning("UINavigationManager no encontrado. Las protecciones anti-doble input no funcionarán.");
             }
         }
     }
-
-    
 
     public void StartConversation(Conversation conversation, NPC npc)
     {
@@ -421,8 +470,18 @@ public class DialogueManager : MonoBehaviour
 
         Debug.Log("Conversación finalizada - Cooldown iniciado");
     }
+
     public void SelectDiceOption()
     {
+        Debug.Log("Seleccionando opción de dados - Implementando protecciones anti-doble input");
+
+        // PROTECCIÓN CRÍTICA: Bloquear inputs del sistema de navegación temporalmente
+        if (uiNavigationManager != null)
+        {
+            uiNavigationManager.BlockInputTemporarily(1.0f); // Bloquear por 1 segundo
+            Debug.Log("Sistema de navegación bloqueado temporalmente");
+        }
+
         // Desactivar la interfaz de diálogo
         dialogueInterface.SetActive(false);
 
@@ -434,6 +493,8 @@ public class DialogueManager : MonoBehaviour
 
         // Configurar el DC para la tirada
         diceManager.SetDifficultyClass(currentConversation.dialogueOptions[selectedOptionIndex].difficultyClass);
+
+        Debug.Log("Interfaz de dados activada con protecciones");
     }
 
     public void OnTypingComplete()
@@ -489,6 +550,7 @@ public class DialogueManager : MonoBehaviour
             diceInterface.SetActive(false);
         }
     }
+
     private void AnimateDialogueEntry()
     {
         // Asegurarnos de que dialogueUI existe y está activo
@@ -564,6 +626,40 @@ public class DialogueManager : MonoBehaviour
     {
         return isInConversation;
     }
+
+    /// <summary>
+    /// Obtiene el texto de la tecla de skip dialogue para mostrar al usuario
+    /// </summary>
+    public string GetSkipDialogueKeyDisplayText()
+    {
+        if (skipDialogueAction != null && skipDialogueAction.bindings.Count > 0)
+        {
+            // Obtener el primer binding para mostrar
+            var binding = skipDialogueAction.bindings[0];
+            string displayString = InputControlPath.ToHumanReadableString(binding.effectivePath,
+                InputControlPath.HumanReadableStringOptions.OmitDevice);
+            return displayString;
+        }
+        return "E"; // Fallback
+    }
+
+    /// <summary>
+    /// Habilita o deshabilita temporalmente el input de skip dialogue
+    /// </summary>
+    public void SetSkipDialogueInputEnabled(bool enabled)
+    {
+        if (skipDialogueAction != null)
+        {
+            if (enabled)
+            {
+                skipDialogueAction.Enable();
+            }
+            else
+            {
+                skipDialogueAction.Disable();
+            }
+        }
+    }
 }
 
 [System.Serializable]
@@ -573,6 +669,7 @@ public class Dialogue
     [TextArea(4, 4)]
     public string content;
 }
+
 public static class TextFormatHelper
 {
     public static string ProcessTextTags(string input)
@@ -646,5 +743,4 @@ public static class TextFormatHelper
 
         return processed;
     }
-    
 }

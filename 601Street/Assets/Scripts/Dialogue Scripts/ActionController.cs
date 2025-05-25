@@ -57,8 +57,8 @@ public class ActionController : MonoBehaviour
 ));
             RegisterAction("Conversacion_Policia_1", new DialogueAction(
     () => Actions_Script.Instance.ActivarObjetosPolicia1(),
-    null,
-    null
+    () => Actions_Script.Instance.ActivarObjetosPolicia1(),
+    () => Actions_Script.Instance.ActivarObjetosPolicia1()
 ));
         RegisterAction("FracasoBar", new DialogueAction(
     () => Actions_Script.Instance.ActivarObjetosBar(),
@@ -72,7 +72,7 @@ public class ActionController : MonoBehaviour
 ));
 
         RegisterAction("Policia_SegudoEncuentro", new DialogueAction(
-    () => Actions_Script.Instance.ActivarLlamadaDaichiPostComisaria(),
+    () => Actions_Script.Instance.ActivarObjetosPolicia2(),
     () => Actions_Script.Instance.ActivarObjetosPolicia2(),
     () => Actions_Script.Instance.ActivarObjetosPolicia2_Fracaso()
 ));    

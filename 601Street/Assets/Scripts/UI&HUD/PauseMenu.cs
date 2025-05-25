@@ -1,8 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 /// <summary>
-/// Controla el menú de pausa del juego, integrado con los sistemas de gestión de escenas y estados del juego.
+/// Controla el menú de pausa del juego, integrado con los sistemas de gestión de escenas,
+/// estados del juego y el nuevo Input System de Unity.
 /// </summary>
 public class PauseMenu : MonoBehaviour
 {
@@ -12,8 +14,11 @@ public class PauseMenu : MonoBehaviour
 
     [Header("Configuración")]
     [SerializeField] private string mainMenuSceneName = "MainMenu";
-    [SerializeField] private KeyCode pauseKey = KeyCode.Escape;
     [SerializeField] private float delayBeforeSceneChange = 0.5f;
+
+    // Input System
+    private PlayerControls playerControls;
+    private InputAction pauseAction;
 
     // Estado del juego
     private bool gamePaused = false;
@@ -27,7 +32,10 @@ public class PauseMenu : MonoBehaviour
 
     private void Awake()
     {
-        // Inicializar
+        // Inicializar Input System
+        InitializeInputSystem();
+
+        // Inicializar UI
         if (pauseMenuUI != null)
         {
             pauseMenuUI.SetActive(false);
@@ -42,23 +50,49 @@ public class PauseMenu : MonoBehaviour
         FindManagerReferences();
     }
 
+    private void InitializeInputSystem()
+    {
+        playerControls = new PlayerControls();
+        pauseAction = playerControls.Gameplay.Pause;
+
+        // Suscribirse al evento de pausa
+        pauseAction.performed += OnPauseInput;
+    }
+
+    private void OnEnable()
+    {
+        playerControls?.Gameplay.Enable();
+    }
+
+    private void OnDisable()
+    {
+        playerControls?.Gameplay.Disable();
+    }
+
+    private void OnDestroy()
+    {
+        if (pauseAction != null)
+        {
+            pauseAction.performed -= OnPauseInput;
+        }
+
+        playerControls?.Dispose();
+    }
+
     private void Start()
     {
         gamePaused = false;
         Time.timeScale = 1f;
     }
 
-    private void Update()
+    // Callback para el Input System
+    private void OnPauseInput(InputAction.CallbackContext context)
     {
         // Solo verificar input si no estamos en una transición de escena
         if (sceneManager != null && sceneManager.IsTransitioning())
             return;
 
-        // Verificar si se presiona la tecla de pausa
-        if (Input.GetKeyDown(pauseKey))
-        {
-            TogglePause();
-        }
+        TogglePause();
     }
 
     /// <summary>
@@ -297,5 +331,45 @@ public class PauseMenu : MonoBehaviour
     public bool IsGamePaused()
     {
         return gamePaused;
+    }
+
+    /// <summary>
+    /// Método público para pausar el juego desde código (útil para cutscenes, etc.)
+    /// </summary>
+    public void ForcePause()
+    {
+        if (!gamePaused)
+        {
+            PauseGame();
+        }
+    }
+
+    /// <summary>
+    /// Método público para reanudar el juego desde código
+    /// </summary>
+    public void ForceResume()
+    {
+        if (gamePaused)
+        {
+            ResumeGame();
+        }
+    }
+
+    /// <summary>
+    /// Habilita o deshabilita temporalmente el input de pausa
+    /// </summary>
+    public void SetPauseInputEnabled(bool enabled)
+    {
+        if (pauseAction != null)
+        {
+            if (enabled)
+            {
+                pauseAction.Enable();
+            }
+            else
+            {
+                pauseAction.Disable();
+            }
+        }
     }
 }

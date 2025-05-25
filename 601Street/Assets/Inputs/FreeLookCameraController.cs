@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 public class FreeLookCameraController : MonoBehaviour
 {
     [Header("Input Settings")]
-    [Tooltip("Velocidad de rotación con el stick derecho del gamepad")]
+    [Tooltip("Velocidad base de rotación con el stick derecho del gamepad")]
     [SerializeField] private float gamepadLookSpeed = 300f;
 
     [Tooltip("Velocidad de rotación horizontal con el mouse")]
@@ -21,34 +21,65 @@ public class FreeLookCameraController : MonoBehaviour
     [Tooltip("Botón del mouse que habilita la rotación (0 = izquierdo, 1 = derecho, 2 = medio)")]
     [SerializeField] private int mouseButton = 1;
 
+    [Header("Gamepad Enhanced Settings")]
+    [Tooltip("Multiplicador de velocidad cuando el stick está completamente presionado")]
+    [SerializeField] private float gamepadSpeedMultiplier = 1.5f;
+
+    [Tooltip("Curva de aceleración para el gamepad (X = input magnitude, Y = speed multiplier)")]
+    [SerializeField] private AnimationCurve gamepadAccelerationCurve = AnimationCurve.EaseInOut(0f, 0.1f, 1f, 1f);
+
+    [Tooltip("Zona muerta del stick analógico (0-1)")]
+    [Range(0f, 1f)]
+    [SerializeField] private float gamepadDeadzone = 0.15f;
+
+    [Tooltip("Sensibilidad diferente para el eje X del gamepad")]
+    [SerializeField] private float gamepadXSensitivity = 1f;
+
+    [Tooltip("Sensibilidad diferente para el eje Y del gamepad")]
+    [SerializeField] private float gamepadYSensitivity = 0.8f;
+
     [Header("Rotation Settings")]
     [Tooltip("Suavizado de movimiento")]
     [Range(0.01f, 1f)]
     [SerializeField] private float lookSmoothing = 0.5f;
+
+    [Tooltip("Tiempo de aceleración para el gamepad (en segundos)")]
+    [SerializeField] private float gamepadAccelerationTime = 0.2f;
+
+    [Tooltip("Tiempo de desaceleración para el gamepad (en segundos)")]
+    [SerializeField] private float gamepadDecelerationTime = 0.1f;
+
+    [Header("Comfort Settings")]
+    [Tooltip("Invertir el eje Y del gamepad")]
+    [SerializeField] private bool invertGamepadY = false;
+
+    [Tooltip("Invertir el eje X del gamepad")]
+    [SerializeField] private bool invertGamepadX = false;
+
+    [Tooltip("Ajuste automático de sensibilidad basado en framerate")]
+    [SerializeField] private bool frameRateCompensation = true;
 
     // Referencias internas
     private CinemachineFreeLook freeLookCamera;
     private PlayerControls playerControls;
     private Vector2 lookInput;
     private Vector2 smoothedLookInput;
+    private Vector2 targetLookInput;
     private bool isUsingGamepad = false;
     private bool usingMouse = false;
+
+    // Variables para el sistema de aceleración mejorado
+    private Vector2 currentGamepadVelocity;
+    private float currentAcceleration = 0f;
+    private float lastInputMagnitude = 0f;
 
     // Referencias para el input del mouse
     private Vector2 mousePosition;
     private Vector2 lastMousePosition;
     private Vector2 mouseDelta;
 
-    // Método para detectar si estamos usando gamepad
-    private bool IsCurrentlyUsingGamepad()
-    {
-        if (Gamepad.current != null)
-        {
-            // Si hay alguna actividad en el gamepad, asumimos que estamos usándolo
-            return Gamepad.current.wasUpdatedThisFrame;
-        }
-        return false;
-    }
+    // Variables para compensación de framerate
+    private float deltaTimeMultiplier = 1f;
 
     private void Awake()
     {
@@ -111,16 +142,38 @@ public class FreeLookCameraController : MonoBehaviour
         lookInput = Vector2.zero;
     }
 
+    // Método mejorado para detectar si estamos usando gamepad
+    private bool IsCurrentlyUsingGamepad()
+    {
+        if (Gamepad.current != null)
+        {
+            // Verificar si hay actividad reciente en el gamepad
+            return Gamepad.current.rightStick.ReadValue().magnitude > gamepadDeadzone ||
+                   Gamepad.current.wasUpdatedThisFrame;
+        }
+        return false;
+    }
+
     private void Update()
     {
+        // Calcular compensación de framerate si está habilitada
+        if (frameRateCompensation)
+        {
+            deltaTimeMultiplier = Mathf.Clamp(Time.unscaledDeltaTime * 60f, 0.5f, 2f);
+        }
+
         // Manejar el input del mouse específicamente
+        HandleMouseInput();
+    }
+
+    private void HandleMouseInput()
+    {
         if (Mouse.current != null)
         {
             // Capturar la posición actual del mouse
             mousePosition = Mouse.current.position.ReadValue();
 
-            // Calcular el delta del mouse manualmente 
-            // (más preciso que depender del binding en algunas situaciones)
+            // Calcular el delta del mouse manualmente
             mouseDelta = mousePosition - lastMousePosition;
 
             // Verificar si el usuario está usando el mouse para la rotación
@@ -136,59 +189,147 @@ public class FreeLookCameraController : MonoBehaviour
 
     private void LateUpdate()
     {
-        // Primero verificamos si estamos usando el gamepad o el mouse
+        // Determinar qué método de input estamos usando
         bool isUsingMouse = !isUsingGamepad && usingMouse;
 
-        // Verificamos si podemos rotar con el mouse según la configuración
+        // Verificar si podemos rotar con el mouse según la configuración
         bool canRotateWithMouse = !requireMouseButtonToRotate ||
-                          (requireMouseButtonToRotate && (
-                           (mouseButton == 0 && Mouse.current != null && Mouse.current.leftButton.isPressed) ||
-                           (mouseButton == 1 && Mouse.current != null && Mouse.current.rightButton.isPressed) ||
-                           (mouseButton == 2 && Mouse.current != null && Mouse.current.middleButton.isPressed)));
+                          (requireMouseButtonToRotate && IsMouseButtonPressed());
 
-        // Si estamos usando el gamepad, usamos directamente el lookInput
-        if (isUsingGamepad && lookInput.magnitude > 0.1f)
+        // Procesar input de gamepad con mejoras
+        if (isUsingGamepad && lookInput.magnitude > gamepadDeadzone)
         {
-            // Aplicamos suavizado
-            smoothedLookInput = Vector2.Lerp(smoothedLookInput, lookInput, Time.deltaTime / lookSmoothing);
-
-            // Para el gamepad NO invertimos el eje Y
-            float yInput = smoothedLookInput.y;
-
-            // Aplicar la rotación con la velocidad del gamepad
-            freeLookCamera.m_XAxis.m_InputAxisValue = smoothedLookInput.x * gamepadLookSpeed * Time.deltaTime;
-            freeLookCamera.m_YAxis.m_InputAxisValue = yInput * gamepadLookSpeed * Time.deltaTime;
+            ProcessGamepadInput();
         }
-        // Si estamos usando el mouse y podemos rotar, usamos el mouseDelta
+        // Procesar input de mouse
         else if (isUsingMouse && canRotateWithMouse && mouseDelta.magnitude > 0.1f)
         {
-            // Para el mouse SIEMPRE invertimos el eje Y
-            // Nota: en Unity, el movimiento hacia arriba del mouse es positivo,
-            // pero para la cámara, el movimiento hacia arriba debe ser negativo,
-            // así que lo invertimos con un -mouseDelta.y
-            float yDelta = -mouseDelta.y;
-
-            // Aplicamos la rotación con velocidades específicas para mouse
-            // Nota: El mouse necesita valores más altos que el gamepad porque el delta es pequeño
-            freeLookCamera.m_XAxis.m_InputAxisValue = mouseDelta.x * mouseXSpeed * 0.01f;
-            freeLookCamera.m_YAxis.m_InputAxisValue = yDelta * mouseYSpeed * 0.01f;
+            ProcessMouseInput();
         }
+        // No hay input válido
         else
         {
-            // Si no hay input o no podemos rotar, gradualmente reducimos la velocidad a cero
-            freeLookCamera.m_XAxis.m_InputAxisValue = Mathf.Lerp(freeLookCamera.m_XAxis.m_InputAxisValue, 0, Time.deltaTime * 10f);
-            freeLookCamera.m_YAxis.m_InputAxisValue = Mathf.Lerp(freeLookCamera.m_YAxis.m_InputAxisValue, 0, Time.deltaTime * 10f);
-
-            // Reseteamos el smoothedLookInput
-            smoothedLookInput = Vector2.Lerp(smoothedLookInput, Vector2.zero, Time.deltaTime * 10f);
+            ProcessNoInput();
         }
 
         // Resetear usingMouse cada frame para que necesite confirmación constante
         usingMouse = false;
     }
 
-    // Métodos públicos para ajustar parámetros en tiempo de ejecución
+    private void ProcessGamepadInput()
+    {
+        // Aplicar zona muerta
+        Vector2 processedInput = ApplyDeadzone(lookInput, gamepadDeadzone);
 
+        // Aplicar inversiones
+        if (invertGamepadX) processedInput.x = -processedInput.x;
+        if (invertGamepadY) processedInput.y = -processedInput.y;
+
+        // Aplicar sensibilidades individuales
+        processedInput.x *= gamepadXSensitivity;
+        processedInput.y *= gamepadYSensitivity;
+
+        // Calcular la magnitud del input para la curva de aceleración
+        float inputMagnitude = processedInput.magnitude;
+
+        // Aplicar curva de aceleración
+        float accelerationMultiplier = gamepadAccelerationCurve.Evaluate(inputMagnitude);
+
+        // Sistema de aceleración temporal
+        float targetAcceleration = accelerationMultiplier * gamepadSpeedMultiplier;
+
+        // Interpolar la aceleración basada en si estamos acelerando o desacelerando
+        float accelerationSpeed = inputMagnitude > lastInputMagnitude ?
+            1f / gamepadAccelerationTime : 1f / gamepadDecelerationTime;
+
+        currentAcceleration = Mathf.Lerp(currentAcceleration, targetAcceleration,
+            Time.unscaledDeltaTime * accelerationSpeed);
+
+        // Aplicar suavizado con velocidad variable
+        float smoothingFactor = Mathf.Lerp(lookSmoothing * 2f, lookSmoothing * 0.5f, inputMagnitude);
+        targetLookInput = processedInput * currentAcceleration;
+        smoothedLookInput = Vector2.Lerp(smoothedLookInput, targetLookInput,
+            Time.unscaledDeltaTime / smoothingFactor);
+
+        // Aplicar compensación de framerate
+        Vector2 finalInput = smoothedLookInput * deltaTimeMultiplier;
+
+        // Aplicar la rotación
+        freeLookCamera.m_XAxis.m_InputAxisValue = finalInput.x * gamepadLookSpeed * Time.unscaledDeltaTime;
+        freeLookCamera.m_YAxis.m_InputAxisValue = finalInput.y * gamepadLookSpeed * Time.unscaledDeltaTime;
+
+        lastInputMagnitude = inputMagnitude;
+    }
+
+    private void ProcessMouseInput()
+    {
+        // Para el mouse SIEMPRE invertimos el eje Y para comportamiento natural
+        float yDelta = -mouseDelta.y;
+
+        // Aplicar compensación de framerate y sensibilidades
+        Vector2 mouseInput = new Vector2(
+            mouseDelta.x * mouseXSpeed * 0.01f * deltaTimeMultiplier,
+            yDelta * mouseYSpeed * 0.01f * deltaTimeMultiplier
+        );
+
+        // Aplicar directamente sin suavizado para respuesta inmediata del mouse
+        freeLookCamera.m_XAxis.m_InputAxisValue = mouseInput.x;
+        freeLookCamera.m_YAxis.m_InputAxisValue = mouseInput.y;
+
+        // Resetear aceleración del gamepad
+        currentAcceleration = 0f;
+        lastInputMagnitude = 0f;
+    }
+
+    private void ProcessNoInput()
+    {
+        // Suavizar hacia cero cuando no hay input
+        float dampingSpeed = 10f;
+
+        freeLookCamera.m_XAxis.m_InputAxisValue = Mathf.Lerp(
+            freeLookCamera.m_XAxis.m_InputAxisValue, 0,
+            Time.unscaledDeltaTime * dampingSpeed);
+
+        freeLookCamera.m_YAxis.m_InputAxisValue = Mathf.Lerp(
+            freeLookCamera.m_YAxis.m_InputAxisValue, 0,
+            Time.unscaledDeltaTime * dampingSpeed);
+
+        // Suavizar hacia cero los valores internos
+        smoothedLookInput = Vector2.Lerp(smoothedLookInput, Vector2.zero,
+            Time.unscaledDeltaTime * dampingSpeed);
+
+        currentAcceleration = Mathf.Lerp(currentAcceleration, 0f,
+            Time.unscaledDeltaTime * dampingSpeed);
+
+        lastInputMagnitude = 0f;
+    }
+
+    // Aplicar zona muerta circular mejorada
+    private Vector2 ApplyDeadzone(Vector2 input, float deadzone)
+    {
+        float magnitude = input.magnitude;
+
+        if (magnitude < deadzone)
+        {
+            return Vector2.zero;
+        }
+
+        // Remapear el rango [deadzone, 1] a [0, 1] para suavizar la transición
+        float normalizedMagnitude = (magnitude - deadzone) / (1f - deadzone);
+        return input.normalized * normalizedMagnitude;
+    }
+
+    // Verificar si algún botón del mouse está presionado según la configuración
+    private bool IsMouseButtonPressed()
+    {
+        if (Mouse.current == null) return false;
+
+        return (mouseButton == 0 && Mouse.current.leftButton.isPressed) ||
+               (mouseButton == 1 && Mouse.current.rightButton.isPressed) ||
+               (mouseButton == 2 && Mouse.current.middleButton.isPressed);
+    }
+
+    // Métodos públicos para ajustar parámetros en tiempo de ejecución
     public void SetGamepadLookSpeed(float speed)
     {
         gamepadLookSpeed = speed;
@@ -204,6 +345,18 @@ public class FreeLookCameraController : MonoBehaviour
         mouseYSpeed = speed;
     }
 
+    public void SetGamepadSensitivity(float xSensitivity, float ySensitivity)
+    {
+        gamepadXSensitivity = xSensitivity;
+        gamepadYSensitivity = ySensitivity;
+    }
+
+    public void SetGamepadInversion(bool invertX, bool invertY)
+    {
+        invertGamepadX = invertX;
+        invertGamepadY = invertY;
+    }
+
     public void RequireMouseButtonToRotate(bool require)
     {
         requireMouseButtonToRotate = require;
@@ -214,6 +367,39 @@ public class FreeLookCameraController : MonoBehaviour
         if (button >= 0 && button <= 2)
         {
             mouseButton = button;
+        }
+    }
+
+    public void SetGamepadDeadzone(float deadzone)
+    {
+        gamepadDeadzone = Mathf.Clamp01(deadzone);
+    }
+
+    // Método para aplicar un preset de configuración
+    public void ApplyComfortPreset(string presetName)
+    {
+        switch (presetName.ToLower())
+        {
+            case "responsive":
+                gamepadLookSpeed = 400f;
+                gamepadAccelerationTime = 0.1f;
+                gamepadDecelerationTime = 0.05f;
+                lookSmoothing = 0.3f;
+                break;
+
+            case "smooth":
+                gamepadLookSpeed = 250f;
+                gamepadAccelerationTime = 0.3f;
+                gamepadDecelerationTime = 0.2f;
+                lookSmoothing = 0.7f;
+                break;
+
+            case "cinematic":
+                gamepadLookSpeed = 200f;
+                gamepadAccelerationTime = 0.5f;
+                gamepadDecelerationTime = 0.3f;
+                lookSmoothing = 0.8f;
+                break;
         }
     }
 }

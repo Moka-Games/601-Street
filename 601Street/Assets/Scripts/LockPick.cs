@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using TMPro;
 using UnityEngine.Events;
 using Cinemachine;
 using Cinemachine.Utility;
 
-public class LockPick : MonoBehaviour
+public class LockPick : MonoBehaviour, PlayerControls.IGameplayActions
 {
     // Referencias de cámaras
     [Header("Referencias de Cámara")]
@@ -43,6 +44,17 @@ public class LockPick : MonoBehaviour
     [Range(1, 25)]
     public float lockRange = 10;
 
+    [Header("Configuración de Input")]
+    [Tooltip("Sensibilidad del input del lockpick (más alto = más sensible)")]
+    [SerializeField] private float lockpickInputSensitivity = 2f;
+    [Tooltip("Suavizado del input del lockpick")]
+    [SerializeField] private float lockpickInputSmoothing = 5f;
+    [Tooltip("Zona muerta para el input del lockpick")]
+    [Range(0f, 1f)]
+    [SerializeField] private float lockpickDeadzone = 0.1f;
+    [Tooltip("Invertir el input horizontal del lockpick")]
+    [SerializeField] private bool invertLockpickInput = true;
+
     // Representa la dificultad de la cerradura
     public TMP_Text difficultyText;
 
@@ -62,6 +74,13 @@ public class LockPick : MonoBehaviour
     private bool movePick = true;
     private bool isLockpickModeActive = false;
 
+    // Variables del nuevo sistema de input
+    private PlayerControls playerControls;
+    private Vector2 lockpickInput;
+    private Vector2 smoothedLockpickInput;
+    private bool tryLockPickPressed = false;
+    private bool tryLockPickHeld = false;
+
     // Referencia a un transform que mantendrá la posición constante de la ganzúa
     private Transform lockpickAnchor;
 
@@ -71,7 +90,7 @@ public class LockPick : MonoBehaviour
     // Rotación inicial del innerLock
     private Quaternion initialInnerLockRotation;
 
-    // Ángulo de la ganzúa cuando se presiona E
+    // Ángulo de la ganzúa cuando se presiona el botón
     private float lockedPickAngle;
 
     // Valor de rotación actual del innerLock (relativo a su posición inicial)
@@ -94,10 +113,10 @@ public class LockPick : MonoBehaviour
 
     void Awake()
     {
-        // Buscar la cámara principal si no está asignada
-        
+        // Inicializar el sistema de input
+        playerControls = new PlayerControls();
 
-        // Buscar la cámara del jugador (FreeLookCamera)
+        // Buscar la cámara principal si no está asignada
         FindPlayerCamera();
 
         // Verificar que la cámara principal tenga CinemachineBrain
@@ -123,6 +142,129 @@ public class LockPick : MonoBehaviour
             {
                 Debug.LogWarning("No se encontró PlayerInteraction. Algunas funcionalidades pueden no estar disponibles.");
             }
+        }
+    }
+
+    #region Input System Callbacks
+
+    public void OnWalking(InputAction.CallbackContext context)
+    {
+        // No se usa en LockPick - se maneja en PlayerController
+    }
+
+    public void OnSprint(InputAction.CallbackContext context)
+    {
+        // No se usa en LockPick - se maneja en PlayerController
+    }
+
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        // No se usa en LockPick - se maneja en PlayerInteraction
+    }
+
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        // No se usa en LockPick - se maneja en FreeLookCameraController
+    }
+
+    public void OnAcceptCall(InputAction.CallbackContext context)
+    {
+        // No se usa en LockPick
+    }
+
+    public void OnToggleInventory(InputAction.CallbackContext context)
+    {
+        // No se usa en LockPick
+    }
+
+    public void OnPause(InputAction.CallbackContext context)
+    {
+        // Lógica para salir del modo lockpick con Escape
+        if (context.performed && isLockpickModeActive)
+        {
+            ExitLockpickMode();
+        }
+    }
+
+    public void OnSkipDialogue(InputAction.CallbackContext context)
+    {
+        // No se usa en LockPick
+    }
+
+    public void OnLockpick(InputAction.CallbackContext context)
+    {
+        // Solo procesar el input si estamos en modo lockpick
+        if (!isLockpickModeActive) return;
+
+        if (context.canceled)
+        {
+            lockpickInput = Vector2.zero;
+        }
+        else
+        {
+            lockpickInput = context.ReadValue<Vector2>();
+        }
+    }
+
+    // Método para manejar el input de girar el lockpick (si existe)
+    public void OnTurn_Lockpick(InputAction.CallbackContext context)
+    {
+        // Usar el mismo método que OnLockpick para compatibilidad
+        OnLockpick(context);
+    }
+
+    // Método para manejar el input de intentar girar la cerradura
+    public void OnTry_LockPick(InputAction.CallbackContext context)
+    {
+        // Solo procesar si estamos en modo lockpick
+        if (!isLockpickModeActive) return;
+
+        if (context.started)
+        {
+            tryLockPickPressed = true;
+            tryLockPickHeld = true;
+        }
+        else if (context.canceled)
+        {
+            tryLockPickHeld = false;
+        }
+    }
+
+    #endregion
+
+    private void OnEnable()
+    {
+        if (playerControls != null)
+        {
+            playerControls.Gameplay.AddCallbacks(this);
+            // Solo habilitamos los controles cuando entramos en modo lockpick
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (playerControls != null)
+        {
+            playerControls.Gameplay.RemoveCallbacks(this);
+            playerControls.Gameplay.Disable();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (isLockpickModeActive)
+        {
+            ExitLockpickMode();
+        }
+
+        if (lockpickAnchor != null)
+        {
+            Destroy(lockpickAnchor.gameObject);
+        }
+
+        if (playerControls != null)
+        {
+            playerControls.Dispose();
         }
     }
 
@@ -238,6 +380,12 @@ public class LockPick : MonoBehaviour
     {
         if (!isLockpickModeActive && lockpickVCam != null)
         {
+            // Habilitar los controles de input
+            if (playerControls != null)
+            {
+                playerControls.Gameplay.Enable();
+            }
+
             // Guardar el estado de interacción actual
             if (playerInteraction != null)
             {
@@ -271,6 +419,12 @@ public class LockPick : MonoBehaviour
             // Reiniciamos el valor de rotación actual
             currentInnerLockRotation = 0f;
 
+            // Resetear variables de input
+            lockpickInput = Vector2.zero;
+            smoothedLockpickInput = Vector2.zero;
+            tryLockPickPressed = false;
+            tryLockPickHeld = false;
+
             // Invocamos el evento si hay listeners
             OnLockpickModeEntered?.Invoke();
 
@@ -294,6 +448,12 @@ public class LockPick : MonoBehaviour
     {
         if (isLockpickModeActive && lockpickVCam != null)
         {
+            // Deshabilitar los controles de input
+            if (playerControls != null)
+            {
+                playerControls.Gameplay.Disable();
+            }
+
             // Restauramos la prioridad original
             lockpickVCam.Priority = originalPriority;
             isLockpickModeActive = false;
@@ -364,6 +524,36 @@ public class LockPick : MonoBehaviour
         innerLock.rotation = initialInnerLockRotation * Quaternion.Euler(0, 0, angle);
     }
 
+    // Procesar el input del lockpick
+    private void ProcessLockpickInput()
+    {
+        // Aplicar zona muerta
+        Vector2 processedInput = lockpickInput;
+        if (processedInput.magnitude < lockpickDeadzone)
+        {
+            processedInput = Vector2.zero;
+        }
+
+        // Suavizar el input
+        smoothedLockpickInput = Vector2.Lerp(smoothedLockpickInput, processedInput,
+            Time.deltaTime * lockpickInputSmoothing);
+
+        // Convertir el input horizontal a ángulo
+        // Usamos solo el componente X para el movimiento izquierda/derecha
+        float horizontalInput = smoothedLockpickInput.x;
+
+        // Invertir el input si está configurado para hacerlo
+        if (invertLockpickInput)
+        {
+            horizontalInput = -horizontalInput;
+        }
+
+        float inputAngle = horizontalInput * lockpickInputSensitivity * maxAngle;
+
+        // Acumular el ángulo manteniendo los límites
+        eulerAngle = Mathf.Clamp(inputAngle, -maxAngle, maxAngle);
+    }
+
     void Update()
     {
         // Solo procesamos la lógica si está activo el modo lockpick
@@ -403,17 +593,20 @@ public class LockPick : MonoBehaviour
             return;
         }
 
-        // Procesamos la acción de la tecla E
-        if (Input.GetKeyDown(KeyCode.E))
+        // Procesamos la acción del botón Try_LockPick
+        if (tryLockPickPressed)
         {
             movePick = false;
             keyPressTime = 1;
-            // Guardamos el ángulo actual de la ganzúa al presionar E
+            // Guardamos el ángulo actual de la ganzúa al presionar el botón
             lockedPickAngle = eulerAngle;
             // Reiniciamos el valor de rotación actual del innerLock
             currentInnerLockRotation = 0f;
+
+            tryLockPickPressed = false; // Resetear el flag
         }
-        if (Input.GetKeyUp(KeyCode.E))
+
+        if (!tryLockPickHeld && keyPressTime > 0)
         {
             // En lugar de restaurar inmediatamente, iniciar la transición suave
             isReturning = true;
@@ -431,37 +624,17 @@ public class LockPick : MonoBehaviour
             keyPressTime = 0;
         }
 
-        // Lógica para salir del modo lockpick con Escape
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            ExitLockpickMode();
-            return;
-        }
-
         if (movePick)
         {
-            // Cuando movePick es true, controlamos la ganzúa con el ratón
-            // Calculamos el centro de la pantalla
-            Vector2 screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
-
-            // Calculamos la dirección desde el centro de la pantalla hacia la posición del mouse
-            Vector2 mouseDirection = Input.mousePosition - new Vector3(screenCenter.x, screenCenter.y, 0);
-
-            // Normalizamos la dirección para que solo nos interese la orientación
-            mouseDirection.Normalize();
-
-            // Calculamos el ángulo entre la dirección del mouse y el vector "arriba"
-            eulerAngle = Vector2.SignedAngle(Vector2.up, mouseDirection);
-
-            // Limitamos el ángulo al rango permitido
-            eulerAngle = Mathf.Clamp(eulerAngle, -maxAngle, maxAngle);
+            // Cuando movePick es true, controlamos la ganzúa con el input
+            ProcessLockpickInput();
 
             // Aplicamos la rotación respetando la rotación inicial del objeto
             transform.rotation = initialPickRotation * Quaternion.Euler(0, 0, eulerAngle);
         }
         else
         {
-            // Si no estamos moviendo la ganzúa (pulsamos E), calculamos las rotaciones
+            // Si no estamos moviendo la ganzúa (pulsamos el botón), calculamos las rotaciones
 
             // Calculamos la distancia angular más corta entre el ángulo actual y el ángulo de desbloqueo
             float angularDistance = Mathf.Abs(Mathf.DeltaAngle(lockedPickAngle, unlockAngle));
@@ -571,16 +744,39 @@ public class LockPick : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
-    {
-        if (isLockpickModeActive)
-        {
-            ExitLockpickMode();
-        }
+    #region Public Configuration Methods
 
-        if (lockpickAnchor != null)
-        {
-            Destroy(lockpickAnchor.gameObject);
-        }
+    /// <summary>
+    /// Configura la sensibilidad del input del lockpick
+    /// </summary>
+    public void SetLockpickInputSensitivity(float sensitivity)
+    {
+        lockpickInputSensitivity = Mathf.Max(0.1f, sensitivity);
     }
+
+    /// <summary>
+    /// Configura el suavizado del input del lockpick
+    /// </summary>
+    public void SetLockpickInputSmoothing(float smoothing)
+    {
+        lockpickInputSmoothing = Mathf.Max(0.1f, smoothing);
+    }
+
+    /// <summary>
+    /// Configura la zona muerta del input del lockpick
+    /// </summary>
+    public void SetLockpickDeadzone(float deadzone)
+    {
+        lockpickDeadzone = Mathf.Clamp01(deadzone);
+    }
+
+    /// <summary>
+    /// Configura si se debe invertir el input horizontal del lockpick
+    /// </summary>
+    public void SetInvertLockpickInput(bool invert)
+    {
+        invertLockpickInput = invert;
+    }
+
+    #endregion
 }

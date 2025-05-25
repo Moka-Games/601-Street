@@ -792,6 +792,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 2056939757}
+        m_TargetAssemblyTypeName: GameStateController, Assembly-CSharp
+        m_MethodName: ChangeGameState
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Ordenador_Interactuado
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &265875416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4693,6 +4705,11 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0.59521997
       objectReference: {fileID: 0}
+    - target: {fileID: -1740540149701742743, guid: 17db0cd694e84cf49b9fc0c842e6dc4d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.352
+      objectReference: {fileID: 0}
     - target: {fileID: -1508278421927197766, guid: 17db0cd694e84cf49b9fc0c842e6dc4d,
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -6769,6 +6786,7 @@ GameObject:
   - component: {fileID: 2052084827}
   - component: {fileID: 2052084826}
   - component: {fileID: 2052084825}
+  - component: {fileID: 2052084828}
   m_Layer: 6
   m_Name: '||CANVAS-CORREO-UMI||'
   m_TagString: Untagged
@@ -6859,6 +6877,34 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &2052084828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2052084823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e67ea3df3af1e5e4f9ae56f089a8b8a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navigationDelay: 0.15
+  autoSelectFirstButton: 1
+  navigationSound: {fileID: 8300000, guid: 0d9fcf08b627dcc4d84f08219e203d5f, type: 3}
+  selectSound: {fileID: 8300000, guid: 2e49fb4d20f896e4f9bd2d8366469d92, type: 3}
+  firstSelected: {fileID: 1140370443}
+  isFirstSelected: 1
+  animationDuration: 0.3
+  selectedScale: 1.2
+  scaleInEase: 27
+  scaleOutEase: 26
+  enablePulseEffect: 1
+  pulseIntensity: 0.05
+  pulseDuration: 1.5
+  navigableElements:
+  - {fileID: 2002370054}
+  - {fileID: 1140370443}
 --- !u!1 &2056939750
 GameObject:
   m_ObjectHideFlags: 0
@@ -6944,18 +6990,6 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 2056939757}
-        m_TargetAssemblyTypeName: GameStateController, Assembly-CSharp
-        m_MethodName: ChangeGameState
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: Ordenador_Interactuado
           m_BoolArgument: 0
         m_CallState: 2
   onInteracted:
@@ -7047,6 +7081,7 @@ GameObject:
   - component: {fileID: 2131207132}
   - component: {fileID: 2131207131}
   - component: {fileID: 2131207130}
+  - component: {fileID: 2131207133}
   m_Layer: 6
   m_Name: '||CANVAS-CORREO-UMI||'
   m_TagString: Untagged
@@ -7137,6 +7172,33 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &2131207133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2131207128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e67ea3df3af1e5e4f9ae56f089a8b8a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navigationDelay: 0.15
+  autoSelectFirstButton: 1
+  navigationSound: {fileID: 8300000, guid: 0d9fcf08b627dcc4d84f08219e203d5f, type: 3}
+  selectSound: {fileID: 8300000, guid: 2e49fb4d20f896e4f9bd2d8366469d92, type: 3}
+  firstSelected: {fileID: 265875415}
+  isFirstSelected: 1
+  animationDuration: 0.3
+  selectedScale: 1.2
+  scaleInEase: 27
+  scaleOutEase: 26
+  enablePulseEffect: 1
+  pulseIntensity: 0.05
+  pulseDuration: 1.5
+  navigableElements:
+  - {fileID: 265875415}
 --- !u!4 &695268711259970820
 Transform:
   m_ObjectHideFlags: 0
@@ -7198,7 +7260,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ecc5a774897a5af4cb5fe964cb8349f2, type: 2}
+  - {fileID: 2100000, guid: b6c2b4d6af14978469c1fdc725dc2f25, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -7315,7 +7377,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ecc5a774897a5af4cb5fe964cb8349f2, type: 2}
+  - {fileID: 2100000, guid: 6fc26fd8595a890418ad962ba96a3aed, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -7409,7 +7471,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ecc5a774897a5af4cb5fe964cb8349f2, type: 2}
+  - {fileID: 2100000, guid: 6fc26fd8595a890418ad962ba96a3aed, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -7465,7 +7527,6 @@ GameObject:
   - component: {fileID: 6878170232025778812}
   - component: {fileID: 6878170232025778813}
   - component: {fileID: 6878170232025778814}
-  - component: {fileID: 6878170232025778815}
   m_Layer: 6
   m_Name: Cerradura
   m_TagString: Untagged
@@ -7545,32 +7606,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &6878170232025778815
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6878170232025778811}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectID: Cerradura
-  useSceneName: 1
-  sceneName: CasaNyssa
-  defaultActiveState: 0
-  applyStateImmediately: 1
-  onActivate:
-    m_PersistentCalls:
-      m_Calls: []
-  onDeactivate:
-    m_PersistentCalls:
-      m_Calls: []
-  listenOnlyWhenActive: 0
-  useTransition: 0
-  transitionDuration: 0.5
 --- !u!33 &7688419701685249851
 MeshFilter:
   m_ObjectHideFlags: 0
