@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Versión CORREGIDA del gestor de inventario donde ToggleInventory funciona como verdadero TOGGLE
+/// Versión final corregida del gestor de inventario donde ToggleInventory funciona como verdadero TOGGLE
 /// - ToggleInventory puede abrir Y cerrar el inventario
 /// - Cancel está completamente eliminado del sistema de inventario
 /// </summary>
@@ -118,17 +118,29 @@ public class Inventory_Manager : MonoBehaviour
 
     private void OnEnable()
     {
-        // Inicialmente solo habilitar Gameplay
-        playerControls?.Gameplay.Enable();
-        Debug.Log("Inventory_Manager: Gameplay actions enabled");
+        // CRÍTICO: Solo habilitar Gameplay al inicio, NUNCA UI
+        if (playerControls != null)
+        {
+            playerControls.Gameplay.Enable();
+            playerControls.UI.Disable(); // Asegurar que UI esté deshabilitado inicialmente
+            toggleInventoryUI?.Disable(); // Asegurar que la acción personalizada esté deshabilitada
+        }
+        Debug.Log("Inventory_Manager: Solo Gameplay habilitado al inicio");
     }
 
     private void OnDisable()
     {
-        // Deshabilitar todo
-        playerControls?.Gameplay.Disable();
-        playerControls?.UI.Disable();
-        toggleInventoryUI?.Disable();
+        // Deshabilitar todo de forma segura
+        if (playerControls != null)
+        {
+            playerControls.Gameplay.Disable();
+            playerControls.UI.Disable();
+        }
+
+        if (toggleInventoryUI != null)
+        {
+            toggleInventoryUI.Disable();
+        }
 
         Debug.Log("Inventory_Manager: All actions disabled");
     }
