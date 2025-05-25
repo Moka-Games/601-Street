@@ -1005,6 +1005,8 @@ MonoBehaviour:
   autoSelectFirstButton: 1
   navigationSound: {fileID: 8300000, guid: 0d9fcf08b627dcc4d84f08219e203d5f, type: 3}
   selectSound: {fileID: 8300000, guid: 2e49fb4d20f896e4f9bd2d8366469d92, type: 3}
+  enableAutoSelection: 1
+  autoSelectionCheckInterval: 0.1
   firstSelected: {fileID: 8943669681785385012}
   isFirstSelected: 1
   animationDuration: 0.3
@@ -1936,7 +1938,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7342285045038154459, guid: 6eed741178b27d34599012cfbf910397,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2879689020380121666}
   m_SourcePrefab: {fileID: 100100000, guid: 6eed741178b27d34599012cfbf910397, type: 3}
 --- !u!224 &3962051608893385334 stripped
 RectTransform:
@@ -1950,3 +1956,31 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1591337972877220095}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8354344625997503012 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7342285045038154459, guid: 6eed741178b27d34599012cfbf910397,
+    type: 3}
+  m_PrefabInstance: {fileID: 1591337972877220095}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &2879689020380121666
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8354344625997503012}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 504f79589bde6d046a8e23522254e897, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

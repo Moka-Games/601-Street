@@ -49,6 +49,9 @@ public class Dice_Manager : MonoBehaviour
     [Header("Navigation Integration")]
     [SerializeField] private UINavigationManager navigationManager;
 
+    [Header("Bonus System Integration")]
+    [SerializeField] private BonusManager bonusManager;
+
     [Header("Input Protection")]
     [SerializeField] private float inputProtectionDelay = 0.8f; // Delay antes de permitir inputs
     private bool isInputProtected = true;
@@ -107,6 +110,10 @@ public class Dice_Manager : MonoBehaviour
         // Buscar UINavigationManager si no está asignado
         if (navigationManager == null)
             navigationManager = FindAnyObjectByType<UINavigationManager>();
+
+        // Buscar BonusManager si no está asignado
+        if (bonusManager == null)
+            bonusManager = BonusManager.Instance;
 
         ResetUI();
         InitializeAnimations();
@@ -200,6 +207,12 @@ public class Dice_Manager : MonoBehaviour
         // BLOQUEO INMEDIATO para prevenir tiradas múltiples
         canRoll = false;
         hasRolledInCurrentSession = true;
+
+        // Notificar al BonusManager que se inició una tirada
+        if (bonusManager != null)
+        {
+            bonusManager.OnDiceRollStarted();
+        }
 
         // Deshabilitar completamente el botón de lanzamiento
         DisableRollButton();
@@ -483,6 +496,12 @@ public class Dice_Manager : MonoBehaviour
         diceTweener.AppendInterval(1f);
         diceTweener.AppendCallback(() => {
             ShowContinueButton();
+
+            // Notificar al BonusManager que la tirada ha terminado
+            if (bonusManager != null)
+            {
+                bonusManager.OnDiceRollCompleted();
+            }
         });
 
         // Iniciar la secuencia
@@ -491,28 +510,45 @@ public class Dice_Manager : MonoBehaviour
 
     private void ApplyBonuses()
     {
-        Debug.Log("Aplicando bonuses");
+        Debug.Log("Aplicando bonuses - Nuevo Sistema");
 
-        // Aplicar cada bonus activo de forma directa
-        if (bonus1Activated)
+        // NUEVO SISTEMA: Usar BonusManager en lugar del sistema anterior
+        if (bonusManager != null && bonusManager.HasActiveBBonus())
         {
-            totalRoll += bonus1;
-            ShowBonusPopup(bonus1Popup, bonus1);
-            Debug.Log($"Bonus 1 aplicado: +{bonus1}");
+            int bonusValue = bonusManager.GetActiveBonusValue();
+            string bonusName = bonusManager.GetActiveBonusName();
+
+            totalRoll += bonusValue;
+            Debug.Log($"Bonus aplicado - {bonusName}: +{bonusValue}");
+
+            // Mostrar popup del bonus aplicado
+            ShowNewBonusPopup(bonusName, bonusValue);
         }
-
-        if (bonus2Activated)
+        else
         {
-            totalRoll += bonus2;
-            ShowBonusPopup(bonus2Popup, bonus2);
-            Debug.Log($"Bonus 2 aplicado: +{bonus2}");
-        }
+            // SISTEMA ANTERIOR (Fallback): Mantener compatibilidad
+            Debug.Log("Usando sistema de bonuses anterior (fallback)");
 
-        if (bonus3Activated)
-        {
-            totalRoll += bonus3;
-            ShowBonusPopup(bonus3Popup, bonus3);
-            Debug.Log($"Bonus 3 aplicado: +{bonus3}");
+            if (bonus1Activated)
+            {
+                totalRoll += bonus1;
+                ShowBonusPopup(bonus1Popup, bonus1);
+                Debug.Log($"Bonus 1 aplicado: +{bonus1}");
+            }
+
+            if (bonus2Activated)
+            {
+                totalRoll += bonus2;
+                ShowBonusPopup(bonus2Popup, bonus2);
+                Debug.Log($"Bonus 2 aplicado: +{bonus2}");
+            }
+
+            if (bonus3Activated)
+            {
+                totalRoll += bonus3;
+                ShowBonusPopup(bonus3Popup, bonus3);
+                Debug.Log($"Bonus 3 aplicado: +{bonus3}");
+            }
         }
 
         // Actualizar el texto al valor total
@@ -540,6 +576,60 @@ public class Dice_Manager : MonoBehaviour
                         .OnComplete(() => popup.SetActive(false));
                 });
             });
+    }
+
+    /// <summary>
+    /// Muestra popup para el nuevo sistema de bonuses de forma más visible
+    /// </summary>
+    private void ShowNewBonusPopup(string bonusName, int bonusValue)
+    {
+        Debug.Log($"Mostrando popup para bonus: {bonusName} (+{bonusValue})");
+
+        // Crear un popup temporal para mostrar el bonus
+        GameObject bonusVisual = new GameObject("TempBonusPopup");
+        bonusVisual.transform.SetParent(diceResultText.transform.parent, false);
+
+        // Añadir componente Canvas Group para animaciones
+        CanvasGroup canvasGroup = bonusVisual.AddComponent<CanvasGroup>();
+
+        // Crear texto para mostrar el bonus
+        GameObject textObj = new GameObject("BonusText");
+        textObj.transform.SetParent(bonusVisual.transform, false);
+
+        TMP_Text bonusText = textObj.AddComponent<TMP_Text>();
+        bonusText.text = $"+{bonusValue}";
+        bonusText.fontSize = 36;
+        bonusText.color = Color.green;
+        bonusText.fontStyle = FontStyles.Bold;
+        bonusText.alignment = TextAlignmentOptions.Center;
+
+        // Configurar RectTransform
+        RectTransform textRect = textObj.GetComponent<RectTransform>();
+        textRect.sizeDelta = new Vector2(100, 50);
+        textRect.anchoredPosition = new Vector2(80, 0); // Posición al lado del resultado del dado
+
+        // Animación del popup
+        Sequence bonusPopupSequence = DOTween.Sequence();
+
+        // Aparecer con escalado
+        bonusVisual.transform.localScale = Vector3.zero;
+        bonusPopupSequence.Append(bonusVisual.transform.DOScale(1.2f, 0.3f).SetEase(Ease.OutBack));
+        bonusPopupSequence.Append(bonusVisual.transform.DOScale(1f, 0.2f));
+
+        // Mantener visible un momento
+        bonusPopupSequence.AppendInterval(1.5f);
+
+        // Mover hacia el resultado principal mientras desaparece
+        bonusPopupSequence.Append(textRect.DOAnchorPos(Vector2.zero, 0.5f));
+        bonusPopupSequence.Join(canvasGroup.DOFade(0, 0.5f));
+
+        // Destruir después de la animación
+        bonusPopupSequence.OnComplete(() => {
+            if (bonusVisual != null)
+            {
+                Destroy(bonusVisual);
+            }
+        });
     }
 
     private void ShowResultIndicator(bool isSuccess)
