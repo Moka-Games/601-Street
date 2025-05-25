@@ -4921,7 +4921,7 @@ Transform:
   m_GameObject: {fileID: 279673292}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.42720008, z: 0, w: 0.9041571}
-  m_LocalPosition: {x: -26.718, y: 1.8611, z: -16.401}
+  m_LocalPosition: {x: -26.6, y: 1.8611, z: -9.88}
   m_LocalScale: {x: 0.8149936, y: 0.8149936, z: 0.8149936}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6109,6 +6109,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5057657977918626904, guid: 4b20f13d419e62548994c2f1b8936253,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.058
       objectReference: {fileID: 0}
     - target: {fileID: 5136646863411926590, guid: 4b20f13d419e62548994c2f1b8936253,
         type: 3}
@@ -26157,7 +26162,7 @@ PrefabInstance:
     - target: {fileID: 2830979939959797174, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3079553400576404774, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
@@ -26288,6 +26293,11 @@ PrefabInstance:
         type: 3}
       propertyPath: detectionRadius
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7404180985309168843, guid: 10526014e2aca84438494ef6cb3d8e67,
+        type: 3}
+      propertyPath: interactionPrompt
+      value: Attempt Picklock
       objectReference: {fileID: 0}
     - target: {fileID: 7404180985309168843, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
@@ -36429,6 +36439,11 @@ PrefabInstance:
         type: 3}
       propertyPath: detectionRadius
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7404180985309168843, guid: 10526014e2aca84438494ef6cb3d8e67,
+        type: 3}
+      propertyPath: interactionPrompt
+      value: Attempt Picklock
       objectReference: {fileID: 0}
     - target: {fileID: 7460372431973512114, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
