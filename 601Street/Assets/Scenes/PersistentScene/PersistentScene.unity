@@ -769,24 +769,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1539481033}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &495210966 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8783419505407024348, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
-    type: 3}
-  m_PrefabInstance: {fileID: 1539481033}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &495210967 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6814035504576456749, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
-    type: 3}
-  m_PrefabInstance: {fileID: 1539481033}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &495210968 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2248875136445079680, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
-    type: 3}
-  m_PrefabInstance: {fileID: 1539481033}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &495210969 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2384681060200947106, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
@@ -929,12 +911,6 @@ MonoBehaviour:
   failObject: {fileID: 1257928493}
   successObject: {fileID: 1257928492}
   resultPanel: {fileID: 1461852379}
-  bonus1Object: {fileID: 900978068}
-  bonus2Object: {fileID: 900978068}
-  bonus3Object: {fileID: 900978068}
-  bonus1Popup: {fileID: 495210968}
-  bonus2Popup: {fileID: 495210967}
-  bonus3Popup: {fileID: 495210966}
   bonusesPanel: {fileID: 900978069}
   diceRollDuration: 2
   resultHighlightDuration: 0.5
@@ -3936,7 +3912,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1540100534}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f45096f4c32e6af4abda6bccff3ccfb7, type: 3}
   m_Name: 

@@ -26,15 +26,9 @@ public class Dice_Manager : MonoBehaviour
     [SerializeField] private GameObject successObject;
     [SerializeField] private RectTransform resultPanel;
 
-    [Header("Bonus Indicators")]
-    [SerializeField] private GameObject bonus1Object;
-    [SerializeField] private GameObject bonus2Object;
-    [SerializeField] private GameObject bonus3Object;
 
     [Header("Bonus Pop-Ups")]
-    [SerializeField] private GameObject bonus1Popup;
-    [SerializeField] private GameObject bonus2Popup;
-    [SerializeField] private GameObject bonus3Popup;
+
     [SerializeField] private RectTransform bonusesPanel;
 
     [Header("Animation Settings")]
@@ -130,24 +124,6 @@ public class Dice_Manager : MonoBehaviour
         // Pausar animaciones cuando la interfaz se desactive
         if (throwButtonTextTween != null) throwButtonTextTween.Pause();
     }
-
-    private void Update()
-    {
-        bonus1Object.SetActive(bonus1Activated);
-        bonus2Object.SetActive(bonus2Activated);
-        bonus3Object.SetActive(bonus3Activated);
-
-        // Si algún bonus cambia de estado, animarlo
-        if (bonus1Object.activeSelf != bonus1Activated)
-            AnimateBonusActivation(bonus1Object, bonus1Activated);
-
-        if (bonus2Object.activeSelf != bonus2Activated)
-            AnimateBonusActivation(bonus2Object, bonus2Activated);
-
-        if (bonus3Object.activeSelf != bonus3Activated)
-            AnimateBonusActivation(bonus3Object, bonus3Activated);
-    }
-
     #region Core Functionality
 
     public void SetDifficultyClass(int difficultyClass)
@@ -253,11 +229,6 @@ public class Dice_Manager : MonoBehaviour
         rollButton.SetActive(false);
         successObject.SetActive(false);
         failObject.SetActive(false);
-
-        // Ocultar popups de bonus
-        bonus1Popup.SetActive(false);
-        bonus2Popup.SetActive(false);
-        bonus3Popup.SetActive(false);
 
         // Asegurar que los tweens se detengan
         DOTween.Kill(diceTransform);
@@ -524,32 +495,6 @@ public class Dice_Manager : MonoBehaviour
             // Mostrar popup del bonus aplicado
             ShowNewBonusPopup(bonusName, bonusValue);
         }
-        else
-        {
-            // SISTEMA ANTERIOR (Fallback): Mantener compatibilidad
-            Debug.Log("Usando sistema de bonuses anterior (fallback)");
-
-            if (bonus1Activated)
-            {
-                totalRoll += bonus1;
-                ShowBonusPopup(bonus1Popup, bonus1);
-                Debug.Log($"Bonus 1 aplicado: +{bonus1}");
-            }
-
-            if (bonus2Activated)
-            {
-                totalRoll += bonus2;
-                ShowBonusPopup(bonus2Popup, bonus2);
-                Debug.Log($"Bonus 2 aplicado: +{bonus2}");
-            }
-
-            if (bonus3Activated)
-            {
-                totalRoll += bonus3;
-                ShowBonusPopup(bonus3Popup, bonus3);
-                Debug.Log($"Bonus 3 aplicado: +{bonus3}");
-            }
-        }
 
         // Actualizar el texto al valor total
         diceResultText.text = totalRoll.ToString();
@@ -578,9 +523,7 @@ public class Dice_Manager : MonoBehaviour
             });
     }
 
-    /// <summary>
-    /// Muestra popup para el nuevo sistema de bonuses de forma más visible
-    /// </summary>
+
     private void ShowNewBonusPopup(string bonusName, int bonusValue)
     {
         Debug.Log($"Mostrando popup para bonus: {bonusName} (+{bonusValue})");
