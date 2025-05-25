@@ -8,7 +8,7 @@ using DG.Tweening;
 /// <summary>
 /// Gestor de navegación específico para los canvas de interacción de ítems del inventario
 /// Se activa automáticamente cuando se abre un InteractionPrefab
-/// ACTUALIZADO: Cancel solo cierra canvas de interacción, NO interfiere con el inventario
+/// VERSIÓN FINAL: Cancel solo cierra canvas de interacción, NO interfiere con el inventario
 /// </summary>
 public class InteractionCanvasNavigationManager : MonoBehaviour
 {
