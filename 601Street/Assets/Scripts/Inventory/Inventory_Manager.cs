@@ -6,8 +6,9 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Versión mejorada del gestor de inventario que soporta persistencia entre escenas,
-/// prefabs de interacción e integración con el Input System
+/// Versión CORREGIDA del gestor de inventario donde ToggleInventory funciona como verdadero TOGGLE
+/// - ToggleInventory puede abrir Y cerrar el inventario
+/// - Cancel está completamente eliminado del sistema de inventario
 /// </summary>
 public class Inventory_Manager : MonoBehaviour
 {
@@ -41,9 +42,10 @@ public class Inventory_Manager : MonoBehaviour
     [Tooltip("Si está marcado, bloqueará automáticamente la cámara durante las interacciones")]
     public bool blockCameraDuringInteraction = true;
 
-    // Input System
+    // Input System - CAMBIO IMPORTANTE: Mantenemos ambas referencias activas
     private PlayerControls playerControls;
-    private InputAction toggleInventoryAction;
+    private InputAction toggleInventoryGameplay; // Para cuando está cerrado
+    private InputAction toggleInventoryUI;       // Para cuando está abierto (necesitamos crearlo)
 
     // Control de estado para saber por qué están bloqueados
     private bool blockedByInventory = false;
@@ -97,27 +99,52 @@ public class Inventory_Manager : MonoBehaviour
     private void InitializeInputSystem()
     {
         playerControls = new PlayerControls();
-        toggleInventoryAction = playerControls.Gameplay.ToggleInventory;
 
-        // Suscribirse al evento de toggle inventory
-        toggleInventoryAction.performed += OnToggleInventoryInput;
+        // Obtener la acción original de Gameplay
+        toggleInventoryGameplay = playerControls.Gameplay.ToggleInventory;
+
+        // CREAR una acción temporal para UI con el mismo binding
+        // Esto es un workaround hasta que podamos modificar el Input Action Asset
+        toggleInventoryUI = new InputAction("ToggleInventoryUI", InputActionType.Button);
+        toggleInventoryUI.AddBinding("<Gamepad>/buttonNorth");
+        toggleInventoryUI.AddBinding("<Keyboard>/tab");
+
+        // Suscribirse a ambas acciones
+        toggleInventoryGameplay.performed += OnToggleInventoryInput;
+        toggleInventoryUI.performed += OnToggleInventoryInput;
+
+        Debug.Log("Inventory_Manager: Input System inicializado con ToggleInventory en ambos estados");
     }
 
     private void OnEnable()
     {
+        // Inicialmente solo habilitar Gameplay
         playerControls?.Gameplay.Enable();
+        Debug.Log("Inventory_Manager: Gameplay actions enabled");
     }
 
     private void OnDisable()
     {
+        // Deshabilitar todo
         playerControls?.Gameplay.Disable();
+        playerControls?.UI.Disable();
+        toggleInventoryUI?.Disable();
+
+        Debug.Log("Inventory_Manager: All actions disabled");
     }
 
     private void OnDestroy()
     {
-        if (toggleInventoryAction != null)
+        // Limpiar suscripciones
+        if (toggleInventoryGameplay != null)
         {
-            toggleInventoryAction.performed -= OnToggleInventoryInput;
+            toggleInventoryGameplay.performed -= OnToggleInventoryInput;
+        }
+
+        if (toggleInventoryUI != null)
+        {
+            toggleInventoryUI.performed -= OnToggleInventoryInput;
+            toggleInventoryUI.Dispose();
         }
 
         playerControls?.Dispose();
@@ -142,10 +169,101 @@ public class Inventory_Manager : MonoBehaviour
             Debug.LogWarning("No se encontró Camera_Script en la escena. No se podrá bloquear la cámara.");
     }
 
-    // Callback para el Input System
+    /// <summary>
+    /// Callback ÚNICO para ToggleInventory - funciona tanto para abrir como cerrar
+    /// </summary>
     private void OnToggleInventoryInput(InputAction.CallbackContext context)
     {
-        ToggleInventory();
+        Debug.Log($"ToggleInventory activado - Control: {context.control?.path}");
+        Debug.Log($"Estado actual del inventario: {(inventoryOpened ? "ABIERTO" : "CERRADO")}");
+
+        // Verificar que realmente sea el botón correcto (Button North o Tab)
+        if (context.control != null)
+        {
+            string controlPath = context.control.path;
+            bool isCorrectButton = controlPath.Contains("buttonNorth") || controlPath.Contains("tab");
+
+            if (!isCorrectButton)
+            {
+                Debug.LogWarning($"ToggleInventory activado por control incorrecto: {controlPath} - Ignorando");
+                return;
+            }
+        }
+
+        // TOGGLE real: si está abierto, cerrar; si está cerrado, abrir
+        if (inventoryOpened)
+        {
+            Debug.Log("Cerrando inventario con ToggleInventory");
+            CloseInventory();
+        }
+        else
+        {
+            Debug.Log("Abriendo inventario con ToggleInventory");
+            OpenInventory();
+        }
+    }
+
+    /// <summary>
+    /// Abre el inventario
+    /// </summary>
+    public void OpenInventory()
+    {
+        if (inventoryOpened)
+        {
+            Debug.Log("OpenInventory llamado pero el inventario ya está abierto - ignorando");
+            return; // Ya está abierto
+        }
+
+        inventoryOpened = true;
+        InventoryInterface.SetActive(true);
+
+        // CAMBIO CRÍTICO: Cambiar Action Maps Y habilitar la acción de toggle para UI
+        playerControls.Gameplay.Disable();
+        playerControls.UI.Enable();
+        toggleInventoryUI.Enable(); // Habilitar la acción personalizada para cuando esté abierto
+
+        BlockPlayerAndCameraForInventory();
+        Debug.Log("Inventario ABIERTO: Gameplay disabled, UI enabled, ToggleInventoryUI enabled");
+    }
+
+    /// <summary>
+    /// Cierra el inventario
+    /// </summary>
+    public void CloseInventory()
+    {
+        if (!inventoryOpened)
+        {
+            Debug.Log("CloseInventory llamado pero el inventario ya está cerrado - ignorando");
+            return; // Ya está cerrado
+        }
+
+        inventoryOpened = false;
+        InventoryInterface.SetActive(false);
+
+        // CAMBIO CRÍTICO: Volver a Gameplay y deshabilitar la acción de UI
+        playerControls.UI.Disable();
+        toggleInventoryUI.Disable(); // Deshabilitar la acción personalizada
+        playerControls.Gameplay.Enable();
+
+        UnblockPlayerAndCameraFromInventory();
+        Debug.Log("Inventario CERRADO: UI disabled, ToggleInventoryUI disabled, Gameplay enabled");
+    }
+
+    /// <summary>
+    /// Método legacy para compatibilidad - redirige al nuevo sistema
+    /// </summary>
+    public void ToggleInventory()
+    {
+        Debug.Log("ToggleInventory() llamado directamente");
+
+        if (inventoryOpened)
+        {
+            CloseInventory();
+        }
+        else
+        {
+            OpenInventory();
+        }
     }
 
     /// <summary>
@@ -173,25 +291,6 @@ public class Inventory_Manager : MonoBehaviour
         if (popUpParent.activeSelf && Time.time - lastPickUpTime >= popUpDuration)
         {
             popUpParent.SetActive(false);
-        }
-    }
-
-    public void ToggleInventory()
-    {
-        inventoryOpened = !inventoryOpened;
-        InventoryInterface.SetActive(inventoryOpened);
-
-        // Si el inventario se acaba de abrir, bloquear al jugador y la cámara
-        if (inventoryOpened)
-        {
-            BlockPlayerAndCameraForInventory();
-            Debug.Log("Inventario abierto: Controlador y cámara bloqueados");
-        }
-        // Si el inventario se acaba de cerrar, desbloquear al jugador y la cámara
-        else
-        {
-            UnblockPlayerAndCameraFromInventory();
-            Debug.Log("Inventario cerrado: Controlador y cámara desbloqueados");
         }
     }
 
@@ -593,5 +692,17 @@ public class Inventory_Manager : MonoBehaviour
     public bool IsInventoryOpen()
     {
         return inventoryOpened;
+    }
+
+    /// <summary>
+    /// Método público para forzar el cierre del inventario desde otros sistemas
+    /// </summary>
+    public void ForceCloseInventory()
+    {
+        if (inventoryOpened)
+        {
+            Debug.Log("Forzando cierre del inventario");
+            CloseInventory();
+        }
     }
 }

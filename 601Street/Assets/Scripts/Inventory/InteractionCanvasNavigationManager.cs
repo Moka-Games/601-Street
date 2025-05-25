@@ -8,6 +8,7 @@ using DG.Tweening;
 /// <summary>
 /// Gestor de navegación específico para los canvas de interacción de ítems del inventario
 /// Se activa automáticamente cuando se abre un InteractionPrefab
+/// ACTUALIZADO: Cancel solo cierra canvas de interacción, NO interfiere con el inventario
 /// </summary>
 public class InteractionCanvasNavigationManager : MonoBehaviour
 {
@@ -52,7 +53,7 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         // Buscar sistemas de navegación existentes
         FindNavigationSystems();
 
-        // Inicialmente desactivado
+        // CRÍTICO: Inicialmente completamente desactivado - no habilitar ningún input
         this.enabled = false;
     }
 
@@ -79,6 +80,25 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         playerControls.UI.Submit.performed += OnSubmit;
         playerControls.UI.Cancel.performed += OnCancel;
         playerControls.UI.Navigate.performed += OnNavigate;
+
+        // IMPORTANTE: No habilitar los controles aquí - solo configurar las suscripciones
+    }
+
+    // Método OnEnable explícito para controlar cuándo se habilitan los inputs
+    private void OnEnable()
+    {
+        // Solo habilitar inputs si el componente está realmente activo
+        // Esto se llama desde ActivateForCanvas()
+    }
+
+    // Método OnDisable explícito para asegurar que los inputs se deshabiliten
+    private void OnDisable()
+    {
+        // Asegurar que los inputs estén deshabilitados cuando el componente se desactiva
+        if (playerControls != null)
+        {
+            playerControls.UI.Disable();
+        }
     }
 
     public void ActivateForCanvas(GameObject canvasObject)
@@ -94,7 +114,13 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         // Activar este sistema
         isActive = true;
         this.enabled = true;
-        playerControls.UI.Enable();
+
+        // CRÍTICO: Solo habilitar UI cuando realmente hay un canvas activo
+        if (playerControls != null)
+        {
+            playerControls.UI.Enable();
+            Debug.Log("InteractionCanvas: UI actions enabled para canvas específico");
+        }
 
         // Seleccionar primer botón
         if (navigableButtons.Count > 0)
@@ -110,10 +136,16 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         // Limpiar animaciones
         CleanupAnimations();
 
+        // CRÍTICO: Deshabilitar UI antes de desactivar el sistema
+        if (playerControls != null)
+        {
+            playerControls.UI.Disable();
+            Debug.Log("InteractionCanvas: UI actions disabled");
+        }
+
         // Desactivar este sistema
         isActive = false;
         this.enabled = false;
-        playerControls.UI.Disable();
 
         // Reactivar sistemas de navegación anteriores
         ReactivateOtherNavigationSystems();
@@ -224,20 +256,32 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
 
     private void OnCancel(InputAction.CallbackContext context)
     {
-        if (!isActive) return;
+        // CAMBIO IMPORTANTE: Solo manejar Cancel si este canvas está activo
+        // NO interferir con el inventario principal
+        if (!isActive)
+        {
+            Debug.Log("Cancel recibido pero canvas no está activo - pasando al siguiente handler");
+            return;
+        }
 
-        // Buscar el botón de cierre y presionarlo
+        Debug.Log($"Cancel recibido en InteractionCanvas - Solo cerrar canvas, NO inventario");
+
+        // Buscar el botón de cierre del canvas y presionarlo
         Button closeButton = FindCloseButton();
         if (closeButton != null)
         {
+            Debug.Log("Ejecutando cierre del canvas de interacción (NO del inventario)");
             closeButton.onClick.Invoke();
         }
         else
         {
-            // Si no hay botón de cierre, desactivar directamente
-            Debug.LogWarning("No se encontró botón de cierre, desactivando navegación");
+            // Si no hay botón de cierre, desactivar solo este canvas
+            Debug.LogWarning("No se encontró botón de cierre, desactivando solo navegación del canvas");
             DeactivateNavigation();
         }
+
+        // NOTA: Este Cancel NO debe cerrar el inventario principal
+        // El inventario solo se cierra con ToggleInventory
     }
 
     private Button FindCloseButton()
@@ -347,6 +391,12 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
     {
         CleanupAnimations();
         playerControls?.Dispose();
+    }
+
+    // Método público para verificar si este canvas está activo
+    public bool IsHandlingInputs()
+    {
+        return isActive;
     }
 
     // Método público para configuración externa
