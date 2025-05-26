@@ -2647,6 +2647,7 @@ MonoBehaviour:
   singleUseInteraction: 0
   disableAfterInteraction: 0
   detectionRadius: 7
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!65 &122917232
@@ -26162,7 +26163,7 @@ PrefabInstance:
     - target: {fileID: 2830979939959797174, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3079553400576404774, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
@@ -30667,7 +30668,7 @@ PrefabInstance:
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.66
+      value: 4.8
       objectReference: {fileID: 0}
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
@@ -30677,7 +30678,7 @@ PrefabInstance:
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 20.79
+      value: 16.73
       objectReference: {fileID: 0}
     - target: {fileID: 491794078661335822, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
