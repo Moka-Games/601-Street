@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 177673800}
   - component: {fileID: 177673801}
+  - component: {fileID: 177673802}
   m_Layer: 0
   m_Name: Bonus Manager
   m_TagString: Untagged
@@ -173,6 +174,30 @@ MonoBehaviour:
   showEase: 27
   hideEase: 26
   diceManager: {fileID: 661201953}
+  navigationExtension: {fileID: 177673802}
+  uiNavigationManager: {fileID: 1183917775}
+  enableNavigationIntegration: 1
+--- !u!114 &177673802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 177673799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 690f4cfb85eb81f409fd124b49c6a5b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navigationManager: {fileID: 1183917775}
+  bonusManager: {fileID: 177673801}
+  bonusesContentParent: {fileID: 239761676}
+  enableAutomaticNavigation: 1
+  debugMode: 0
+  navigationPriority: 1
+  windowController: {fileID: 1257928495}
+  addToNavigationWhenWindowOpen: 1
+  removeFromNavigationWhenWindowClosed: 1
 --- !u!114 &218002293 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3926818345833003236, guid: 8f4e14d956cc52a4b97a8a4992f17415,
@@ -2584,6 +2609,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 944780252429315485, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
+      propertyPath: m_text
+      value: Continue
+      objectReference: {fileID: 0}
+    - target: {fileID: 944780252429315485, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
+        type: 3}
       propertyPath: m_fontSize
       value: 50
       objectReference: {fileID: 0}
@@ -3620,7 +3650,7 @@ PrefabInstance:
     - target: {fileID: 6978344857127199023, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7124714627280460905, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
@@ -4299,6 +4329,11 @@ PrefabInstance:
         type: 3}
       propertyPath: elementWidth
       value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 4737401581275121266, guid: 8f4e14d956cc52a4b97a8a4992f17415,
+        type: 3}
+      propertyPath: m_Padding.m_Right
+      value: -600
       objectReference: {fileID: 0}
     - target: {fileID: 5743276537001577198, guid: 8f4e14d956cc52a4b97a8a4992f17415,
         type: 3}
