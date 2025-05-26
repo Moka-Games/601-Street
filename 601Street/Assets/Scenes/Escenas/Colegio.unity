@@ -3247,11 +3247,6 @@ PrefabInstance:
       propertyPath: m_Radius
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 3416207317952422469, guid: 0d5500dc99f9c0843bd8767313e23a17,
-        type: 3}
-      propertyPath: m_Center.y
-      value: 0.25
-      objectReference: {fileID: 0}
     - target: {fileID: 7125272824277244258, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: m_Name
@@ -3493,10 +3488,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1066634375}
-    - targetCorrespondingSourceObject: {fileID: 7125272824277244258, guid: 0d5500dc99f9c0843bd8767313e23a17,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1066634376}
   m_SourcePrefab: {fileID: 100100000, guid: 0d5500dc99f9c0843bd8767313e23a17, type: 3}
 --- !u!1 &308015216
 GameObject:
@@ -12043,7 +12034,7 @@ GameObject:
   m_Component:
   - component: {fileID: 882793274}
   - component: {fileID: 882793273}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: FeedbackCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12080,8 +12071,8 @@ Transform:
   m_GameObject: {fileID: 882793272}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.21011637, z: -0, w: 0.9776764}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 2.578249, z: 0}
+  m_LocalScale: {x: 2.0898643, y: 30.693573, z: 2.0898643}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1700969698}
@@ -14626,33 +14617,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a4772c18ba1c9549bb1e6e3a8501188, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!54 &1066634376
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1066634359}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 0
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &1069968350
 GameObject:
   m_ObjectHideFlags: 0
@@ -26174,11 +26138,6 @@ PrefabInstance:
       propertyPath: m_Radius
       value: 0.75
       objectReference: {fileID: 0}
-    - target: {fileID: 3416207317952422469, guid: 0d5500dc99f9c0843bd8767313e23a17,
-        type: 3}
-      propertyPath: m_Center.y
-      value: 0.25
-      objectReference: {fileID: 0}
     - target: {fileID: 7125272824277244258, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: m_Name
@@ -26417,10 +26376,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1700969705}
-    - targetCorrespondingSourceObject: {fileID: 7125272824277244258, guid: 0d5500dc99f9c0843bd8767313e23a17,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1700969706}
   m_SourcePrefab: {fileID: 100100000, guid: 0d5500dc99f9c0843bd8767313e23a17, type: 3}
 --- !u!1 &1700969696 stripped
 GameObject:
@@ -26466,33 +26421,6 @@ MonoBehaviour:
   listenOnlyWhenActive: 0
   useTransition: 0
   transitionDuration: 0.5
---- !u!54 &1700969706
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1700969696}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 0
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &1701248702
 GameObject:
   m_ObjectHideFlags: 0
@@ -26830,7 +26758,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1713818343}
   - component: {fileID: 1713818346}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: FeedbackCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26846,8 +26774,8 @@ Transform:
   m_GameObject: {fileID: 1713818342}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.21011637, z: -0, w: 0.9776764}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 2.578249, z: 0}
+  m_LocalScale: {x: 1.092393, y: 16.043839, z: 1.092393}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1066634365}
@@ -26871,7 +26799,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 7
+  m_Radius: 10
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!64 &1714774776
 MeshCollider:

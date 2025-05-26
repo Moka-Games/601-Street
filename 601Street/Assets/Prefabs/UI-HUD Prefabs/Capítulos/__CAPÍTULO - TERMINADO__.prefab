@@ -75,7 +75,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278255428
+    rgba: 100728644
   m_fontColor: {r: 0.2650001, g: 1, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -230,8 +230,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 75
-  m_fontSizeBase: 75
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -349,7 +349,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 16777215
   m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -423,7 +423,6 @@ GameObject:
   - component: {fileID: 7423146302192193245}
   - component: {fileID: 2540149072973353182}
   - component: {fileID: 7376132090320240254}
-  - component: {fileID: 6244769451778767808}
   m_Layer: 5
   m_Name: "__CAP\xCDTULO - TERMINADO__"
   m_TagString: Untagged
@@ -514,35 +513,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &6244769451778767808
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1745252693622660021}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e67ea3df3af1e5e4f9ae56f089a8b8a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  navigationDelay: 0.15
-  autoSelectFirstButton: 1
-  navigationSound: {fileID: 8300000, guid: 0d9fcf08b627dcc4d84f08219e203d5f, type: 3}
-  selectSound: {fileID: 8300000, guid: 2e49fb4d20f896e4f9bd2d8366469d92, type: 3}
-  enableAutoSelection: 1
-  autoSelectionCheckInterval: 0.1
-  firstSelected: {fileID: 1531457345687167438}
-  isFirstSelected: 1
-  animationDuration: 0.3
-  selectedScale: 1.2
-  scaleInEase: 27
-  scaleOutEase: 26
-  enablePulseEffect: 1
-  pulseIntensity: 0.05
-  pulseDuration: 1.5
-  navigableElements:
-  - {fileID: 1531457345687167438}
 --- !u!1 &1949719882419378582
 GameObject:
   m_ObjectHideFlags: 0
@@ -791,7 +761,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 3372220415
   m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -942,7 +912,6 @@ GameObject:
   - component: {fileID: 2347063618520847565}
   - component: {fileID: 8398845482552446071}
   - component: {fileID: 1531457345687167438}
-  - component: {fileID: 7624582817665086654}
   m_Layer: 5
   m_Name: NEXT_CHAPTER_BUTTON
   m_TagString: Untagged
@@ -959,16 +928,16 @@ RectTransform:
   m_GameObject: {fileID: 5204772158427697586}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3.4838, y: 3.4838, z: 3.4838}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4931670601898479577}
   m_Father: {fileID: 2787197082825805855}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 210}
-  m_SizeDelta: {x: 917.9474, y: 153.46631}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -276.11383}
+  m_SizeDelta: {x: 231.3413, y: 38.6766}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2347063618520847565
 CanvasRenderer:
@@ -1051,31 +1020,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8398845482552446071}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7624582817665086654}
-        m_TargetAssemblyTypeName: GameStateController, Assembly-CSharp
-        m_MethodName: ChangeGameState
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: "Cap\xEDtulo_1_Completado"
-          m_BoolArgument: 0
-        m_CallState: 2
---- !u!114 &7624582817665086654
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5204772158427697586}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a4772c18ba1c9549bb1e6e3a8501188, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+      m_Calls: []
 --- !u!1 &7198162367563642251
 GameObject:
   m_ObjectHideFlags: 0
