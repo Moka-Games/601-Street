@@ -2609,6 +2609,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 944780252429315485, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
+      propertyPath: m_text
+      value: Continue
+      objectReference: {fileID: 0}
+    - target: {fileID: 944780252429315485, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
+        type: 3}
       propertyPath: m_fontSize
       value: 50
       objectReference: {fileID: 0}
@@ -3645,7 +3650,7 @@ PrefabInstance:
     - target: {fileID: 6978344857127199023, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7124714627280460905, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
@@ -4324,6 +4329,11 @@ PrefabInstance:
         type: 3}
       propertyPath: elementWidth
       value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 4737401581275121266, guid: 8f4e14d956cc52a4b97a8a4992f17415,
+        type: 3}
+      propertyPath: m_Padding.m_Right
+      value: -600
       objectReference: {fileID: 0}
     - target: {fileID: 5743276537001577198, guid: 8f4e14d956cc52a4b97a8a4992f17415,
         type: 3}

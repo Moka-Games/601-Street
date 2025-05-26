@@ -16895,6 +16895,7 @@ MonoBehaviour:
   singleUseInteraction: 0
   disableAfterInteraction: 0
   detectionRadius: 10
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!114 &218613130
@@ -36217,6 +36218,7 @@ MonoBehaviour:
   singleUseInteraction: 0
   disableAfterInteraction: 0
   detectionRadius: 25
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!1001 &412507685
@@ -37100,6 +37102,7 @@ MonoBehaviour:
   singleUseInteraction: 0
   disableAfterInteraction: 0
   detectionRadius: 10
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!65 &429503224
@@ -42059,6 +42062,7 @@ MonoBehaviour:
   singleUseInteraction: 0
   disableAfterInteraction: 0
   detectionRadius: 15
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!4 &533306066
@@ -58740,6 +58744,7 @@ MonoBehaviour:
   singleUseInteraction: 0
   disableAfterInteraction: 0
   detectionRadius: 10
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!65 &768382409
@@ -77743,6 +77748,7 @@ MonoBehaviour:
   singleUseInteraction: 0
   disableAfterInteraction: 0
   detectionRadius: 5
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!64 &894089340
@@ -102675,6 +102681,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1164012609}
+    - targetCorrespondingSourceObject: {fileID: 3392600333855457418, guid: 4c57fb7400a89fc4e861e32d41e2a64d,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1742936981}
   m_SourcePrefab: {fileID: 100100000, guid: 4c57fb7400a89fc4e861e32d41e2a64d, type: 3}
 --- !u!1 &1164012605 stripped
 GameObject:
@@ -128546,6 +128556,7 @@ MonoBehaviour:
   singleUseInteraction: 1
   disableAfterInteraction: 0
   detectionRadius: 5
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!65 &1405508067
@@ -136831,6 +136842,7 @@ MonoBehaviour:
   singleUseInteraction: 1
   disableAfterInteraction: 0
   detectionRadius: 5
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!65 &1583082216
@@ -143066,6 +143078,7 @@ MonoBehaviour:
   singleUseInteraction: 1
   disableAfterInteraction: 0
   detectionRadius: 5
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!65 &1626080101
@@ -153538,6 +153551,18 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 1182321067297408051, guid: 0ed6e7f652824b343a6cc1124518867e, type: 3}
+--- !u!114 &1736312735 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9116121740609650174, guid: 4c57fb7400a89fc4e861e32d41e2a64d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1164012604}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1738915640
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -153647,6 +153672,41 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1738915640}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1742936980 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3392600333855457418, guid: 4c57fb7400a89fc4e861e32d41e2a64d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1164012604}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1742936981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1742936980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e67ea3df3af1e5e4f9ae56f089a8b8a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navigationDelay: 0.15
+  autoSelectFirstButton: 1
+  navigationSound: {fileID: 8300000, guid: 0d9fcf08b627dcc4d84f08219e203d5f, type: 3}
+  selectSound: {fileID: 8300000, guid: 2e49fb4d20f896e4f9bd2d8366469d92, type: 3}
+  enableAutoSelection: 1
+  autoSelectionCheckInterval: 0.1
+  firstSelected: {fileID: 1736312735}
+  isFirstSelected: 1
+  animationDuration: 0.3
+  selectedScale: 1.2
+  scaleInEase: 27
+  scaleOutEase: 26
+  enablePulseEffect: 1
+  pulseIntensity: 0.05
+  pulseDuration: 1.5
+  navigableElements:
+  - {fileID: 1736312735}
 --- !u!1 &1747663410
 GameObject:
   m_ObjectHideFlags: 0

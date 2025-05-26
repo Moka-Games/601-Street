@@ -30728,7 +30728,7 @@ PrefabInstance:
     - target: {fileID: 3041951732959857947, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
       propertyPath: detectionRadius
-      value: 3.74
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 3041951732959857947, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
@@ -30782,8 +30782,18 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 35d6f9bf3ed3f464ab3e88966b6fba54, type: 2}
     - target: {fileID: 5840868460635798395, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
+      propertyPath: m_Size.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5840868460635798395, guid: f8e8612f46092c642850f3c0eb7e8d9b,
+        type: 3}
       propertyPath: m_Size.y
-      value: 2.746791
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5840868460635798395, guid: f8e8612f46092c642850f3c0eb7e8d9b,
+        type: 3}
+      propertyPath: m_Size.z
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5840868460635798395, guid: f8e8612f46092c642850f3c0eb7e8d9b,
         type: 3}
