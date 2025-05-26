@@ -26394,14 +26394,6 @@ PrefabInstance:
     - {fileID: 858292012640182491, guid: 10526014e2aca84438494ef6cb3d8e67, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2830979939959797174, guid: 10526014e2aca84438494ef6cb3d8e67,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1473272167}
-    - targetCorrespondingSourceObject: {fileID: 2830979939959797174, guid: 10526014e2aca84438494ef6cb3d8e67,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1473272168}
     - targetCorrespondingSourceObject: {fileID: 7217869648279548872, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
       insertIndex: -1
@@ -26517,45 +26509,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -2746142260806068395, guid: 6f17625d27ddfa04997fb62231de7222, type: 3}
---- !u!114 &1473272167
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1473272163}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e64f5cbc289c58948a4d0c6173aeafe3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  id: Ganzua_Despacho
---- !u!114 &1473272168
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1473272163}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectID: Ganzua_Despacho
-  useSceneName: 0
-  sceneName: ComisariaInterior
-  defaultActiveState: 1
-  applyStateImmediately: 1
-  onActivate:
-    m_PersistentCalls:
-      m_Calls: []
-  onDeactivate:
-    m_PersistentCalls:
-      m_Calls: []
-  listenOnlyWhenActive: 0
-  useTransition: 0
-  transitionDuration: 0.5
 --- !u!1 &1487464080
 GameObject:
   m_ObjectHideFlags: 0
