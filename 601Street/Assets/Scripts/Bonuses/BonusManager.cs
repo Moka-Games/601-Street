@@ -7,7 +7,6 @@ using System.Collections;
 
 /// <summary>
 /// Gestor principal del sistema de bonuses para el dado
-/// VERSIÓN ACTUALIZADA: Incluye integración con sistema de navegación dinámico
 /// </summary>
 public class BonusManager : MonoBehaviour
 {
@@ -27,11 +26,6 @@ public class BonusManager : MonoBehaviour
 
     [Header("Referencias al Sistema de Dados")]
     [SerializeField] private Dice_Manager diceManager;
-
-    [Header("NUEVO: Integración con Navegación")]
-    [SerializeField] private BonusNavigationExtension navigationExtension;
-    [SerializeField] private UINavigationManager uiNavigationManager;
-    [SerializeField] private bool enableNavigationIntegration = true;
 
     // Estado del sistema
     private List<CollectedBonus> collectedBonuses = new List<CollectedBonus>();
@@ -80,16 +74,12 @@ public class BonusManager : MonoBehaviour
         if (diceManager == null)
             diceManager = FindAnyObjectByType<Dice_Manager>();
 
-        // NUEVO: Inicializar sistema de navegación
-        InitializeNavigationSystem();
-
         Debug.Log("=== BONUS MANAGER INITIALIZATION ===");
         Debug.Log($"BonusWindow assigned: {bonusWindow != null}");
         Debug.Log($"BonusAnimator assigned: {bonusAnimator != null}");
         Debug.Log($"OpenWindowButton assigned: {openWindowButton != null}");
         Debug.Log($"BonusesContent assigned: {bonusesContent != null}");
         Debug.Log($"BonusPrefab assigned: {bonusPrefab != null}");
-        Debug.Log($"NavigationExtension assigned: {navigationExtension != null}");
 
         // Configurar la ventana principal (siempre activa pero inicialmente oculta)
         if (bonusWindow != null)
@@ -139,50 +129,10 @@ public class BonusManager : MonoBehaviour
         Debug.Log("===================================");
     }
 
-    /// <summary>
-    /// NUEVO: Inicializa el sistema de navegación
-    /// </summary>
-    private void InitializeNavigationSystem()
-    {
-        if (!enableNavigationIntegration)
-        {
-            Debug.Log("Integración de navegación deshabilitada");
-            return;
-        }
-
-        // Buscar BonusNavigationExtension si no está asignado
-        if (navigationExtension == null)
-        {
-            navigationExtension = FindAnyObjectByType<BonusNavigationExtension>();
-            if (navigationExtension == null)
-            {
-                Debug.LogWarning("BonusNavigationExtension no encontrado - Los bonuses no serán navegables con gamepad");
-            }
-        }
-
-        // Buscar UINavigationManager si no está asignado
-        if (uiNavigationManager == null)
-        {
-            uiNavigationManager = FindAnyObjectByType<UINavigationManager>();
-            if (uiNavigationManager == null)
-            {
-                Debug.LogWarning("UINavigationManager no encontrado");
-            }
-        }
-
-        // Configurar el parent en el NavigationExtension
-        if (navigationExtension != null && bonusesContent != null)
-        {
-            navigationExtension.SetBonusesParent(bonusesContent);
-            Debug.Log("BonusNavigationExtension configurado con parent de bonuses");
-        }
-    }
-
     #region Gestión de Bonuses
 
     /// <summary>
     /// Añade un nuevo bonus al sistema
-    /// ACTUALIZADO: Incluye notificación al sistema de navegación
     /// </summary>
     public void AddBonus(string bonusName, int bonusValue, string description = "", Sprite icon = null)
     {
@@ -218,15 +168,6 @@ public class BonusManager : MonoBehaviour
         {
             // Actualizar visibilidad de la ventana
             UpdateWindowVisibility();
-
-            // NUEVO: Notificar al sistema de navegación si está habilitado
-            if (enableNavigationIntegration && navigationExtension != null)
-            {
-                // La notificación se maneja automáticamente desde BonusUI.Initialize()
-                // pero podemos forzar una actualización aquí también
-                navigationExtension.ForceRefreshNavigation();
-            }
-
             Debug.Log("Bonus añadido exitosamente y visibilidad actualizada");
         }
         else
@@ -295,20 +236,12 @@ public class BonusManager : MonoBehaviour
 
     /// <summary>
     /// Consume el bonus activo (llamado después de usar el bonus en una tirada)
-    /// ACTUALIZADO: Incluye notificación al sistema de navegación
     /// </summary>
     public void ConsumeActiveBonus()
     {
         if (activeBonus != null)
         {
             Debug.Log($"Consumiendo bonus: {activeBonus.bonusName}");
-
-            // NUEVO: Obtener el botón antes de destruir para notificar al sistema de navegación
-            Button bonusButton = null;
-            if (activeBonus.bonusUIScript != null)
-            {
-                bonusButton = activeBonus.bonusUIScript.GetButton();
-            }
 
             // Remover de la lista
             collectedBonuses.Remove(activeBonus);
@@ -317,12 +250,6 @@ public class BonusManager : MonoBehaviour
             if (activeBonus.uiInstance != null)
             {
                 Destroy(activeBonus.uiInstance);
-            }
-
-            // NUEVO: Notificar al sistema de navegación sobre la remoción
-            if (enableNavigationIntegration && navigationExtension != null && bonusButton != null)
-            {
-                navigationExtension.OnBonusRemoved(bonusButton);
             }
 
             activeBonus = null;
@@ -368,9 +295,6 @@ public class BonusManager : MonoBehaviour
 
             bonusUI.Initialize(bonus, this);
             bonus.bonusUIScript = bonusUI;
-
-            // NUEVO: La notificación al sistema de navegación se maneja automáticamente
-            // desde BonusUI.Initialize() -> NotifyNavigationSystemAboutNewElement()
 
             Debug.Log($"Interfaz creada exitosamente para bonus: {bonus.bonusName}");
             Debug.Log($"Posición final del prefab: {bonusInstance.transform.position}");
@@ -427,12 +351,6 @@ public class BonusManager : MonoBehaviour
                 bonusWindow.SetActive(false);
                 isWindowOpen = false; // Resetear estado
                 Debug.Log("BonusWindow desactivada");
-
-                // NUEVO: Notificar al sistema de navegación que la ventana se cerró
-                if (enableNavigationIntegration && navigationExtension != null)
-                {
-                    navigationExtension.OnBonusWindowClosed();
-                }
             }
         }
         else
@@ -464,15 +382,10 @@ public class BonusManager : MonoBehaviour
         Debug.Log("Abriendo ventana de bonuses - reproduciendo animación Open_Bonuses");
 
         StartCoroutine(WindowInteracted(1f));
+        //isWindowOpen = true;
 
         // Reproducir animación de apertura
         bonusAnimator.Play("Open_Bonuses");
-
-        // NUEVO: Notificar al sistema de navegación que la ventana se abrió
-        if (enableNavigationIntegration && navigationExtension != null)
-        {
-            navigationExtension.OnBonusWindowOpened();
-        }
     }
 
     private void HideBonusWindow()
@@ -489,12 +402,6 @@ public class BonusManager : MonoBehaviour
 
         // Reproducir animación de cierre
         bonusAnimator.Play("Close_Bonuses");
-
-        // NUEVO: Notificar al sistema de navegación que la ventana se cerró
-        if (enableNavigationIntegration && navigationExtension != null)
-        {
-            navigationExtension.OnBonusWindowClosed();
-        }
     }
 
     #endregion
@@ -563,67 +470,6 @@ public class BonusManager : MonoBehaviour
 
     #endregion
 
-    #region NUEVO: Métodos de Navegación
-
-    /// <summary>
-    /// Habilita o deshabilita la integración con el sistema de navegación
-    /// </summary>
-    public void SetNavigationIntegrationEnabled(bool enabled)
-    {
-        enableNavigationIntegration = enabled;
-
-        if (navigationExtension != null)
-        {
-            navigationExtension.SetAutomaticNavigation(enabled);
-        }
-
-        Debug.Log($"Integración de navegación {(enabled ? "habilitada" : "deshabilitada")}");
-    }
-
-    /// <summary>
-    /// Fuerza la actualización del sistema de navegación
-    /// </summary>
-    public void RefreshNavigation()
-    {
-        if (enableNavigationIntegration && navigationExtension != null)
-        {
-            navigationExtension.ForceRefreshNavigation();
-        }
-    }
-
-    /// <summary>
-    /// Selecciona automáticamente el primer bonus disponible
-    /// </summary>
-    public void SelectFirstBonus()
-    {
-        if (enableNavigationIntegration && navigationExtension != null)
-        {
-            navigationExtension.SelectFirstBonus();
-        }
-    }
-
-    /// <summary>
-    /// Obtiene el número de bonuses navegables actualmente
-    /// </summary>
-    public int GetNavigableBonusCount()
-    {
-        if (enableNavigationIntegration && navigationExtension != null)
-        {
-            return navigationExtension.GetActiveInteractableBonusCount();
-        }
-        return 0;
-    }
-
-    /// <summary>
-    /// Verifica si hay bonuses disponibles para navegación
-    /// </summary>
-    public bool HasNavigableBonuses()
-    {
-        return GetNavigableBonusCount() > 0;
-    }
-
-    #endregion
-
     #region Métodos Públicos de Consulta
 
     public bool HasActiveBBonus() => activeBonus != null;
@@ -637,25 +483,7 @@ public class BonusManager : MonoBehaviour
     public bool CanActivateBonuses() => canActivateBonuses;
 
     /// <summary>
-    /// NUEVO: Obtiene una lista de todos los bonuses disponibles
-    /// </summary>
-    public List<CollectedBonus> GetAllBonuses() => new List<CollectedBonus>(collectedBonuses);
-
-    /// <summary>
-    /// NUEVO: Busca un bonus por nombre
-    /// </summary>
-    public CollectedBonus FindBonusByName(string bonusName)
-    {
-        return collectedBonuses.Find(bonus => bonus.bonusName.Equals(bonusName, System.StringComparison.OrdinalIgnoreCase));
-    }
-
-    #endregion
-
-    #region Métodos de Debug
-
-    /// <summary>
     /// Método para debug - mostrar estado actual
-    /// ACTUALIZADO: Incluye información de navegación
     /// </summary>
     [ContextMenu("Debug Bonus State")]
     public void DebugBonusState()
@@ -665,17 +493,6 @@ public class BonusManager : MonoBehaviour
         Debug.Log($"Bonus activo: {(activeBonus != null ? $"{activeBonus.bonusName} (+{activeBonus.bonusValue})" : "NINGUNO")}");
         Debug.Log($"Puede activar bonuses: {canActivateBonuses}");
         Debug.Log($"Ventana abierta: {isWindowOpen}");
-
-        // NUEVO: Información de navegación
-        Debug.Log("--- NAVEGACIÓN ---");
-        Debug.Log($"Integración de navegación habilitada: {enableNavigationIntegration}");
-        Debug.Log($"NavigationExtension disponible: {navigationExtension != null}");
-        Debug.Log($"UINavigationManager disponible: {uiNavigationManager != null}");
-        if (enableNavigationIntegration && navigationExtension != null)
-        {
-            Debug.Log($"Bonuses navegables: {navigationExtension.GetActiveInteractableBonusCount()}");
-            Debug.Log($"NavigationExtension gestionando: {navigationExtension.ManagedBonusCount} botones");
-        }
 
         // Debug de referencias
         Debug.Log("--- REFERENCIAS ---");
@@ -695,33 +512,11 @@ public class BonusManager : MonoBehaviour
             for (int i = 0; i < collectedBonuses.Count; i++)
             {
                 var bonus = collectedBonuses[i];
-                string buttonInfo = "NULL";
-                if (bonus.bonusUIScript != null)
-                {
-                    Button button = bonus.bonusUIScript.GetButton();
-                    buttonInfo = button != null ? $"Button: {button.name}, Interactable: {button.interactable}" : "NULL";
-                }
-                Debug.Log($"[{i}] {bonus.bonusName} (+{bonus.bonusValue}) - UI: {(bonus.uiInstance != null ? "Created" : "NULL")} - {buttonInfo}");
+                Debug.Log($"[{i}] {bonus.bonusName} (+{bonus.bonusValue}) - UI: {(bonus.uiInstance != null ? "Created" : "NULL")}");
             }
         }
 
         Debug.Log("================================");
-    }
-
-    /// <summary>
-    /// NUEVO: Debug específico del sistema de navegación
-    /// </summary>
-    [ContextMenu("Debug Navigation State")]
-    public void DebugNavigationState()
-    {
-        if (enableNavigationIntegration && navigationExtension != null)
-        {
-            Debug.Log(navigationExtension.GetDetailedStatus());
-        }
-        else
-        {
-            Debug.Log("Sistema de navegación no disponible o deshabilitado");
-        }
     }
 
     /// <summary>
@@ -750,77 +545,9 @@ public class BonusManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// NUEVO: Añade múltiples bonuses de prueba para testing de navegación
-    /// </summary>
-    [ContextMenu("Add Multiple Test Bonuses")]
-    public void AddMultipleTestBonuses()
-    {
-        if (Application.isPlaying)
-        {
-            AddBonus("Bonus Pequeño", 1, "Bonus de prueba pequeño");
-            AddBonus("Bonus Mediano", 2, "Bonus de prueba mediano");
-            AddBonus("Bonus Grande", 4, "Bonus de prueba grande");
-            Debug.Log("Añadidos 3 bonuses de prueba para testing de navegación");
-        }
-        else
-        {
-            Debug.Log("Este método solo funciona en Play Mode");
-        }
-    }
-
-    /// <summary>
-    /// NUEVO: Test de navegación - selecciona el primer bonus
-    /// </summary>
-    [ContextMenu("Test Select First Bonus")]
-    public void TestSelectFirstBonus()
-    {
-        if (Application.isPlaying)
-        {
-            SelectFirstBonus();
-        }
-        else
-        {
-            Debug.Log("Este método solo funciona en Play Mode");
-        }
-    }
-
-    /// <summary>
-    /// NUEVO: Test de navegación - refresca el sistema
-    /// </summary>
-    [ContextMenu("Test Refresh Navigation")]
-    public void TestRefreshNavigation()
-    {
-        if (Application.isPlaying)
-        {
-            RefreshNavigation();
-        }
-        else
-        {
-            Debug.Log("Este método solo funciona en Play Mode");
-        }
-    }
-
-    /// <summary>
-    /// NUEVO: Toggle del sistema de navegación para testing
-    /// </summary>
-    [ContextMenu("Toggle Navigation Integration")]
-    public void ToggleNavigationIntegration()
-    {
-        if (Application.isPlaying)
-        {
-            SetNavigationIntegrationEnabled(!enableNavigationIntegration);
-            Debug.Log($"Integración de navegación ahora: {(enableNavigationIntegration ? "HABILITADA" : "DESHABILITADA")}");
-        }
-        else
-        {
-            Debug.Log("Este método solo funciona en Play Mode");
-        }
-    }
-
     private IEnumerator WindowInteracted(float delay)
     {
-        yield return new WaitForSecondsRealtime(delay);
+        yield return new WaitForSeconds(delay);
         isWindowOpen = true;
     }
 
