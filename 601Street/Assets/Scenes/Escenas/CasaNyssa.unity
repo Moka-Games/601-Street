@@ -5842,9 +5842,9 @@ GameObject:
   - component: {fileID: 1943567785}
   - component: {fileID: 1943567784}
   - component: {fileID: 1943567783}
-  - component: {fileID: 1943567782}
-  - component: {fileID: 1943567781}
   - component: {fileID: 1943567786}
+  - component: {fileID: 1943567781}
+  - component: {fileID: 1943567787}
   m_Layer: 6
   m_Name: OrdenadorCorreo_2
   m_TagString: Untagged
@@ -5894,37 +5894,6 @@ MonoBehaviour:
   listenOnlyWhenActive: 0
   useTransition: 0
   transitionDuration: 0.5
---- !u!114 &1943567782
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1943567779}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa7eee6eb12ee9744b28c7b4d22b4e9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stateModifications:
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: MapaExterior
-    objectID: Mision-Post-Casa-1
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: MapaExterior
-    objectID: Salida_Bar
-  activateOnStart: 0
-  activateOnInteract: 1
-  activateOnce: 0
-  forceImmediateUpdate: 1
 --- !u!114 &1943567783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5956,18 +5925,6 @@ MonoBehaviour:
   onInteraction:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1943567782}
-        m_TargetAssemblyTypeName: WorldStateActivator, Assembly-CSharp
-        m_MethodName: OnInteract
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 1943567786}
         m_TargetAssemblyTypeName: FreezeOnInteract, Assembly-CSharp
         m_MethodName: OnInteractOpenAndFreeze
@@ -6025,6 +5982,19 @@ MonoBehaviour:
   freezePlayerMovement: 1
   freezeCamera: 1
   showDebugMessages: 1
+--- !u!114 &1943567787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1943567779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e64f5cbc289c58948a4d0c6173aeafe3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: Ordenador_2_CasaNyysa
 --- !u!1 &2001068958
 GameObject:
   m_ObjectHideFlags: 0
@@ -6923,6 +6893,8 @@ GameObject:
   - component: {fileID: 2056939754}
   - component: {fileID: 2056939756}
   - component: {fileID: 2056939757}
+  - component: {fileID: 2056939759}
+  - component: {fileID: 2056939758}
   m_Layer: 6
   m_Name: OrdenadorCorreo_1
   m_TagString: Untagged
@@ -7046,6 +7018,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a4772c18ba1c9549bb1e6e3a8501188, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2056939758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056939750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: Ordenador_2_CasaNyysa
+  useSceneName: 0
+  sceneName: CasaNyssa
+  defaultActiveState: 1
+  applyStateImmediately: 1
+  onActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  listenOnlyWhenActive: 0
+  useTransition: 0
+  transitionDuration: 0.5
+--- !u!114 &2056939759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056939750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e64f5cbc289c58948a4d0c6173aeafe3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: Ordenador_1_CasaNyysa
 --- !u!1 &2073145269 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4067818517711116892, guid: 17db0cd694e84cf49b9fc0c842e6dc4d,
