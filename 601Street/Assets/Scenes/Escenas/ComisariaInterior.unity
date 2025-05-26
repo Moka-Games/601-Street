@@ -4921,7 +4921,7 @@ Transform:
   m_GameObject: {fileID: 279673292}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.42720008, z: 0, w: 0.9041571}
-  m_LocalPosition: {x: -26.6, y: 1.8611, z: -9.88}
+  m_LocalPosition: {x: -27.124, y: 1.8611, z: -16.596}
   m_LocalScale: {x: 0.8149936, y: 0.8149936, z: 0.8149936}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -26162,7 +26162,7 @@ PrefabInstance:
     - target: {fileID: 2830979939959797174, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3079553400576404774, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
@@ -26218,6 +26218,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.0043140305
+      objectReference: {fileID: 0}
+    - target: {fileID: 4590021676508014460, guid: 10526014e2aca84438494ef6cb3d8e67,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.95
       objectReference: {fileID: 0}
     - target: {fileID: 5227733543738376066, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
@@ -26307,7 +26312,32 @@ PrefabInstance:
     - target: {fileID: 7404180985309168843, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.size
-      value: 2
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7404180985309168843, guid: 10526014e2aca84438494ef6cb3d8e67,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7404180985309168843, guid: 10526014e2aca84438494ef6cb3d8e67,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[2].m_Target
+      value: 
+      objectReference: {fileID: 1483130966}
+    - target: {fileID: 7404180985309168843, guid: 10526014e2aca84438494ef6cb3d8e67,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
+      value: EnterLockpickMode
+      objectReference: {fileID: 0}
+    - target: {fileID: 7404180985309168843, guid: 10526014e2aca84438494ef6cb3d8e67,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
+      value: LockPick, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7404180985309168843, guid: 10526014e2aca84438494ef6cb3d8e67,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_BoolArgument
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7460372431973512114, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
@@ -26518,6 +26548,18 @@ MonoBehaviour:
   listenOnlyWhenActive: 0
   useTransition: 0
   transitionDuration: 0.5
+--- !u!114 &1483130966 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5942450752863399121, guid: 10526014e2aca84438494ef6cb3d8e67,
+    type: 3}
+  m_PrefabInstance: {fileID: 1473272157}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15688ed7a4877264d901a8c454c4e1d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1487464080
 GameObject:
   m_ObjectHideFlags: 0
