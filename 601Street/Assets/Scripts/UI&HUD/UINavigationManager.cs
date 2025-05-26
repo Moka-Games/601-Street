@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using DG.Tweening;
 
+
 /// <summary>
 /// Maneja la navegación por UI usando el nuevo Input System de Unity
 /// Sistema reutilizable para cualquier menú con selección automática mejorada
@@ -63,11 +64,14 @@ public class UINavigationManager : MonoBehaviour
     public System.Action<Selectable> OnElementSubmitted;
     public System.Action OnCancelled;
 
+
+
     private void Awake()
     {
-        // Inicializar componentes
-        eventSystem = EventSystem.current;
-        if (eventSystem == null)
+        playerControls = new PlayerControls();
+        SetupInputActions();
+
+        eventSystem = EventSystemManager.GetEventSystem(); if (eventSystem == null)
         {
             GameObject eventSystemGO = new GameObject("EventSystem");
             eventSystem = eventSystemGO.AddComponent<EventSystem>();
@@ -98,11 +102,7 @@ public class UINavigationManager : MonoBehaviour
     private void OnDisable()
     {
         playerControls.UI.Disable();
-
-        // Detener sistema de selección automática
         StopAutoSelectionSystem();
-
-        // Limpiar animaciones
         CleanupAnimations();
     }
 
@@ -372,7 +372,12 @@ public class UINavigationManager : MonoBehaviour
 
     private void Update()
     {
-        // Actualizar input de navegación
+        if (!enabled || !gameObject.activeInHierarchy)
+        {
+            Debug.LogWarning($"[UINavigationManager] {gameObject.name} está inactivo en Update!");
+            return;
+        }
+
         navigationInput = playerControls.UI.Navigate.ReadValue<Vector2>();
 
         // Procesar navegación si ha pasado suficiente tiempo
@@ -1001,12 +1006,17 @@ public class UINavigationManager : MonoBehaviour
 
     #region Debug Methods
 
-    [ContextMenu("Debug Current State")]
-    public void DebugCurrentState()
-    {
-        string detailedStatus = GetDetailedStatus();
-        Debug.Log(detailedStatus);
-    }
+    [ContextMenu("Debug State")]
+public void DebugCurrentState()
+{
+    Debug.Log($"=== DEBUG {gameObject.name} ===");
+    Debug.Log($"GameObject activo: {gameObject.activeInHierarchy}");
+    Debug.Log($"Componente habilitado: {enabled}");
+    Debug.Log($"PlayerControls: {(playerControls != null ? "OK" : "NULL")}");
+    Debug.Log($"EventSystem: {(eventSystem != null ? eventSystem.name : "NULL")}");
+    Debug.Log($"Elementos navegables: {navigableElements.Count}");
+    Debug.Log($"===============================");
+}
 
     [ContextMenu("Force Smart Selection")]
     public void ForceSmartSelectionFromContext()
@@ -1060,6 +1070,8 @@ public class UINavigationManager : MonoBehaviour
     {
         ConfigureAndSelectDefault();
     }
+
+
 
     #endregion
 

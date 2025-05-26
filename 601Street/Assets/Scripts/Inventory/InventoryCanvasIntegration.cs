@@ -3,8 +3,8 @@ using UnityEngine.UI;
 using System.Collections;
 
 /// <summary>
-/// Integración automática para manejar la navegación en canvas de interacción
-/// Se añade automáticamente al Inventory_Manager para gestionar transiciones de navegación
+/// VERSIÓN SIMPLIFICADA: Integración automática para manejar la navegación en canvas de interacción
+/// SIN desactivación de otros sistemas - Solo maneja la navegación del canvas específico
 /// </summary>
 [RequireComponent(typeof(Inventory_Manager))]
 public class InventoryCanvasIntegration : MonoBehaviour
@@ -17,9 +17,6 @@ public class InventoryCanvasIntegration : MonoBehaviour
     private InteractionCanvasNavigationManager canvasNavigationManager;
     private GameObject currentActiveCanvas;
     private bool isMonitoringCanvas = false;
-
-    // Referencias para el manejo de estados
-    private InventoryNavigationManager inventoryNavigation;
 
     private void Awake()
     {
@@ -35,9 +32,6 @@ public class InventoryCanvasIntegration : MonoBehaviour
             // Hacer que persista entre escenas si es necesario
             DontDestroyOnLoad(navObject);
         }
-
-        // Buscar InventoryNavigationManager
-        inventoryNavigation = GetComponent<InventoryNavigationManager>();
     }
 
     private void Start()
@@ -50,7 +44,7 @@ public class InventoryCanvasIntegration : MonoBehaviour
 
     private void SetupIntegration()
     {
-        Debug.Log("Configurando integración de navegación para canvas de interacción...");
+        Debug.Log("Configurando integración de navegación para canvas de interacción (SIN interferencia con otros sistemas)...");
 
         // Iniciar monitoreo de canvas activos
         StartCoroutine(MonitorActiveCanvas());
@@ -85,14 +79,15 @@ public class InventoryCanvasIntegration : MonoBehaviour
 
     private void OnInteractionCanvasOpened()
     {
-        Debug.Log("Canvas de interacción detectado - Activando navegación específica");
+        Debug.Log("Canvas de interacción detectado - Activando navegación específica (SIN desactivar otros sistemas)");
 
         // Buscar el canvas activo a través del prefabContainer
         currentActiveCanvas = FindActiveInteractionCanvas();
 
         if (currentActiveCanvas != null)
         {
-            // Activar navegación específica para el canvas
+            // CAMBIO IMPORTANTE: Solo activar navegación específica para el canvas
+            // NO desactivar otros sistemas
             canvasNavigationManager.ActivateForCanvas(currentActiveCanvas);
             isMonitoringCanvas = true;
 
@@ -107,9 +102,10 @@ public class InventoryCanvasIntegration : MonoBehaviour
 
     private void OnInteractionCanvasClosed()
     {
-        Debug.Log("Canvas de interacción cerrado - Desactivando navegación específica");
+        Debug.Log("Canvas de interacción cerrado - Desactivando navegación específica (SIN afectar otros sistemas)");
 
-        // Desactivar navegación del canvas
+        // CAMBIO IMPORTANTE: Solo desactivar navegación del canvas
+        // NO reactivar o cambiar otros sistemas
         if (canvasNavigationManager != null)
         {
             canvasNavigationManager.DeactivateNavigation();
@@ -159,7 +155,7 @@ public class InventoryCanvasIntegration : MonoBehaviour
         {
             // Añadir callback adicional para desactivar navegación
             closeButton.onClick.AddListener(() => {
-                Debug.Log("Botón de cierre presionado - Desactivando navegación del canvas");
+                Debug.Log("Botón de cierre presionado - Desactivando navegación del canvas (SIN afectar otros sistemas)");
 
                 // Pequeño delay para asegurar que otras operaciones se completen primero
                 StartCoroutine(DelayedDeactivation());
@@ -232,11 +228,12 @@ public class InventoryCanvasIntegration : MonoBehaviour
     [ContextMenu("Debug Canvas Integration")]
     public void DebugIntegrationState()
     {
-        Debug.Log($"=== Canvas Integration State ===");
+        Debug.Log($"=== CANVAS INTEGRATION STATE (SIMPLIFIED) ===");
         Debug.Log($"Is Monitoring Canvas: {isMonitoringCanvas}");
         Debug.Log($"Current Active Canvas: {currentActiveCanvas?.name ?? "NULL"}");
         Debug.Log($"Has Active Interaction: {inventoryManager?.HasActiveInteractionObject()}");
         Debug.Log($"Canvas Navigation Manager: {canvasNavigationManager?.name ?? "NULL"}");
+        Debug.Log("=== SIN INTERFERENCIA CON OTROS SISTEMAS ===");
 
         if (canvasNavigationManager != null)
         {

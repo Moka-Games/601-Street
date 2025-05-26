@@ -15,7 +15,6 @@ public class CallSystem : MonoBehaviour
     [SerializeField] private GameObject callPopupPanel;
     [SerializeField] private Animator callPanelAnimator;
     [SerializeField] private TMPro.TMP_Text callerNameText;
-    [SerializeField] private TMPro.TMP_Text callerDescriptionText;
     [Tooltip("Referencia directa a la imagen que mostrará el avatar del llamante")]
     [SerializeField] private Image callerAvatarImage;
 
@@ -240,13 +239,6 @@ public class CallSystem : MonoBehaviour
             callerNameText.text = callerName;
         }
 
-        if (callerDescriptionText != null)
-        {
-            // Obtener el texto del binding actual para mostrar al usuario
-            string acceptKey = GetAcceptCallKeyDisplayText();
-            callerDescriptionText.text = description + $"\nPress {acceptKey} to accept";
-        }
-
         // Actualizar avatar
         if (callerAvatarImage != null && avatar != null)
         {
@@ -351,11 +343,6 @@ public class CallSystem : MonoBehaviour
         isCallActive = true;
         OnCallStateChanged?.Invoke(true);
         StartSafetyCheck();
-
-        if (callerDescriptionText != null)
-        {
-            callerDescriptionText.text = "Ongoing call...";
-        }
 
         if (popupTimerCoroutine != null)
         {
@@ -481,11 +468,6 @@ public class CallSystem : MonoBehaviour
         {
             Debug.Log("CallSystem: Finalizando llamada tras terminar la conversación");
             ReleasePlayerMultipleWays();
-
-            if (callerDescriptionText != null)
-            {
-                callerDescriptionText.text = "Call ended";
-            }
 
             HideCallPopup();
             EndCall();

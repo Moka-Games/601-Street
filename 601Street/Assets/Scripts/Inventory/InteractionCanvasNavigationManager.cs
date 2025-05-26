@@ -6,9 +6,8 @@ using UnityEngine.InputSystem;
 using DG.Tweening;
 
 /// <summary>
-/// Gestor de navegación específico para los canvas de interacción de ítems del inventario
-/// Se activa automáticamente cuando se abre un InteractionPrefab
-/// VERSIÓN FINAL: Cancel solo cierra canvas de interacción, NO interfiere con el inventario
+/// VERSIÓN SIMPLIFICADA: Gestor de navegación específico para los canvas de interacción
+/// SIN desactivación de otros sistemas - Solo maneja su propia navegación
 /// </summary>
 public class InteractionCanvasNavigationManager : MonoBehaviour
 {
@@ -37,10 +36,6 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
     private bool isActive = false;
     private EventSystem eventSystem;
 
-    // Referencias externas
-    private InventoryNavigationManager inventoryNavigation;
-    private UINavigationManager pauseMenuNavigation;
-
     private void Awake()
     {
         // Inicializar referencias
@@ -50,29 +45,8 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         playerControls = new PlayerControls();
         SetupInputActions();
 
-        // Buscar sistemas de navegación existentes
-        FindNavigationSystems();
-
-        // CRÍTICO: Inicialmente completamente desactivado - no habilitar ningún input
+        // CRÍTICO: Inicialmente completamente desactivado
         this.enabled = false;
-    }
-
-    private void FindNavigationSystems()
-    {
-        // Buscar InventoryNavigationManager
-        inventoryNavigation = FindAnyObjectByType<InventoryNavigationManager>();
-
-        // Buscar UINavigationManager (para menús de pausa, etc.)
-        UINavigationManager[] uiManagers = FindObjectsByType<UINavigationManager>(FindObjectsSortMode.None);
-        foreach (var manager in uiManagers)
-        {
-            // Tomar el que no sea el del inventario
-            if (manager.gameObject != inventoryNavigation?.gameObject)
-            {
-                pauseMenuNavigation = manager;
-                break;
-            }
-        }
     }
 
     private void SetupInputActions()
@@ -80,18 +54,13 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         playerControls.UI.Submit.performed += OnSubmit;
         playerControls.UI.Cancel.performed += OnCancel;
         playerControls.UI.Navigate.performed += OnNavigate;
-
-        // IMPORTANTE: No habilitar los controles aquí - solo configurar las suscripciones
     }
 
-    // Método OnEnable explícito para controlar cuándo se habilitan los inputs
     private void OnEnable()
     {
         // Solo habilitar inputs si el componente está realmente activo
-        // Esto se llama desde ActivateForCanvas()
     }
 
-    // Método OnDisable explícito para asegurar que los inputs se deshabiliten
     private void OnDisable()
     {
         // Asegurar que los inputs estén deshabilitados cuando el componente se desactiva
@@ -105,8 +74,8 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
     {
         Debug.Log($"Activando navegación para canvas: {canvasObject.name}");
 
-        // Desactivar otros sistemas de navegación
-        DisableOtherNavigationSystems();
+        // CAMBIO IMPORTANTE: NO desactivar otros sistemas
+        // Solo configurar y activar este sistema
 
         // Configurar navegación para este canvas
         SetupCanvasNavigation(canvasObject);
@@ -115,7 +84,7 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         isActive = true;
         this.enabled = true;
 
-        // CRÍTICO: Solo habilitar UI cuando realmente hay un canvas activo
+        // Habilitar UI cuando realmente hay un canvas activo
         if (playerControls != null)
         {
             playerControls.UI.Enable();
@@ -136,7 +105,7 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         // Limpiar animaciones
         CleanupAnimations();
 
-        // CRÍTICO: Deshabilitar UI antes de desactivar el sistema
+        // Deshabilitar UI antes de desactivar el sistema
         if (playerControls != null)
         {
             playerControls.UI.Disable();
@@ -147,8 +116,8 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         isActive = false;
         this.enabled = false;
 
-        // Reactivar sistemas de navegación anteriores
-        ReactivateOtherNavigationSystems();
+        // CAMBIO IMPORTANTE: NO reactivar otros sistemas
+        // Dejar que cada sistema maneje su propio estado
 
         // Limpiar referencias
         navigableButtons.Clear();
@@ -162,7 +131,6 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
 
         if (autoDetectButtons)
         {
-            // Auto-detectar todos los botones en el canvas
             Button[] buttons = canvasObject.GetComponentsInChildren<Button>();
 
             foreach (Button button in buttons)
@@ -176,13 +144,11 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
             Debug.Log($"Detectados {navigableButtons.Count} botones en el canvas");
         }
 
-        // Asegurar que el botón de cierre esté al final para navegación intuitiva
         OrganizeButtons();
     }
 
     private void OrganizeButtons()
     {
-        // Mover el botón de cierre al final de la lista si existe
         Button closeButton = null;
 
         for (int i = 0; i < navigableButtons.Count; i++)
@@ -212,21 +178,18 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
 
         int newIndex = currentIndex;
 
-        // Navegación vertical u horizontal
         if (Mathf.Abs(input.y) > Mathf.Abs(input.x))
         {
-            // Navegación vertical
-            if (input.y > 0) // Arriba
+            if (input.y > 0)
                 newIndex = (currentIndex - 1 + navigableButtons.Count) % navigableButtons.Count;
-            else // Abajo
+            else
                 newIndex = (currentIndex + 1) % navigableButtons.Count;
         }
         else
         {
-            // Navegación horizontal
-            if (input.x > 0) // Derecha
+            if (input.x > 0)
                 newIndex = (currentIndex + 1) % navigableButtons.Count;
-            else // Izquierda
+            else
                 newIndex = (currentIndex - 1 + navigableButtons.Count) % navigableButtons.Count;
         }
 
@@ -242,7 +205,6 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
 
         Debug.Log($"Submit presionado en: {currentSelectedButton.name}");
 
-        // Ejecutar el onClick del botón actual
         try
         {
             currentSelectedButton.onClick.Invoke();
@@ -256,32 +218,25 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
 
     private void OnCancel(InputAction.CallbackContext context)
     {
-        // CAMBIO IMPORTANTE: Solo manejar Cancel si este canvas está activo
-        // NO interferir con el inventario principal
         if (!isActive)
         {
-            Debug.Log("Cancel recibido pero canvas no está activo - pasando al siguiente handler");
+            Debug.Log("Cancel recibido pero canvas no está activo - ignorando");
             return;
         }
 
-        Debug.Log($"Cancel recibido en InteractionCanvas - Solo cerrar canvas, NO inventario");
+        Debug.Log($"Cancel recibido en InteractionCanvas - Cerrando canvas");
 
-        // Buscar el botón de cierre del canvas y presionarlo
         Button closeButton = FindCloseButton();
         if (closeButton != null)
         {
-            Debug.Log("Ejecutando cierre del canvas de interacción (NO del inventario)");
+            Debug.Log("Ejecutando cierre del canvas de interacción");
             closeButton.onClick.Invoke();
         }
         else
         {
-            // Si no hay botón de cierre, desactivar solo este canvas
-            Debug.LogWarning("No se encontró botón de cierre, desactivando solo navegación del canvas");
+            Debug.LogWarning("No se encontró botón de cierre, desactivando navegación del canvas");
             DeactivateNavigation();
         }
-
-        // NOTA: Este Cancel NO debe cerrar el inventario principal
-        // El inventario solo se cierra con ToggleInventory
     }
 
     private Button FindCloseButton()
@@ -303,15 +258,11 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         Button button = navigableButtons[index];
         if (button == null || !button.gameObject.activeInHierarchy || !button.interactable) return;
 
-        // Actualizar referencias
         previousSelectedButton = currentSelectedButton;
         currentIndex = index;
         currentSelectedButton = button;
 
-        // Actualizar EventSystem
         eventSystem.SetSelectedGameObject(button.gameObject);
-
-        // Aplicar animaciones
         ApplySelectionAnimation();
 
         Debug.Log($"Botón seleccionado: {button.name} (índice: {index})");
@@ -319,17 +270,14 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
 
     private void ApplySelectionAnimation()
     {
-        // Limpiar animación anterior
         currentAnimationTween?.Kill();
 
-        // Resetear botón anterior
         if (previousSelectedButton != null && previousSelectedButton != currentSelectedButton)
         {
             previousSelectedButton.transform.DOKill();
             previousSelectedButton.transform.localScale = Vector3.one;
         }
 
-        // Animar botón actual
         if (currentSelectedButton != null)
         {
             currentSelectedButton.transform.localScale = Vector3.one;
@@ -354,52 +302,17 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         }
     }
 
-    private void DisableOtherNavigationSystems()
-    {
-        // Desactivar navegación del inventario
-        if (inventoryNavigation != null)
-        {
-            inventoryNavigation.SetNavigationEnabled(false);
-            Debug.Log("InventoryNavigationManager desactivado");
-        }
-
-        // Desactivar navegación de menú de pausa si está activa
-        if (pauseMenuNavigation != null && pauseMenuNavigation.enabled)
-        {
-            pauseMenuNavigation.DisableUINavigation();
-            Debug.Log("UINavigationManager desactivado");
-        }
-    }
-
-    private void ReactivateOtherNavigationSystems()
-    {
-        // Reactivar navegación del inventario si el inventario sigue abierto
-        if (inventoryNavigation != null)
-        {
-            var inventoryManager = FindAnyObjectByType<Inventory_Manager>();
-            if (inventoryManager != null && inventoryManager.IsInventoryOpen())
-            {
-                inventoryNavigation.SetNavigationEnabled(true);
-                // Forzar refresco para actualizar selección
-                inventoryNavigation.ForceRefresh();
-                Debug.Log("InventoryNavigationManager reactivado");
-            }
-        }
-    }
-
     private void OnDestroy()
     {
         CleanupAnimations();
         playerControls?.Dispose();
     }
 
-    // Método público para verificar si este canvas está activo
     public bool IsHandlingInputs()
     {
         return isActive;
     }
 
-    // Método público para configuración externa
     public void SetupForSpecificCanvas(GameObject canvasObject, List<Button> specificButtons = null)
     {
         if (specificButtons != null && specificButtons.Count > 0)
@@ -412,7 +325,6 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         }
     }
 
-    // Método de debug
     [ContextMenu("Debug Canvas Navigation")]
     public void DebugCurrentState()
     {

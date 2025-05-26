@@ -3365,7 +3365,7 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
-      value: 6
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -3386,7 +3386,7 @@ PrefabInstance:
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
-      objectReference: {fileID: 1936779529}
+      objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -3405,7 +3405,7 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: SetActive
+      value: DebugCurrentState
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -3430,7 +3430,7 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
-      value: UnityEngine.GameObject, UnityEngine
+      value: UINavigationManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -3440,11 +3440,16 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
+      value: Nota_Interactuada
+      objectReference: {fileID: 0}
+    - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
+        type: 3}
+      propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_StringArgument
       value: Nota_Interactuada
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
@@ -28677,6 +28682,7 @@ MonoBehaviour:
   singleUseInteraction: 0
   disableAfterInteraction: 0
   detectionRadius: 7
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!114 &1891648460
@@ -29385,6 +29391,7 @@ MonoBehaviour:
   singleUseInteraction: 0
   disableAfterInteraction: 0
   detectionRadius: 7
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!114 &1936779534

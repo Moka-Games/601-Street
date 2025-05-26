@@ -2,9 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Integración automática entre Inventory_Manager e InventoryNavigationManager
-/// Ahora incluye manejo automático de canvas de interacción
-/// Añade este componente al mismo GameObject que Inventory_Manager
+/// VERSIÓN SIMPLIFICADA: Integración automática entre Inventory_Manager e InventoryNavigationManager
+/// SIN desactivación de otros sistemas - Solo maneja su propia navegación
 /// </summary>
 [RequireComponent(typeof(Inventory_Manager))]
 public class InventoryNavigationIntegration : MonoBehaviour
@@ -17,7 +16,6 @@ public class InventoryNavigationIntegration : MonoBehaviour
     private Inventory_Manager inventoryManager;
     private InventoryNavigationManager navigationManager;
     private InventoryCanvasIntegration canvasIntegration;
-    private PlayerControls playerControls;
 
     // Referencias para intercambio de controles
     private bool originalInventoryState = false;
@@ -27,7 +25,6 @@ public class InventoryNavigationIntegration : MonoBehaviour
     [SerializeField] private bool onlyScrollIfElementNotVisible = true;
     [SerializeField] private float manualScrollGracePeriod = 2f;
     [SerializeField] private float visibilityMargin = 50f;
-
 
     private void Awake()
     {
@@ -47,10 +44,8 @@ public class InventoryNavigationIntegration : MonoBehaviour
         {
             canvasIntegration = gameObject.AddComponent<InventoryCanvasIntegration>();
         }
-
-        // Inicializar controles
-        playerControls = new PlayerControls();
     }
+
     private void Start()
     {
         if (autoSetupOnStart)
@@ -61,36 +56,25 @@ public class InventoryNavigationIntegration : MonoBehaviour
 
     private void OnEnable()
     {
-        // Configurar eventos del inventario
         SetupInventoryEvents();
     }
 
     private void OnDisable()
     {
-        // Limpiar eventos
         CleanupInventoryEvents();
-    }
-
-    private void OnDestroy()
-    {
-        playerControls?.Dispose();
     }
 
     public void SetupIntegration()
     {
         Debug.Log("Configurando integración de navegación para inventario...");
 
-        // Auto-configurar referencias del navegador
         if (inventoryManager != null && navigationManager != null)
         {
             ConfigureNavigationReferences();
             ConfigureScrollRects();
-
-            // NUEVO: Configurar el comportamiento de auto-scroll
             ConfigureAutoScroll();
         }
 
-        // Configurar eventos
         SetupNavigationEvents();
 
         Debug.Log("Integración de navegación configurada correctamente");
@@ -98,13 +82,9 @@ public class InventoryNavigationIntegration : MonoBehaviour
 
     private void ConfigureNavigationReferences()
     {
-        // Configurar referencias usando los campos públicos del Inventory_Manager
-        var navManager = navigationManager;
-
-        // Usar reflexión para obtener las referencias privadas del inventario
         var inventoryType = typeof(Inventory_Manager);
 
-        // Obtener noteContainer
+        // Obtener noteContainer usando reflexión
         var noteContainerField = inventoryType.GetField("noteContainer");
         if (noteContainerField != null)
         {
@@ -112,7 +92,7 @@ public class InventoryNavigationIntegration : MonoBehaviour
             SetNavigationField("noteContainer", noteContainer);
         }
 
-        // Obtener objectContainer  
+        // Obtener objectContainer usando reflexión
         var objectContainerField = inventoryType.GetField("objectContainer");
         if (objectContainerField != null)
         {
@@ -120,7 +100,6 @@ public class InventoryNavigationIntegration : MonoBehaviour
             SetNavigationField("objectContainer", objectContainer);
         }
 
-        // Auto-detectar ScrollRects
         DetectScrollRects();
     }
 
@@ -138,12 +117,10 @@ public class InventoryNavigationIntegration : MonoBehaviour
 
     private void DetectScrollRects()
     {
-        // Buscar ScrollRects en la interfaz del inventario
         if (inventoryManager.InventoryInterface != null)
         {
             ScrollRect[] scrolls = inventoryManager.InventoryInterface.GetComponentsInChildren<ScrollRect>();
 
-            // Asignar automáticamente los primeros dos ScrollRects encontrados
             if (scrolls.Length >= 1)
             {
                 SetNavigationField("noteScrollRect", scrolls[0]);
@@ -160,10 +137,8 @@ public class InventoryNavigationIntegration : MonoBehaviour
 
     private void SetupInventoryEvents()
     {
-        // Detectar cuando se abre/cierra el inventario
         if (enableNavigationWhenInventoryOpens)
         {
-            // Usar un patrón de observación simple
             InvokeRepeating(nameof(CheckInventoryState), 0.1f, 0.1f);
         }
     }
@@ -173,9 +148,6 @@ public class InventoryNavigationIntegration : MonoBehaviour
         CancelInvoke(nameof(CheckInventoryState));
     }
 
-    /// <summary>
-    /// Verifica cambios en el estado del inventario
-    /// </summary>
     private void CheckInventoryState()
     {
         if (inventoryManager == null) return;
@@ -197,39 +169,53 @@ public class InventoryNavigationIntegration : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// VERSIÓN SIMPLIFICADA: Solo habilita la navegación del inventario sin afectar otros sistemas
+    /// </summary>
     private void OnInventoryOpened()
     {
-        Debug.Log("Inventario abierto - Habilitando navegación");
+        Debug.Log("Inventario abierto - Habilitando navegación del inventario");
 
-        // Cambiar a controles de UI
-        playerControls.Gameplay.Disable();
-        playerControls.UI.Enable();
-
-        // Habilitar navegación del inventario
+        // CAMBIO IMPORTANTE: Solo habilitar la navegación del inventario
+        // NO desactivar otros sistemas
         if (navigationManager != null)
         {
-            navigationManager.SetNavigationEnabled(true);
+            navigationManager.enabled = true;
 
-            // NUEVO: Resetear el estado de scroll manual para permitir auto-scroll inicial
-            navigationManager.ResetManualScrollState();
+            // Configurar navegación específica del inventario
+            try
+            {
+                var resetMethod = navigationManager.GetType().GetMethod("ResetManualScrollState");
+                if (resetMethod != null)
+                {
+                    resetMethod.Invoke(navigationManager, null);
+                }
 
-            // Forzar refresco para detectar elementos actuales
-            navigationManager.ForceRefresh();
+                var refreshMethod = navigationManager.GetType().GetMethod("ForceRefresh");
+                if (refreshMethod != null)
+                {
+                    refreshMethod.Invoke(navigationManager, null);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Error al configurar navegación del inventario: {e.Message}");
+            }
         }
     }
 
+    /// <summary>
+    /// VERSIÓN SIMPLIFICADA: Solo deshabilita la navegación del inventario
+    /// </summary>
     private void OnInventoryClosed()
     {
-        Debug.Log("Inventario cerrado - Deshabilitando navegación");
+        Debug.Log("Inventario cerrado - Deshabilitando navegación del inventario");
 
-        // Volver a controles de gameplay
-        playerControls.UI.Disable();
-        playerControls.Gameplay.Enable();
-
-        // Deshabilitar navegación del inventario
+        // CAMBIO IMPORTANTE: Solo deshabilitar la navegación del inventario
+        // NO afectar otros sistemas
         if (navigationManager != null)
         {
-            navigationManager.SetNavigationEnabled(false);
+            navigationManager.enabled = false;
         }
     }
 
@@ -237,44 +223,162 @@ public class InventoryNavigationIntegration : MonoBehaviour
     {
         if (navigationManager != null)
         {
-            // Suscribirse a eventos de navegación
-            navigationManager.OnElementSelected += OnNavigationElementSelected;
-            navigationManager.OnElementSubmitted += OnNavigationElementSubmitted;
-            navigationManager.OnSectionChanged += OnNavigationSectionChanged;
+            try
+            {
+                var navType = typeof(InventoryNavigationManager);
+
+                // Buscar eventos usando reflexión
+                var onElementSelectedEvent = navType.GetEvent("OnElementSelected");
+                var onElementSubmittedEvent = navType.GetEvent("OnElementSubmitted");
+                var onSectionChangedEvent = navType.GetEvent("OnSectionChanged");
+
+                // Suscribirse a eventos si existen
+                if (onElementSelectedEvent != null)
+                {
+                    var addMethod = onElementSelectedEvent.GetAddMethod();
+                    var delegateType = onElementSelectedEvent.EventHandlerType;
+                    var delegateInstance = System.Delegate.CreateDelegate(delegateType, this, nameof(OnNavigationElementSelected));
+                    addMethod.Invoke(navigationManager, new object[] { delegateInstance });
+                }
+
+                if (onElementSubmittedEvent != null)
+                {
+                    var addMethod = onElementSubmittedEvent.GetAddMethod();
+                    var delegateType = onElementSubmittedEvent.EventHandlerType;
+                    var delegateInstance = System.Delegate.CreateDelegate(delegateType, this, nameof(OnNavigationElementSubmitted));
+                    addMethod.Invoke(navigationManager, new object[] { delegateInstance });
+                }
+
+                if (onSectionChangedEvent != null)
+                {
+                    var addMethod = onSectionChangedEvent.GetAddMethod();
+                    var delegateType = onSectionChangedEvent.EventHandlerType;
+                    var delegateInstance = System.Delegate.CreateDelegate(delegateType, this, nameof(OnNavigationSectionChangedReflection));
+                    addMethod.Invoke(navigationManager, new object[] { delegateInstance });
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Error al configurar eventos de navegación: {e.Message}");
+            }
         }
     }
 
     private void OnNavigationElementSelected(Button selectedButton)
     {
         Debug.Log($"Elemento seleccionado por navegación: {selectedButton.name}");
-
-        // Aquí puedes añadir lógica adicional cuando se selecciona un elemento
-        // Por ejemplo, mostrar información del ítem, actualizar UI, etc.
     }
 
     private void OnNavigationElementSubmitted(Button submittedButton)
     {
         Debug.Log($"Elemento confirmado por navegación: {submittedButton.name}");
-
-        // El botón ya se presiona automáticamente, pero puedes añadir efectos adicionales
-        // Por ejemplo, animaciones especiales, sonidos, etc.
     }
 
-    private void OnNavigationSectionChanged(InventoryNavigationManager.InventorySection newSection)
+    private void OnNavigationSectionChangedReflection(object newSection)
     {
         Debug.Log($"Sección cambiada a: {newSection}");
-
-        // Aquí puedes añadir lógica cuando cambia de sección
-        // Por ejemplo, cambiar el color de un indicador, actualizar texto, etc.
     }
 
-    // Métodos públicos para control manual
+    private void ConfigureScrollRects()
+    {
+        // Verificar si los ScrollRects están asignados usando reflexión
+        var navType = typeof(InventoryNavigationManager);
+        var noteScrollField = navType.GetField("noteScrollRect", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var objectScrollField = navType.GetField("objectScrollRect", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        if (noteScrollField?.GetValue(navigationManager) == null || objectScrollField?.GetValue(navigationManager) == null)
+        {
+            Debug.LogWarning("ScrollRects no están asignados. Intentando detección automática...");
+            DetectScrollRects();
+        }
+
+        // Configurar propiedades de scroll usando reflexión si los métodos existen
+        try
+        {
+            var setScrollEnabledMethod = navType.GetMethod("SetScrollEnabled");
+            if (setScrollEnabledMethod != null)
+            {
+                setScrollEnabledMethod.Invoke(navigationManager, new object[] { true });
+            }
+
+            var setScrollSensitivityMethod = navType.GetMethod("SetScrollSensitivity");
+            if (setScrollSensitivityMethod != null)
+            {
+                setScrollSensitivityMethod.Invoke(navigationManager, new object[] { 2.0f });
+            }
+
+            var setScrollDeadZoneMethod = navType.GetMethod("SetScrollDeadZone");
+            if (setScrollDeadZoneMethod != null)
+            {
+                setScrollDeadZoneMethod.Invoke(navigationManager, new object[] { 0.3f });
+            }
+
+            Debug.Log("Configuración de scroll completada");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"Error al configurar scroll: {e.Message}");
+        }
+    }
+
+    public void ConfigureAutoScroll()
+    {
+        if (navigationManager != null)
+        {
+            try
+            {
+                var navType = typeof(InventoryNavigationManager);
+
+                var setAutoScrollEnabledMethod = navType.GetMethod("SetAutoScrollEnabled");
+                if (setAutoScrollEnabledMethod != null)
+                {
+                    setAutoScrollEnabledMethod.Invoke(navigationManager, new object[] { enableAutoScrollOnNavigation });
+                }
+
+                var setScrollOnlyIfNotVisibleMethod = navType.GetMethod("SetScrollOnlyIfNotVisible");
+                if (setScrollOnlyIfNotVisibleMethod != null)
+                {
+                    setScrollOnlyIfNotVisibleMethod.Invoke(navigationManager, new object[] { onlyScrollIfElementNotVisible });
+                }
+
+                var setManualScrollGracePeriodMethod = navType.GetMethod("SetManualScrollGracePeriod");
+                if (setManualScrollGracePeriodMethod != null)
+                {
+                    setManualScrollGracePeriodMethod.Invoke(navigationManager, new object[] { manualScrollGracePeriod });
+                }
+
+                var setVisibilityMarginMethod = navType.GetMethod("SetVisibilityMargin");
+                if (setVisibilityMarginMethod != null)
+                {
+                    setVisibilityMarginMethod.Invoke(navigationManager, new object[] { visibilityMargin });
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Error al configurar auto-scroll: {e.Message}");
+            }
+        }
+    }
+
+    // Métodos públicos para control manual - SIMPLIFICADOS
     public void EnableInventoryNavigation()
     {
         if (navigationManager != null)
         {
-            navigationManager.SetNavigationEnabled(true);
-            navigationManager.ForceRefresh();
+            navigationManager.enabled = true;
+
+            try
+            {
+                var refreshMethod = navigationManager.GetType().GetMethod("ForceRefresh");
+                if (refreshMethod != null)
+                {
+                    refreshMethod.Invoke(navigationManager, null);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Error al refrescar navegación: {e.Message}");
+            }
         }
     }
 
@@ -282,7 +386,7 @@ public class InventoryNavigationIntegration : MonoBehaviour
     {
         if (navigationManager != null)
         {
-            navigationManager.SetNavigationEnabled(false);
+            navigationManager.enabled = false;
         }
     }
 
@@ -290,11 +394,22 @@ public class InventoryNavigationIntegration : MonoBehaviour
     {
         if (navigationManager != null)
         {
-            navigationManager.ForceRefresh();
+            try
+            {
+                var refreshMethod = navigationManager.GetType().GetMethod("ForceRefresh");
+                if (refreshMethod != null)
+                {
+                    refreshMethod.Invoke(navigationManager, null);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Error al refrescar navegación: {e.Message}");
+            }
         }
     }
 
-    // Método para forzar configuración manual si la automática falla
+    // Métodos de contexto para debugging
     [ContextMenu("Setup Manual Integration")]
     public void SetupManualIntegration()
     {
@@ -306,7 +421,22 @@ public class InventoryNavigationIntegration : MonoBehaviour
     {
         if (navigationManager != null)
         {
-            navigationManager.DebugCurrentState();
+            try
+            {
+                var debugMethod = navigationManager.GetType().GetMethod("DebugCurrentState");
+                if (debugMethod != null)
+                {
+                    debugMethod.Invoke(navigationManager, null);
+                }
+                else
+                {
+                    Debug.Log($"InventoryNavigationManager está presente: {navigationManager.name}");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Error al hacer debug de navegación: {e.Message}");
+            }
         }
     }
 
@@ -316,31 +446,16 @@ public class InventoryNavigationIntegration : MonoBehaviour
         RefreshInventoryNavigation();
     }
 
-    private void ConfigureScrollRects()
+    [ContextMenu("Debug Integration State")]
+    public void DebugIntegrationState()
     {
-        // Verificar que los ScrollRects estén correctamente asignados
-        if (navigationManager.noteScrollRect == null || navigationManager.objectScrollRect == null)
-        {
-            Debug.LogWarning("ScrollRects no están asignados. Intentando detección automática...");
-            DetectScrollRects();
-        }
-
-        // Configurar parámetros de scroll
-        navigationManager.SetScrollEnabled(true);
-        navigationManager.SetScrollSensitivity(2.0f);
-        navigationManager.SetScrollDeadZone(0.3f);
-
-        Debug.Log("Configuración de scroll completada");
-    }
-
-    public void ConfigureAutoScroll()
-    {
-        if (navigationManager != null)
-        {
-            navigationManager.SetAutoScrollEnabled(enableAutoScrollOnNavigation);
-            navigationManager.SetScrollOnlyIfNotVisible(onlyScrollIfElementNotVisible);
-            navigationManager.SetManualScrollGracePeriod(manualScrollGracePeriod);
-            navigationManager.SetVisibilityMargin(visibilityMargin);
-        }
+        Debug.Log($"=== INVENTORY NAVIGATION INTEGRATION STATE (SIMPLIFIED) ===");
+        Debug.Log($"Inventory Manager: {inventoryManager?.name ?? "NULL"}");
+        Debug.Log($"Navigation Manager: {navigationManager?.name ?? "NULL"}");
+        Debug.Log($"Navigation Manager Enabled: {navigationManager?.enabled}");
+        Debug.Log($"Canvas Integration: {canvasIntegration?.name ?? "NULL"}");
+        Debug.Log($"Original Inventory State: {originalInventoryState}");
+        Debug.Log($"Current Inventory Open: {inventoryManager?.IsInventoryOpen()}");
+        Debug.Log("=== SIN INTERFERENCIA CON OTROS SISTEMAS ===");
     }
 }
