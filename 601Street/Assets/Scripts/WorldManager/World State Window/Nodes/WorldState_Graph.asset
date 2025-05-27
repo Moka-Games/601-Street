@@ -147,8 +147,8 @@ MonoBehaviour:
     name: Ordenador 2 Interactuado
     position:
       serializedVersion: 2
-      x: 128.27502
-      y: 677.0625
+      x: 130.27502
+      y: 689.0625
       width: 200
       height: 150
     activeObjectIDs: []
@@ -164,13 +164,16 @@ MonoBehaviour:
     name: Post Riku
     position:
       serializedVersion: 2
-      x: 406.57495
-      y: 675.78125
+      x: 399.57495
+      y: 689.78125
       width: 200
       height: 150
     activeObjectIDs: []
-    inactiveObjectIDs: []
-    connectedNodeIDs: []
+    inactiveObjectIDs:
+    - Guarda_Exito
+    - Guarda_Fracaso
+    connectedNodeIDs:
+    - Post-Secta
     isInitialNode: 0
     misionAsociada: {fileID: 0}
     misionDelay: 0
@@ -178,8 +181,68 @@ MonoBehaviour:
     name: "Cap\xEDtulo 2 Completado"
     position:
       serializedVersion: 2
-      x: 687.125
-      y: 691.78125
+      x: 914.125
+      y: 690.78125
+      width: 200
+      height: 150
+    activeObjectIDs: []
+    inactiveObjectIDs: []
+    connectedNodeIDs:
+    - Post-Universidad
+    isInitialNode: 0
+    misionAsociada: {fileID: 0}
+    misionDelay: 0
+  - id: Post-Secta
+    name: Post Secta
+    position:
+      serializedVersion: 2
+      x: 658.875
+      y: 691.6406
+      width: 200
+      height: 150
+    activeObjectIDs: []
+    inactiveObjectIDs: []
+    connectedNodeIDs:
+    - "Cap\xEDtulo-2-Completado"
+    isInitialNode: 0
+    misionAsociada: {fileID: 0}
+    misionDelay: 0
+  - id: Post-Universidad
+    name: Post Universidad
+    position:
+      serializedVersion: 2
+      x: 123.875
+      y: 888.6406
+      width: 200
+      height: 150
+    activeObjectIDs: []
+    inactiveObjectIDs: []
+    connectedNodeIDs:
+    - Post-Riku-Universidad
+    isInitialNode: 0
+    misionAsociada: {fileID: 0}
+    misionDelay: 0
+  - id: Post-Riku-Universidad
+    name: Post Riku Universidad
+    position:
+      serializedVersion: 2
+      x: 485.9375
+      y: 889.0703
+      width: 200
+      height: 150
+    activeObjectIDs: []
+    inactiveObjectIDs: []
+    connectedNodeIDs:
+    - Juego-Completado
+    isInitialNode: 0
+    misionAsociada: {fileID: 0}
+    misionDelay: 0
+  - id: Juego-Completado
+    name: Juego Completado
+    position:
+      serializedVersion: 2
+      x: 795.9375
+      y: 890.0703
       width: 200
       height: 150
     activeObjectIDs: []
@@ -207,4 +270,14 @@ MonoBehaviour:
     toNodeID: Ordenador_2_Interactuado
   - fromNodeID: Ordenador_2_Interactuado
     toNodeID: 24c4861a-d794-4cdc-943c-42f043e4d674
+  - fromNodeID: 24c4861a-d794-4cdc-943c-42f043e4d674
+    toNodeID: Post-Secta
+  - fromNodeID: Post-Secta
+    toNodeID: "Cap\xEDtulo-2-Completado"
+  - fromNodeID: "Cap\xEDtulo-2-Completado"
+    toNodeID: Post-Universidad
+  - fromNodeID: Post-Universidad
+    toNodeID: Post-Riku-Universidad
+  - fromNodeID: Post-Riku-Universidad
+    toNodeID: Juego-Completado
   initialNodeID: InitialState_Colegio
