@@ -155,9 +155,38 @@ MonoBehaviour:
     inactiveObjectIDs:
     - "Cap\xEDtulo_2_Comenzado"
     - Bloqueo-Parque
-    connectedNodeIDs: []
+    connectedNodeIDs:
+    - 24c4861a-d794-4cdc-943c-42f043e4d674
     isInitialNode: 0
     misionAsociada: {fileID: 11400000, guid: bc4cb3db17dffbf4dac204550b89fc81, type: 2}
+    misionDelay: 0
+  - id: 24c4861a-d794-4cdc-943c-42f043e4d674
+    name: Post Riku
+    position:
+      serializedVersion: 2
+      x: 406.57495
+      y: 675.78125
+      width: 200
+      height: 150
+    activeObjectIDs: []
+    inactiveObjectIDs: []
+    connectedNodeIDs: []
+    isInitialNode: 0
+    misionAsociada: {fileID: 0}
+    misionDelay: 0
+  - id: "Cap\xEDtulo-2-Completado"
+    name: "Cap\xEDtulo 2 Completado"
+    position:
+      serializedVersion: 2
+      x: 687.125
+      y: 691.78125
+      width: 200
+      height: 150
+    activeObjectIDs: []
+    inactiveObjectIDs: []
+    connectedNodeIDs: []
+    isInitialNode: 0
+    misionAsociada: {fileID: 0}
     misionDelay: 0
   connections:
   - fromNodeID: InitialState_Colegio
@@ -176,4 +205,6 @@ MonoBehaviour:
     toNodeID: "Cap\xEDtulo_1_Completado"
   - fromNodeID: "Cap\xEDtulo_1_Completado"
     toNodeID: Ordenador_2_Interactuado
+  - fromNodeID: Ordenador_2_Interactuado
+    toNodeID: 24c4861a-d794-4cdc-943c-42f043e4d674
   initialNodeID: InitialState_Colegio
