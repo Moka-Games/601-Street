@@ -12021,6 +12021,7 @@ MonoBehaviour:
   singleUseInteraction: 0
   disableAfterInteraction: 0
   detectionRadius: 5
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!114 &1629875649
@@ -12302,6 +12303,26 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -13.256
       objectReference: {fileID: 0}
+    - target: {fileID: -5715174251297866376, guid: 792b651e5fb780d4685bac494a9117ed,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 145.7335
+      objectReference: {fileID: 0}
+    - target: {fileID: -5715174251297866376, guid: 792b651e5fb780d4685bac494a9117ed,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 147.6915
+      objectReference: {fileID: 0}
+    - target: {fileID: -5715174251297866376, guid: 792b651e5fb780d4685bac494a9117ed,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.12
+      objectReference: {fileID: 0}
+    - target: {fileID: -5715174251297866376, guid: 792b651e5fb780d4685bac494a9117ed,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -36.82
+      objectReference: {fileID: 0}
     - target: {fileID: -5700299985212750502, guid: 792b651e5fb780d4685bac494a9117ed,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -12482,6 +12503,26 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -13.401
       objectReference: {fileID: 0}
+    - target: {fileID: -1382560304653594042, guid: 792b651e5fb780d4685bac494a9117ed,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 145.7335
+      objectReference: {fileID: 0}
+    - target: {fileID: -1382560304653594042, guid: 792b651e5fb780d4685bac494a9117ed,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 147.6915
+      objectReference: {fileID: 0}
+    - target: {fileID: -1382560304653594042, guid: 792b651e5fb780d4685bac494a9117ed,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.12
+      objectReference: {fileID: 0}
+    - target: {fileID: -1382560304653594042, guid: 792b651e5fb780d4685bac494a9117ed,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -31.71
+      objectReference: {fileID: 0}
     - target: {fileID: -674360160767046173, guid: 792b651e5fb780d4685bac494a9117ed,
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -12572,6 +12613,31 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 63ce721ebdf70f64e91117da30d218f5, type: 2}
+    - target: {fileID: 3433992052308909741, guid: 792b651e5fb780d4685bac494a9117ed,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 145.74306
+      objectReference: {fileID: 0}
+    - target: {fileID: 3433992052308909741, guid: 792b651e5fb780d4685bac494a9117ed,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 145.74306
+      objectReference: {fileID: 0}
+    - target: {fileID: 3433992052308909741, guid: 792b651e5fb780d4685bac494a9117ed,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 145.74306
+      objectReference: {fileID: 0}
+    - target: {fileID: 3433992052308909741, guid: 792b651e5fb780d4685bac494a9117ed,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 18.352
+      objectReference: {fileID: 0}
+    - target: {fileID: 3433992052308909741, guid: 792b651e5fb780d4685bac494a9117ed,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.72
+      objectReference: {fileID: 0}
     - target: {fileID: 3459193194213827910, guid: 792b651e5fb780d4685bac494a9117ed,
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -19132,6 +19198,7 @@ MonoBehaviour:
   singleUseInteraction: 1
   disableAfterInteraction: 0
   detectionRadius: 5
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!114 &8670761335412162309
