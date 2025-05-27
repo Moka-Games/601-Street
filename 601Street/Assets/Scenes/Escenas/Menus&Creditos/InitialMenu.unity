@@ -504,7 +504,6 @@ GameObject:
   - component: {fileID: 434460066}
   - component: {fileID: 434460065}
   - component: {fileID: 434460064}
-  - component: {fileID: 434460063}
   m_Layer: 5
   m_Name: Quit_Button
   m_TagString: Untagged
@@ -531,28 +530,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 775.785, y: 310.314}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!95 &434460063
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 434460061}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 9065e3bc30399f24cad7a06008df4647, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &434460064
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3843,8 +3820,7 @@ PrefabInstance:
       propertyPath: m_Name
       value: NewGame_Button
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 4267438808920218466, guid: 1c9b214cf96b8a149bcbceacb78d4050, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

@@ -146,8 +146,8 @@ MonoBehaviour:
     name: Ordenador 2 Interactuado
     position:
       serializedVersion: 2
-      x: -2.7249756
-      y: 703.0625
+      x: 30.275024
+      y: 687.0625
       width: 200
       height: 150
     activeObjectIDs: []
@@ -156,7 +156,7 @@ MonoBehaviour:
     - Barrera_Parque
     connectedNodeIDs: []
     isInitialNode: 0
-    misionAsociada: {fileID: 0}
+    misionAsociada: {fileID: 11400000, guid: bc4cb3db17dffbf4dac204550b89fc81, type: 2}
     misionDelay: 0
   connections:
   - fromNodeID: InitialState_Colegio
