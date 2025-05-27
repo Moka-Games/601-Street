@@ -54,8 +54,8 @@ MonoBehaviour:
     name: Post Colegio
     position:
       serializedVersion: 2
-      x: 516.85
-      y: 236.5
+      x: 520.85
+      y: 235.5
       width: 200
       height: 150
     activeObjectIDs:
@@ -83,6 +83,7 @@ MonoBehaviour:
     - Entrada_Comisaria
     - Policia_1
     - Cerradura_CasaNyssa
+    - Daichi_1_CasaNyssa
     inactiveObjectIDs:
     - Eco
     connectedNodeIDs:
@@ -128,7 +129,7 @@ MonoBehaviour:
     name: "Cap\xEDtulo 1 Completado"
     position:
       serializedVersion: 2
-      x: 664.4625
+      x: 660.4625
       y: 477.75
       width: 200
       height: 150
@@ -146,14 +147,14 @@ MonoBehaviour:
     name: Ordenador 2 Interactuado
     position:
       serializedVersion: 2
-      x: 30.275024
-      y: 687.0625
+      x: 128.27502
+      y: 677.0625
       width: 200
       height: 150
     activeObjectIDs: []
     inactiveObjectIDs:
     - "Cap\xEDtulo_2_Comenzado"
-    - Barrera_Parque
+    - Bloqueo-Parque
     connectedNodeIDs: []
     isInitialNode: 0
     misionAsociada: {fileID: 11400000, guid: bc4cb3db17dffbf4dac204550b89fc81, type: 2}
