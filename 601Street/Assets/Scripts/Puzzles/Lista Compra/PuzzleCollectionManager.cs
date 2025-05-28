@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -41,7 +42,13 @@ public class PuzzleCollectionManager : MonoBehaviour
     public GameObject puertaSecta;
     public GameObject ganzua;
 
-    public GameObject misiónRikuFallado;
+
+    private GameStateController gameStateController;
+    [Header("Gestión de estados")]
+    [SerializeField] private string Estado_Riku_Exito;
+    [SerializeField] private string Estado_Riku_Fracaso;
+    [SerializeField] private string Estado_Riku_FracasoGuardia;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -50,6 +57,8 @@ public class PuzzleCollectionManager : MonoBehaviour
             return;
         }
         Instance = this;
+
+        gameStateController = GetComponent<GameStateController>();
     }
     private void Start()
     {
@@ -179,24 +188,19 @@ public class PuzzleCollectionManager : MonoBehaviour
 
     public void ActivateApple()
     {
-        aplleObject.SetActive(true);
-        sectGuard.SetActive(false);
+        gameStateController.ChangeGameState(Estado_Riku_Exito);
     }
 
     public void FracasoRiku()
     {
-        sectGuard.SetActive(false);
-        sectGuard_Fracaso.SetActive(true);
-        misiónRikuFallado.SetActive(true);
+        gameStateController.ChangeGameState(Estado_Riku_Fracaso);
+
     }
 
     public void FracasoSectario_2()
     {
-        llamadaDaichi_Fracaso.SetActive(true);
-        colliderGuardia.SetActive(false);
-        puertaSecta.SetActive(false);
-        ganzua.SetActive(true);
+        gameStateController.ChangeGameState(Estado_Riku_FracasoGuardia);
     }
 
-    
+
 }

@@ -129,8 +129,8 @@ MonoBehaviour:
     name: "Cap\xEDtulo 1 Completado"
     position:
       serializedVersion: 2
-      x: 660.4625
-      y: 477.75
+      x: 661.4625
+      y: 476.75
       width: 200
       height: 150
     activeObjectIDs:
@@ -138,6 +138,7 @@ MonoBehaviour:
     - Ordenador_2_CasaNyysa
     inactiveObjectIDs:
     - Puerta_Despacho
+    - Ordenador_1_CasaNyysa
     connectedNodeIDs:
     - Ordenador_2_Interactuado
     isInitialNode: 0
@@ -147,11 +148,12 @@ MonoBehaviour:
     name: Ordenador 2 Interactuado
     position:
       serializedVersion: 2
-      x: 130.27502
-      y: 689.0625
+      x: 121.275024
+      y: 723.0625
       width: 200
       height: 150
-    activeObjectIDs: []
+    activeObjectIDs:
+    - Daichi_2_PostCasaNyssa
     inactiveObjectIDs:
     - "Cap\xEDtulo_2_Comenzado"
     - Bloqueo-Parque
@@ -164,8 +166,8 @@ MonoBehaviour:
     name: Post Riku
     position:
       serializedVersion: 2
-      x: 399.57495
-      y: 689.78125
+      x: 390.57495
+      y: 725.78125
       width: 200
       height: 150
     activeObjectIDs: []
@@ -173,16 +175,17 @@ MonoBehaviour:
     - Guarda_Exito
     - Guarda_Fracaso
     connectedNodeIDs:
-    - Post-Secta
+    - Riku-Exito
+    - Riku-Fracaso
     isInitialNode: 0
-    misionAsociada: {fileID: 0}
+    misionAsociada: {fileID: 11400000, guid: 63af476e314d3b24685cb0395a931081, type: 2}
     misionDelay: 0
   - id: "Cap\xEDtulo-2-Completado"
     name: "Cap\xEDtulo 2 Completado"
     position:
       serializedVersion: 2
-      x: 914.125
-      y: 690.78125
+      x: 1414.125
+      y: 691.78125
       width: 200
       height: 150
     activeObjectIDs: []
@@ -196,23 +199,24 @@ MonoBehaviour:
     name: Post Secta
     position:
       serializedVersion: 2
-      x: 658.875
-      y: 691.6406
+      x: 1127.875
+      y: 690.6406
       width: 200
       height: 150
     activeObjectIDs: []
-    inactiveObjectIDs: []
+    inactiveObjectIDs:
+    - Riku-Parque
     connectedNodeIDs:
     - "Cap\xEDtulo-2-Completado"
     isInitialNode: 0
-    misionAsociada: {fileID: 0}
+    misionAsociada: {fileID: 11400000, guid: e1c6877cb68380f4a80d0a8232c0666f, type: 2}
     misionDelay: 0
   - id: Post-Universidad
     name: Post Universidad
     position:
       serializedVersion: 2
-      x: 123.875
-      y: 888.6406
+      x: 131.875
+      y: 1045.6406
       width: 200
       height: 150
     activeObjectIDs: []
@@ -226,8 +230,8 @@ MonoBehaviour:
     name: Post Riku Universidad
     position:
       serializedVersion: 2
-      x: 485.9375
-      y: 889.0703
+      x: 475.9375
+      y: 1046.0703
       width: 200
       height: 150
     activeObjectIDs: []
@@ -241,13 +245,66 @@ MonoBehaviour:
     name: Juego Completado
     position:
       serializedVersion: 2
-      x: 795.9375
-      y: 890.0703
+      x: 784.9375
+      y: 1048.0703
       width: 200
       height: 150
     activeObjectIDs: []
     inactiveObjectIDs: []
     connectedNodeIDs: []
+    isInitialNode: 0
+    misionAsociada: {fileID: 0}
+    misionDelay: 0
+  - id: Riku-Exito
+    name: Riku Exito
+    position:
+      serializedVersion: 2
+      x: 659.9375
+      y: 642.78516
+      width: 200
+      height: 150
+    activeObjectIDs:
+    - Puesto Manzana
+    - "Daichi_2_Parque_\xC9xito"
+    inactiveObjectIDs:
+    - Guardia_Secta
+    connectedNodeIDs:
+    - Post-Secta
+    isInitialNode: 0
+    misionAsociada: {fileID: 0}
+    misionDelay: 0
+  - id: Riku-Fracaso
+    name: Riku Fracaso
+    position:
+      serializedVersion: 2
+      x: 662.9375
+      y: 805.78516
+      width: 200
+      height: 150
+    activeObjectIDs:
+    - Guardia_Fracaso
+    inactiveObjectIDs:
+    - Guardia_Secta
+    connectedNodeIDs:
+    - Post-Fracaso-Sectario
+    isInitialNode: 0
+    misionAsociada: {fileID: 0}
+    misionDelay: 0
+  - id: Post-Fracaso-Sectario
+    name: Post Fracaso Sectario
+    position:
+      serializedVersion: 2
+      x: 902.9375
+      y: 805.78516
+      width: 200
+      height: 150
+    activeObjectIDs:
+    - Ganzua-Secta
+    inactiveObjectIDs:
+    - Barrera_Guardia
+    - Puerta-Secta
+    connectedNodeIDs:
+    - Post-Secta
     isInitialNode: 0
     misionAsociada: {fileID: 0}
     misionDelay: 0
@@ -270,8 +327,6 @@ MonoBehaviour:
     toNodeID: Ordenador_2_Interactuado
   - fromNodeID: Ordenador_2_Interactuado
     toNodeID: 24c4861a-d794-4cdc-943c-42f043e4d674
-  - fromNodeID: 24c4861a-d794-4cdc-943c-42f043e4d674
-    toNodeID: Post-Secta
   - fromNodeID: Post-Secta
     toNodeID: "Cap\xEDtulo-2-Completado"
   - fromNodeID: "Cap\xEDtulo-2-Completado"
@@ -280,4 +335,14 @@ MonoBehaviour:
     toNodeID: Post-Riku-Universidad
   - fromNodeID: Post-Riku-Universidad
     toNodeID: Juego-Completado
+  - fromNodeID: 24c4861a-d794-4cdc-943c-42f043e4d674
+    toNodeID: Riku-Exito
+  - fromNodeID: 24c4861a-d794-4cdc-943c-42f043e4d674
+    toNodeID: Riku-Fracaso
+  - fromNodeID: Riku-Fracaso
+    toNodeID: Post-Fracaso-Sectario
+  - fromNodeID: Riku-Exito
+    toNodeID: Post-Secta
+  - fromNodeID: Post-Fracaso-Sectario
+    toNodeID: Post-Secta
   initialNodeID: InitialState_Colegio
