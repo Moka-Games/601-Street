@@ -186,9 +186,12 @@ MonoBehaviour:
       y: 690.6406
       width: 200
       height: 150
-    activeObjectIDs: []
+    activeObjectIDs:
+    - Entrada-CasaAbandonada
     inactiveObjectIDs:
     - Riku-Parque
+    - Guardia_Secta
+    - Guardia_Fracaso
     connectedNodeIDs:
     - "Cap\xEDtulo-2-Completado"
     isInitialNode: 0
@@ -261,7 +264,7 @@ MonoBehaviour:
     name: Riku Fracaso
     position:
       serializedVersion: 2
-      x: 659.9375
+      x: 658.9375
       y: 806.78516
       width: 200
       height: 150

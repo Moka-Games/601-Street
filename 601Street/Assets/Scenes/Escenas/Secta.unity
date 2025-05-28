@@ -135,7 +135,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 1a979d45dba6c434889c804f006ca58e,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1
+      value: -1.01
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1a979d45dba6c434889c804f006ca58e,
         type: 3}
@@ -944,6 +944,7 @@ GameObject:
   - component: {fileID: 654951885}
   - component: {fileID: 654951887}
   - component: {fileID: 654951886}
+  - component: {fileID: 654951888}
   m_Layer: 0
   m_Name: NPC's_Secta
   m_TagString: Untagged
@@ -994,29 +995,17 @@ MonoBehaviour:
   OnConversationEnded:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1463908480}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 654951888}
+        m_TargetAssemblyTypeName: GameStateController, Assembly-CSharp
+        m_MethodName: ChangeGameState
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 1346574126}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
+          m_BoolArgument: 0
         m_CallState: 2
 --- !u!136 &654951887
 CapsuleCollider:
@@ -1041,6 +1030,18 @@ CapsuleCollider:
   m_Height: 9.17
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &654951888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 654951884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4772c18ba1c9549bb1e6e3a8501188, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!64 &820156477
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1581,84 +1582,6 @@ Transform:
   - {fileID: 269862713}
   m_Father: {fileID: 192816148}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1076481811
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1980472230792912192, guid: 966ba2a066f9f14458c03db045d8adc1,
-        type: 3}
-      propertyPath: idMision
-      value: Mision-CasaAbandonada-2
-      objectReference: {fileID: 0}
-    - target: {fileID: 3378748533538107753, guid: 966ba2a066f9f14458c03db045d8adc1,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 51.43
-      objectReference: {fileID: 0}
-    - target: {fileID: 3378748533538107753, guid: 966ba2a066f9f14458c03db045d8adc1,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 16.66
-      objectReference: {fileID: 0}
-    - target: {fileID: 3378748533538107753, guid: 966ba2a066f9f14458c03db045d8adc1,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -15.41
-      objectReference: {fileID: 0}
-    - target: {fileID: 3378748533538107753, guid: 966ba2a066f9f14458c03db045d8adc1,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3378748533538107753, guid: 966ba2a066f9f14458c03db045d8adc1,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3378748533538107753, guid: 966ba2a066f9f14458c03db045d8adc1,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3378748533538107753, guid: 966ba2a066f9f14458c03db045d8adc1,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3378748533538107753, guid: 966ba2a066f9f14458c03db045d8adc1,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3378748533538107753, guid: 966ba2a066f9f14458c03db045d8adc1,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3378748533538107753, guid: 966ba2a066f9f14458c03db045d8adc1,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4706274421044006994, guid: 966ba2a066f9f14458c03db045d8adc1,
-        type: 3}
-      propertyPath: m_Name
-      value: ScheduledMision_Prefab
-      objectReference: {fileID: 0}
-    - target: {fileID: 4706274421044006994, guid: 966ba2a066f9f14458c03db045d8adc1,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 966ba2a066f9f14458c03db045d8adc1, type: 3}
 --- !u!1 &1084740324
 GameObject:
   m_ObjectHideFlags: 0
@@ -2222,62 +2145,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1073965339}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!1 &1346574126
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1346574128}
-  - component: {fileID: 1346574127}
-  m_Layer: 0
-  m_Name: MainSceneMision_Activator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1346574127
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1346574126}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa7eee6eb12ee9744b28c7b4d22b4e9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stateModifications:
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: MapaExterior
-    objectID: Mision-CasaAbandonada-2
-  activateOnStart: 1
-  activateOnInteract: 0
-  activateOnce: 0
-  forceImmediateUpdate: 1
---- !u!4 &1346574128
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1346574126}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.9768937, y: 1.5773748, z: -11.95992}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1422590718
 GameObject:
   m_ObjectHideFlags: 0
@@ -2327,12 +2194,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 192816148}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1463908480 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4706274421044006994, guid: 966ba2a066f9f14458c03db045d8adc1,
-    type: 3}
-  m_PrefabInstance: {fileID: 1076481811}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1660736608
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2887,6 +2748,7 @@ MonoBehaviour:
   singleUseInteraction: 0
   disableAfterInteraction: 0
   detectionRadius: 5
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!65 &1957568212
@@ -3401,5 +3263,3 @@ SceneRoots:
   - {fileID: 481278105}
   - {fileID: 1713663800}
   - {fileID: 510602331}
-  - {fileID: 1076481811}
-  - {fileID: 1346574128}
