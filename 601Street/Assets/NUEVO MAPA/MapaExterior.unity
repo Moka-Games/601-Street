@@ -191524,6 +191524,8 @@ GameObject:
   - component: {fileID: 1583082216}
   - component: {fileID: 1583082215}
   - component: {fileID: 1583082214}
+  - component: {fileID: 1583082218}
+  - component: {fileID: 1583082217}
   m_Layer: 6
   m_Name: Puesto_Mercado_Manzana (1)
   m_TagString: Untagged
@@ -191540,7 +191542,7 @@ Transform:
   m_GameObject: {fileID: 1583082212}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.26912448, z: -0, w: 0.96310544}
-  m_LocalPosition: {x: -90.861, y: 12.08, z: -139.404}
+  m_LocalPosition: {x: -90.861, y: 11.944, z: -139.404}
   m_LocalScale: {x: 3.23215, y: 1.5703, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -191607,6 +191609,45 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1583082217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1583082212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e64f5cbc289c58948a4d0c6173aeafe3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: Puesto-Manzana
+--- !u!114 &1583082218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1583082212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: Puesto-Manzana
+  useSceneName: 0
+  sceneName: MapaExterior
+  defaultActiveState: 0
+  applyStateImmediately: 1
+  onActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  listenOnlyWhenActive: 0
+  useTransition: 0
+  transitionDuration: 0.5
 --- !u!1001 &1585394023
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -228050,6 +228091,11 @@ PrefabInstance:
         type: 3}
       propertyPath: interactOnce
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4839107122043451380, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      propertyPath: singleInteraction
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7299986215572759509, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
         type: 3}
