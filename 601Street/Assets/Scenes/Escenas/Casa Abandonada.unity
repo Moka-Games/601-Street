@@ -299,6 +299,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2013143691063555766, guid: ffab24593e699fb469bb6fe47519208f,
         type: 3}
+      propertyPath: disableAfterInteraction
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2013143691063555766, guid: ffab24593e699fb469bb6fe47519208f,
+        type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.size
       value: 0
       objectReference: {fileID: 0}
@@ -873,19 +878,39 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
         type: 3}
+      propertyPath: interactionPrompt
+      value: Take Rune
+      objectReference: {fileID: 0}
+    - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
+        type: 3}
+      propertyPath: disableAfterInteraction
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
+        type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
         type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 1
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
         type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 478103059}
+    - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 478103059}
     - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
         type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -893,17 +918,47 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
         type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
+        type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnInteract
+      value: ChangeGameState
+      objectReference: {fileID: 0}
+    - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: ChangeGameState
       objectReference: {fileID: 0}
     - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
         type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WorldStateActivator, Assembly-CSharp
+      value: GameStateController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: GameStateController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
+      value: "Cap\xEDtulo-2-Completado"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_StringArgument
+      value: "Cap\xEDtulo-2-Completado"
       objectReference: {fileID: 0}
     - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
         type: 3}
       propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 1906329488452182790, guid: 4574cd6729a7c6242b69cde6c2faf26a,
+        type: 3}
+      propertyPath: onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3422021052348863179, guid: 4574cd6729a7c6242b69cde6c2faf26a,
@@ -999,7 +1054,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7219703171021740586, guid: 4574cd6729a7c6242b69cde6c2faf26a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 478103059}
   m_SourcePrefab: {fileID: 100100000, guid: 4574cd6729a7c6242b69cde6c2faf26a, type: 3}
 --- !u!1 &478103056 stripped
 GameObject:
@@ -1029,6 +1088,18 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44409751ae1b75c4795c84efedd64243, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &478103059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 478103056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4772c18ba1c9549bb1e6e3a8501188, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &479260198 stripped
@@ -1860,6 +1931,11 @@ PrefabInstance:
       propertyPath: interactionPrompt
       value: Collect Cube Toy
       objectReference: {fileID: 0}
+    - target: {fileID: 686438656488966123, guid: 9cc504ae1dfefdc41ae2e6bf013c3ee0,
+        type: 3}
+      propertyPath: disableAfterInteraction
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 754750896406433449, guid: 9cc504ae1dfefdc41ae2e6bf013c3ee0,
         type: 3}
       propertyPath: m_Enabled
@@ -2232,6 +2308,11 @@ PrefabInstance:
         type: 3}
       propertyPath: interactionPrompt
       value: Collect Toy Train
+      objectReference: {fileID: 0}
+    - target: {fileID: 1707019553482076407, guid: 5bf5fbd684e013f4287c8ce36b7de128,
+        type: 3}
+      propertyPath: disableAfterInteraction
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2160922171605887817, guid: 5bf5fbd684e013f4287c8ce36b7de128,
         type: 3}
@@ -6444,7 +6525,7 @@ PrefabInstance:
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 7629522996768676217}
+      objectReference: {fileID: 0}
     - target: {fileID: 330052977999043412, guid: 91f4817c522196b42bcb001a368bda0e,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -6648,10 +6729,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 7629522996768676216}
-    - targetCorrespondingSourceObject: {fileID: 8621143615332506418, guid: 91f4817c522196b42bcb001a368bda0e,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7629522996768676217}
   m_SourcePrefab: {fileID: 100100000, guid: 91f4817c522196b42bcb001a368bda0e, type: 3}
 --- !u!33 &6184926831212493669
 MeshFilter:
@@ -7431,44 +7508,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &7629522996768676217
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7125272824672931303}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa7eee6eb12ee9744b28c7b4d22b4e9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stateModifications:
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: MapaExterior
-    objectID: Casa-Ardiendo
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: MapaExterior
-    objectID: Cap-3
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: MapaExterior
-    objectID: Riku_Universidad
-  activateOnStart: 0
-  activateOnInteract: 1
-  activateOnce: 0
-  forceImmediateUpdate: 1
 --- !u!4 &7649267739536884464
 Transform:
   m_ObjectHideFlags: 0
@@ -8342,7 +8381,6 @@ GameObject:
   - component: {fileID: 8843830054491425396}
   - component: {fileID: 8843830054491425395}
   - component: {fileID: 8843830054491425397}
-  - component: {fileID: 8843830054491425398}
   m_Layer: 6
   m_Name: PuzzleManager
   m_TagString: Untagged
@@ -8382,9 +8420,10 @@ MonoBehaviour:
   onInteracted:
     m_PersistentCalls:
       m_Calls: []
-  singleUseInteraction: 1
+  singleUseInteraction: 0
   disableAfterInteraction: 0
   detectionRadius: 5
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!136 &8843830054491425396
@@ -8426,30 +8465,6 @@ MonoBehaviour:
   - {fileID: 3240848125599950619}
   - {fileID: 5945635037919619911}
   - {fileID: 9039625585545450956}
---- !u!114 &8843830054491425398
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8843830054491425394}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa7eee6eb12ee9744b28c7b4d22b4e9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stateModifications:
-  - type: 4
-    stateID: 
-    flagValue: 1
-    counterValue: 0
-    stringValue: 
-    objectSceneName: Casa-Ardiendo
-    objectID: MapaExterior
-  activateOnStart: 0
-  activateOnInteract: 1
-  activateOnce: 0
-  forceImmediateUpdate: 1
 --- !u!4 &8865779809507803009
 Transform:
   m_ObjectHideFlags: 0

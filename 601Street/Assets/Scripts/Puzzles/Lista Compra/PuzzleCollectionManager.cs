@@ -189,13 +189,11 @@ public class PuzzleCollectionManager : MonoBehaviour
     public void ActivateApple()
     {
         gameStateController.ChangeGameState(Estado_Riku_Exito);
-        print("Riku Exito");
     }
 
     public void FracasoRiku()
     {
         gameStateController.ChangeGameState(Estado_Riku_Fracaso);
-        print("Riku Fracaso");
     }
 
     public void FracasoSectario_2()
