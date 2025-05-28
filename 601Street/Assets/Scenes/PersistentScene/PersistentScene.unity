@@ -3305,6 +3305,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4791773876486863550, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
+      propertyPath: m_SortingOrder
+      value: 999
+      objectReference: {fileID: 0}
+    - target: {fileID: 4791773876486863550, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
+        type: 3}
       propertyPath: m_PlaneDistance
       value: 0.6
       objectReference: {fileID: 0}
@@ -4171,6 +4176,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7587977485321894650, guid: 71fd2317e6d85594693f367bc89aed12,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 998
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4340,6 +4350,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5787631887591189399, guid: 8f4e14d956cc52a4b97a8a4992f17415,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 998
       objectReference: {fileID: 0}
     - target: {fileID: 7580886116411929714, guid: 8f4e14d956cc52a4b97a8a4992f17415,
         type: 3}
@@ -5190,6 +5205,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1942858743}
     m_Modifications:
+    - target: {fileID: 1021773164937156457, guid: b9d35503130604d45a3782ab262ccfd2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3053357060922897902, guid: b9d35503130604d45a3782ab262ccfd2,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5865,6 +5885,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9022852182892589552, guid: 4f0602da8b7c0454da285e47a61fc786,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 9999
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
