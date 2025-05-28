@@ -57,8 +57,6 @@ public class PuzzleCollectionManager : MonoBehaviour
             return;
         }
         Instance = this;
-
-        gameStateController = GetComponent<GameStateController>();
     }
     private void Start()
     {
@@ -73,6 +71,8 @@ public class PuzzleCollectionManager : MonoBehaviour
         }
         aplleObject.SetActive(false); // Desactivar el objeto de la manzana al inicio
         UpdateAllFeedbackUI();
+
+        gameStateController = GetComponent<GameStateController>();
     }
 
     public void CollectObject(CollectibleType type)
@@ -189,18 +189,17 @@ public class PuzzleCollectionManager : MonoBehaviour
     public void ActivateApple()
     {
         gameStateController.ChangeGameState(Estado_Riku_Exito);
+        print("Riku Exito");
     }
 
     public void FracasoRiku()
     {
         gameStateController.ChangeGameState(Estado_Riku_Fracaso);
-
+        print("Riku Fracaso");
     }
 
     public void FracasoSectario_2()
     {
         gameStateController.ChangeGameState(Estado_Riku_FracasoGuardia);
     }
-
-
 }

@@ -148,8 +148,8 @@ MonoBehaviour:
     name: Ordenador 2 Interactuado
     position:
       serializedVersion: 2
-      x: 121.275024
-      y: 723.0625
+      x: 195.27502
+      y: 744.0625
       width: 200
       height: 150
     activeObjectIDs:
@@ -158,27 +158,10 @@ MonoBehaviour:
     - "Cap\xEDtulo_2_Comenzado"
     - Bloqueo-Parque
     connectedNodeIDs:
-    - 24c4861a-d794-4cdc-943c-42f043e4d674
-    isInitialNode: 0
-    misionAsociada: {fileID: 11400000, guid: bc4cb3db17dffbf4dac204550b89fc81, type: 2}
-    misionDelay: 0
-  - id: 24c4861a-d794-4cdc-943c-42f043e4d674
-    name: Post Riku
-    position:
-      serializedVersion: 2
-      x: 390.57495
-      y: 725.78125
-      width: 200
-      height: 150
-    activeObjectIDs: []
-    inactiveObjectIDs:
-    - Guarda_Exito
-    - Guarda_Fracaso
-    connectedNodeIDs:
     - Riku-Exito
     - Riku-Fracaso
     isInitialNode: 0
-    misionAsociada: {fileID: 11400000, guid: 63af476e314d3b24685cb0395a931081, type: 2}
+    misionAsociada: {fileID: 11400000, guid: bc4cb3db17dffbf4dac204550b89fc81, type: 2}
     misionDelay: 0
   - id: "Cap\xEDtulo-2-Completado"
     name: "Cap\xEDtulo 2 Completado"
@@ -326,8 +309,6 @@ MonoBehaviour:
     toNodeID: "Cap\xEDtulo_1_Completado"
   - fromNodeID: "Cap\xEDtulo_1_Completado"
     toNodeID: Ordenador_2_Interactuado
-  - fromNodeID: Ordenador_2_Interactuado
-    toNodeID: 24c4861a-d794-4cdc-943c-42f043e4d674
   - fromNodeID: Post-Secta
     toNodeID: "Cap\xEDtulo-2-Completado"
   - fromNodeID: "Cap\xEDtulo-2-Completado"
@@ -336,14 +317,14 @@ MonoBehaviour:
     toNodeID: Post-Riku-Universidad
   - fromNodeID: Post-Riku-Universidad
     toNodeID: Juego-Completado
-  - fromNodeID: 24c4861a-d794-4cdc-943c-42f043e4d674
-    toNodeID: Riku-Exito
-  - fromNodeID: 24c4861a-d794-4cdc-943c-42f043e4d674
-    toNodeID: Riku-Fracaso
   - fromNodeID: Riku-Fracaso
     toNodeID: Post-Fracaso-Sectario
   - fromNodeID: Riku-Exito
     toNodeID: Post-Secta
   - fromNodeID: Post-Fracaso-Sectario
     toNodeID: Post-Secta
+  - fromNodeID: Ordenador_2_Interactuado
+    toNodeID: Riku-Exito
+  - fromNodeID: Ordenador_2_Interactuado
+    toNodeID: Riku-Fracaso
   initialNodeID: InitialState_Colegio

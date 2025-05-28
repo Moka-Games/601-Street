@@ -64253,12 +64253,6 @@ MonoBehaviour:
   panelNegro: {fileID: 1551852404}
   "C\xE1maraSecuencia": {fileID: 1525158874}
   VFXFuego: {fileID: 1806466574}
---- !u!1 &510672341 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4894938081992467949, guid: 8fa307519e568e04a8cd353b71f05219,
-    type: 3}
-  m_PrefabInstance: {fileID: 985623515}
-  m_PrefabAsset: {fileID: 0}
 --- !u!43 &511079895
 Mesh:
   m_ObjectHideFlags: 0
@@ -82972,7 +82966,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 87533296}
-  - {fileID: 985623516}
   - {fileID: 1733413659}
   m_Father: {fileID: 1731549522}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -120247,110 +120240,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 985584213}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &985623515
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 703034136}
-    m_Modifications:
-    - target: {fileID: 3477941085435601882, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3477941085435601882, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3477941085435601882, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3477941085435601882, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3477941085435601882, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3477941085435601882, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3477941085435601882, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3477941085435601882, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3477941085435601882, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3477941085435601882, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3477941085435601882, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3477941085435601882, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4894938081992467949, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: m_Name
-      value: Daichi_1_PostEco
-      objectReference: {fileID: 0}
-    - target: {fileID: 4894938081992467949, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7961254536067206711, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: callID
-      value: Daichi_1_PostEco1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7961254536067206711, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: callOnStart
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7961254536067206711, guid: 8fa307519e568e04a8cd353b71f05219,
-        type: 3}
-      propertyPath: destroyAfterTrigger
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 8fa307519e568e04a8cd353b71f05219, type: 3}
---- !u!4 &985623516 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3477941085435601882, guid: 8fa307519e568e04a8cd353b71f05219,
-    type: 3}
-  m_PrefabInstance: {fileID: 985623515}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &985806963
 GameObject:
   m_ObjectHideFlags: 0
@@ -126225,18 +126114,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
       - m_Target: {fileID: 118269769}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
@@ -126261,8 +126138,8 @@ MonoBehaviour:
   puertaSecta: {fileID: 533306063}
   ganzua: {fileID: 420297043}
   Estado_Riku_Exito: Riku-Exito
-  Estado_Riku_Fracaso: Riku-Fracaso
-  Estado_Riku_FracasoGuardia: Riku-Fracaso
+  Estado_Riku_Fracaso: Riku Fracaso
+  Estado_Riku_FracasoGuardia: Post-Fracaso-Sectario
 --- !u!114 &1004274089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146004,7 +145881,7 @@ PrefabInstance:
         type: 3}
       propertyPath: onEcoTriggered.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 510672341}
+      objectReference: {fileID: 0}
     - target: {fileID: 8462810847862383499, guid: 4c57fb7400a89fc4e861e32d41e2a64d,
         type: 3}
       propertyPath: onEcoTriggered.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -193799,7 +193676,7 @@ PrefabInstance:
     - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 12.168
+      value: 11.84
       objectReference: {fileID: 0}
     - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
         type: 3}
@@ -242624,7 +242501,7 @@ PrefabInstance:
     - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 12.12
+      value: 11.88
       objectReference: {fileID: 0}
     - target: {fileID: 775298871108593160, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
         type: 3}
