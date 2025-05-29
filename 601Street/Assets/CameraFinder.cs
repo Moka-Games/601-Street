@@ -11,6 +11,8 @@ public class CameraFinder : MonoBehaviour
 
         cameraToFind = Camera.main;
 
+        canvas.planeDistance = 0.8f;
+
         canvas.worldCamera = cameraToFind;
     }
 }
