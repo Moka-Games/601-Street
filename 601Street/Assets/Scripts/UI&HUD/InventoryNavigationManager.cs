@@ -1,311 +1,404 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using DG.Tweening;
 
 /// <summary>
-/// Gestor de navegación especializado para el inventario
-/// Maneja elementos dinámicos, múltiples secciones y scrolls automáticos
+/// Sistema de navegación ESPECÍFICO para el inventario - INDEPENDIENTE de UINavigationManager
+/// Maneja SOLO la navegación dentro del inventario usando el Input System
 /// </summary>
 public class InventoryNavigationManager : MonoBehaviour
 {
-    [Header("Referencias del Inventario")]
-    public Transform noteContainer;
-    public Transform objectContainer;
-    public ScrollRect noteScrollRect;
-    public ScrollRect objectScrollRect;
-
-    [Header("Configuración de Scroll")]
-    [SerializeField] private bool enableScrollWithInput = true;
-    [SerializeField] private float scrollSensitivity = 2f;
-    [SerializeField] private float scrollDeadZone = 0.3f;
-    [SerializeField] private bool invertScrollX = false;
+    [Header("Contenedores del Inventario")]
+    [SerializeField] private Transform noteContainer;
+    [SerializeField] private Transform objectContainer;
 
     [Header("Configuración de Navegación")]
-    [SerializeField] private float scrollAnimationDuration = 0.3f;
-    [SerializeField] private bool autoDetectNewItems = true;
-    [SerializeField] private float detectionInterval = 0.1f;
+    [SerializeField] private int elementsPerRow = 6;
+    [SerializeField] private float navigationDelay = 0.15f;
 
-    [Header("Configuración Visual")]
+    [Header("Animaciones")]
     [SerializeField] private float selectedScale = 1.15f;
     [SerializeField] private float animationDuration = 0.2f;
     [SerializeField] private DG.Tweening.Ease animationEase = DG.Tweening.Ease.OutBack;
 
-    [Header("Sonidos")]
-    [SerializeField] private AudioClip navigationSound;
-    [SerializeField] private AudioClip sectionChangeSound;
-    [SerializeField] private AudioClip selectSound;
+    [Header("Debug")]
+    [SerializeField] private bool logNavigationActions = true;
 
-    // Sistema de Input
+    // Input del inventario - SEPARADO del UINavigationManager  
     private PlayerControls playerControls;
-    private Vector2 navigationInput;
-    private Vector2 scrollInput;
-    private float lastNavigationTime;
-    private float lastScrollTime;
-    private float navigationDelay = 0.15f;
-    private float scrollDelay = 0.05f;
+    private InputAction navigateAction;
+    private InputAction submitAction;
 
-    // Control de secciones
-    public enum InventorySection { Notes, Objects }
-    private InventorySection currentSection = InventorySection.Notes;
-
-    // Listas de elementos por sección
-    private List<Button> noteButtons = new List<Button>();
-    private List<Button> objectButtons = new List<Button>();
-
-    // Estado de navegación
-    private int currentNoteIndex = 0;
-    private int currentObjectIndex = 0;
+    // Lista de elementos navegables del inventario
+    private List<Button> inventoryButtons = new List<Button>();
+    private int currentIndex = 0;
     private Button currentSelectedButton;
     private Button previousSelectedButton;
 
-    // Animaciones
+    // Control de tiempo
+    private float lastNavigationTime;
+
+    // Referencias del sistema
+    private EventSystem eventSystem;
     private Tween currentAnimationTween;
-    private Tween currentScrollTween;
 
-    // Componentes
-    private AudioSource audioSource;
-    private Inventory_Manager inventoryManager;
+    // Estado del sistema
+    private bool isActive = false;
+    private LayoutGroup noteLayoutGroup;
+    private LayoutGroup objectLayoutGroup;
 
-    // Control de detección automática
-    private float lastDetectionTime;
-    private int lastNoteCount = 0;
-    private int lastObjectCount = 0;
-
-    // Eventos
-    public System.Action<Button> OnElementSelected;
-    public System.Action<Button> OnElementSubmitted;
-    public System.Action<InventorySection> OnSectionChanged;
-
-    [Header("Configuración de Auto-Scroll")]
-    [SerializeField] private bool enableAutoScrollOnNavigation = true;
-    [SerializeField] private bool onlyScrollIfElementNotVisible = true;
-    [SerializeField] private float visibilityMargin = 50f; // Margen para considerar un elemento "visible"
-
-    // Variable para rastrear si el usuario ha hecho scroll manual recientemente
-    private bool userHasScrolledManually = false;
-    private float lastManualScrollTime = 0f;
-    private float manualScrollGracePeriod = 2f;
+    #region Inicialización
 
     private void Awake()
     {
-        // Inicializar componentes
-        audioSource = GetComponent<AudioSource>();
-        inventoryManager = GetComponent<Inventory_Manager>();
+        // Configurar Input System ESPECÍFICO para inventario
+        InitializeInputSystem();
 
-        if (inventoryManager == null)
+        // Obtener EventSystem
+        eventSystem = EventSystem.current;
+        if (eventSystem == null)
         {
-            inventoryManager = FindAnyObjectByType<Inventory_Manager>();
+            Debug.LogError("InventoryNavigationManager: No se encontró EventSystem");
         }
 
-        // Configurar controles
+        // Inicialmente desactivado
+        this.enabled = false;
+    }
+
+    private void InitializeInputSystem()
+    {
         playerControls = new PlayerControls();
-        SetupInputActions();
 
-        // Auto-detectar contenedores si no están asignados
-        AutoDetectContainers();
+        // IMPORTANTE: Usar acciones ESPECÍFICAS de UI para el inventario
+        navigateAction = playerControls.UI.Navigate;
+        submitAction = playerControls.UI.Submit;
+
+        // Configurar callbacks
+        submitAction.performed += OnSubmitInventory;
+
+        if (logNavigationActions)
+            Debug.Log("InventoryNavigationManager: Input System inicializado INDEPENDIENTEMENTE");
     }
 
-    private void AutoDetectContainers()
+    private void Start()
     {
-        if (noteContainer == null && inventoryManager != null)
-        {
-            noteContainer = inventoryManager.noteContainer;
-        }
+        // Detectar contenedores automáticamente si no están asignados
+        DetectContainers();
 
-        if (objectContainer == null && inventoryManager != null)
-        {
-            objectContainer = inventoryManager.objectContainer;
-        }
-
-        // Auto-detectar ScrollRects
-        if (noteScrollRect == null && noteContainer != null)
-        {
-            noteScrollRect = noteContainer.GetComponentInParent<ScrollRect>();
-        }
-
-        if (objectScrollRect == null && objectContainer != null)
-        {
-            objectScrollRect = objectContainer.GetComponentInParent<ScrollRect>();
-        }
+        // Detectar LayoutGroups para organización
+        DetectLayoutGroups();
     }
 
-    private void SetupInputActions()
+    private void DetectContainers()
     {
-        playerControls.UI.Navigate.performed += OnNavigate;
-        playerControls.UI.Submit.performed += OnSubmit;
-        playerControls.UI.Cancel.performed += OnCancel;
-
-        // Configurar input de scroll
-        if (enableScrollWithInput)
+        if (noteContainer == null || objectContainer == null)
         {
-            playerControls.UI.Scroll_Inventory.performed += OnScroll;
-            playerControls.UI.Scroll_Inventory.canceled += OnScrollCanceled;
+            Inventory_Manager inventoryManager = FindAnyObjectByType<Inventory_Manager>();
+            if (inventoryManager != null)
+            {
+                noteContainer = inventoryManager.noteContainer;
+                objectContainer = inventoryManager.objectContainer;
+
+                if (logNavigationActions)
+                    Debug.Log("InventoryNavigationManager: Contenedores detectados automáticamente");
+            }
         }
     }
 
-    private void OnEnable()
+    private void DetectLayoutGroups()
     {
+        if (noteContainer != null)
+            noteLayoutGroup = noteContainer.GetComponent<LayoutGroup>();
+        if (objectContainer != null)
+            objectLayoutGroup = objectContainer.GetComponent<LayoutGroup>();
+    }
+
+    #endregion
+
+    #region Activación/Desactivación del Sistema
+
+    /// <summary>
+    /// Activa el sistema de navegación del inventario
+    /// </summary>
+    public void ActivateInventoryNavigation()
+    {
+        if (isActive) return;
+
+        if (logNavigationActions)
+            Debug.Log("InventoryNavigationManager: Activando navegación del inventario");
+
+        // Habilitar el sistema
+        isActive = true;
+        this.enabled = true;
+
+        // Habilitar SOLO las acciones UI del inventario
         playerControls.UI.Enable();
 
-        // Detectar elementos actuales y seleccionar el primero
-        RefreshInventoryNavigation();
+        // Recopilar elementos del inventario
+        RefreshInventoryElements();
 
-        // Iniciar detección automática si está habilitada
-        if (autoDetectNewItems)
-        {
-            InvokeRepeating(nameof(CheckForNewItems), detectionInterval, detectionInterval);
-        }
+        // Seleccionar primer elemento
+        StartCoroutine(SelectFirstElementDelayed());
     }
 
-    private void OnDisable()
+    /// <summary>
+    /// Desactiva el sistema de navegación del inventario
+    /// </summary>
+    public void DeactivateInventoryNavigation()
     {
+        if (!isActive) return;
+
+        if (logNavigationActions)
+            Debug.Log("InventoryNavigationManager: Desactivando navegación del inventario");
+
+        // Limpiar animaciones
+        CleanupAnimations();
+
+        // Deshabilitar inputs UI
         playerControls.UI.Disable();
-        CleanupAnimations();
 
-        // Detener detección automática
-        if (autoDetectNewItems)
-        {
-            CancelInvoke(nameof(CheckForNewItems));
-        }
+        // Desactivar el sistema
+        isActive = false;
+        this.enabled = false;
+
+        // Limpiar selección
+        ClearSelection();
     }
 
-    private void OnDestroy()
+    #endregion
+
+    #region Gestión de Elementos
+
+    /// <summary>
+    /// Recopila todos los botones del inventario
+    /// </summary>
+    public void RefreshInventoryElements()
     {
-        CleanupAnimations();
+        inventoryButtons.Clear();
 
-        // Limpiar eventos de scroll
-        if (playerControls != null && enableScrollWithInput)
+        // Recopilar botones de notas
+        if (noteContainer != null)
         {
-            playerControls.UI.Scroll_Inventory.performed -= OnScroll;
-            playerControls.UI.Scroll_Inventory.canceled -= OnScrollCanceled;
+            CollectButtonsFromContainer(noteContainer);
         }
 
-        playerControls?.Dispose();
+        // Recopilar botones de objetos
+        if (objectContainer != null)
+        {
+            CollectButtonsFromContainer(objectContainer);
+        }
+
+        if (logNavigationActions)
+            Debug.Log($"InventoryNavigationManager: {inventoryButtons.Count} elementos recopilados");
+
+        // Resetear índice si es necesario
+        if (currentIndex >= inventoryButtons.Count)
+        {
+            currentIndex = 0;
+        }
     }
+
+    private void CollectButtonsFromContainer(Transform container)
+    {
+        foreach (Transform child in container)
+        {
+            if (child.gameObject.activeInHierarchy)
+            {
+                Button button = child.GetComponent<Button>();
+                if (button != null && button.interactable)
+                {
+                    inventoryButtons.Add(button);
+                }
+            }
+        }
+    }
+
+    private IEnumerator SelectFirstElementDelayed()
+    {
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(0.1f);
+
+        if (inventoryButtons.Count > 0)
+        {
+            SelectButton(0);
+        }
+    }
+
+    #endregion
+
+    #region Navegación
 
     private void Update()
     {
-        // Procesar navegación
-        navigationInput = playerControls.UI.Navigate.ReadValue<Vector2>();
+        if (!isActive || !enabled) return;
 
-        if (Time.time - lastNavigationTime >= navigationDelay)
-        {
-            ProcessNavigation();
-        }
-
-        // ESTE MÉTODO NO EXISTE
-        ProcessScrollInput(); // <-- Esta línea está causando errores
+        ProcessNavigation();
     }
 
     private void ProcessNavigation()
     {
-        if (navigationInput.magnitude < 0.3f) return;
+        Vector2 navigationInput = navigateAction.ReadValue<Vector2>();
 
-        // Navegación horizontal (cambio de sección o elemento)
+        if (navigationInput.magnitude < 0.3f || inventoryButtons.Count <= 1) return;
+
+        if (Time.time - lastNavigationTime < navigationDelay) return;
+
+        int newIndex = currentIndex;
+
+        // Navegación basada en grid
         if (Mathf.Abs(navigationInput.x) > Mathf.Abs(navigationInput.y))
         {
+            // Movimiento horizontal
             if (navigationInput.x > 0) // Derecha
-            {
-                NavigateRight();
-            }
+                newIndex = GetNextIndexHorizontal(1);
             else // Izquierda
-            {
-                NavigateLeft();
-            }
+                newIndex = GetNextIndexHorizontal(-1);
         }
-        // Navegación vertical (cambio de sección)
         else
         {
-            if (navigationInput.y > 0) // Arriba
-            {
-                SwitchToSection(InventorySection.Notes);
-            }
+            // Movimiento vertical
+            if (navigationInput.y > 0) // Arriba (en UI es negativo)
+                newIndex = GetNextIndexVertical(-1);
             else // Abajo
+                newIndex = GetNextIndexVertical(1);
+        }
+
+        if (newIndex != currentIndex && newIndex >= 0 && newIndex < inventoryButtons.Count)
+        {
+            SelectButton(newIndex);
+            lastNavigationTime = Time.time;
+        }
+    }
+
+    private int GetNextIndexHorizontal(int direction)
+    {
+        int row = currentIndex / elementsPerRow;
+        int col = currentIndex % elementsPerRow;
+
+        int newCol = col + direction;
+
+        // Verificar límites de la fila
+        if (newCol < 0)
+        {
+            // Ir al último elemento de la fila
+            newCol = elementsPerRow - 1;
+            while (row * elementsPerRow + newCol >= inventoryButtons.Count && newCol > col)
             {
-                SwitchToSection(InventorySection.Objects);
+                newCol--;
             }
         }
-
-        lastNavigationTime = Time.time;
-    }
-
-    private void NavigateRight()
-    {
-        List<Button> currentButtons = GetCurrentSectionButtons();
-        if (currentButtons.Count == 0) return;
-
-        int currentIndex = GetCurrentSectionIndex();
-        int newIndex = (currentIndex + 1) % currentButtons.Count;
-
-        SetCurrentSectionIndex(newIndex);
-        SelectButton(currentButtons[newIndex]);
-    }
-
-    private void NavigateLeft()
-    {
-        List<Button> currentButtons = GetCurrentSectionButtons();
-        if (currentButtons.Count == 0) return;
-
-        int currentIndex = GetCurrentSectionIndex();
-        int newIndex = (currentIndex - 1 + currentButtons.Count) % currentButtons.Count;
-
-        SetCurrentSectionIndex(newIndex);
-        SelectButton(currentButtons[newIndex]);
-    }
-
-    private void SwitchToSection(InventorySection newSection)
-    {
-        if (currentSection == newSection) return;
-
-        currentSection = newSection;
-
-        List<Button> newSectionButtons = GetCurrentSectionButtons();
-        if (newSectionButtons.Count > 0)
+        else if (newCol >= elementsPerRow || row * elementsPerRow + newCol >= inventoryButtons.Count)
         {
-            int index = GetCurrentSectionIndex();
-            SelectButton(newSectionButtons[index]);
-            PlaySound(sectionChangeSound);
-            OnSectionChanged?.Invoke(currentSection);
+            // Ir al primer elemento de la fila
+            newCol = 0;
         }
 
-        Debug.Log($"Cambiado a sección: {currentSection}");
+        return row * elementsPerRow + newCol;
     }
 
-    private void SelectButton(Button button)
+    private int GetNextIndexVertical(int direction)
     {
-        if (button == null || button == currentSelectedButton) return;
+        int newIndex = currentIndex + (direction * elementsPerRow);
 
+        // Wrap around vertical
+        if (newIndex < 0)
+        {
+            // Ir a la última fila posible en la misma columna
+            int col = currentIndex % elementsPerRow;
+            int lastRow = (inventoryButtons.Count - 1) / elementsPerRow;
+            newIndex = lastRow * elementsPerRow + col;
+
+            // Ajustar si se pasa del límite
+            if (newIndex >= inventoryButtons.Count)
+            {
+                newIndex = inventoryButtons.Count - 1;
+            }
+        }
+        else if (newIndex >= inventoryButtons.Count)
+        {
+            // Ir a la primera fila en la misma columna
+            int col = currentIndex % elementsPerRow;
+            newIndex = col;
+        }
+
+        return newIndex;
+    }
+
+    private void SelectButton(int index)
+    {
+        if (index < 0 || index >= inventoryButtons.Count) return;
+
+        Button button = inventoryButtons[index];
+        if (button == null || !button.gameObject.activeInHierarchy || !button.interactable) return;
+
+        // Actualizar selección
         previousSelectedButton = currentSelectedButton;
+        currentIndex = index;
         currentSelectedButton = button;
 
+        // Actualizar EventSystem
+        eventSystem?.SetSelectedGameObject(button.gameObject);
+
         // Aplicar animaciones
-        ApplySelectionAnimations();
+        ApplySelectionAnimation();
 
-        // Scroll automático
-        ScrollToButton(button);
-
-        // Efectos
-        PlaySound(navigationSound);
-        OnElementSelected?.Invoke(currentSelectedButton);
-
-        Debug.Log($"Botón seleccionado: {button.name} en sección {currentSection}");
+        if (logNavigationActions)
+            Debug.Log($"InventoryNavigationManager: Seleccionado {button.name} (índice: {index})");
     }
 
-    private void ApplySelectionAnimations()
+    #endregion
+
+    #region Input Callbacks
+
+    private void OnSubmitInventory(InputAction.CallbackContext context)
+    {
+        if (!isActive) return;
+
+        if (currentSelectedButton != null &&
+            currentSelectedButton.gameObject.activeInHierarchy &&
+            currentSelectedButton.interactable)
+        {
+            if (logNavigationActions)
+                Debug.Log($"InventoryNavigationManager: Ejecutando acción en {currentSelectedButton.name}");
+
+            // Ejecutar la acción del botón
+            currentSelectedButton.onClick.Invoke();
+        }
+        else
+        {
+            if (logNavigationActions)
+                Debug.LogWarning("InventoryNavigationManager: No hay botón válido seleccionado para Submit");
+
+            // Intentar refrescar y seleccionar un elemento válido
+            RefreshInventoryElements();
+            if (inventoryButtons.Count > 0)
+            {
+                SelectButton(0);
+            }
+        }
+    }
+
+    #endregion
+
+    #region Animaciones
+
+    private void ApplySelectionAnimation()
     {
         // Limpiar animaciones anteriores
         currentAnimationTween?.Kill();
 
-        // Resetear botón anterior
-        if (previousSelectedButton != null)
+        // Reset elemento anterior
+        if (previousSelectedButton != null && previousSelectedButton != currentSelectedButton)
         {
             previousSelectedButton.transform.DOKill();
             previousSelectedButton.transform.localScale = Vector3.one;
         }
 
-        // Animar botón actual
+        // Animar elemento actual
         if (currentSelectedButton != null)
         {
             currentSelectedButton.transform.localScale = Vector3.one;
@@ -316,282 +409,11 @@ public class InventoryNavigationManager : MonoBehaviour
         }
     }
 
-    private void ScrollToButton(Button button)
-    {
-        if (!enableAutoScrollOnNavigation) return;
-
-        ScrollRect scrollRect = GetCurrentScrollRect();
-        if (scrollRect == null || button == null) return;
-
-        // Si el usuario ha hecho scroll manual recientemente, no hacer auto-scroll
-        if (userHasScrolledManually && (Time.time - lastManualScrollTime) < manualScrollGracePeriod)
-        {
-            Debug.Log("Auto-scroll omitido: Usuario hizo scroll manual recientemente");
-            return;
-        }
-
-        // Si solo queremos hacer scroll cuando el elemento no es visible, verificar visibilidad
-        if (onlyScrollIfElementNotVisible)
-        {
-            if (IsButtonVisible(button, scrollRect, visibilityMargin))
-            {
-                Debug.Log($"Auto-scroll omitido: Elemento {button.name} ya está visible");
-                return;
-            }
-            else
-            {
-                Debug.Log($"Auto-scroll activado: Elemento {button.name} no está completamente visible");
-            }
-        }
-
-        // Proceder con el scroll automático
-        RectTransform content = scrollRect.content;
-        RectTransform buttonRect = button.GetComponent<RectTransform>();
-
-        if (content == null || buttonRect == null) return;
-
-        // Obtener posición local del botón
-        Vector3 buttonPosition = content.InverseTransformPoint(buttonRect.position);
-
-        // Calcular nueva posición del scroll
-        float contentWidth = content.rect.width;
-        float viewportWidth = scrollRect.GetComponent<RectTransform>().rect.width;
-
-        if (contentWidth <= viewportWidth) return; // No necesita scroll
-
-        // Calcular posición normalizada para centrar el elemento
-        float normalizedPosition = Mathf.Clamp01(-buttonPosition.x / (contentWidth - viewportWidth));
-
-        // Animar scroll
-        currentScrollTween?.Kill();
-        currentScrollTween = DOTween.To(
-            () => scrollRect.horizontalNormalizedPosition,
-            x => scrollRect.horizontalNormalizedPosition = x,
-            normalizedPosition,
-            scrollAnimationDuration
-        ).SetEase(Ease.OutCubic).SetUpdate(true);
-
-        Debug.Log($"Auto-scroll aplicado a elemento: {button.name}, Nueva posición: {normalizedPosition:F3}");
-    }
-
-    private void OnNavigate(InputAction.CallbackContext context)
-    {
-        // La navegación se maneja en Update para mayor control
-    }
-
-    private void OnSubmit(InputAction.CallbackContext context)
-    {
-        if (currentSelectedButton != null)
-        {
-            currentSelectedButton.onClick.Invoke();
-            PlaySound(selectSound);
-            OnElementSubmitted?.Invoke(currentSelectedButton);
-        }
-    }
-
-    private void OnCancel(InputAction.CallbackContext context)
-    {
-        // Cerrar inventario
-        if (inventoryManager != null)
-        {
-            inventoryManager.ToggleInventory();
-        }
-    }
-
-    private void OnScroll(InputAction.CallbackContext context)
-    {
-        if (!enableScrollWithInput)
-        {
-            Debug.Log("Scroll deshabilitado por configuración");
-            return;
-        }
-
-        // Marcar que el usuario ha hecho scroll manual
-        userHasScrolledManually = true;
-        lastManualScrollTime = Time.time;
-
-        // Debug: Verificar qué tipo de valor estamos recibiendo
-        Debug.Log($"Scroll Manual Detectado - Tipo: {context.valueType}, Valor Raw: {context.ReadValueAsObject()}");
-
-        // Capturar input de scroll
-        if (context.valueType == typeof(Vector2))
-        {
-            scrollInput = context.ReadValue<Vector2>();
-        }
-        else if (context.valueType == typeof(float))
-        {
-            float value = context.ReadValue<float>();
-            scrollInput = new Vector2(value, 0);
-        }
-    }
-    private void OnScrollCanceled(InputAction.CallbackContext context)
-    {
-        scrollInput = Vector2.zero;
-    }
-
-    private void ProcessScrollInput()
-    {
-        if (scrollInput.magnitude < scrollDeadZone) return;
-
-        ScrollRect currentScrollRect = GetCurrentScrollRect();
-        if (currentScrollRect == null) return;
-
-        // Calcular velocidad de scroll
-        float scrollValue = scrollInput.x * scrollSensitivity * Time.deltaTime;
-
-        // Invertir scroll si está configurado
-        if (invertScrollX)
-        {
-            scrollValue = -scrollValue;
-        }
-
-        // Aplicar scroll horizontal
-        float currentPos = currentScrollRect.horizontalNormalizedPosition;
-        float newPos = Mathf.Clamp01(currentPos + scrollValue);
-
-        currentScrollRect.horizontalNormalizedPosition = newPos;
-
-        lastScrollTime = Time.time;
-
-        Debug.Log($"Scroll aplicado: {scrollValue:F3}, Nueva posición: {newPos:F3}");
-    }
-
-    /// <summary>
-    /// Detecta automáticamente nuevos elementos añadidos al inventario
-    /// </summary>
-    private void CheckForNewItems()
-    {
-        bool hasChanges = false;
-
-        // Verificar cambios en notas
-        int currentNoteCount = noteContainer != null ? noteContainer.childCount : 0;
-        if (currentNoteCount != lastNoteCount)
-        {
-            RefreshSectionButtons(InventorySection.Notes);
-            lastNoteCount = currentNoteCount;
-            hasChanges = true;
-        }
-
-        // Verificar cambios en objetos
-        int currentObjectCount = objectContainer != null ? objectContainer.childCount : 0;
-        if (currentObjectCount != lastObjectCount)
-        {
-            RefreshSectionButtons(InventorySection.Objects);
-            lastObjectCount = currentObjectCount;
-            hasChanges = true;
-        }
-
-        // Si hay cambios y no hay elemento seleccionado, seleccionar el primero
-        if (hasChanges && currentSelectedButton == null)
-        {
-            SelectFirstAvailableButton();
-        }
-    }
-
-    /// <summary>
-    /// Refresca la navegación completa del inventario
-    /// </summary>
-    public void RefreshInventoryNavigation()
-    {
-        RefreshSectionButtons(InventorySection.Notes);
-        RefreshSectionButtons(InventorySection.Objects);
-        SelectFirstAvailableButton();
-
-        Debug.Log($"Navegación refrescada: {noteButtons.Count} notas, {objectButtons.Count} objetos");
-    }
-
-    private void RefreshSectionButtons(InventorySection section)
-    {
-        List<Button> buttonList = section == InventorySection.Notes ? noteButtons : objectButtons;
-        Transform container = section == InventorySection.Notes ? noteContainer : objectContainer;
-
-        buttonList.Clear();
-
-        if (container == null) return;
-
-        // Buscar todos los botones activos en el contenedor
-        Button[] buttons = container.GetComponentsInChildren<Button>();
-
-        foreach (Button button in buttons)
-        {
-            if (button.gameObject.activeInHierarchy && button.interactable)
-            {
-                buttonList.Add(button);
-            }
-        }
-
-        Debug.Log($"Sección {section}: {buttonList.Count} botones encontrados");
-    }
-
-    private void SelectFirstAvailableButton()
-    {
-        // Intentar seleccionar en la sección actual primero
-        List<Button> currentButtons = GetCurrentSectionButtons();
-
-        if (currentButtons.Count > 0)
-        {
-            SetCurrentSectionIndex(0);
-            SelectButton(currentButtons[0]);
-            return;
-        }
-
-        // Si la sección actual está vacía, probar la otra
-        InventorySection otherSection = currentSection == InventorySection.Notes ?
-            InventorySection.Objects : InventorySection.Notes;
-
-        List<Button> otherButtons = otherSection == InventorySection.Notes ? noteButtons : objectButtons;
-
-        if (otherButtons.Count > 0)
-        {
-            SwitchToSection(otherSection);
-            return;
-        }
-
-        // No hay elementos en ninguna sección
-        currentSelectedButton = null;
-        Debug.Log("No hay elementos navegables en el inventario");
-    }
-
-    // Métodos auxiliares
-    private List<Button> GetCurrentSectionButtons()
-    {
-        return currentSection == InventorySection.Notes ? noteButtons : objectButtons;
-    }
-
-    private ScrollRect GetCurrentScrollRect()
-    {
-        return currentSection == InventorySection.Notes ? noteScrollRect : objectScrollRect;
-    }
-
-    private int GetCurrentSectionIndex()
-    {
-        return currentSection == InventorySection.Notes ? currentNoteIndex : currentObjectIndex;
-    }
-
-    private void SetCurrentSectionIndex(int index)
-    {
-        if (currentSection == InventorySection.Notes)
-            currentNoteIndex = index;
-        else
-            currentObjectIndex = index;
-    }
-
     private void CleanupAnimations()
     {
         currentAnimationTween?.Kill();
-        currentScrollTween?.Kill();
 
-        // Resetear todas las escalas
-        foreach (var button in noteButtons)
-        {
-            if (button != null)
-            {
-                button.transform.DOKill();
-                button.transform.localScale = Vector3.one;
-            }
-        }
-
-        foreach (var button in objectButtons)
+        foreach (Button button in inventoryButtons)
         {
             if (button != null)
             {
@@ -601,164 +423,130 @@ public class InventoryNavigationManager : MonoBehaviour
         }
     }
 
-    private void PlaySound(AudioClip clip)
+    private void ClearSelection()
     {
-        if (audioSource != null && clip != null)
+        currentSelectedButton = null;
+        previousSelectedButton = null;
+        eventSystem?.SetSelectedGameObject(null);
+    }
+
+    #endregion
+
+    #region Eventos del Sistema
+
+    private void OnEnable()
+    {
+        if (isActive)
         {
-            audioSource.PlayOneShot(clip);
+            playerControls?.UI.Enable();
         }
     }
 
-    // Métodos públicos
-    public void ForceRefresh()
+    private void OnDisable()
     {
-        RefreshInventoryNavigation();
+        playerControls?.UI.Disable();
+        CleanupAnimations();
     }
 
-    public void SetNavigationEnabled(bool enabled)
+    private void OnDestroy()
     {
-        this.enabled = enabled;
+        CleanupAnimations();
 
-        if (!enabled)
+        if (submitAction != null)
         {
-            CleanupAnimations();
+            submitAction.performed -= OnSubmitInventory;
         }
+
+        playerControls?.Dispose();
     }
 
-    public Button GetCurrentSelectedButton()
-    {
-        return currentSelectedButton;
-    }
+    #endregion
 
-    public InventorySection GetCurrentSection()
-    {
-        return currentSection;
-    }
+    #region Métodos Públicos
 
-    // Métodos públicos para configurar scroll
-    public void SetScrollEnabled(bool enabled)
+    /// <summary>
+    /// Fuerza la actualización de elementos del inventario
+    /// </summary>
+    public void ForceRefreshElements()
     {
-        enableScrollWithInput = enabled;
-
-        if (playerControls != null)
+        if (isActive)
         {
-            if (enabled)
+            RefreshInventoryElements();
+
+            // Reseleccionar un elemento válido
+            if (inventoryButtons.Count > 0)
             {
-                playerControls.UI.Scroll_Inventory.performed += OnScroll;
-                playerControls.UI.Scroll_Inventory.canceled += OnScrollCanceled;
-            }
-            else
-            {
-                playerControls.UI.Scroll_Inventory.performed -= OnScroll;
-                playerControls.UI.Scroll_Inventory.canceled -= OnScrollCanceled;
+                int newIndex = Mathf.Clamp(currentIndex, 0, inventoryButtons.Count - 1);
+                SelectButton(newIndex);
             }
         }
     }
 
-    public void SetScrollSensitivity(float sensitivity)
+    /// <summary>
+    /// Configura los contenedores manualmente
+    /// </summary>
+    public void SetContainers(Transform noteContainer, Transform objectContainer)
     {
-        scrollSensitivity = Mathf.Max(0.1f, sensitivity);
+        this.noteContainer = noteContainer;
+        this.objectContainer = objectContainer;
+
+        DetectLayoutGroups();
+
+        if (isActive)
+        {
+            RefreshInventoryElements();
+        }
     }
 
-    public void SetScrollDeadZone(float deadZone)
+    /// <summary>
+    /// Verifica si el sistema está activo
+    /// </summary>
+    public bool IsNavigationActive()
     {
-        scrollDeadZone = Mathf.Clamp01(deadZone);
+        return isActive && enabled;
     }
 
-    public void SetScrollInverted(bool inverted)
-    {
-        invertScrollX = inverted;
-    }
+    #endregion
 
-    // Método para scroll manual (útil para UI externa)
-    public void ManualScroll(float scrollAmount, InventorySection? targetSection = null)
-    {
-        InventorySection sectionToScroll = targetSection ?? currentSection;
-        ScrollRect scrollRect = sectionToScroll == InventorySection.Notes ? noteScrollRect : objectScrollRect;
+    #region Debug
 
-        if (scrollRect == null) return;
-
-        float currentPos = scrollRect.horizontalNormalizedPosition;
-        float newPos = Mathf.Clamp01(currentPos + scrollAmount);
-        scrollRect.horizontalNormalizedPosition = newPos;
-    }
-    private bool IsButtonVisible(Button button, ScrollRect scrollRect, float margin = 0f)
-    {
-        if (button == null || scrollRect == null) return false;
-
-        RectTransform buttonRect = button.GetComponent<RectTransform>();
-        RectTransform viewportRect = scrollRect.viewport;
-        RectTransform contentRect = scrollRect.content;
-
-        if (buttonRect == null || viewportRect == null || contentRect == null) return false;
-
-        // Obtener los límites del viewport en coordenadas del content
-        Vector3[] viewportCorners = new Vector3[4];
-        viewportRect.GetWorldCorners(viewportCorners);
-
-        Vector3 viewportMin = contentRect.InverseTransformPoint(viewportCorners[0]);
-        Vector3 viewportMax = contentRect.InverseTransformPoint(viewportCorners[2]);
-
-        // Obtener los límites del botón en coordenadas del content
-        Vector3[] buttonCorners = new Vector3[4];
-        buttonRect.GetWorldCorners(buttonCorners);
-
-        Vector3 buttonMin = contentRect.InverseTransformPoint(buttonCorners[0]);
-        Vector3 buttonMax = contentRect.InverseTransformPoint(buttonCorners[2]);
-
-        // Verificar si el botón está completamente visible (con margen)
-        bool isVisible = (buttonMin.x >= viewportMin.x - margin) &&
-                         (buttonMax.x <= viewportMax.x + margin);
-
-        return isVisible;
-    }
-
-    public void ResetManualScrollState()
-    {
-        userHasScrolledManually = false;
-        lastManualScrollTime = 0f;
-        Debug.Log("Estado de scroll manual reseteado");
-    }
-
-    // Métodos públicos para configurar el comportamiento
-    public void SetAutoScrollEnabled(bool enabled)
-    {
-        enableAutoScrollOnNavigation = enabled;
-    }
-
-    public void SetScrollOnlyIfNotVisible(bool enabled)
-    {
-        onlyScrollIfElementNotVisible = enabled;
-    }
-
-    public void SetManualScrollGracePeriod(float seconds)
-    {
-        manualScrollGracePeriod = Mathf.Max(0f, seconds);
-    }
-
-    public void SetVisibilityMargin(float margin)
-    {
-        visibilityMargin = Mathf.Max(0f, margin);
-    }
-    // Método de debug
     [ContextMenu("Debug Inventory Navigation")]
-    public void DebugCurrentState()
+    public void DebugInventoryNavigation()
     {
-        Debug.Log($"=== Inventory Navigation State ===");
-        Debug.Log($"Current Section: {currentSection}");
+        Debug.Log($"=== INVENTORY NAVIGATION STATE ===");
+        Debug.Log($"Is Active: {isActive}");
+        Debug.Log($"Component Enabled: {enabled}");
         Debug.Log($"Current Selected: {currentSelectedButton?.name ?? "NULL"}");
-        Debug.Log($"Note Buttons: {noteButtons.Count}");
-        Debug.Log($"Object Buttons: {objectButtons.Count}");
-        Debug.Log($"Note Index: {currentNoteIndex}");
-        Debug.Log($"Object Index: {currentObjectIndex}");
-        Debug.Log($"Scroll Enabled: {enableScrollWithInput}");
-        Debug.Log($"Scroll Input: {scrollInput}");
-        Debug.Log($"Scroll Sensitivity: {scrollSensitivity}");
+        Debug.Log($"Current Index: {currentIndex}");
+        Debug.Log($"Total Buttons: {inventoryButtons.Count}");
+        Debug.Log($"Note Container: {noteContainer?.name ?? "NULL"}");
+        Debug.Log($"Object Container: {objectContainer?.name ?? "NULL"}");
 
-        // Debug scroll positions
-        if (noteScrollRect != null)
-            Debug.Log($"Notes Scroll Position: {noteScrollRect.horizontalNormalizedPosition:F3}");
-        if (objectScrollRect != null)
-            Debug.Log($"Objects Scroll Position: {objectScrollRect.horizontalNormalizedPosition:F3}");
+        for (int i = 0; i < inventoryButtons.Count; i++)
+        {
+            var button = inventoryButtons[i];
+            Debug.Log($"  [{i}] {button?.name ?? "NULL"} - Active: {button?.gameObject.activeInHierarchy} - Interactable: {button?.interactable}");
+        }
     }
+
+    [ContextMenu("Force Refresh Elements")]
+    public void ForceRefreshElementsFromContext()
+    {
+        ForceRefreshElements();
+    }
+
+    [ContextMenu("Test Navigation")]
+    public void TestNavigation()
+    {
+        if (!isActive)
+        {
+            ActivateInventoryNavigation();
+        }
+        else
+        {
+            DeactivateInventoryNavigation();
+        }
+    }
+
+    #endregion
 }

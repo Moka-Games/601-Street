@@ -68,21 +68,23 @@ public class UINavigationManager : MonoBehaviour
 
     private void Awake()
     {
+        // Configurar controles de input
         playerControls = new PlayerControls();
         SetupInputActions();
 
-        eventSystem = EventSystemManager.GetEventSystem(); if (eventSystem == null)
+        // Obtener o crear EventSystem
+        eventSystem = EventSystemManager.GetEventSystem();
+        if (eventSystem == null)
         {
             GameObject eventSystemGO = new GameObject("EventSystem");
             eventSystem = eventSystemGO.AddComponent<EventSystem>();
             eventSystemGO.AddComponent<StandaloneInputModule>();
+
+            Debug.LogWarning("UINavigationManager: EventSystem creado manualmente. Considera usar EventSystemManager.");
         }
 
+        // Obtener AudioSource si existe
         audioSource = GetComponent<AudioSource>();
-
-        // Configurar controles
-        playerControls = new PlayerControls();
-        SetupInputActions();
     }
 
     private void OnEnable()
