@@ -1004,8 +1004,6 @@ MonoBehaviour:
   bonusText: {fileID: 1318020920}
   throwDiceButton: {fileID: 2065756134}
   diceObject: {fileID: 1597664383}
-  keepTextsUpright: 1
-  followDicePosition: 1
   diceRollDuration: 2
   bonusDisplayDelay: 0.5
   bonusDisplayDuration: 1
@@ -3283,12 +3281,12 @@ PrefabInstance:
     - target: {fileID: 3692168091067980738, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_fontSize
-      value: 25
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 3692168091067980738, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_fontSizeBase
-      value: 25
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 3692168091067980738, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
@@ -3348,12 +3346,12 @@ PrefabInstance:
     - target: {fileID: 4525714623618899369, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 35.4
+      value: 57.3
       objectReference: {fileID: 0}
     - target: {fileID: 4525714623618899369, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 17.6
+      value: 37.4
       objectReference: {fileID: 0}
     - target: {fileID: 4528371306567692611, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
@@ -3528,7 +3526,7 @@ PrefabInstance:
     - target: {fileID: 5001795886280591708, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_fontSize
-      value: 25
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 5001795886280591708, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
@@ -3573,7 +3571,7 @@ PrefabInstance:
     - target: {fileID: 5001795886280591708, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_fontSizeBase
-      value: 25
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 5001795886280591708, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
