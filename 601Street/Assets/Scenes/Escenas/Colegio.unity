@@ -1319,6 +1319,7 @@ Transform:
   - {fileID: 1891648457}
   - {fileID: 1936779531}
   - {fileID: 1896980300}
+  - {fileID: 987626805}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &147770424
@@ -13787,6 +13788,166 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 982351952}
   m_Mesh: {fileID: 8120758116859950162, guid: ff5b4e0db08d3b0419738fe2ba45d06c, type: 3}
+--- !u!1 &987626804
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 987626805}
+  - component: {fileID: 987626809}
+  - component: {fileID: 987626808}
+  - component: {fileID: 987626807}
+  - component: {fileID: 987626806}
+  - component: {fileID: 987626810}
+  - component: {fileID: 987626811}
+  m_Layer: 6
+  m_Name: Entrada Portal
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &987626805
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987626804}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.25329104, z: -0, w: 0.9673901}
+  m_LocalPosition: {x: 8.17, y: -8.77, z: -35.11}
+  m_LocalScale: {x: 1.0969603, y: 2.879082, z: 2.9159398}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 138147909}
+  m_LocalEulerAnglesHint: {x: 0, y: 29.345, z: 0}
+--- !u!114 &987626806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987626804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14df5e5373baac54b9b676c309cb5df2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetSceneName: SalaPortal
+  spawnPointName: Player_InitialPosition
+  isExitToMainScene: 0
+  sceneChangeManager: {fileID: 0}
+  showDetailedLogs: 0
+--- !u!114 &987626807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987626804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdf2841cde257ce41a7e4884979576c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactionID: Entrada-Portal
+  interactionPrompt: Enter Boiler room
+  onInteraction:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 987626806}
+        m_TargetAssemblyTypeName: SceneTransitionPoint, Assembly-CSharp
+        m_MethodName: TransitionToScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onInteracted:
+    m_PersistentCalls:
+      m_Calls: []
+  singleUseInteraction: 0
+  disableAfterInteraction: 0
+  detectionRadius: 10
+  detectionTriggerName: DetectionTrigger
+  edgeOffset: 50
+  objectInteracted: 0
+--- !u!135 &987626808
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987626804}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.75
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!33 &987626809
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987626804}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &987626810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987626804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: Entrada-Portal
+  useSceneName: 0
+  sceneName: Colegio
+  defaultActiveState: 0
+  applyStateImmediately: 1
+  onActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  listenOnlyWhenActive: 0
+  useTransition: 0
+  transitionDuration: 0.5
+--- !u!114 &987626811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987626804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e64f5cbc289c58948a4d0c6173aeafe3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: Entrada-Portal
 --- !u!1 &999336450
 GameObject:
   m_ObjectHideFlags: 0
@@ -30174,7 +30335,7 @@ MonoBehaviour:
       m_Calls: []
   singleUseInteraction: 0
   disableAfterInteraction: 0
-  detectionRadius: 7
+  detectionRadius: 10
   detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
@@ -30223,7 +30384,7 @@ MonoBehaviour:
   objectID: Salida_2
   useSceneName: 0
   sceneName: Colegio
-  defaultActiveState: 1
+  defaultActiveState: 0
   applyStateImmediately: 1
   onActivate:
     m_PersistentCalls:
@@ -31101,7 +31262,7 @@ MonoBehaviour:
       m_Calls: []
   singleUseInteraction: 0
   disableAfterInteraction: 0
-  detectionRadius: 7
+  detectionRadius: 10
   detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
@@ -31150,7 +31311,7 @@ MonoBehaviour:
   objectID: Salida_1
   useSceneName: 0
   sceneName: Colegio
-  defaultActiveState: 1
+  defaultActiveState: 0
   applyStateImmediately: 1
   onActivate:
     m_PersistentCalls:
