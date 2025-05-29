@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 /// <summary>
 /// Versión final corregida del gestor de inventario donde ToggleInventory funciona como verdadero TOGGLE
@@ -71,6 +72,10 @@ public class Inventory_Manager : MonoBehaviour
 
     // Nombre del último ítem añadido (para el popup)
     private string lastAddedItemName = "";
+
+
+    [Header("Navigation System")]
+    [SerializeField] private InventoryNavigationManager inventoryNavigation;
 
     [System.Serializable]
     public class PrefabInteractionData
@@ -167,10 +172,25 @@ public class Inventory_Manager : MonoBehaviour
         InventoryInterface.SetActive(false);
         popUpParent.SetActive(false);
 
-        // Configurar prefabContainer para que persista entre escenas
         EnsurePrefabContainerPersistence();
+        
+        inventoryNavigation = GetComponent<InventoryNavigationManager>();
+        if (inventoryNavigation == null)
+        {
+            inventoryNavigation = FindAnyObjectByType<InventoryNavigationManager>();
+        }
 
-        // Buscar referencias necesarias para bloquear al jugador
+        if (inventoryNavigation != null)
+        {
+            // Configurar contenedores en el sistema de navegación
+            inventoryNavigation.SetContainers(noteContainer, objectContainer);
+            Debug.Log("Sistema de navegación del inventario configurado");
+        }
+        else
+        {
+            Debug.LogWarning("InventoryNavigationManager no encontrado. La navegación del inventario no funcionará.");
+        }
+        
         playerController = FindAnyObjectByType<PlayerController>();
         cameraScript = FindAnyObjectByType<Camera_Script>();
 
@@ -234,10 +254,49 @@ public class Inventory_Manager : MonoBehaviour
         playerControls.UI.Enable();
         toggleInventoryUI.Enable(); // Habilitar la acción personalizada para cuando esté abierto
 
+        // CRÍTICO: Activar navegación específica del inventario
+        if (inventoryNavigation == null)
+        {
+            inventoryNavigation = GetComponent<InventoryNavigationManager>();
+            if (inventoryNavigation == null)
+            {
+                // Buscar en el GameObject del sistema de inventario
+                inventoryNavigation = FindAnyObjectByType<InventoryNavigationManager>();
+            }
+        }
+
+        if (inventoryNavigation != null)
+        {
+            // Esperar un frame para que la UI se active completamente
+            StartCoroutine(ActivateNavigationDelayed());
+        }
+        else
+        {
+            Debug.LogWarning("InventoryNavigationManager no encontrado");
+        }
+
+        // Usar NavigationPriorityManager si está disponible
+        if (NavigationPriorityManager.Instance != null)
+        {
+            NavigationPriorityManager.Instance.ActivateInventoryNavigation();
+        }
+
         BlockPlayerAndCameraForInventory();
-        Debug.Log("Inventario ABIERTO: Gameplay disabled, UI enabled, ToggleInventoryUI enabled");
+        Debug.Log("Inventario ABIERTO: Gameplay disabled, UI enabled, Navigation activated");
     }
 
+    // AÑADIR ESTE NUEVO MÉTODO:
+    private IEnumerator ActivateNavigationDelayed()
+    {
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(0.1f); // Pequeño delay para asegurar que todo esté listo
+
+        if (inventoryNavigation != null)
+        {
+            inventoryNavigation.ActivateInventoryNavigation();
+            Debug.Log("Navegación del inventario activada con delay");
+        }
+    }
     /// <summary>
     /// Cierra el inventario
     /// </summary>
@@ -249,6 +308,19 @@ public class Inventory_Manager : MonoBehaviour
             return; // Ya está cerrado
         }
 
+        // CRÍTICO: Desactivar navegación específica del inventario PRIMERO
+        if (inventoryNavigation != null)
+        {
+            inventoryNavigation.DeactivateInventoryNavigation();
+            Debug.Log("Navegación del inventario desactivada");
+        }
+
+        // Usar NavigationPriorityManager si está disponible
+        if (NavigationPriorityManager.Instance != null)
+        {
+            NavigationPriorityManager.Instance.DeactivateInventoryNavigation();
+        }
+
         inventoryOpened = false;
         InventoryInterface.SetActive(false);
 
@@ -258,7 +330,7 @@ public class Inventory_Manager : MonoBehaviour
         playerControls.Gameplay.Enable();
 
         UnblockPlayerAndCameraFromInventory();
-        Debug.Log("Inventario CERRADO: UI disabled, ToggleInventoryUI disabled, Gameplay enabled");
+        Debug.Log("Inventario CERRADO: UI disabled, Navigation deactivated, Gameplay enabled");
     }
 
     /// <summary>
@@ -396,6 +468,8 @@ public class Inventory_Manager : MonoBehaviour
 
         // Instanciar el elemento UI
         GameObject newItemUI = Instantiate(template, parentContainer);
+        StartCoroutine(RefreshUISetupDelayed());
+
 
         // Configurar imagen
         Image itemImage = newItemUI.GetComponent<Image>();
@@ -433,6 +507,22 @@ public class Inventory_Manager : MonoBehaviour
 
         // Activar el elemento
         newItemUI.SetActive(true);
+        StartCoroutine(NotifyNavigationChanges());
+        StartCoroutine(RefreshUISetupDelayed());
+    }
+    private IEnumerator NotifyNavigationChanges()
+    {
+        yield return new WaitForEndOfFrame();
+
+        // Notificar al sistema de navegación que hay nuevos elementos
+        if (inventoryNavigation != null && inventoryNavigation.IsNavigationActive())
+        {
+            inventoryNavigation.ForceRefreshElements();
+            Debug.Log("Navegación del inventario actualizada con nuevos elementos");
+        }
+
+        // Limpiar EventSystems duplicados si es necesario
+        EventSystemManager.OnUIContentInstantiated();
     }
 
     /// <summary>
@@ -480,6 +570,9 @@ public class Inventory_Manager : MonoBehaviour
 
         // Instanciar el prefab
         GameObject instance = Instantiate(prefab, prefabContainer);
+        EventSystemManager.OnUIContentInstantiated();
+
+
 
         // Configurar botón de cierre si existe
         SetupCloseButton(instance, itemName, isNewItem);
@@ -709,6 +802,7 @@ public class Inventory_Manager : MonoBehaviour
     /// <summary>
     /// Método público para forzar el cierre del inventario desde otros sistemas
     /// </summary>
+    /// 
     public void ForceCloseInventory()
     {
         if (inventoryOpened)
@@ -717,4 +811,19 @@ public class Inventory_Manager : MonoBehaviour
             CloseInventory();
         }
     }
+    private IEnumerator RefreshUISetupDelayed()
+    {
+        yield return new WaitForEndOfFrame();
+
+        InventoryUISetup uiSetup = GetComponent<InventoryUISetup>();
+        if (uiSetup != null)
+        {
+            uiSetup.RefreshNavigation();
+        }
+
+        // También notificar sobre cleanup de EventSystems
+        EventSystemManager.OnUIContentInstantiated();
+    }
+
+
 }
