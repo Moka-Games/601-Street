@@ -68,6 +68,8 @@ public class DialogueManager : MonoBehaviour
     [Header("Navigation Integration")]
     [SerializeField] private UINavigationManager uiNavigationManager;
 
+    private bool isInPreDiceConversation = false;
+    private PendingDiceRollData pendingDiceRoll = null;
     void Awake()
     {
         if (Instance == null)
@@ -368,21 +370,37 @@ public class DialogueManager : MonoBehaviour
             {
                 if (selectedOption.requiresDiceRoll)
                 {
-                    SelectDiceOption();
-                    diceManager.SetDifficultyClass(selectedOption.difficultyClass);
-
-                    // CRÍTICO: Configurar el callback con integración de bonuses
-                    diceManager.OnRollComplete = (isSuccess) =>
+                    // NUEVO: Verificar si hay conversación previa al dado
+                    if (selectedOption.preDiceConversation != null)
                     {
-                        Debug.Log($"=== RESULTADO DE TIRADA CON BONUSES ===");
-                        Debug.Log($"Resultado final (con bonus): {diceManager.GetLastResult()}");
-                        Debug.Log($"DC requerido: {selectedOption.difficultyClass}");
-                        Debug.Log($"¿Tirada exitosa?: {(isSuccess ? "SÍ" : "NO")}");
-                        Debug.Log("=====================================");
+                        Debug.Log("Iniciando conversación previa al dado");
 
-                        diceRollResult = isSuccess;
-                        nextContextualConversation = isSuccess ? selectedOption.successDialogue : selectedOption.failureDialogue;
-                    };
+                        // Ocultar las opciones de diálogo
+                        if (optionsUI != null)
+                        {
+                            optionsUI.SetActive(false);
+                        }
+
+                        // Marcar que estamos en modo "pre-dado" para saber qué hacer después
+                        isInPreDiceConversation = true;
+
+                        // Guardar los datos de la tirada para usar después de la conversación previa
+                        pendingDiceRoll = new PendingDiceRollData
+                        {
+                            selectedOption = selectedOption,
+                            optionIndex = optionIndex,
+                            originalConversation = currentConversation, // NUEVO: Guardar conversación original
+                            originalNPC = currentNPC // NUEVO: Guardar NPC original
+                        };
+
+                        // Iniciar la conversación previa
+                        StartConversation(selectedOption.preDiceConversation, currentNPC);
+                    }
+                    else
+                    {
+                        // No hay conversación previa, proceder directamente con el dado
+                        ExecuteDiceRoll(selectedOption);
+                    }
                 }
                 else
                 {
@@ -401,6 +419,60 @@ public class DialogueManager : MonoBehaviour
                     }
                 }
             }
+        }
+    }
+
+    // NUEVO: Método separado para ejecutar la tirada de dados
+    private void ExecuteDiceRoll(DialogueOption selectedOption)
+    {
+        // En lugar de llamar a SelectDiceOption() que usa variables globales,
+        // implementamos la lógica directamente aquí con los parámetros específicos
+        Debug.Log("=== INICIANDO TIRADA DE DADOS CON BONUSES ===");
+
+        // PROTECCIÓN CRÍTICA: Bloquear inputs del sistema de navegación temporalmente
+        if (uiNavigationManager != null)
+        {
+            uiNavigationManager.BlockInputTemporarily(1.0f); // Bloquear por 1 segundo
+            Debug.Log("Sistema de navegación bloqueado temporalmente");
+        }
+
+        // Desactivar la interfaz de diálogo
+        if (dialogueInterface != null)
+        {
+            dialogueInterface.SetActive(false);
+        }
+
+        // Activar la interfaz de dados
+        if (diceInterface != null)
+        {
+            diceInterface.SetActive(true);
+        }
+
+        // Resetear la interfaz de dados
+        if (diceManager != null)
+        {
+            diceManager.ResetUI();
+            diceManager.SetDifficultyClass(selectedOption.difficultyClass);
+        }
+
+        Debug.Log($"DC configurado: {selectedOption.difficultyClass}");
+        Debug.Log("Interfaz de dados activada con protecciones");
+        Debug.Log("============================================");
+
+        // CRÍTICO: Configurar el callback con integración de bonuses
+        if (diceManager != null)
+        {
+            diceManager.OnRollComplete = (isSuccess) =>
+            {
+                Debug.Log($"=== RESULTADO DE TIRADA CON BONUSES ===");
+                Debug.Log($"Resultado final (con bonus): {diceManager.GetLastResult()}");
+                Debug.Log($"DC requerido: {selectedOption.difficultyClass}");
+                Debug.Log($"¿Tirada exitosa?: {(isSuccess ? "SÍ" : "NO")}");
+                Debug.Log("=====================================");
+
+                diceRollResult = isSuccess;
+                nextContextualConversation = isSuccess ? selectedOption.successDialogue : selectedOption.failureDialogue;
+            };
         }
     }
 
@@ -430,6 +502,32 @@ public class DialogueManager : MonoBehaviour
 
     public void EndConversation()
     {
+        // NUEVO: Verificar si estamos terminando una conversación previa al dado
+        if (isInPreDiceConversation && pendingDiceRoll != null)
+        {
+            Debug.Log("Terminando conversación previa al dado - Iniciando tirada");
+
+            // Resetear el flag
+            isInPreDiceConversation = false;
+
+            // CRÍTICO: Restaurar el contexto original antes de ejecutar la tirada
+            currentConversation = pendingDiceRoll.originalConversation;
+            currentNPC = pendingDiceRoll.originalNPC;
+            selectedOptionIndex = pendingDiceRoll.optionIndex;
+
+            // Ejecutar la tirada con los datos guardados
+            DialogueOption selectedOption = pendingDiceRoll.selectedOption;
+            ExecuteDiceRoll(selectedOption);
+
+            // Limpiar los datos pendientes
+            pendingDiceRoll = null;
+
+            // NO llamar al resto del método EndConversation porque no queremos
+            // terminar completamente la conversación, solo la parte previa al dado
+            return;
+        }
+
+        // RESTO DEL MÉTODO ORIGINAL (sin cambios)
         // Ejecutar la acción asociada a la conversación si existe
         if (currentConversation != null && !string.IsNullOrEmpty(currentConversation.actionId))
         {
@@ -475,35 +573,10 @@ public class DialogueManager : MonoBehaviour
 
         Debug.Log("Conversación finalizada - Cooldown iniciado");
     }
+    
 
-    public void SelectDiceOption()
-    {
-        Debug.Log("=== INICIANDO TIRADA DE DADOS CON BONUSES ===");
-
-        // PROTECCIÓN CRÍTICA: Bloquear inputs del sistema de navegación temporalmente
-        if (uiNavigationManager != null)
-        {
-            uiNavigationManager.BlockInputTemporarily(1.0f); // Bloquear por 1 segundo
-            Debug.Log("Sistema de navegación bloqueado temporalmente");
-        }
-
-        // Desactivar la interfaz de diálogo
-        dialogueInterface.SetActive(false);
-
-        // Activar la interfaz de dados
-        diceInterface.SetActive(true);
-
-        // Resetear la interfaz de dados
-        diceManager.ResetUI();
-
-        // Configurar el DC para la tirada
-        diceManager.SetDifficultyClass(currentConversation.dialogueOptions[selectedOptionIndex].difficultyClass);
-
-        Debug.Log($"DC configurado: {currentConversation.dialogueOptions[selectedOptionIndex].difficultyClass}");
-        Debug.Log("Interfaz de dados activada con protecciones");
-        Debug.Log("============================================");
-    }
-
+    // NUEVO: Método separado para ejecutar la tirada de dados
+    
     public void OnTypingComplete()
     {
         isTyping = false;
@@ -687,6 +760,14 @@ public class DialogueManager : MonoBehaviour
     }
 }
 
+[System.Serializable]
+public class PendingDiceRollData
+{
+    public DialogueOption selectedOption;
+    public int optionIndex;
+    public Conversation originalConversation; // NUEVO: Guardar la conversación original
+    public NPC originalNPC; // NUEVO: Guardar el NPC original
+}
 [System.Serializable]
 public class Dialogue
 {

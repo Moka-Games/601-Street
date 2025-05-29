@@ -4671,6 +4671,11 @@ PrefabInstance:
       propertyPath: m_SortingOrder
       value: 998
       objectReference: {fileID: 0}
+    - target: {fileID: 6912408175034452782, guid: 8f4e14d956cc52a4b97a8a4992f17415,
+        type: 3}
+      propertyPath: m_Name
+      value: Apartados
+      objectReference: {fileID: 0}
     - target: {fileID: 7580886116411929714, guid: 8f4e14d956cc52a4b97a8a4992f17415,
         type: 3}
       propertyPath: m_SizeDelta.y
@@ -4899,6 +4904,9 @@ MonoBehaviour:
   popUpParent: {fileID: 1524181020}
   popUpText: {fileID: 1524181019}
   popUpDuration: 4.5
+  enableItemAnimation: 0
+  animationSpeed: 4
+  animationDuration: 0.5
   prefabContainer: {fileID: 733720843}
   showPopupOnAdd: 1
   skipPopupIfInteractionActive: 1
@@ -5101,7 +5109,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1818005304}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 972d4825081cc3542a9339200c59b3bd, type: 3}
   m_Name: 

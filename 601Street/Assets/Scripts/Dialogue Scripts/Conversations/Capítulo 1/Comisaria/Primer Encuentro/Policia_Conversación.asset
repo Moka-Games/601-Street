@@ -59,6 +59,8 @@ MonoBehaviour:
     nextDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     successDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     failureDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    preDiceConversation: {fileID: 11400000, guid: 89d6e4669fc2e144586cd0c16cc576e5,
+      type: 2}
   - optionText: Sharing what you know can help us both.
     actionId: Option_2
     requiresDiceRoll: 1
@@ -66,6 +68,8 @@ MonoBehaviour:
     nextDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     successDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     failureDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    preDiceConversation: {fileID: 11400000, guid: 89d6e4669fc2e144586cd0c16cc576e5,
+      type: 2}
   - optionText: I have the right to know the truth
     actionId: Option_3
     requiresDiceRoll: 1
@@ -73,3 +77,5 @@ MonoBehaviour:
     nextDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     successDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     failureDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
+    preDiceConversation: {fileID: 11400000, guid: 89d6e4669fc2e144586cd0c16cc576e5,
+      type: 2}
