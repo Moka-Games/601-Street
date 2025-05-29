@@ -6,7 +6,7 @@ using DG.Tweening;
 /// <summary>
 /// Script para cada instancia individual de bonus en la interfaz
 /// Maneja la interacción y visualización de un bonus específico
-/// VERSIÓN CORREGIDA: Soluciona problemas de hover y navegación
+/// VERSIÓN ACTUALIZADA: Sistema de navegación centralizado
 /// </summary>
 public class BonusUI : MonoBehaviour
 {
@@ -33,7 +33,7 @@ public class BonusUI : MonoBehaviour
     private Vector3 originalScale;
     private Tween currentTween;
 
-    // NUEVO: Control de hover manual para evitar conflictos con navegación
+    // Control de hover manual para evitar conflictos con navegación
     private bool isHovering = false;
     private bool isNavigationSelected = false;
 
@@ -67,7 +67,7 @@ public class BonusUI : MonoBehaviour
         {
             bonusButton.onClick.AddListener(OnBonusClicked);
 
-            // CORRECCIÓN: Configurar eventos de hover de forma más controlada
+            // Configurar eventos de hover de forma controlada
             ConfigureHoverEvents();
         }
         else
@@ -77,7 +77,7 @@ public class BonusUI : MonoBehaviour
     }
 
     /// <summary>
-    /// NUEVO: Configuración más robusta de eventos de hover
+    /// Configuración robusta de eventos de hover
     /// </summary>
     private void ConfigureHoverEvents()
     {
@@ -103,7 +103,7 @@ public class BonusUI : MonoBehaviour
         pointerExit.callback.AddListener((data) => { OnPointerExitSafe(); });
         eventTrigger.triggers.Add(pointerExit);
 
-        // NUEVO: Eventos de selección/deselección para navegación con gamepad
+        // Eventos de selección/deselección para navegación con gamepad
         var selectEvent = new UnityEngine.EventSystems.EventTrigger.Entry();
         selectEvent.eventID = UnityEngine.EventSystems.EventTriggerType.Select;
         selectEvent.callback.AddListener((data) => { OnNavigationSelect(); });
@@ -156,25 +156,8 @@ public class BonusUI : MonoBehaviour
 
         Debug.Log($"BonusUI inicializado completamente para: {bonus.bonusName} (+{bonus.bonusValue})");
 
-        // NUEVO: Notificar al sistema de navegación que hay un nuevo elemento
-        NotifyNavigationSystemAboutNewElement();
-    }
-
-    /// <summary>
-    /// NUEVO: Notifica al sistema de navegación sobre este nuevo elemento
-    /// </summary>
-    private void NotifyNavigationSystemAboutNewElement()
-    {
-        // Buscar el BonusNavigationExtension en la escena
-        BonusNavigationExtension bonusNavigation = FindAnyObjectByType<BonusNavigationExtension>();
-        if (bonusNavigation != null)
-        {
-            bonusNavigation.OnBonusAdded(bonusButton);
-        }
-        else
-        {
-            Debug.LogWarning("BonusNavigationExtension no encontrado - Los bonuses no serán navegables con gamepad");
-        }
+        // NOTA: La notificación al sistema de navegación se hace desde BonusManager
+        // No es necesario hacerla aquí para evitar duplicación
     }
 
     /// <summary>
@@ -211,7 +194,7 @@ public class BonusUI : MonoBehaviour
             bonusButton.interactable = isInteractable && bonusManager.CanActivateBonuses();
         }
 
-        // CORRECCIÓN: Solo aplicar animación de "activo" si realmente está activo
+        // Solo aplicar animación de "activo" si realmente está activo
         // y no hay interacciones de hover/navegación en curso
         if (isActive && !isHovering && !isNavigationSelected)
         {
@@ -232,7 +215,7 @@ public class BonusUI : MonoBehaviour
         UpdateVisualState(isActive);
     }
 
-    #region Event Handlers - CORREGIDOS
+    #region Event Handlers
 
     private void OnBonusClicked()
     {
@@ -266,7 +249,7 @@ public class BonusUI : MonoBehaviour
     }
 
     /// <summary>
-    /// NUEVO: Manejo seguro del hover del ratón
+    /// Manejo seguro del hover del ratón
     /// </summary>
     private void OnPointerEnterSafe()
     {
@@ -283,7 +266,7 @@ public class BonusUI : MonoBehaviour
     }
 
     /// <summary>
-    /// NUEVO: Manejo seguro de la salida del hover
+    /// Manejo seguro de la salida del hover
     /// </summary>
     private void OnPointerExitSafe()
     {
@@ -300,7 +283,7 @@ public class BonusUI : MonoBehaviour
     }
 
     /// <summary>
-    /// NUEVO: Manejo de selección por navegación (gamepad)
+    /// Manejo de selección por navegación (gamepad)
     /// </summary>
     private void OnNavigationSelect()
     {
@@ -314,7 +297,7 @@ public class BonusUI : MonoBehaviour
     }
 
     /// <summary>
-    /// NUEVO: Manejo de deselección por navegación
+    /// Manejo de deselección por navegación
     /// </summary>
     private void OnNavigationDeselect()
     {
@@ -340,10 +323,10 @@ public class BonusUI : MonoBehaviour
 
     #endregion
 
-    #region Animaciones - MEJORADAS
+    #region Animaciones
 
     /// <summary>
-    /// NUEVO: Aplica efecto de hover controlado
+    /// Aplica efecto de hover controlado
     /// </summary>
     private void ApplyHoverEffect()
     {
@@ -353,7 +336,7 @@ public class BonusUI : MonoBehaviour
     }
 
     /// <summary>
-    /// NUEVO: Aplica efecto de selección por navegación (más prominente que hover)
+    /// Aplica efecto de selección por navegación (más prominente que hover)
     /// </summary>
     private void ApplyNavigationSelectEffect()
     {
@@ -364,7 +347,7 @@ public class BonusUI : MonoBehaviour
     }
 
     /// <summary>
-    /// NUEVO: Resetea a estado normal de forma controlada
+    /// Resetea a estado normal de forma controlada
     /// </summary>
     private void ResetToNormalState()
     {
@@ -375,7 +358,7 @@ public class BonusUI : MonoBehaviour
 
     private void AnimateActive()
     {
-        // CORRECCIÓN: Solo animar si no hay otras interacciones activas
+        // Solo animar si no hay otras interacciones activas
         if (isHovering || isNavigationSelected) return;
 
         currentTween?.Kill();
@@ -391,7 +374,7 @@ public class BonusUI : MonoBehaviour
 
     private void ResetAnimation()
     {
-        // CORRECCIÓN: Solo resetear si no hay interacciones activas
+        // Solo resetear si no hay interacciones activas
         if (isHovering || isNavigationSelected) return;
 
         currentTween?.Kill();
@@ -445,7 +428,7 @@ public class BonusUI : MonoBehaviour
     }
 
     /// <summary>
-    /// NUEVO: Obtiene el botón para navegación
+    /// Obtiene el botón para navegación
     /// </summary>
     public Button GetButton()
     {
@@ -453,7 +436,7 @@ public class BonusUI : MonoBehaviour
     }
 
     /// <summary>
-    /// NUEVO: Fuerza el estado de navegación (útil para sistemas externos)
+    /// Fuerza el estado de navegación (útil para sistemas externos)
     /// </summary>
     public void SetNavigationSelected(bool selected)
     {
@@ -517,12 +500,5 @@ public class BonusUI : MonoBehaviour
         // Limpiar tweens al destruir
         currentTween?.Kill();
         DOTween.Kill(transform);
-
-        // NUEVO: Notificar al sistema de navegación que este elemento será destruido
-        BonusNavigationExtension bonusNavigation = FindAnyObjectByType<BonusNavigationExtension>();
-        if (bonusNavigation != null && bonusButton != null)
-        {
-            bonusNavigation.OnBonusRemoved(bonusButton);
-        }
     }
 }

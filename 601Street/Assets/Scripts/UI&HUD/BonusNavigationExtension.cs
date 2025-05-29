@@ -1,56 +1,63 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
 
 /// <summary>
-/// Extensión del UINavigationManager para manejar la navegación dinámica de bonuses
-/// Se encarga de añadir/remover bonuses automáticamente del sistema de navegación
+/// Extensión del sistema de navegación específicamente para los bonuses
+/// Se encarga de registrar/desregistrar automáticamente los botones de bonus
 /// </summary>
 public class BonusNavigationExtension : MonoBehaviour
 {
-    [Header("Referencias")]
+    [Header("Referencias del Sistema")]
     [SerializeField] private UINavigationManager navigationManager;
     [SerializeField] private BonusManager bonusManager;
-    [SerializeField] private Transform bonusesContentParent; // Padre donde se instancian los bonuses
+    [SerializeField] private Transform bonusesContent; // El contenedor donde aparecen los bonuses
 
     [Header("Configuración")]
-    [SerializeField] private bool enableAutomaticNavigation = true;
-    [SerializeField] private bool debugMode = false;
-    [SerializeField] private float navigationPriority = 1f; // Prioridad para ordenar bonuses
+    [SerializeField] private bool enableDebugLogs = true;
+    [SerializeField] private bool autoRegisterOnBonusCreation = true;
+    [SerializeField] private bool setFirstBonusAsSelected = true;
 
-    [Header("Integración con Ventana de Bonuses")]
-    [SerializeField] private BonusWindowController windowController;
-    [SerializeField] private bool addToNavigationWhenWindowOpen = true;
-    [SerializeField] private bool removeFromNavigationWhenWindowClosed = true;
-
-    // Estado interno
-    private List<Button> managedBonusButtons = new List<Button>();
-    private bool isWindowCurrentlyOpen = false;
-    private Coroutine bonusDetectionCoroutine;
-
-    // Cache para optimización
-    private int lastKnownBonusCount = 0;
-    private Dictionary<Button, BonusUI> bonusUICache = new Dictionary<Button, BonusUI>();
+    // Control de estado
+    private List<Button> registeredBonusButtons = new List<Button>();
+    private bool isNavigationActive = false;
 
     private void Start()
     {
-        InitializeReferences();
-        StartBonusDetectionSystem();
+        InitializeNavigationExtension();
     }
 
-    private void InitializeReferences()
+    private void InitializeNavigationExtension()
     {
+        Debug.Log("=== INICIALIZANDO BONUS NAVIGATION EXTENSION ===");
+
         // Buscar referencias automáticamente si no están asignadas
+        FindMissingReferences();
+
+        // Validar referencias críticas
+        if (!ValidateReferences())
+        {
+            Debug.LogError("BonusNavigationExtension: Referencias incompletas. La navegación de bonuses no funcionará.");
+            return;
+        }
+
+        // Configurar el sistema
+        SetupNavigationSystem();
+
+        Debug.Log("BonusNavigationExtension inicializado correctamente");
+        Debug.Log("================================================");
+    }
+
+    private void FindMissingReferences()
+    {
         if (navigationManager == null)
         {
-            navigationManager = FindAnyObjectByType<UINavigationManager>();
+            navigationManager = GetComponentInParent<UINavigationManager>();
             if (navigationManager == null)
             {
-                Debug.LogWarning("BonusNavigationExtension: UINavigationManager no encontrado");
-                return;
+                navigationManager = FindAnyObjectByType<UINavigationManager>();
             }
+            LogDebug($"UINavigationManager encontrado: {navigationManager != null}");
         }
 
         if (bonusManager == null)
@@ -58,585 +65,364 @@ public class BonusNavigationExtension : MonoBehaviour
             bonusManager = BonusManager.Instance;
             if (bonusManager == null)
             {
-                Debug.LogWarning("BonusNavigationExtension: BonusManager no encontrado");
-                return;
+                bonusManager = FindAnyObjectByType<BonusManager>();
             }
+            LogDebug($"BonusManager encontrado: {bonusManager != null}");
         }
 
-        if (windowController == null)
+        if (bonusesContent == null)
         {
-            windowController = FindAnyObjectByType<BonusWindowController>();
-        }
-
-        if (bonusesContentParent == null && bonusManager != null)
-        {
-            // Intentar obtener el parent desde el BonusManager via reflection o buscar en la escena
-            bonusesContentParent = GameObject.Find("BonusesContent")?.transform;
-            if (bonusesContentParent == null)
+            // Buscar el contenedor de bonuses por nombre
+            GameObject bonusesContentGO = GameObject.Find("Bonuses_Content");
+            if (bonusesContentGO != null)
             {
-                Debug.LogWarning("BonusNavigationExtension: No se pudo encontrar BonusesContent parent");
+                bonusesContent = bonusesContentGO.transform;
             }
+            LogDebug($"Bonuses_Content encontrado: {bonusesContent != null}");
         }
-
-        Debug.Log($"BonusNavigationExtension inicializado - NavigationManager: {navigationManager != null}, BonusManager: {bonusManager != null}");
     }
 
-    private void StartBonusDetectionSystem()
+    private bool ValidateReferences()
     {
-        if (enableAutomaticNavigation && bonusDetectionCoroutine == null)
+        bool isValid = true;
+
+        if (navigationManager == null)
         {
-            bonusDetectionCoroutine = StartCoroutine(BonusDetectionCoroutine());
+            Debug.LogError("BonusNavigationExtension: UINavigationManager no encontrado");
+            isValid = false;
         }
+
+        if (bonusManager == null)
+        {
+            Debug.LogError("BonusNavigationExtension: BonusManager no encontrado");
+            isValid = false;
+        }
+
+        if (bonusesContent == null)
+        {
+            Debug.LogError("BonusNavigationExtension: bonusesContent no encontrado");
+            isValid = false;
+        }
+
+        return isValid;
     }
 
-    private void StopBonusDetectionSystem()
+    private void SetupNavigationSystem()
     {
-        if (bonusDetectionCoroutine != null)
-        {
-            StopCoroutine(bonusDetectionCoroutine);
-            bonusDetectionCoroutine = null;
-        }
+        // Escanear bonuses existentes al inicializar
+        ScanAndRegisterExistingBonuses();
+
+        LogDebug("Sistema de navegación de bonuses configurado");
     }
+
+    #region Gestión de Bonuses en Navegación
 
     /// <summary>
-    /// Corrutina que detecta automáticamente cambios en los bonuses
+    /// Llamado cuando se añade un nuevo bonus (desde BonusUI)
     /// </summary>
-    private IEnumerator BonusDetectionCoroutine()
+    public void OnBonusAdded(Button bonusButton)
     {
-        while (enableAutomaticNavigation)
+        if (bonusButton == null)
         {
-            yield return new WaitForSeconds(0.2f); // Verificar cada 0.2 segundos
-
-            DetectBonusChanges();
-        }
-    }
-
-    /// <summary>
-    /// Detecta cambios en la cantidad de bonuses y actualiza la navegación
-    /// </summary>
-    private void DetectBonusChanges()
-    {
-        if (bonusManager == null) return;
-
-        int currentBonusCount = bonusManager.GetCollectedBonusCount();
-
-        // Si cambió la cantidad de bonuses, actualizar
-        if (currentBonusCount != lastKnownBonusCount)
-        {
-            if (debugMode)
-            {
-                Debug.Log($"Cambio detectado en bonuses: {lastKnownBonusCount} -> {currentBonusCount}");
-            }
-
-            lastKnownBonusCount = currentBonusCount;
-            RefreshBonusNavigation();
+            LogDebug("OnBonusAdded: bonusButton es null");
+            return;
         }
 
-        // También verificar si la ventana cambió de estado
-        CheckWindowStateChange();
-    }
+        LogDebug($"=== AÑADIENDO BONUS A NAVEGACIÓN ===");
+        LogDebug($"Bonus: {bonusButton.name}");
 
-    /// <summary>
-    /// Verifica si la ventana de bonuses cambió de estado
-    /// </summary>
-    private void CheckWindowStateChange()
-    {
-        if (windowController == null) return;
-
-        bool windowOpen = windowController.IsWindowOpen();
-        if (windowOpen != isWindowCurrentlyOpen)
+        // Verificar que no esté ya registrado
+        if (registeredBonusButtons.Contains(bonusButton))
         {
-            isWindowCurrentlyOpen = windowOpen;
-
-            if (debugMode)
-            {
-                Debug.Log($"Estado de ventana cambió: {(windowOpen ? "Abierta" : "Cerrada")}");
-            }
-
-            HandleWindowStateChange(windowOpen);
+            LogDebug($"Bonus {bonusButton.name} ya está registrado");
+            return;
         }
-    }
 
-    /// <summary>
-    /// Maneja los cambios de estado de la ventana
-    /// </summary>
-    private void HandleWindowStateChange(bool isOpen)
-    {
-        if (isOpen && addToNavigationWhenWindowOpen)
-        {
-            AddAllBonusesToNavigation();
-        }
-        else if (!isOpen && removeFromNavigationWhenWindowClosed)
-        {
-            RemoveAllBonusesFromNavigation();
-        }
-    }
+        // Añadir a nuestra lista local
+        registeredBonusButtons.Add(bonusButton);
 
-    /// <summary>
-    /// Refresca toda la navegación de bonuses
-    /// </summary>
-    private void RefreshBonusNavigation()
-    {
-        // Primero limpiar los bonuses que ya no existen
-        CleanupRemovedBonuses();
-
-        // Luego añadir los nuevos bonuses
-        DetectAndAddNewBonuses();
-
-        // Actualizar el sistema de navegación
+        // Añadir al UINavigationManager
         if (navigationManager != null)
         {
+            navigationManager.AddNavigableElement(bonusButton);
+            LogDebug($"Bonus {bonusButton.name} añadido al UINavigationManager");
+
+            // Si es el primer bonus y está configurado, seleccionarlo
+            if (setFirstBonusAsSelected && registeredBonusButtons.Count == 1)
+            {
+                navigationManager.SetFirstSelected(bonusButton);
+                LogDebug($"Primer bonus configurado como seleccionado por defecto: {bonusButton.name}");
+            }
+
+            // Forzar actualización del sistema de navegación
             navigationManager.ForceAutoSelectionCheck();
         }
+
+        LogDebug($"Total bonuses registrados: {registeredBonusButtons.Count}");
+        LogDebug("=======================================");
     }
 
     /// <summary>
-    /// Limpia bonuses que han sido removidos
+    /// Llamado cuando se remueve un bonus (desde BonusUI)
     /// </summary>
-    private void CleanupRemovedBonuses()
+    public void OnBonusRemoved(Button bonusButton)
     {
-        List<Button> buttonsToRemove = new List<Button>();
+        if (bonusButton == null) return;
 
-        foreach (var button in managedBonusButtons)
+        LogDebug($"=== REMOVIENDO BONUS DE NAVEGACIÓN ===");
+        LogDebug($"Bonus: {bonusButton.name}");
+
+        // Remover de nuestra lista local
+        registeredBonusButtons.Remove(bonusButton);
+
+        // Remover del UINavigationManager
+        if (navigationManager != null)
         {
-            if (button == null || !button.gameObject.activeInHierarchy)
+            navigationManager.RemoveNavigableElement(bonusButton);
+            LogDebug($"Bonus {bonusButton.name} removido del UINavigationManager");
+
+            // Si era el primer seleccionado, encontrar un reemplazo
+            if (navigationManager.CurrentSelected == bonusButton && registeredBonusButtons.Count > 0)
             {
-                buttonsToRemove.Add(button);
+                navigationManager.SetFirstSelected(registeredBonusButtons[0]);
+                LogDebug($"Nuevo primer seleccionado: {registeredBonusButtons[0].name}");
             }
+
+            // Forzar actualización del sistema de navegación
+            navigationManager.ForceAutoSelectionCheck();
         }
 
-        foreach (var button in buttonsToRemove)
-        {
-            OnBonusRemoved(button);
-        }
+        LogDebug($"Total bonuses registrados: {registeredBonusButtons.Count}");
+        LogDebug("=====================================");
     }
 
     /// <summary>
-    /// Detecta y añade nuevos bonuses al sistema de navegación
+    /// Escanea y registra todos los bonuses existentes en el contenedor
     /// </summary>
-    private void DetectAndAddNewBonuses()
+    public void ScanAndRegisterExistingBonuses()
     {
-        if (bonusesContentParent == null) return;
+        if (bonusesContent == null) return;
 
-        // Buscar todos los BonusUI activos
-        BonusUI[] allBonusUIs = bonusesContentParent.GetComponentsInChildren<BonusUI>();
+        LogDebug("=== ESCANEANDO BONUSES EXISTENTES ===");
 
-        foreach (var bonusUI in allBonusUIs)
+        // Limpiar lista actual
+        registeredBonusButtons.Clear();
+
+        // Buscar todos los botones de bonus en el contenedor
+        Button[] bonusButtons = bonusesContent.GetComponentsInChildren<Button>();
+
+        LogDebug($"Bonuses encontrados: {bonusButtons.Length}");
+
+        foreach (Button bonusButton in bonusButtons)
         {
-            Button bonusButton = bonusUI.GetButton();
-            if (bonusButton != null && !managedBonusButtons.Contains(bonusButton))
+            // Verificar que el botón esté activo y sea interactuable
+            if (bonusButton.gameObject.activeInHierarchy && bonusButton.interactable)
             {
                 OnBonusAdded(bonusButton);
             }
         }
+
+        LogDebug($"Bonuses registrados: {registeredBonusButtons.Count}");
+        LogDebug("===================================");
     }
 
     /// <summary>
-    /// Añade todos los bonuses existentes a la navegación
+    /// Actualiza el estado de navegación cuando se abre/cierra la ventana de bonuses
     /// </summary>
-    private void AddAllBonusesToNavigation()
+    public void OnBonusWindowStateChanged(bool isOpen)
     {
-        if (bonusesContentParent == null || navigationManager == null) return;
+        isNavigationActive = isOpen;
 
-        BonusUI[] allBonusUIs = bonusesContentParent.GetComponentsInChildren<BonusUI>();
+        LogDebug($"=== VENTANA DE BONUSES {(isOpen ? "ABIERTA" : "CERRADA")} ===");
 
-        foreach (var bonusUI in allBonusUIs)
+        if (isOpen)
         {
-            Button bonusButton = bonusUI.GetButton();
-            if (bonusButton != null && bonusButton.gameObject.activeInHierarchy && bonusButton.interactable)
+            // Ventana abierta: asegurar que los bonuses estén registrados
+            ScanAndRegisterExistingBonuses();
+
+            // Configurar navegación si hay bonuses
+            if (registeredBonusButtons.Count > 0 && navigationManager != null)
             {
-                if (!managedBonusButtons.Contains(bonusButton))
+                // Seleccionar el primer bonus automáticamente
+                if (setFirstBonusAsSelected)
                 {
-                    OnBonusAdded(bonusButton);
+                    navigationManager.SetFirstSelected(registeredBonusButtons[0]);
+                }
+
+                navigationManager.ForceAutoSelectionCheck();
+                LogDebug("Navegación de bonuses activada");
+            }
+        }
+        else
+        {
+            // Ventana cerrada: limpiar selección si es necesario
+            if (navigationManager != null)
+            {
+                // Solo limpiar si el elemento seleccionado es un bonus
+                if (navigationManager.CurrentSelected != null &&
+                    registeredBonusButtons.Contains(navigationManager.CurrentSelected as Button))
+                {
+                    // No limpiar la selección completamente, dejar que el sistema maneje la transición
+                    LogDebug("Ventana de bonuses cerrada - navegación transferida");
                 }
             }
         }
 
-        if (debugMode)
-        {
-            Debug.Log($"Añadidos {managedBonusButtons.Count} bonuses a la navegación");
-        }
-    }
-
-    /// <summary>
-    /// Remueve todos los bonuses de la navegación
-    /// </summary>
-    private void RemoveAllBonusesFromNavigation()
-    {
-        if (navigationManager == null) return;
-
-        foreach (var button in managedBonusButtons.ToList())
-        {
-            OnBonusRemoved(button);
-        }
-
-        if (debugMode)
-        {
-            Debug.Log("Todos los bonuses removidos de la navegación");
-        }
-    }
-
-    #region Public Methods - Llamados por BonusUI
-
-    /// <summary>
-    /// Llamado cuando se añade un nuevo bonus
-    /// </summary>
-    public void OnBonusAdded(Button bonusButton)
-    {
-        if (bonusButton == null || managedBonusButtons.Contains(bonusButton))
-            return;
-
-        if (navigationManager == null)
-        {
-            Debug.LogWarning("BonusNavigationExtension: NavigationManager no disponible");
-            return;
-        }
-
-        // Añadir a nuestro tracking
-        managedBonusButtons.Add(bonusButton);
-
-        // Añadir al sistema de navegación si la ventana está abierta o no importa el estado
-        bool shouldAdd = !addToNavigationWhenWindowOpen || isWindowCurrentlyOpen;
-
-        if (shouldAdd)
-        {
-            navigationManager.AddNavigableElement(bonusButton);
-
-            // Cachear el componente BonusUI para optimización
-            BonusUI bonusUI = bonusButton.GetComponent<BonusUI>();
-            if (bonusUI != null)
-            {
-                bonusUICache[bonusButton] = bonusUI;
-            }
-
-            if (debugMode)
-            {
-                Debug.Log($"Bonus añadido a navegación: {bonusButton.name}");
-            }
-
-            // Forzar verificación de selección automática
-            navigationManager.ForceAutoSelectionCheck();
-        }
-    }
-
-    /// <summary>
-    /// Llamado cuando se remueve un bonus
-    /// </summary>
-    public void OnBonusRemoved(Button bonusButton)
-    {
-        if (bonusButton == null)
-            return;
-
-        // Remover de nuestro tracking
-        managedBonusButtons.Remove(bonusButton);
-
-        // Remover del cache
-        if (bonusUICache.ContainsKey(bonusButton))
-        {
-            bonusUICache.Remove(bonusButton);
-        }
-
-        // Remover del sistema de navegación
-        if (navigationManager != null)
-        {
-            navigationManager.RemoveNavigableElement(bonusButton);
-
-            if (debugMode)
-            {
-                Debug.Log($"Bonus removido de navegación: {bonusButton.name}");
-            }
-
-            // Forzar verificación de selección automática
-            navigationManager.ForceAutoSelectionCheck();
-        }
+        LogDebug("===========================================");
     }
 
     #endregion
 
-    #region Configuration Methods
+    #region Métodos Públicos de Utilidad
 
     /// <summary>
-    /// Habilita o deshabilita la navegación automática
+    /// Fuerza una actualización completa del sistema de navegación de bonuses
     /// </summary>
-    public void SetAutomaticNavigation(bool enabled)
+    public void RefreshBonusNavigation()
     {
-        enableAutomaticNavigation = enabled;
+        LogDebug("Refrescando navegación de bonuses...");
+        ScanAndRegisterExistingBonuses();
+    }
 
-        if (enabled)
+    /// <summary>
+    /// Obtiene la lista de botones de bonus registrados
+    /// </summary>
+    public List<Button> GetRegisteredBonusButtons()
+    {
+        return new List<Button>(registeredBonusButtons);
+    }
+
+    /// <summary>
+    /// Verifica si un botón específico está registrado
+    /// </summary>
+    public bool IsBonusRegistered(Button bonusButton)
+    {
+        return registeredBonusButtons.Contains(bonusButton);
+    }
+
+    /// <summary>
+    /// Configura qué bonus debe ser seleccionado por defecto
+    /// </summary>
+    public void SetDefaultSelectedBonus(Button bonusButton)
+    {
+        if (bonusButton != null && registeredBonusButtons.Contains(bonusButton) && navigationManager != null)
         {
-            StartBonusDetectionSystem();
+            navigationManager.SetFirstSelected(bonusButton);
+            LogDebug($"Bonus seleccionado por defecto configurado: {bonusButton.name}");
+        }
+    }
+
+    /// <summary>
+    /// Habilita o deshabilita la selección automática del primer bonus
+    /// </summary>
+    public void SetFirstBonusSelection(bool enabled)
+    {
+        setFirstBonusAsSelected = enabled;
+        LogDebug($"Selección automática del primer bonus: {(enabled ? "habilitada" : "deshabilitada")}");
+    }
+
+    #endregion
+
+    #region Integración con BonusManager
+
+    /// <summary>
+    /// Método que puede ser llamado desde BonusManager cuando se crea un nuevo bonus
+    /// </summary>
+    public void NotifyBonusCreated(GameObject bonusUI)
+    {
+        if (bonusUI == null) return;
+
+        Button bonusButton = bonusUI.GetComponent<Button>();
+        if (bonusButton != null)
+        {
+            OnBonusAdded(bonusButton);
         }
         else
         {
-            StopBonusDetectionSystem();
+            LogDebug($"WARNING: Bonus UI {bonusUI.name} no tiene componente Button");
         }
     }
 
     /// <summary>
-    /// Configura el comportamiento de integración con la ventana
+    /// Método que puede ser llamado desde BonusManager cuando se destruye un bonus
     /// </summary>
-    public void ConfigureWindowIntegration(bool addWhenOpen, bool removeWhenClosed)
+    public void NotifyBonusDestroyed(GameObject bonusUI)
     {
-        addToNavigationWhenWindowOpen = addWhenOpen;
-        removeFromNavigationWhenWindowClosed = removeWhenClosed;
+        if (bonusUI == null) return;
 
-        if (debugMode)
+        Button bonusButton = bonusUI.GetComponent<Button>();
+        if (bonusButton != null)
         {
-            Debug.Log($"Configuración de ventana actualizada - AddWhenOpen: {addWhenOpen}, RemoveWhenClosed: {removeWhenClosed}");
-        }
-    }
-
-    /// <summary>
-    /// Establece el parent donde se instancian los bonuses
-    /// </summary>
-    public void SetBonusesParent(Transform parent)
-    {
-        bonusesContentParent = parent;
-        RefreshBonusNavigation();
-    }
-
-    /// <summary>
-    /// Fuerza una actualización completa del sistema de navegación
-    /// </summary>
-    public void ForceRefreshNavigation()
-    {
-        RefreshBonusNavigation();
-    }
-
-    /// <summary>
-    /// Obtiene el botón de bonus actualmente seleccionado (si existe)
-    /// </summary>
-    public Button GetCurrentlySelectedBonusButton()
-    {
-        if (navigationManager == null) return null;
-
-        var currentSelected = navigationManager.CurrentSelected;
-        if (currentSelected is Button button && managedBonusButtons.Contains(button))
-        {
-            return button;
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Selecciona un bonus específico por índice
-    /// </summary>
-    public void SelectBonusByIndex(int index)
-    {
-        if (index < 0 || index >= managedBonusButtons.Count)
-        {
-            Debug.LogWarning($"Índice de bonus fuera de rango: {index}");
-            return;
-        }
-
-        Button targetButton = managedBonusButtons[index];
-        if (targetButton != null && navigationManager != null)
-        {
-            // Buscar el índice en la lista completa del NavigationManager
-            int navigationIndex = navigationManager.NavigableElements.IndexOf(targetButton);
-            if (navigationIndex >= 0)
-            {
-                // Usar método interno del NavigationManager si está disponible
-                // Como no tenemos acceso directo, usamos el EventSystem
-                UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(targetButton.gameObject);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Selecciona el primer bonus disponible
-    /// </summary>
-    public void SelectFirstBonus()
-    {
-        SelectBonusByIndex(0);
-    }
-
-    /// <summary>
-    /// Selecciona el último bonus disponible
-    /// </summary>
-    public void SelectLastBonus()
-    {
-        SelectBonusByIndex(managedBonusButtons.Count - 1);
-    }
-
-    #endregion
-
-    #region Integration with BonusWindowController
-
-    /// <summary>
-    /// Método llamado por BonusWindowController cuando la ventana se abre
-    /// </summary>
-    public void OnBonusWindowOpened()
-    {
-        if (debugMode)
-        {
-            Debug.Log("Ventana de bonuses abierta - Integrando navegación");
-        }
-
-        isWindowCurrentlyOpen = true;
-
-        if (addToNavigationWhenWindowOpen)
-        {
-            AddAllBonusesToNavigation();
-        }
-    }
-
-    /// <summary>
-    /// Método llamado por BonusWindowController cuando la ventana se cierra
-    /// </summary>
-    public void OnBonusWindowClosed()
-    {
-        if (debugMode)
-        {
-            Debug.Log("Ventana de bonuses cerrada - Removiendo navegación");
-        }
-
-        isWindowCurrentlyOpen = false;
-
-        if (removeFromNavigationWhenWindowClosed)
-        {
-            RemoveAllBonusesFromNavigation();
+            OnBonusRemoved(bonusButton);
         }
     }
 
     #endregion
 
-    #region Utility Methods
+    #region Métodos de Debug
 
-    /// <summary>
-    /// Obtiene información detallada sobre el estado actual
-    /// </summary>
-    public string GetDetailedStatus()
+    private void LogDebug(string message)
     {
-        string status = "=== BONUS NAVIGATION EXTENSION STATUS ===\n";
-        status += $"Navegación Automática: {enableAutomaticNavigation}\n";
-        status += $"Ventana Abierta: {isWindowCurrentlyOpen}\n";
-        status += $"Bonuses Gestionados: {managedBonusButtons.Count}\n";
-        status += $"NavigationManager: {(navigationManager != null ? "Disponible" : "NO DISPONIBLE")}\n";
-        status += $"BonusManager: {(bonusManager != null ? "Disponible" : "NO DISPONIBLE")}\n";
-        status += $"WindowController: {(windowController != null ? "Disponible" : "NO DISPONIBLE")}\n";
-        status += $"BonusesParent: {(bonusesContentParent != null ? bonusesContentParent.name : "NO ASIGNADO")}\n";
-
-        if (managedBonusButtons.Count > 0)
+        if (enableDebugLogs)
         {
-            status += "Bonuses en Navegación:\n";
-            for (int i = 0; i < managedBonusButtons.Count; i++)
+            Debug.Log($"[BonusNavigation] {message}");
+        }
+    }
+
+    [ContextMenu("Debug Navigation State")]
+    public void DebugNavigationState()
+    {
+        Debug.Log("=== ESTADO DE NAVEGACIÓN DE BONUSES ===");
+        Debug.Log($"NavigationManager: {(navigationManager != null ? navigationManager.name : "NULL")}");
+        Debug.Log($"BonusManager: {(bonusManager != null ? bonusManager.name : "NULL")}");
+        Debug.Log($"BonusesContent: {(bonusesContent != null ? bonusesContent.name : "NULL")}");
+        Debug.Log($"Navegación activa: {isNavigationActive}");
+        Debug.Log($"Bonuses registrados: {registeredBonusButtons.Count}");
+
+        if (registeredBonusButtons.Count > 0)
+        {
+            Debug.Log("--- BONUSES REGISTRADOS ---");
+            for (int i = 0; i < registeredBonusButtons.Count; i++)
             {
-                var button = managedBonusButtons[i];
-                bool isActive = button != null && button.gameObject.activeInHierarchy;
-                bool isInteractable = button != null && button.interactable;
-                status += $"  {i + 1}. {(button != null ? button.name : "NULL")} - Activo: {isActive}, Interactuable: {isInteractable}\n";
+                Button btn = registeredBonusButtons[i];
+                Debug.Log($"[{i}] {btn.name} - Activo: {btn.gameObject.activeInHierarchy} - Interactuable: {btn.interactable}");
             }
         }
 
-        status += "=== END STATUS ===";
-        return status;
-    }
+        if (navigationManager != null)
+        {
+            Debug.Log($"Elemento seleccionado en NavigationManager: {navigationManager.CurrentSelected?.name ?? "NINGUNO"}");
+            Debug.Log($"Total elementos en NavigationManager: {navigationManager.NavigableElements.Count}");
+        }
 
-    /// <summary>
-    /// Cuenta los bonuses activos e interactuables
-    /// </summary>
-    public int GetActiveInteractableBonusCount()
-    {
-        return managedBonusButtons.Count(button =>
-            button != null &&
-            button.gameObject.activeInHierarchy &&
-            button.interactable);
-    }
-
-    /// <summary>
-    /// Verifica si hay bonuses disponibles para navegación
-    /// </summary>
-    public bool HasNavigableBonuses()
-    {
-        return GetActiveInteractableBonusCount() > 0;
-    }
-
-    #endregion
-
-    #region Debug Methods
-
-    [ContextMenu("Debug Status")]
-    public void DebugStatus()
-    {
-        Debug.Log(GetDetailedStatus());
+        Debug.Log("=====================================");
     }
 
     [ContextMenu("Force Refresh Navigation")]
     public void ForceRefreshNavigationFromContext()
     {
-        ForceRefreshNavigation();
+        RefreshBonusNavigation();
     }
 
-    [ContextMenu("Add All Bonuses to Navigation")]
-    public void AddAllBonusesToNavigationFromContext()
+    [ContextMenu("Test Register All Bonuses")]
+    public void TestRegisterAllBonusesFromContext()
     {
-        AddAllBonusesToNavigation();
-    }
-
-    [ContextMenu("Remove All Bonuses from Navigation")]
-    public void RemoveAllBonusesFromNavigationFromContext()
-    {
-        RemoveAllBonusesFromNavigation();
-    }
-
-    [ContextMenu("Select First Bonus")]
-    public void SelectFirstBonusFromContext()
-    {
-        SelectFirstBonus();
-    }
-
-    [ContextMenu("Test Window State Toggle")]
-    public void TestWindowStateToggle()
-    {
-        isWindowCurrentlyOpen = !isWindowCurrentlyOpen;
-        HandleWindowStateChange(isWindowCurrentlyOpen);
-        Debug.Log($"Estado de ventana simulado: {(isWindowCurrentlyOpen ? "Abierta" : "Cerrada")}");
+        if (Application.isPlaying)
+        {
+            ScanAndRegisterExistingBonuses();
+            Debug.Log($"Test completado: {registeredBonusButtons.Count} bonuses registrados");
+        }
+        else
+        {
+            Debug.LogWarning("Este test solo funciona en Play Mode");
+        }
     }
 
     #endregion
-
-    #region Event Handlers
-
-    private void OnEnable()
-    {
-        StartBonusDetectionSystem();
-    }
-
-    private void OnDisable()
-    {
-        StopBonusDetectionSystem();
-    }
 
     private void OnDestroy()
     {
-        StopBonusDetectionSystem();
-
-        // Limpiar todas las referencias
-        if (navigationManager != null)
-        {
-            foreach (var button in managedBonusButtons.ToList())
-            {
-                if (button != null)
-                {
-                    navigationManager.RemoveNavigableElement(button);
-                }
-            }
-        }
-
-        managedBonusButtons.Clear();
-        bonusUICache.Clear();
+        // Limpiar referencias
+        registeredBonusButtons.Clear();
     }
-
-    #endregion
-
-    #region Properties
-
-    public int ManagedBonusCount => managedBonusButtons.Count;
-    public bool IsWindowOpen => isWindowCurrentlyOpen;
-    public bool AutomaticNavigationEnabled => enableAutomaticNavigation;
-    public List<Button> ManagedButtons => new List<Button>(managedBonusButtons);
-
-    #endregion
 }

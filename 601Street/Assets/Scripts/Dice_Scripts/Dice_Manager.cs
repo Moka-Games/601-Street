@@ -1,695 +1,519 @@
-using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
-using UnityEngine.UI;
 
+/// <summary>
+/// Dice Manager mejorado con feedback visual para bonuses
+/// Incluye sistema para mantener textos sin rotación mientras siguen al dado
+/// </summary>
 public class Dice_Manager : MonoBehaviour
 {
-    [Header("Dice Interface")]
-    public GameObject diceInferface;
-
-    [Header("Interface Objects")]
+    [Header("Referencias de la Interfaz")]
     [SerializeField] private TMP_Text diceResultText;
-    [SerializeField] private TMP_Text difficultyClassText;
-    [SerializeField] private GameObject failPopup;
-    [SerializeField] private GameObject continueButton;
-    [SerializeField] private GameObject rollButton;
-    [SerializeField] private GameObject diceObject;
-    [SerializeField] private Transform diceTransform;
-    [SerializeField] private Transform diceModelTransform; // Nueva referencia al modelo del dado (hijo)
-    private Quaternion initialDiceModelRotation;
+    [SerializeField] private TMP_Text bonusText; // El componente "Bonus" de la captura
+    [SerializeField] private Button throwDiceButton;
+    [SerializeField] private GameObject diceObject; // El dado 3D
 
-    [Header("Success/Fail Feedback")]
-    [SerializeField] private GameObject failObject;
-    [SerializeField] private GameObject successObject;
-    [SerializeField] private RectTransform resultPanel;
-
-
-    [Header("Bonus Pop-Ups")]
-
-    [SerializeField] private RectTransform bonusesPanel;
-
-    [Header("Animation Settings")]
+    [Header("Configuración de Animaciones")]
     [SerializeField] private float diceRollDuration = 2f;
-    [SerializeField] private float resultHighlightDuration = 0.5f;
-    [SerializeField] private float bonusPanelAnimationDuration = 0.3f;
-    [SerializeField] private float buttonPulseDuration = 0.8f;
+    [SerializeField] private float bonusDisplayDelay = 0.5f;
+    [SerializeField] private float bonusDisplayDuration = 1f;
+    [SerializeField] private float finalResultDelay = 0.5f;
 
-    [Header("UI Elements")]
-    [SerializeField] private CanvasGroup diceResultGroup;
+    [Header("Configuración Visual del Bonus")]
+    [SerializeField] private Color bonusColor = Color.green;
+    [SerializeField] private float bonusScaleAnimation = 1.2f;
+    [SerializeField] private Ease bonusAnimationEase = Ease.OutBack;
 
-    [Header("Navigation Integration")]
-    [SerializeField] private UINavigationManager navigationManager;
+    [Header("Sistema Legacy (Compatibilidad)")]
+    public bool bonus1Activated = false;
+    public bool bonus2Activated = false;
+    public bool bonus3Activated = false;
 
-    [Header("Bonus System Integration")]
-    [SerializeField] private BonusManager bonusManager;
+    // Variables de estado
+    private int baseResult = 0;
+    private int bonusValue = 0;
+    private int finalResult = 0;
+    private int difficultyClass = 10;
+    private bool isRolling = false;
 
-    [Header("Input Protection")]
-    [SerializeField] private float inputProtectionDelay = 0.8f; // Delay antes de permitir inputs
-    private bool isInputProtected = true;
-    private Coroutine inputProtectionCoroutine;
+    // Referencias del sistema
+    private BonusManager bonusManager;
 
-    // Variables para el sistema de dados
-    public bool bonus1Activated;
-    public bool bonus2Activated;
-    public bool bonus3Activated;
+    // Control de integración con diálogos
+    private bool isWaitingForDialogueContinuation = false;
 
-    private int bonus1 = 2;
-    private int bonus2 = 3;
-    private int bonus3 = 4;
-
-    private int baseRoll;
-    private int totalRoll;
-    private bool canRoll = true;
-    private bool hasRolledInCurrentSession = false; // Nuevo: Previene tiradas múltiples
-    private int currentDifficultyClass;
-
-    // Referencias a los componentes Button para manejo directo
-    private Button rollButtonComponent;
-    private Button continueButtonComponent;
-
-    public Action<bool> OnRollComplete;
-
-    // Tweens
-    private Sequence diceTweener;
-    private Tween throwButtonTextTween;
-    private Tween bonusesPanelTween;
+    // Callbacks
+    public System.Action<bool> OnRollComplete;
 
     private void Start()
     {
-        diceInferface.SetActive(false);
+        // Buscar referencias
+        bonusManager = BonusManager.Instance;
 
-        // Inicializar componentes si no están asignados
-        if (diceTransform == null && diceObject != null)
-            diceTransform = diceObject.transform;
+        // Configurar interfaz inicial
+        SetupInitialUI();
 
-        if (diceResultGroup == null && diceResultText != null)
-            diceResultGroup = diceResultText.GetComponent<CanvasGroup>()
-                ?? diceResultText.gameObject.AddComponent<CanvasGroup>();
-
-        if (diceModelTransform != null)
+        // Configurar botón
+        if (throwDiceButton != null)
         {
-            initialDiceModelRotation = diceModelTransform.localRotation;
+            throwDiceButton.onClick.AddListener(ThrowDice);
         }
 
-        // Obtener referencias a los componentes Button
-        if (rollButton != null)
-            rollButtonComponent = rollButton.GetComponent<Button>();
-
-        if (continueButton != null)
-            continueButtonComponent = continueButton.GetComponent<Button>();
-
-        // Buscar UINavigationManager si no está asignado
-        if (navigationManager == null)
-            navigationManager = FindAnyObjectByType<UINavigationManager>();
-
-        // Buscar BonusManager si no está asignado
-        if (bonusManager == null)
-            bonusManager = BonusManager.Instance;
-
-        ResetUI();
-        InitializeAnimations();
+        Debug.Log("Dice_Manager inicializado con sistema de feedback de bonus");
     }
 
-    private void OnEnable()
+    private void SetupInitialUI()
     {
-        // Iniciar animaciones cuando la interfaz se active
-        if (throwButtonTextTween != null) throwButtonTextTween.Play();
-    }
-
-    private void OnDisable()
-    {
-        // Pausar animaciones cuando la interfaz se desactive
-        if (throwButtonTextTween != null) throwButtonTextTween.Pause();
-    }
-    #region Core Functionality
-
-    public void SetDifficultyClass(int difficultyClass)
-    {
-        currentDifficultyClass = difficultyClass;
-
-        // PROTECCIÓN CRÍTICA: Iniciar protección de input
-        StartInputProtection();
-
-        // Animar el cambio de texto con DOTween
-        difficultyClassText.transform.DOScale(1.2f, 0.2f).OnComplete(() => {
-            difficultyClassText.text = difficultyClass.ToString();
-            difficultyClassText.transform.DOScale(1f, 0.2f);
-        });
-
-        // Mostrar el botón de lanzamiento y habilitarlo
-        ShowRollButton();
-    }
-
-    public void OnRollButtonClicked()
-    {
-        // PROTECCIÓN CRÍTICA: Verificar si los inputs están protegidos
-        if (isInputProtected)
+        // Ocultar texto de bonus inicialmente
+        if (bonusText != null)
         {
-            Debug.LogWarning("Input protegido: No se puede tirar el dado todavía");
+            bonusText.gameObject.SetActive(false);
+            bonusText.color = bonusColor;
+        }
+
+        // Configurar texto del resultado
+        if (diceResultText != null)
+        {
+            diceResultText.text = "00";
+        }
+    }
+
+    /// <summary>
+    /// Método principal para lanzar el dado con feedback de bonus
+    /// </summary>
+    public void ThrowDice()
+    {
+        if (isRolling)
+        {
+            Debug.LogWarning("Ya hay una tirada en progreso");
             return;
         }
 
-        // VERIFICACIÓN MEJORADA: Múltiples comprobaciones de seguridad
-        if (!canRoll)
-        {
-            Debug.LogWarning("No se puede tirar el dado: canRoll = false");
-            return;
-        }
-
-        if (hasRolledInCurrentSession)
-        {
-            Debug.LogWarning("Ya se ha tirado el dado en esta sesión");
-            return;
-        }
-
-        if (rollButtonComponent != null && !rollButtonComponent.interactable)
-        {
-            Debug.LogWarning("El botón de tirar dado no está interactuable");
-            return;
-        }
-
-        Debug.Log("Iniciando tirada de dado - Input válido confirmado");
-        RollDice(currentDifficultyClass);
+        StartCoroutine(DiceRollSequence());
     }
 
-    private void RollDice(int difficultyClass)
+    /// <summary>
+    /// Secuencia completa de la tirada con feedback visual
+    /// </summary>
+    private IEnumerator DiceRollSequence()
     {
-        // Detener cualquier animación previa
-        if (diceTweener != null) diceTweener.Kill();
+        isRolling = true;
+        isWaitingForDialogueContinuation = false;
 
-        // BLOQUEO INMEDIATO para prevenir tiradas múltiples
-        canRoll = false;
-        hasRolledInCurrentSession = true;
-
-        // Notificar al BonusManager que se inició una tirada
+        // Notificar al BonusManager que inicia la tirada
         if (bonusManager != null)
         {
             bonusManager.OnDiceRollStarted();
         }
 
-        // Deshabilitar completamente el botón de lanzamiento
-        DisableRollButton();
+        // Deshabilitar botón durante la tirada
+        if (throwDiceButton != null)
+        {
+            throwDiceButton.interactable = false;
+        }
 
-        // Iniciar la secuencia de animación del dado
-        StartDiceRollAnimation(difficultyClass);
+        Debug.Log("=== INICIANDO SECUENCIA DE TIRADA ===");
+
+        // PASO 1: Obtener valores
+        baseResult = Random.Range(1, 21); // D20
+        bonusValue = GetCurrentBonusValue();
+        finalResult = baseResult + bonusValue;
+
+        Debug.Log($"Resultado base: {baseResult}");
+        Debug.Log($"Valor del bonus: {bonusValue}");
+        Debug.Log($"Resultado final: {finalResult}");
+
+        // PASO 2: Animación del dado
+        yield return StartCoroutine(AnimateDiceRoll());
+
+        // PASO 3: Mostrar resultado base
+        ShowBaseResult();
+        yield return new WaitForSeconds(bonusDisplayDelay);
+
+        // PASO 4: Mostrar bonus (si existe)
+        if (bonusValue > 0)
+        {
+            yield return StartCoroutine(ShowBonusSequence());
+        }
+
+        // PASO 5: Mostrar resultado final
+        yield return StartCoroutine(ShowFinalResult());
+
+        // PASO 6: Esperar un momento y luego proceder automáticamente
+        yield return new WaitForSeconds(1f);
+
+        // PASO 7: Completar tirada automáticamente
+        CompleteDiceRoll();
+
+        Debug.Log("=== SECUENCIA DE TIRADA COMPLETADA ===");
     }
 
-    public void Continue()
+    /// <summary>
+    /// Anima la rotación del dado durante la tirada
+    /// </summary>
+    private IEnumerator AnimateDiceRoll()
     {
-        Debug.Log("Continuando desde Dice Manager");
+        Debug.Log("Animando tirada del dado...");
 
-        // Simplemente desactivar la interfaz
-        diceInferface.SetActive(false);
-
-        // Resetear UI para la próxima vez
-        ResetUI();
-    }
-
-    public void ResetUI()
-    {
-        Debug.Log("Reseteando UI del Dice Manager");
-
-        // Detener protección de input
-        StopInputProtection();
-
-        // Resetear textos
-        diceResultText.text = "";
-        difficultyClassText.text = "";
-
-        // Resetear estado de tirada
-        canRoll = true;
-        hasRolledInCurrentSession = false;
-
-        // Ocultar elementos
-        failPopup.SetActive(false);
-        continueButton.SetActive(false);
-        rollButton.SetActive(false);
-        successObject.SetActive(false);
-        failObject.SetActive(false);
-
-        // Asegurar que los tweens se detengan
-        DOTween.Kill(diceTransform);
-        DOTween.Kill(diceModelTransform);
-        DOTween.Kill(diceResultText.transform);
-
-        // Restablecer la rotación inicial si es necesario
-        if (diceModelTransform != null)
+        if (diceObject != null)
         {
-            diceModelTransform.localRotation = initialDiceModelRotation;
+            // Rotación aleatoria del dado (solo el dado, los textos no se ven afectados)
+            diceObject.transform.DORotate(
+                new Vector3(
+                    Random.Range(0, 360) * 3,
+                    Random.Range(0, 360) * 3,
+                    Random.Range(0, 360) * 3
+                ),
+                diceRollDuration,
+                RotateMode.LocalAxisAdd
+            ).SetEase(Ease.OutQuart);
         }
 
-        // Habilitar botón de tirada para el próximo uso
-        if (rollButtonComponent != null)
+        // Mostrar números cambiantes en el resultado
+        if (diceResultText != null)
         {
-            rollButtonComponent.interactable = true;
-        }
-    }
-
-    #endregion
-
-    #region Button Management
-
-    #region Input Protection
-
-    private void StartInputProtection()
-    {
-        Debug.Log($"Iniciando protección de input por {inputProtectionDelay} segundos");
-
-        // Detener cualquier protección anterior
-        if (inputProtectionCoroutine != null)
-        {
-            StopCoroutine(inputProtectionCoroutine);
-        }
-
-        isInputProtected = true;
-
-        // Bloquear también el sistema de navegación temporalmente
-        if (navigationManager != null)
-        {
-            navigationManager.BlockInputTemporarily(inputProtectionDelay);
-        }
-
-        inputProtectionCoroutine = StartCoroutine(InputProtectionCoroutine());
-    }
-
-    private IEnumerator InputProtectionCoroutine()
-    {
-        yield return new WaitForSecondsRealtime(inputProtectionDelay);
-
-        isInputProtected = false;
-        Debug.Log("Protección de input liberada - Ahora se puede tirar el dado");
-
-        inputProtectionCoroutine = null;
-    }
-
-    private void StopInputProtection()
-    {
-        if (inputProtectionCoroutine != null)
-        {
-            StopCoroutine(inputProtectionCoroutine);
-            inputProtectionCoroutine = null;
-        }
-
-        isInputProtected = false;
-        Debug.Log("Protección de input detenida manualmente");
-    }
-
-    #endregion
-
-    private void ShowRollButton()
-    {
-        Debug.Log("Mostrando botón de tirada");
-
-        rollButton.SetActive(true);
-
-        // Asegurar que el botón esté habilitado
-        if (rollButtonComponent != null)
-        {
-            rollButtonComponent.interactable = true;
-        }
-
-        // Notificar al sistema de navegación para que actualice
-        if (navigationManager != null)
-        {
-            navigationManager.ForceAutoSelectionCheck();
-        }
-    }
-
-    private void DisableRollButton()
-    {
-        Debug.Log("Deshabilitando botón de tirada");
-
-        // Deshabilitar el botón pero mantenerlo visible para debug
-        if (rollButtonComponent != null)
-        {
-            rollButtonComponent.interactable = false;
-        }
-
-        // Opcionalmente ocultarlo también
-        rollButton.SetActive(false);
-
-        // Notificar al sistema de navegación
-        if (navigationManager != null)
-        {
-            navigationManager.ForceAutoSelectionCheck();
-        }
-    }
-
-    private void ShowContinueButton()
-    {
-        Debug.Log("Mostrando botón de continuar");
-
-        continueButton.SetActive(true);
-
-        // Asegurar que el botón esté habilitado
-        if (continueButtonComponent != null)
-        {
-            continueButtonComponent.interactable = true;
-        }
-
-        // Notificar al sistema de navegación para selección automática
-        if (navigationManager != null)
-        {
-            // Pequeño delay para asegurar que el botón esté completamente activo
-            StartCoroutine(DelayedAutoSelectionNotification());
-        }
-    }
-
-    private IEnumerator DelayedAutoSelectionNotification()
-    {
-        yield return null; // Esperar un frame
-        if (navigationManager != null)
-        {
-            navigationManager.ForceAutoSelectionCheck();
-        }
-    }
-
-    #endregion
-
-    #region Animation Methods
-
-    private void InitializeAnimations()
-    {
-        if (bonusesPanel != null)
-        {
-            // Guardar la posición original y ocultar inicialmente
-            Vector2 originalPos = bonusesPanel.anchoredPosition;
-            bonusesPanel.anchoredPosition = new Vector2(originalPos.x, originalPos.y - 100);
-
-            // Animar la entrada con un rebote
-            bonusesPanelTween = bonusesPanel.DOAnchorPosY(originalPos.y, bonusPanelAnimationDuration)
-                .SetEase(Ease.OutBack)
-                .SetAutoKill(false)
-                .Pause(); // Inicialmente pausado
-        }
-    }
-
-    private void StartDiceRollAnimation(int difficultyClass)
-    {
-        Debug.Log("Iniciando animación de tirada de dado");
-
-        // Crear una secuencia para la animación completa
-        diceTweener = DOTween.Sequence();
-
-        // Añadir efecto de "punch" al lanzar el dado (afecta al padre)
-        diceTweener.Append(diceTransform.DOPunchScale(new Vector3(0.3f, 0.3f, 0.3f), 0.5f, 5, 0.5f));
-
-        // Rotaciones aleatorias rápidas para simular el lanzamiento
-        for (int i = 0; i < 8; i++)
-        {
-            // Mover el padre (mantiene la funcionalidad de movimiento)
-            diceTweener.Append(diceTransform.DOMove(
-                diceTransform.position + new Vector3(
-                    UnityEngine.Random.Range(-0.1f, 0.1f),
-                    UnityEngine.Random.Range(-0.1f, 0.1f),
-                    UnityEngine.Random.Range(-0.1f, 0.1f)
-                ), 0.15f).SetEase(Ease.Linear));
-
-            // Rotar solo el modelo del dado
-            diceTweener.Join(diceModelTransform.DOLocalRotate(new Vector3(
-                UnityEngine.Random.Range(0, 360),
-                UnityEngine.Random.Range(0, 360),
-                UnityEngine.Random.Range(0, 360)
-            ), 0.15f, RotateMode.FastBeyond360).SetEase(Ease.Linear));
-
-            // Cambiar el número mostrado durante la rotación
-            int randomValue = UnityEngine.Random.Range(1, 21);
-            diceTweener.Join(DOTween.To(
-                () => int.Parse(diceResultText.text == "" ? "1" : diceResultText.text),
-                (x) => diceResultText.text = x.ToString(),
-                randomValue, 0.15f
-            ));
-        }
-
-        // Volver a la posición original con rebote (para el padre)
-        diceTweener.Append(diceTransform.DOMove(
-            diceTransform.position, 0.5f).SetEase(Ease.OutBack));
-
-        // Volver a la rotación inicial con rebote (para el modelo)
-        diceTweener.Join(diceModelTransform.DOLocalRotateQuaternion(
-            initialDiceModelRotation, 0.5f).SetEase(Ease.OutBack));
-
-        // Generar y mostrar el resultado real del dado
-        diceTweener.AppendCallback(() => {
-            baseRoll = UnityEngine.Random.Range(1, 21);
-            totalRoll = baseRoll;
-            Debug.Log($"Resultado base del dado: {baseRoll}");
-
-            // Mostrar directamente el número resultante
-            diceResultText.text = baseRoll.ToString();
-        });
-
-        // Pausa para apreciar el resultado base
-        diceTweener.AppendInterval(1f);
-
-        // Aplicar bonuses de manera directa
-        diceTweener.AppendCallback(() => {
-            ApplyBonuses();
-        });
-
-        // Comprobar el resultado final
-        diceTweener.AppendInterval(0.5f);
-        diceTweener.AppendCallback(() => {
-            bool isSuccess = totalRoll >= difficultyClass;
-            Debug.Log($"Resultado final: {totalRoll} vs DC {difficultyClass} = {(isSuccess ? "Éxito" : "Fallo")}");
-
-            // Mostrar popup de éxito o fracaso
-            ShowResultIndicator(isSuccess);
-
-            // Invocar el callback de resultado
-            OnRollComplete?.Invoke(isSuccess);
-        });
-
-        // Activar el botón de continuar después de un breve delay
-        diceTweener.AppendInterval(1f);
-        diceTweener.AppendCallback(() => {
-            ShowContinueButton();
-
-            // Notificar al BonusManager que la tirada ha terminado
-            if (bonusManager != null)
+            float elapsedTime = 0f;
+            while (elapsedTime < diceRollDuration)
             {
-                bonusManager.OnDiceRollCompleted();
-            }
-        });
+                int randomNumber = Random.Range(1, 21);
+                diceResultText.text = randomNumber.ToString("00");
 
-        // Iniciar la secuencia
-        diceTweener.Play();
+                elapsedTime += 0.1f;
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+
+        yield return new WaitForSeconds(0.2f);
+
+        Debug.Log("Animación del dado completada");
     }
 
-    private void ApplyBonuses()
+    /// <summary>
+    /// Muestra el resultado base del dado
+    /// </summary>
+    private void ShowBaseResult()
     {
-        Debug.Log("Aplicando bonuses - Nuevo Sistema");
+        Debug.Log($"Mostrando resultado base: {baseResult}");
 
-        // NUEVO SISTEMA: Usar BonusManager en lugar del sistema anterior
+        if (diceResultText != null)
+        {
+            diceResultText.text = baseResult.ToString("00");
+
+            // Animación de énfasis en el resultado
+            diceResultText.transform.DOPunchScale(Vector3.one * 0.2f, 0.3f, 5, 0.5f);
+        }
+    }
+
+    /// <summary>
+    /// Secuencia para mostrar el bonus aplicado
+    /// </summary>
+    private IEnumerator ShowBonusSequence()
+    {
+        Debug.Log("=== MOSTRANDO SECUENCIA DE BONUS ===");
+
+        if (bonusText == null)
+        {
+            Debug.LogError("bonusText no está asignado - No se puede mostrar feedback de bonus");
+            yield break;
+        }
+
+        // PASO 1: Configurar y mostrar texto del bonus
+        bonusText.text = $"+{bonusValue}";
+        bonusText.gameObject.SetActive(true);
+        bonusText.transform.localScale = Vector3.zero;
+
+        Debug.Log($"Mostrando bonus: +{bonusValue}");
+
+        // PASO 2: Animar aparición del bonus (respetando rotación fija)
+        bonusText.transform.DOScale(bonusScaleAnimation, 0.3f)
+            .SetEase(bonusAnimationEase)
+            .OnComplete(() => {
+                bonusText.transform.DOScale(1f, 0.2f);
+            });
+
+        // Efecto de color pulsante
+        bonusText.DOColor(Color.white, 0.5f)
+            .SetLoops(2, LoopType.Yoyo)
+            .SetEase(Ease.InOutSine);
+
+        // PASO 3: Esperar que el jugador vea el bonus
+        yield return new WaitForSeconds(bonusDisplayDuration);
+
+        Debug.Log("Bonus mostrado, aplicando al resultado...");
+    }
+
+    /// <summary>
+    /// Muestra el resultado final con el bonus aplicado
+    /// </summary>
+    private IEnumerator ShowFinalResult()
+    {
+        Debug.Log($"Mostrando resultado final: {baseResult} + {bonusValue} = {finalResult}");
+
+        if (diceResultText != null)
+        {
+            // Animación de transición del resultado
+            diceResultText.transform.DOPunchScale(Vector3.one * 0.3f, 0.4f, 8, 0.7f);
+
+            // Cambiar color temporalmente para indicar que se aplicó el bonus
+            if (bonusValue > 0)
+            {
+                Color originalColor = diceResultText.color;
+                diceResultText.DOColor(bonusColor, 0.3f)
+                    .OnComplete(() => {
+                        diceResultText.DOColor(originalColor, 0.3f);
+                    });
+            }
+
+            // Actualizar el texto al resultado final
+            yield return new WaitForSeconds(0.2f);
+            diceResultText.text = finalResult.ToString("00");
+
+            // Animación final de énfasis
+            diceResultText.transform.DOPunchScale(Vector3.one * 0.4f, 0.5f, 6, 0.8f);
+        }
+
+        // Ocultar texto del bonus después de aplicarlo
+        if (bonusText != null && bonusValue > 0)
+        {
+            yield return new WaitForSeconds(finalResultDelay);
+
+            bonusText.transform.DOScale(0f, 0.3f)
+                .SetEase(Ease.InBack)
+                .OnComplete(() => {
+                    bonusText.gameObject.SetActive(false);
+                });
+        }
+
+        yield return new WaitForSeconds(0.3f);
+    }
+
+    /// <summary>
+    /// Finaliza la tirada y ejecuta automáticamente la continuación del diálogo
+    /// </summary>
+    private void CompleteDiceRoll()
+    {
+        isRolling = false;
+        isWaitingForDialogueContinuation = true;
+
+        // CRÍTICO: Determinar si la tirada fue exitosa usando el resultado FINAL (incluyendo bonus)
+        bool isSuccess = finalResult >= difficultyClass;
+
+        Debug.Log($"=== EVALUACIÓN DE TIRADA ===");
+        Debug.Log($"Resultado base: {baseResult}");
+        Debug.Log($"Bonus aplicado: +{bonusValue}");
+        Debug.Log($"Resultado final: {finalResult}");
+        Debug.Log($"Clase de dificultad: {difficultyClass}");
+        Debug.Log($"¿Tirada exitosa?: {(isSuccess ? "SÍ" : "NO")}");
+        Debug.Log("============================");
+
+        // Notificar al BonusManager que terminó la tirada
+        if (bonusManager != null)
+        {
+            bonusManager.OnDiceRollCompleted();
+        }
+
+        // CRÍTICO: Ejecutar callback con el resultado basado en el resultado FINAL
+        OnRollComplete?.Invoke(isSuccess);
+
+        // NUEVO: Iniciar automáticamente la continuación del diálogo
+        StartCoroutine(AutoContinueToDialogue());
+    }
+
+    /// <summary>
+    /// Continúa automáticamente al diálogo después de completar la tirada
+    /// </summary>
+    private IEnumerator AutoContinueToDialogue()
+    {
+        // Esperar un momento para que el jugador vea el resultado final
+        yield return new WaitForSeconds(1.5f);
+
+        Debug.Log("=== CONTINUANDO AUTOMÁTICAMENTE AL DIÁLOGO ===");
+
+        // Buscar el DialogueManager y llamar al método de continuación
+        DialogueManager dialogueManager = DialogueManager.Instance;
+        if (dialogueManager != null)
+        {
+            // Simular presionar el botón de continuar
+            dialogueManager.OnDiceRollCompleteButtonPressed();
+            Debug.Log("Continuación del diálogo ejecutada automáticamente");
+        }
+        else
+        {
+            Debug.LogError("DialogueManager no encontrado - No se puede continuar automáticamente");
+            // Reactivar botón como fallback
+            if (throwDiceButton != null)
+            {
+                throwDiceButton.interactable = true;
+            }
+        }
+
+        isWaitingForDialogueContinuation = false;
+    }
+
+    /// <summary>
+    /// Obtiene el valor del bonus actual del BonusManager
+    /// </summary>
+    private int GetCurrentBonusValue()
+    {
         if (bonusManager != null && bonusManager.HasActiveBBonus())
         {
-            int bonusValue = bonusManager.GetActiveBonusValue();
-            string bonusName = bonusManager.GetActiveBonusName();
-
-            totalRoll += bonusValue;
-            Debug.Log($"Bonus aplicado - {bonusName}: +{bonusValue}");
-
-            // Mostrar popup del bonus aplicado
-            ShowNewBonusPopup(bonusName, bonusValue);
+            return bonusManager.GetActiveBonusValue();
         }
 
-        // Actualizar el texto al valor total
-        diceResultText.text = totalRoll.ToString();
-        Debug.Log($"Total final con bonuses: {totalRoll}");
+        // Fallback al sistema legacy
+        if (bonus3Activated) return 3;
+        if (bonus2Activated) return 2;
+        if (bonus1Activated) return 1;
+
+        return 0;
     }
 
-    private void ShowBonusPopup(GameObject popup, int bonusValue)
-    {
-        // Configurar el popup
-        popup.SetActive(true);
-        popup.transform.localScale = Vector3.zero;
+    #region Métodos Públicos de Configuración
 
-        // Texto del bonus
-        TMP_Text bonusText = popup.GetComponentInChildren<TMP_Text>();
+    /// <summary>
+    /// Establece la clase de dificultad para la tirada
+    /// </summary>
+    public void SetDifficultyClass(int dc)
+    {
+        difficultyClass = dc;
+        Debug.Log($"Clase de dificultad establecida: {dc}");
+    }
+
+    /// <summary>
+    /// Reactiva el botón de tirada (llamado desde DialogueManager)
+    /// </summary>
+    public void ReactivateDiceButton()
+    {
+        if (throwDiceButton != null)
+        {
+            throwDiceButton.interactable = true;
+            Debug.Log("Botón de tirada reactivado desde DialogueManager");
+        }
+    }
+
+    /// <summary>
+    /// Resetea la interfaz del dado
+    /// </summary>
+    public void ResetUI()
+    {
+        if (diceResultText != null)
+        {
+            diceResultText.text = "00";
+            diceResultText.transform.localScale = Vector3.one;
+        }
+
         if (bonusText != null)
-            bonusText.text = "+" + bonusValue;
-
-        // Animar la aparición de forma simple
-        popup.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack)
-            .OnComplete(() => {
-                // Hacer desaparecer después de un breve tiempo
-                DOVirtual.DelayedCall(0.7f, () => {
-                    popup.transform.DOScale(0f, 0.3f).SetEase(Ease.InBack)
-                        .OnComplete(() => popup.SetActive(false));
-                });
-            });
-    }
-
-
-    private void ShowNewBonusPopup(string bonusName, int bonusValue)
-    {
-        Debug.Log($"Mostrando popup para bonus: {bonusName} (+{bonusValue})");
-
-        // Crear un popup temporal para mostrar el bonus
-        GameObject bonusVisual = new GameObject("TempBonusPopup");
-        bonusVisual.transform.SetParent(diceResultText.transform.parent, false);
-
-        // Añadir componente Canvas Group para animaciones
-        CanvasGroup canvasGroup = bonusVisual.AddComponent<CanvasGroup>();
-
-        // Crear texto para mostrar el bonus
-        GameObject textObj = new GameObject("BonusText");
-        textObj.transform.SetParent(bonusVisual.transform, false);
-
-        TMP_Text bonusText = textObj.AddComponent<TMP_Text>();
-        bonusText.text = $"+{bonusValue}";
-        bonusText.fontSize = 36;
-        bonusText.color = Color.green;
-        bonusText.fontStyle = FontStyles.Bold;
-        bonusText.alignment = TextAlignmentOptions.Center;
-
-        // Configurar RectTransform
-        RectTransform textRect = textObj.GetComponent<RectTransform>();
-        textRect.sizeDelta = new Vector2(100, 50);
-        textRect.anchoredPosition = new Vector2(80, 0); // Posición al lado del resultado del dado
-
-        // Animación del popup
-        Sequence bonusPopupSequence = DOTween.Sequence();
-
-        // Aparecer con escalado
-        bonusVisual.transform.localScale = Vector3.zero;
-        bonusPopupSequence.Append(bonusVisual.transform.DOScale(1.2f, 0.3f).SetEase(Ease.OutBack));
-        bonusPopupSequence.Append(bonusVisual.transform.DOScale(1f, 0.2f));
-
-        // Mantener visible un momento
-        bonusPopupSequence.AppendInterval(1.5f);
-
-        // Mover hacia el resultado principal mientras desaparece
-        bonusPopupSequence.Append(textRect.DOAnchorPos(Vector2.zero, 0.5f));
-        bonusPopupSequence.Join(canvasGroup.DOFade(0, 0.5f));
-
-        // Destruir después de la animación
-        bonusPopupSequence.OnComplete(() => {
-            if (bonusVisual != null)
-            {
-                Destroy(bonusVisual);
-            }
-        });
-    }
-
-    private void ShowResultIndicator(bool isSuccess)
-    {
-        GameObject indicator = isSuccess ? successObject : failObject;
-
-        // Configurar el indicador
-        indicator.SetActive(true);
-        indicator.transform.localScale = Vector3.zero;
-
-        // Animar la aparición
-        Sequence indicatorSequence = DOTween.Sequence();
-
-        // Aparecer con efecto de rebote
-        indicatorSequence.Append(indicator.transform.DOScale(1.3f, 0.4f).SetEase(Ease.OutBack));
-        indicatorSequence.Append(indicator.transform.DOScale(1f, 0.2f));
-
-        // Añadir efecto de brillo o parpadeo
-        if (indicator.GetComponent<Image>() != null)
         {
-            Image indicatorImage = indicator.GetComponent<Image>();
-            Color originalColor = indicatorImage.color;
-            Color glowColor = isSuccess ? new Color(0.5f, 1f, 0.5f, 1f) : new Color(1f, 0.5f, 0.5f, 1f);
-
-            indicatorSequence.Append(indicatorImage.DOColor(glowColor, 0.3f).SetLoops(3, LoopType.Yoyo));
-            indicatorSequence.Append(indicatorImage.DOColor(originalColor, 0.3f));
+            bonusText.gameObject.SetActive(false);
+            bonusText.transform.localScale = Vector3.one;
         }
 
-        // Hacer parpadear el popup de fallo si es necesario
-        if (!isSuccess)
+        if (throwDiceButton != null)
         {
-            failPopup.SetActive(true);
-            failPopup.transform.localScale = Vector3.zero;
-            indicatorSequence.Append(failPopup.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack));
+            throwDiceButton.interactable = true;
         }
+
+        // Detener animaciones en progreso
+        DOTween.Kill(diceResultText?.transform);
+        DOTween.Kill(bonusText?.transform);
+        DOTween.Kill(diceObject?.transform);
+
+        isRolling = false;
+        isWaitingForDialogueContinuation = false;
+
+        Debug.Log("Interfaz del dado reseteada");
     }
 
-    private void AnimateBonusActivation(GameObject bonusObject, bool activate)
+    /// <summary>
+    /// Obtiene el último resultado de la tirada
+    /// </summary>
+    public int GetLastResult()
     {
-        if (activate)
-        {
-            // Efecto de activación
-            bonusObject.transform.DOPunchScale(new Vector3(0.3f, 0.3f, 0.3f), 0.5f, 5, 0.5f);
+        return finalResult;
+    }
 
-            // Si tiene imagen, hacer parpadear con color
-            Image bonusImage = bonusObject.GetComponent<Image>();
-            if (bonusImage != null)
-            {
-                Color originalColor = bonusImage.color;
+    /// <summary>
+    /// Obtiene el resultado base (sin bonus) de la última tirada
+    /// </summary>
+    public int GetLastBaseResult()
+    {
+        return baseResult;
+    }
 
-                // Secuencia de color
-                Sequence colorSequence = DOTween.Sequence();
-                colorSequence.Append(bonusImage.DOColor(Color.yellow, 0.2f));
-                colorSequence.Append(bonusImage.DOColor(originalColor, 0.3f));
-                colorSequence.SetLoops(2);
-            }
-        }
+    /// <summary>
+    /// Obtiene el valor del bonus aplicado en la última tirada
+    /// </summary>
+    public int GetLastBonusValue()
+    {
+        return bonusValue;
+    }
+
+    /// <summary>
+    /// Verifica si hay una tirada en progreso
+    /// </summary>
+    public bool IsRolling()
+    {
+        return isRolling;
     }
 
     #endregion
 
-    #region Public Interface
+    #region Métodos de Debug
 
-    /// <summary>
-    /// Método para integración con sistemas externos (como DialogueManager)
-    /// </summary>
-    public bool CanRollDice()
+    [ContextMenu("Test Dice Roll")]
+    public void TestDiceRoll()
     {
-        return canRoll && !hasRolledInCurrentSession && rollButtonComponent != null && rollButtonComponent.interactable;
+        if (Application.isPlaying)
+        {
+            ThrowDice();
+        }
     }
 
-    /// <summary>
-    /// Método para forzar reset desde sistemas externos
-    /// </summary>
-    public void ForceReset()
+    [ContextMenu("Test With Bonus")]
+    public void TestWithBonus()
     {
-        Debug.Log("Forzando reset del Dice Manager");
-
-        // Detener todas las animaciones
-        diceTweener?.Kill();
-        DOTween.Kill(this);
-
-        // Resetear UI
-        ResetUI();
+        if (Application.isPlaying)
+        {
+            // Simular bonus para testing
+            bonus2Activated = true;
+            ThrowDice();
+        }
     }
-
-    /// <summary>
-    /// Método para configurar el navigation manager externamente
-    /// </summary>
-    public void SetNavigationManager(UINavigationManager navManager)
-    {
-        navigationManager = navManager;
-    }
-
-    #endregion
-
-    #region Debug Methods
 
     [ContextMenu("Debug Dice State")]
     public void DebugDiceState()
     {
-        Debug.Log($"=== Dice Manager State ===");
-        Debug.Log($"Can Roll: {canRoll}");
-        Debug.Log($"Has Rolled In Session: {hasRolledInCurrentSession}");
-        Debug.Log($"Roll Button Active: {rollButton.activeSelf}");
-        Debug.Log($"Roll Button Interactable: {rollButtonComponent?.interactable ?? false}");
-        Debug.Log($"Continue Button Active: {continueButton.activeSelf}");
-        Debug.Log($"Continue Button Interactable: {continueButtonComponent?.interactable ?? false}");
-        Debug.Log($"Current DC: {currentDifficultyClass}");
-        Debug.Log($"Base Roll: {baseRoll}, Total Roll: {totalRoll}");
-    }
+        Debug.Log("=== ESTADO DEL DICE MANAGER ===");
+        Debug.Log($"Último resultado base: {baseResult}");
+        Debug.Log($"Último bonus aplicado: {bonusValue}");
+        Debug.Log($"Último resultado final: {finalResult}");
+        Debug.Log($"Clase de dificultad: {difficultyClass}");
+        Debug.Log($"Tirada en progreso: {isRolling}");
+        Debug.Log($"Esperando continuación de diálogo: {isWaitingForDialogueContinuation}");
+        Debug.Log($"BonusManager encontrado: {bonusManager != null}");
 
-    [ContextMenu("Force Reset UI")]
-    public void ForceResetFromContext()
-    {
-        ForceReset();
+        if (bonusManager != null)
+        {
+            Debug.Log($"Bonus activo: {bonusManager.HasActiveBBonus()}");
+            if (bonusManager.HasActiveBBonus())
+            {
+                Debug.Log($"Valor del bonus activo: {bonusManager.GetActiveBonusValue()}");
+                Debug.Log($"Nombre del bonus activo: {bonusManager.GetActiveBonusName()}");
+            }
+        }
+        Debug.Log("==============================");
     }
 
     #endregion
+
+    private void OnDestroy()
+    {
+        // Limpiar tweens al destruir
+        DOTween.Kill(diceResultText?.transform);
+        DOTween.Kill(bonusText?.transform);
+        DOTween.Kill(diceObject?.transform);
+    }
 }

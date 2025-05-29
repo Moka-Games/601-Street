@@ -6,18 +6,19 @@ using DG.Tweening;
 using System.Collections;
 
 /// <summary>
-/// Gestor principal del sistema de bonuses para el dado
+/// Gestor principal del sistema de bonuses para el dado - VERSIÓN ACTUALIZADA
+/// Integrado con el nuevo sistema de feedback visual
 /// </summary>
 public class BonusManager : MonoBehaviour
 {
     public static BonusManager Instance { get; private set; }
 
     [Header("Referencias de la Interfaz")]
-    [SerializeField] private GameObject bonusWindow; // La ventana completa de bonuses (siempre activa)
-    [SerializeField] private Button openWindowButton; // Botón para abrir/cerrar ventana
-    [SerializeField] private Animator bonusAnimator; // Animator del Parent/Background con animaciones Open_Bonuses/Close_Bonuses
-    [SerializeField] private Transform bonusesContent; // Padre donde se instancian los bonuses
-    [SerializeField] private GameObject bonusPrefab; // Prefab "Bonus_Prefab_Parent"
+    [SerializeField] private GameObject bonusWindow;
+    [SerializeField] private Button openWindowButton;
+    [SerializeField] private Animator bonusAnimator;
+    [SerializeField] private Transform bonusesContent;
+    [SerializeField] private GameObject bonusPrefab;
 
     [Header("Configuración de Animaciones")]
     [SerializeField] private float animationDuration = 0.5f;
@@ -26,13 +27,17 @@ public class BonusManager : MonoBehaviour
 
     [Header("Referencias al Sistema de Dados")]
     [SerializeField] private Dice_Manager diceManager;
+    [SerializeField] private BonusFeedbackManager feedbackManager;
+
+    [Header("Feedback Visual del Bonus Activo")]
+    [SerializeField] private GameObject activeBonusIndicator; // Indicador visual de bonus activo
+    [SerializeField] private TMP_Text activeBonusValueText;   // Texto que muestra el valor del bonus activo
+    [SerializeField] private Color activeBonusColor = Color.green;
 
     // Estado del sistema
     private List<CollectedBonus> collectedBonuses = new List<CollectedBonus>();
     private CollectedBonus activeBonus = null;
     private bool canActivateBonuses = true;
-
-    // Variables para el estado de la ventana
     private bool isWindowOpen = false;
 
     [System.Serializable]
@@ -41,9 +46,9 @@ public class BonusManager : MonoBehaviour
         public string bonusName;
         public int bonusValue;
         public string description;
-        public Sprite icon; // Opcional para diferentes iconos
-        public GameObject uiInstance; // Referencia al prefab instanciado
-        public BonusUI bonusUIScript; // Script del prefab
+        public Sprite icon;
+        public GameObject uiInstance;
+        public BonusUI bonusUIScript;
 
         public CollectedBonus(string name, int value, string desc = "", Sprite bonusIcon = null)
         {
@@ -56,7 +61,6 @@ public class BonusManager : MonoBehaviour
 
     private void Awake()
     {
-        // Singleton pattern
         if (Instance == null)
         {
             Instance = this;
@@ -70,9 +74,17 @@ public class BonusManager : MonoBehaviour
 
     private void Start()
     {
-        // Buscar referencias si no están asignadas
+        InitializeBonusManager();
+    }
+
+    private void InitializeBonusManager()
+    {
+        // Buscar referencias automáticamente
         if (diceManager == null)
             diceManager = FindAnyObjectByType<Dice_Manager>();
+
+        if (feedbackManager == null)
+            feedbackManager = FindAnyObjectByType<BonusFeedbackManager>();
 
         Debug.Log("=== BONUS MANAGER INITIALIZATION ===");
         Debug.Log($"BonusWindow assigned: {bonusWindow != null}");
@@ -80,59 +92,47 @@ public class BonusManager : MonoBehaviour
         Debug.Log($"OpenWindowButton assigned: {openWindowButton != null}");
         Debug.Log($"BonusesContent assigned: {bonusesContent != null}");
         Debug.Log($"BonusPrefab assigned: {bonusPrefab != null}");
+        Debug.Log($"DiceManager found: {diceManager != null}");
+        Debug.Log($"FeedbackManager found: {feedbackManager != null}");
 
-        // Configurar la ventana principal (siempre activa pero inicialmente oculta)
+        // Configurar ventana inicial
         if (bonusWindow != null)
         {
-            bonusWindow.SetActive(false); // Inicialmente oculta hasta que haya bonuses
-            Debug.Log("BonusWindow configurada (oculta inicialmente)");
-        }
-        else
-        {
-            Debug.LogError("BonusWindow no está asignado en el inspector");
-        }
-
-        // Verificar Animator
-        if (bonusAnimator != null)
-        {
-            // El animator debe empezar en estado cerrado por defecto
-            Debug.Log("BonusAnimator configurado - Panel estará cerrado inicialmente");
-        }
-        else
-        {
-            Debug.LogError("BonusAnimator no está asignado en el inspector");
+            bonusWindow.SetActive(false);
         }
 
         // Configurar botón de apertura
         if (openWindowButton != null)
         {
             openWindowButton.onClick.AddListener(ToggleBonusWindow);
-            openWindowButton.gameObject.SetActive(false); // Ocultar hasta que haya bonuses
-            Debug.Log("OpenWindowButton configurado y ocultado inicialmente");
-        }
-        else
-        {
-            Debug.LogError("OpenWindowButton no está asignado en el inspector");
+            openWindowButton.gameObject.SetActive(false);
         }
 
-        // Verificar DiceManager
-        if (diceManager != null)
-        {
-            Debug.Log("DiceManager encontrado y configurado");
-        }
-        else
-        {
-            Debug.LogWarning("DiceManager no encontrado");
-        }
+        // Configurar indicador de bonus activo
+        SetupActiveBonusIndicator();
 
-        Debug.Log("BonusManager inicializado correctamente");
+        Debug.Log("BonusManager inicializado con sistema de feedback mejorado");
         Debug.Log("===================================");
+    }
+
+    private void SetupActiveBonusIndicator()
+    {
+        if (activeBonusIndicator != null)
+        {
+            activeBonusIndicator.SetActive(false);
+        }
+
+        if (activeBonusValueText != null)
+        {
+            activeBonusValueText.color = activeBonusColor;
+            activeBonusValueText.text = "";
+        }
     }
 
     #region Gestión de Bonuses
 
     /// <summary>
-    /// Añade un nuevo bonus al sistema
+    /// Añade un nuevo bonus al sistema con feedback mejorado
     /// </summary>
     public void AddBonus(string bonusName, int bonusValue, string description = "", Sprite icon = null)
     {
@@ -141,47 +141,42 @@ public class BonusManager : MonoBehaviour
         Debug.Log($"Valor: +{bonusValue}");
         Debug.Log($"Descripción: {description}");
 
-        // Verificar que el BonusManager está correctamente inicializado
-        if (bonusesContent == null)
+        if (bonusesContent == null || bonusPrefab == null)
         {
-            Debug.LogError("BonusesContent es null - No se puede añadir bonus. Verificar referencias en inspector.");
-            return;
-        }
-
-        if (bonusPrefab == null)
-        {
-            Debug.LogError("BonusPrefab es null - No se puede crear interfaz. Verificar referencias en inspector.");
+            Debug.LogError("Referencias faltantes para crear bonus UI");
             return;
         }
 
         // Crear el objeto de bonus
         CollectedBonus newBonus = new CollectedBonus(bonusName, bonusValue, description, icon);
-
-        // Añadir a la lista
         collectedBonuses.Add(newBonus);
-        Debug.Log($"Bonus añadido a la lista. Total bonuses: {collectedBonuses.Count}");
 
         // Crear la interfaz del bonus
         bool uiCreated = CreateBonusUI(newBonus);
 
         if (uiCreated)
         {
-            // Actualizar visibilidad de la ventana
             UpdateWindowVisibility();
-            Debug.Log("Bonus añadido exitosamente y visibilidad actualizada");
+
+            // Mostrar feedback rápido del nuevo bonus
+            if (feedbackManager != null)
+            {
+                feedbackManager.ShowBonusValueQuick(bonusValue);
+            }
+
+            Debug.Log("Bonus añadido exitosamente con feedback visual");
         }
         else
         {
-            Debug.LogError("Error al crear la interfaz del bonus");
-            // Remover de la lista si no se pudo crear la UI
             collectedBonuses.Remove(newBonus);
+            Debug.LogError("Error al crear la interfaz del bonus");
         }
 
         Debug.Log("===================");
     }
 
     /// <summary>
-    /// Activa un bonus para la próxima tirada
+    /// Activa un bonus con feedback visual mejorado
     /// </summary>
     public bool ActivateBonus(CollectedBonus bonus)
     {
@@ -193,21 +188,17 @@ public class BonusManager : MonoBehaviour
 
         if (activeBonus != null)
         {
-            Debug.LogWarning("Ya hay un bonus activo. Desactivando el anterior.");
+            Debug.LogWarning("Desactivando bonus anterior");
             DeactivateCurrentBonus();
         }
 
         activeBonus = bonus;
 
-        // Actualizar la interfaz de todos los bonuses
+        // Actualizar interfaz de todos los bonuses
         UpdateAllBonusesUI();
 
-        // Notificar al sistema de dados
-        if (diceManager != null)
-        {
-            // Aquí integraremos con el Dice_Manager mejorado
-            NotifyDiceManagerBonusActivated(bonus);
-        }
+        // Mostrar indicador de bonus activo
+        ShowActiveBonusIndicator();
 
         Debug.Log($"Bonus activado: {bonus.bonusName} (+{bonus.bonusValue})");
         return true;
@@ -223,14 +214,12 @@ public class BonusManager : MonoBehaviour
             Debug.Log($"Desactivando bonus: {activeBonus.bonusName}");
             activeBonus = null;
 
-            // Actualizar interfaz de todos los bonuses
+            // Actualizar interfaz
             UpdateAllBonusesUI();
+            HideActiveBonusIndicator();
 
             // Notificar al sistema de dados
-            if (diceManager != null)
-            {
-                NotifyDiceManagerBonusDeactivated();
-            }
+            NotifyDiceManagerBonusDeactivated();
         }
     }
 
@@ -243,18 +232,63 @@ public class BonusManager : MonoBehaviour
         {
             Debug.Log($"Consumiendo bonus: {activeBonus.bonusName}");
 
-            // Remover de la lista
-            collectedBonuses.Remove(activeBonus);
-
-            // Destruir la interfaz
+            // Animación de consumo antes de eliminar
             if (activeBonus.uiInstance != null)
             {
-                Destroy(activeBonus.uiInstance);
+                StartCoroutine(AnimateBonusConsumption(activeBonus));
+            }
+            else
+            {
+                // Si no hay UI, eliminar directamente
+                FinalizeBonusConsumption();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Anima el consumo del bonus antes de eliminarlo
+    /// </summary>
+    private IEnumerator AnimateBonusConsumption(CollectedBonus bonusToConsume)
+    {
+        if (bonusToConsume.uiInstance != null)
+        {
+            // IMPORTANTE: Notificar al sistema de navegación ANTES de la animación
+            NotifyNavigationSystemBonusDestroyed(bonusToConsume.uiInstance);
+
+            // Animación de "consumido"
+            Transform bonusTransform = bonusToConsume.uiInstance.transform;
+
+            // Fade out y scale down
+            CanvasGroup canvasGroup = bonusToConsume.uiInstance.GetComponent<CanvasGroup>();
+            if (canvasGroup == null)
+            {
+                canvasGroup = bonusToConsume.uiInstance.AddComponent<CanvasGroup>();
             }
 
+            Sequence consumeSequence = DOTween.Sequence();
+            consumeSequence.Append(bonusTransform.DOScale(1.2f, 0.2f).SetEase(Ease.OutQuart));
+            consumeSequence.Append(canvasGroup.DOFade(0f, 0.3f));
+            consumeSequence.Join(bonusTransform.DOScale(0f, 0.3f).SetEase(Ease.InBack));
+
+            yield return consumeSequence.WaitForCompletion();
+
+            Destroy(bonusToConsume.uiInstance);
+        }
+
+        FinalizeBonusConsumption();
+    }
+
+    /// <summary>
+    /// Finaliza el proceso de consumo del bonus
+    /// </summary>
+    private void FinalizeBonusConsumption()
+    {
+        if (activeBonus != null)
+        {
+            collectedBonuses.Remove(activeBonus);
             activeBonus = null;
 
-            // Actualizar visibilidad de la ventana
+            HideActiveBonusIndicator();
             UpdateWindowVisibility();
 
             Debug.Log($"Bonus consumido. Bonuses restantes: {collectedBonuses.Count}");
@@ -263,7 +297,58 @@ public class BonusManager : MonoBehaviour
 
     #endregion
 
-    #region Gestión de Interfaz
+    #region Indicador de Bonus Activo
+
+    /// <summary>
+    /// Muestra el indicador de bonus activo
+    /// </summary>
+    private void ShowActiveBonusIndicator()
+    {
+        if (activeBonus == null) return;
+
+        if (activeBonusIndicator != null)
+        {
+            activeBonusIndicator.SetActive(true);
+
+            // Animación de aparición
+            activeBonusIndicator.transform.localScale = Vector3.zero;
+            activeBonusIndicator.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
+        }
+
+        if (activeBonusValueText != null)
+        {
+            activeBonusValueText.text = $"+{activeBonus.bonusValue}";
+
+            // Efecto de pulso sutil
+            activeBonusValueText.transform.DOPunchScale(Vector3.one * 0.1f, 0.4f, 4, 0.5f);
+        }
+
+        Debug.Log($"Indicador de bonus activo mostrado: +{activeBonus.bonusValue}");
+    }
+
+    /// <summary>
+    /// Oculta el indicador de bonus activo
+    /// </summary>
+    private void HideActiveBonusIndicator()
+    {
+        if (activeBonusIndicator != null && activeBonusIndicator.activeInHierarchy)
+        {
+            activeBonusIndicator.transform.DOScale(0f, 0.2f)
+                .SetEase(Ease.InBack)
+                .OnComplete(() => activeBonusIndicator.SetActive(false));
+        }
+
+        if (activeBonusValueText != null)
+        {
+            activeBonusValueText.text = "";
+        }
+
+        Debug.Log("Indicador de bonus activo ocultado");
+    }
+
+    #endregion
+
+    #region Gestión de Interfaz (Métodos existentes actualizados)
 
     private bool CreateBonusUI(CollectedBonus bonus)
     {
@@ -277,35 +362,62 @@ public class BonusManager : MonoBehaviour
         {
             Debug.Log($"Creando interfaz para bonus: {bonus.bonusName}");
 
-            // Instanciar el prefab
             GameObject bonusInstance = Instantiate(bonusPrefab, bonusesContent);
             bonus.uiInstance = bonusInstance;
-
-            // IMPORTANTE: Asegurar que la escala sea correcta
             bonusInstance.transform.localScale = Vector3.one;
-            Debug.Log($"Escala del prefab establecida a: {bonusInstance.transform.localScale}");
 
-            // Configurar el script del bonus
             BonusUI bonusUI = bonusInstance.GetComponent<BonusUI>();
             if (bonusUI == null)
             {
-                Debug.Log("BonusUI no encontrado en prefab, añadiendo componente...");
                 bonusUI = bonusInstance.AddComponent<BonusUI>();
             }
 
             bonusUI.Initialize(bonus, this);
             bonus.bonusUIScript = bonusUI;
 
-            Debug.Log($"Interfaz creada exitosamente para bonus: {bonus.bonusName}");
-            Debug.Log($"Posición final del prefab: {bonusInstance.transform.position}");
-            Debug.Log($"Escala final del prefab: {bonusInstance.transform.localScale}");
+            // CRÍTICO: Notificar al sistema de navegación
+            NotifyNavigationSystemBonusCreated(bonusInstance);
 
+            Debug.Log($"Interfaz creada exitosamente para bonus: {bonus.bonusName}");
             return true;
         }
         catch (System.Exception e)
         {
             Debug.LogError($"Error al crear interfaz del bonus: {e.Message}");
             return false;
+        }
+    }
+
+    /// <summary>
+    /// Notifica al sistema de navegación cuando se crea un nuevo bonus
+    /// </summary>
+    private void NotifyNavigationSystemBonusCreated(GameObject bonusUI)
+    {
+        // Buscar BonusNavigationExtension en la escena
+        BonusNavigationExtension navigationExtension = FindAnyObjectByType<BonusNavigationExtension>();
+        if (navigationExtension != null)
+        {
+            navigationExtension.NotifyBonusCreated(bonusUI);
+            Debug.Log($"Sistema de navegación notificado: bonus creado {bonusUI.name}");
+        }
+        else
+        {
+            Debug.LogWarning("BonusNavigationExtension no encontrado - Los bonuses no serán navegables");
+        }
+    }
+
+    /// <summary>
+    /// Notifica al sistema de navegación cuando se destruye un bonus
+    /// </summary>
+    private void NotifyNavigationSystemBonusDestroyed(GameObject bonusUI)
+    {
+        if (bonusUI == null) return;
+
+        BonusNavigationExtension navigationExtension = FindAnyObjectByType<BonusNavigationExtension>();
+        if (navigationExtension != null)
+        {
+            navigationExtension.NotifyBonusDestroyed(bonusUI);
+            Debug.Log($"Sistema de navegación notificado: bonus destruido {bonusUI.name}");
         }
     }
 
@@ -326,36 +438,22 @@ public class BonusManager : MonoBehaviour
 
         Debug.Log($"UpdateWindowVisibility: shouldShowElements = {shouldShowElements}, bonusCount = {collectedBonuses.Count}");
 
-        // Activar/desactivar el botón de toggle
         if (openWindowButton != null)
         {
             openWindowButton.gameObject.SetActive(shouldShowElements);
-            Debug.Log($"OpenWindowButton activado: {shouldShowElements}");
-        }
-        else
-        {
-            Debug.LogWarning("OpenWindowButton es null - verificar referencia en el inspector");
         }
 
-        // Activar la ventana padre cuando hay bonuses
         if (bonusWindow != null)
         {
             if (shouldShowElements && !bonusWindow.activeInHierarchy)
             {
                 bonusWindow.SetActive(true);
-                // El animator comenzará en estado cerrado por defecto
-                Debug.Log("BonusWindow activada - Panel comenzará cerrado");
             }
             else if (!shouldShowElements && bonusWindow.activeInHierarchy)
             {
                 bonusWindow.SetActive(false);
-                isWindowOpen = false; // Resetear estado
-                Debug.Log("BonusWindow desactivada");
+                isWindowOpen = false;
             }
-        }
-        else
-        {
-            Debug.LogWarning("BonusWindow es null - verificar referencia en el inspector");
         }
     }
 
@@ -373,63 +471,50 @@ public class BonusManager : MonoBehaviour
 
     private void ShowBonusWindow()
     {
-        if (bonusAnimator == null)
-        {
-            Debug.LogError("BonusAnimator es null - no se puede reproducir animación");
-            return;
-        }
+        if (bonusAnimator == null) return;
 
-        Debug.Log("Abriendo ventana de bonuses - reproduciendo animación Open_Bonuses");
-
+        Debug.Log("Abriendo ventana de bonuses");
         StartCoroutine(WindowInteracted(1f));
-        //isWindowOpen = true;
-
-        // Reproducir animación de apertura
         bonusAnimator.Play("Open_Bonuses");
+
+        // CRÍTICO: Notificar al sistema de navegación que la ventana se abrió
+        NotifyNavigationSystemWindowStateChanged(true);
     }
 
     private void HideBonusWindow()
     {
-        if (bonusAnimator == null)
-        {
-            Debug.LogError("BonusAnimator es null - no se puede reproducir animación");
-            return;
-        }
+        if (bonusAnimator == null) return;
 
-        Debug.Log("Cerrando ventana de bonuses - reproduciendo animación Close_Bonuses");
-
+        Debug.Log("Cerrando ventana de bonuses");
         isWindowOpen = false;
-
-        // Reproducir animación de cierre
         bonusAnimator.Play("Close_Bonuses");
+
+        // CRÍTICO: Notificar al sistema de navegación que la ventana se cerró
+        NotifyNavigationSystemWindowStateChanged(false);
+    }
+
+    /// <summary>
+    /// Notifica al sistema de navegación sobre el cambio de estado de la ventana
+    /// </summary>
+    private void NotifyNavigationSystemWindowStateChanged(bool isOpen)
+    {
+        BonusNavigationExtension navigationExtension = FindAnyObjectByType<BonusNavigationExtension>();
+        if (navigationExtension != null)
+        {
+            navigationExtension.OnBonusWindowStateChanged(isOpen);
+            Debug.Log($"Sistema de navegación notificado: ventana {(isOpen ? "abierta" : "cerrada")}");
+        }
+    }
+
+    private IEnumerator WindowInteracted(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        isWindowOpen = true;
     }
 
     #endregion
 
-    #region Integración con Sistema de Dados
-
-    private void NotifyDiceManagerBonusActivated(CollectedBonus bonus)
-    {
-        // Esta función se integrará con el Dice_Manager mejorado
-        Debug.Log($"Notificando al Dice_Manager: Bonus {bonus.bonusName} activado");
-
-        // Por ahora, usar el sistema existente como fallback
-        if (diceManager != null)
-        {
-            // Resetear todos los bonuses existentes
-            diceManager.bonus1Activated = false;
-            diceManager.bonus2Activated = false;
-            diceManager.bonus3Activated = false;
-
-            // Activar el bonus apropiado basado en el valor (temporal)
-            if (bonus.bonusValue <= 2)
-                diceManager.bonus1Activated = true;
-            else if (bonus.bonusValue <= 3)
-                diceManager.bonus2Activated = true;
-            else
-                diceManager.bonus3Activated = true;
-        }
-    }
+    #region Integración con Sistema de Dados (Actualizada)
 
     private void NotifyDiceManagerBonusDeactivated()
     {
@@ -450,6 +535,15 @@ public class BonusManager : MonoBehaviour
     {
         Debug.Log("Tirada de dado iniciada - Bloqueando activación de bonuses");
         canActivateBonuses = false;
+
+        // Actualizar UI para mostrar que no se pueden activar bonuses
+        foreach (var bonus in collectedBonuses)
+        {
+            if (bonus.bonusUIScript != null)
+            {
+                bonus.bonusUIScript.SetInteractable(false);
+            }
+        }
     }
 
     /// <summary>
@@ -457,7 +551,7 @@ public class BonusManager : MonoBehaviour
     /// </summary>
     public void OnDiceRollCompleted()
     {
-        Debug.Log("Tirada de dado completada - Permitiendo activación de bonuses");
+        Debug.Log("Tirada de dado completada");
 
         // Si había un bonus activo, consumirlo
         if (activeBonus != null)
@@ -466,6 +560,15 @@ public class BonusManager : MonoBehaviour
         }
 
         canActivateBonuses = true;
+
+        // Reactivar UI de bonuses
+        foreach (var bonus in collectedBonuses)
+        {
+            if (bonus.bonusUIScript != null)
+            {
+                bonus.bonusUIScript.SetInteractable(true);
+            }
+        }
     }
 
     #endregion
@@ -473,18 +576,27 @@ public class BonusManager : MonoBehaviour
     #region Métodos Públicos de Consulta
 
     public bool HasActiveBBonus() => activeBonus != null;
-
     public int GetActiveBonusValue() => activeBonus?.bonusValue ?? 0;
-
     public string GetActiveBonusName() => activeBonus?.bonusName ?? "";
-
     public int GetCollectedBonusCount() => collectedBonuses.Count;
-
     public bool CanActivateBonuses() => canActivateBonuses;
 
     /// <summary>
-    /// Método para debug - mostrar estado actual
+    /// Obtiene información detallada del bonus activo para el sistema de feedback
     /// </summary>
+    public (bool hasBonus, string name, int value) GetActiveBonusInfo()
+    {
+        if (activeBonus != null)
+        {
+            return (true, activeBonus.bonusName, activeBonus.bonusValue);
+        }
+        return (false, "", 0);
+    }
+
+    #endregion
+
+    #region Métodos de Debug Actualizados
+
     [ContextMenu("Debug Bonus State")]
     public void DebugBonusState()
     {
@@ -493,19 +605,8 @@ public class BonusManager : MonoBehaviour
         Debug.Log($"Bonus activo: {(activeBonus != null ? $"{activeBonus.bonusName} (+{activeBonus.bonusValue})" : "NINGUNO")}");
         Debug.Log($"Puede activar bonuses: {canActivateBonuses}");
         Debug.Log($"Ventana abierta: {isWindowOpen}");
+        Debug.Log($"FeedbackManager disponible: {feedbackManager != null}");
 
-        // Debug de referencias
-        Debug.Log("--- REFERENCIAS ---");
-        Debug.Log($"BonusWindow: {(bonusWindow != null ? bonusWindow.name : "NULL")}");
-        Debug.Log($"BonusWindow Active: {(bonusWindow != null ? bonusWindow.activeInHierarchy.ToString() : "N/A")}");
-        Debug.Log($"BonusAnimator: {(bonusAnimator != null ? bonusAnimator.name : "NULL")}");
-        Debug.Log($"BonusAnimator Enabled: {(bonusAnimator != null ? bonusAnimator.enabled.ToString() : "N/A")}");
-        Debug.Log($"OpenWindowButton: {(openWindowButton != null ? openWindowButton.name : "NULL")}");
-        Debug.Log($"OpenWindowButton Active: {(openWindowButton != null ? openWindowButton.gameObject.activeInHierarchy.ToString() : "N/A")}");
-        Debug.Log($"BonusesContent: {(bonusesContent != null ? bonusesContent.name : "NULL")}");
-        Debug.Log($"BonusPrefab: {(bonusPrefab != null ? bonusPrefab.name : "NULL")}");
-
-        // Debug de bonuses individuales
         if (collectedBonuses.Count > 0)
         {
             Debug.Log("--- BONUSES INDIVIDUALES ---");
@@ -519,19 +620,6 @@ public class BonusManager : MonoBehaviour
         Debug.Log("================================");
     }
 
-    /// <summary>
-    /// Fuerza la actualización de la visibilidad - útil para debugging
-    /// </summary>
-    [ContextMenu("Force Update Visibility")]
-    public void ForceUpdateVisibility()
-    {
-        Debug.Log("Forzando actualización de visibilidad...");
-        UpdateWindowVisibility();
-    }
-
-    /// <summary>
-    /// Añade un bonus de prueba para testing
-    /// </summary>
     [ContextMenu("Add Test Bonus")]
     public void AddTestBonus()
     {
@@ -539,24 +627,25 @@ public class BonusManager : MonoBehaviour
         {
             AddBonus("Bonus de Prueba", 3, "Un bonus para testing");
         }
-        else
-        {
-            Debug.Log("Este método solo funciona en Play Mode");
-        }
     }
 
-    private IEnumerator WindowInteracted(float delay)
+    [ContextMenu("Test Bonus Feedback")]
+    public void TestBonusFeedback()
     {
-        yield return new WaitForSeconds(delay);
-        isWindowOpen = true;
+        if (Application.isPlaying && feedbackManager != null)
+        {
+            StartCoroutine(feedbackManager.ShowBonusApplicationSequence(12, 3, 15));
+        }
     }
 
     #endregion
 
     private void OnDestroy()
     {
-        // Ya no necesitamos limpiar tweens de DOTween para el deslizamiento
-        // Las animaciones de Unity se limpian automáticamente
+        // Limpiar animaciones DOTween
+        DOTween.Kill(activeBonusIndicator?.transform);
+        DOTween.Kill(activeBonusValueText?.transform);
+
         Debug.Log("BonusManager destruido");
     }
 }

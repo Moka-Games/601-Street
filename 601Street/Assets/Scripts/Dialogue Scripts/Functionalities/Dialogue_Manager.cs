@@ -26,7 +26,7 @@ public class DialogueManager : MonoBehaviour
 
     public UnityEvent onConversationEnd;
 
-    [Header("Dice Protoype Interface Variables")]
+    [Header("Dice Prototype Interface Variables")]
     [SerializeField] private Dice_Manager diceManager;
     [SerializeField] private GameObject diceInterface;
     [SerializeField] private GameObject dialogueInterface;
@@ -44,16 +44,16 @@ public class DialogueManager : MonoBehaviour
 
     private bool isInConversation = false;
 
-    // Agregar esta variable para un cooldown entre conversaciones
+    // Cooldown entre conversaciones
     private float conversationCooldown = 1.5f;
     private float lastConversationEndTime = 0f;
 
-    // Nuevas variables para animación del diálogo
+    // Variables para animación del diálogo
     [Header("Dialog Animation Settings")]
     [SerializeField] private float dialogEntryDuration = 0.3f;
     [SerializeField] private Ease dialogEntryEase = Ease.OutBack;
 
-    [Header("Dialog Animation Settings")]
+    [Header("Dialog Exit Settings")]
     [SerializeField] private float dialogExitDuration = 0.3f;
     [SerializeField] private Ease dialogExitEase = Ease.InBack;
     [SerializeField] private float slideDistance = 100f;
@@ -65,9 +65,8 @@ public class DialogueManager : MonoBehaviour
     private PlayerControls playerControls;
     private InputAction skipDialogueAction;
 
-    [Header("Navigation Integration - AÑADIR AL INSPECTOR")]
-    [SerializeField]
-    private UINavigationManager uiNavigationManager;
+    [Header("Navigation Integration")]
+    [SerializeField] private UINavigationManager uiNavigationManager;
 
     void Awake()
     {
@@ -372,9 +371,15 @@ public class DialogueManager : MonoBehaviour
                     SelectDiceOption();
                     diceManager.SetDifficultyClass(selectedOption.difficultyClass);
 
-                    // Asignamos el callback para almacenar el resultado y la conversación correspondiente
+                    // CRÍTICO: Configurar el callback con integración de bonuses
                     diceManager.OnRollComplete = (isSuccess) =>
                     {
+                        Debug.Log($"=== RESULTADO DE TIRADA CON BONUSES ===");
+                        Debug.Log($"Resultado final (con bonus): {diceManager.GetLastResult()}");
+                        Debug.Log($"DC requerido: {selectedOption.difficultyClass}");
+                        Debug.Log($"¿Tirada exitosa?: {(isSuccess ? "SÍ" : "NO")}");
+                        Debug.Log("=====================================");
+
                         diceRollResult = isSuccess;
                         nextContextualConversation = isSuccess ? selectedOption.successDialogue : selectedOption.failureDialogue;
                     };
@@ -473,7 +478,7 @@ public class DialogueManager : MonoBehaviour
 
     public void SelectDiceOption()
     {
-        Debug.Log("Seleccionando opción de dados - Implementando protecciones anti-doble input");
+        Debug.Log("=== INICIANDO TIRADA DE DADOS CON BONUSES ===");
 
         // PROTECCIÓN CRÍTICA: Bloquear inputs del sistema de navegación temporalmente
         if (uiNavigationManager != null)
@@ -494,7 +499,9 @@ public class DialogueManager : MonoBehaviour
         // Configurar el DC para la tirada
         diceManager.SetDifficultyClass(currentConversation.dialogueOptions[selectedOptionIndex].difficultyClass);
 
+        Debug.Log($"DC configurado: {currentConversation.dialogueOptions[selectedOptionIndex].difficultyClass}");
         Debug.Log("Interfaz de dados activada con protecciones");
+        Debug.Log("============================================");
     }
 
     public void OnTypingComplete()
@@ -506,13 +513,10 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    public void RandomFunction()
-    {
-        print("I like cucumbers");
-    }
-
     public void OnDiceRollCompleteButtonPressed()
     {
+        Debug.Log("=== PROCESANDO RESULTADO DE TIRADA ===");
+
         if (selectedOptionIndex != -1 && diceRollResult.HasValue && currentConversation != null && selectedOptionIndex < currentConversation.dialogueOptions.Length)
         {
             DialogueOption selectedOption = currentConversation.dialogueOptions[selectedOptionIndex];
@@ -526,17 +530,32 @@ public class DialogueManager : MonoBehaviour
                 optionsUI.SetActive(false);
             }
 
+            // CRÍTICO: Mostrar información detallada del resultado
+            Debug.Log($"Resultado base del dado: {diceManager.GetLastBaseResult()}");
+            Debug.Log($"Bonus aplicado: +{diceManager.GetLastBonusValue()}");
+            Debug.Log($"Resultado final: {diceManager.GetLastResult()}");
+            Debug.Log($"DC requerido: {selectedOption.difficultyClass}");
+            Debug.Log($"Resultado de la tirada: {(diceRollResult.Value ? "ÉXITO" : "FRACASO")}");
+
             // Ejecutar la acción con el resultado de la tirada
             ActionController.Instance.InvokeAction(selectedOption.actionId, diceRollResult.Value);
+
+            // Reactivar el botón del dado para futuras tiradas
+            if (diceManager != null)
+            {
+                diceManager.ReactivateDiceButton();
+            }
 
             // Iniciar la conversación que se asignó previamente
             if (nextContextualConversation != null)
             {
+                Debug.Log($"Iniciando conversación {(diceRollResult.Value ? "de éxito" : "de fracaso")}");
                 StartConversation(nextContextualConversation, currentNPC);
                 nextContextualConversation = null; // Limpiar la referencia tras usarla
             }
             else
             {
+                Debug.Log("No hay conversación de seguimiento, terminando diálogo");
                 EndConversation();
             }
 
@@ -548,7 +567,15 @@ public class DialogueManager : MonoBehaviour
         {
             Debug.LogWarning("No hay resultado de dado disponible o ninguna opción seleccionada.");
             diceInterface.SetActive(false);
+
+            // Reactivar el botón del dado en caso de error
+            if (diceManager != null)
+            {
+                diceManager.ReactivateDiceButton();
+            }
         }
+
+        Debug.Log("===================================");
     }
 
     private void AnimateDialogueEntry()
@@ -571,9 +598,7 @@ public class DialogueManager : MonoBehaviour
 
         // Animamos hacia la posición original guardada
         dialogueRect.DOAnchorPos(initialDialoguePosition, dialogEntryDuration)
-            .SetEase(dialogEntryEase)
-            .OnComplete(() => {
-            });
+            .SetEase(dialogEntryEase);
     }
 
     private void AnimateDialogueExit()
