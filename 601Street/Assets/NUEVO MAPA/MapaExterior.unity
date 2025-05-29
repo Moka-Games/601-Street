@@ -57042,125 +57042,6 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
---- !u!1 &412073384
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 412073387}
-  - component: {fileID: 412073386}
-  - component: {fileID: 412073385}
-  - component: {fileID: 412073389}
-  - component: {fileID: 412073388}
-  m_Layer: 6
-  m_Name: Entrada Portal
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!135 &412073385
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 412073384}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!33 &412073386
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 412073384}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &412073387
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 412073384}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.25329104, z: -0, w: 0.9673901}
-  m_LocalPosition: {x: 13.68, y: 13.31, z: -197.267}
-  m_LocalScale: {x: 1, y: 2.6246, z: 2.6582}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1259590743}
-  m_LocalEulerAnglesHint: {x: 0, y: 29.345, z: 0}
---- !u!114 &412073388
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 412073384}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14df5e5373baac54b9b676c309cb5df2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetSceneName: SalaPortal
-  spawnPointName: Player_InitialPosition
-  isExitToMainScene: 0
-  sceneChangeManager: {fileID: 0}
-  showDetailedLogs: 0
---- !u!114 &412073389
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 412073384}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bdf2841cde257ce41a7e4884979576c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionID: Entrada-Portal
-  interactionPrompt: Enter Boiler room
-  onInteraction:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 412073388}
-        m_TargetAssemblyTypeName: SceneTransitionPoint, Assembly-CSharp
-        m_MethodName: TransitionToScene
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onInteracted:
-    m_PersistentCalls:
-      m_Calls: []
-  singleUseInteraction: 0
-  disableAfterInteraction: 0
-  detectionRadius: 25
-  detectionTriggerName: DetectionTrigger
-  edgeOffset: 50
-  objectInteracted: 0
 --- !u!1001 &412507685
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -143322,7 +143203,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   followActivator: {fileID: 0}
   riku: {fileID: 2054140215}
-  puertaPortal: {fileID: 412073384}
+  puertaPortal: {fileID: 0}
 --- !u!43 &1119229870
 Mesh:
   m_ObjectHideFlags: 0
@@ -164696,7 +164577,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 429503220}
-  - {fileID: 412073387}
   - {fileID: 533306066}
   m_Father: {fileID: 1839558785}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

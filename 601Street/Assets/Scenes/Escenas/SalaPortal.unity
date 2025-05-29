@@ -253,6 +253,7 @@ MonoBehaviour:
   singleUseInteraction: 1
   disableAfterInteraction: 0
   detectionRadius: 5
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!114 &46750599
@@ -2642,6 +2643,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 748243113}
+    - targetCorrespondingSourceObject: {fileID: 8009979216645450960, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 748243114}
   m_SourcePrefab: {fileID: 100100000, guid: 3018ce1c1b7bd8c49b679246a5ddf7c3, type: 3}
 --- !u!4 &748243111 stripped
 Transform:
@@ -2667,7 +2672,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectID: Riku_Portal
+  objectID: Riku-Portal
   useSceneName: 1
   sceneName: SalaPortal
   defaultActiveState: 0
@@ -2681,6 +2686,19 @@ MonoBehaviour:
   listenOnlyWhenActive: 0
   useTransition: 0
   transitionDuration: 0.5
+--- !u!114 &748243114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748243112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e64f5cbc289c58948a4d0c6173aeafe3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: Riku-Portal
 --- !u!64 &748839578
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2898,6 +2916,7 @@ MonoBehaviour:
   singleUseInteraction: 1
   disableAfterInteraction: 0
   detectionRadius: 5
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!135 &759343243
@@ -3414,6 +3433,7 @@ MonoBehaviour:
   singleUseInteraction: 1
   disableAfterInteraction: 0
   detectionRadius: 5
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!135 &830429891
@@ -5925,6 +5945,7 @@ MonoBehaviour:
   singleUseInteraction: 1
   disableAfterInteraction: 1
   detectionRadius: 15
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!114 &2108397394

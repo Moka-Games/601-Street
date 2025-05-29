@@ -39,14 +39,14 @@ MonoBehaviour:
       anything of value left, get it out now... Then you decide: close it, seal it...
       or burn it. No one will miss it.'
   dialogueOptions:
-  - optionText: Quemar la casa
+  - optionText: Burn the house down.
     actionId: Quemar-Casa
     requiresDiceRoll: 0
     difficultyClass: 0
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 0}
     failureDialogue: {fileID: 0}
-  - optionText: No quemar la casa
+  - optionText: Don't burn the house down.
     actionId: No-Quemar-Casa
     requiresDiceRoll: 0
     difficultyClass: 0

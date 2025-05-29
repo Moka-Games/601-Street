@@ -179,7 +179,7 @@ MonoBehaviour:
     connectedNodeIDs:
     - Post-Universidad
     isInitialNode: 0
-    misionAsociada: {fileID: 0}
+    misionAsociada: {fileID: 11400000, guid: d862df8219057e64086296adb361a98d, type: 2}
     misionDelay: 0
   - id: Post-Secta
     name: Post Secta
@@ -209,19 +209,21 @@ MonoBehaviour:
       y: 1046.6406
       width: 200
       height: 150
-    activeObjectIDs: []
+    activeObjectIDs:
+    - Entrada-Portal
+    - Riku-Portal
     inactiveObjectIDs: []
     connectedNodeIDs:
     - Juego-Completado
     isInitialNode: 0
-    misionAsociada: {fileID: 0}
+    misionAsociada: {fileID: 11400000, guid: 44747803856d7344a827c0f336be4463, type: 2}
     misionDelay: 0
   - id: Juego-Completado
     name: Juego Completado
     position:
       serializedVersion: 2
       x: 784.9375
-      y: 1048.0703
+      y: 1049.0703
       width: 200
       height: 150
     activeObjectIDs: []
