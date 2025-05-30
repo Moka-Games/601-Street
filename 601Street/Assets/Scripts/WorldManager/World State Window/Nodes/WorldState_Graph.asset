@@ -177,7 +177,8 @@ MonoBehaviour:
     - Riku-Universidad
     inactiveObjectIDs: []
     connectedNodeIDs:
-    - Post-Universidad
+    - Riku-Universidad-Exito
+    - Riku-Universidad-Fail
     isInitialNode: 0
     misionAsociada: {fileID: 11400000, guid: d862df8219057e64086296adb361a98d, type: 2}
     misionDelay: 0
@@ -201,29 +202,12 @@ MonoBehaviour:
     isInitialNode: 0
     misionAsociada: {fileID: 11400000, guid: e1c6877cb68380f4a80d0a8232c0666f, type: 2}
     misionDelay: 0
-  - id: Post-Universidad
-    name: Post Universidad
-    position:
-      serializedVersion: 2
-      x: 402.875
-      y: 1046.6406
-      width: 200
-      height: 150
-    activeObjectIDs:
-    - Entrada-Portal
-    - Riku-Portal
-    inactiveObjectIDs: []
-    connectedNodeIDs:
-    - Juego-Completado
-    isInitialNode: 0
-    misionAsociada: {fileID: 11400000, guid: 44747803856d7344a827c0f336be4463, type: 2}
-    misionDelay: 0
   - id: Juego-Completado
     name: Juego Completado
     position:
       serializedVersion: 2
-      x: 784.9375
-      y: 1049.0703
+      x: 2076.9375
+      y: 716.0703
       width: 200
       height: 150
     activeObjectIDs: []
@@ -284,6 +268,39 @@ MonoBehaviour:
     isInitialNode: 0
     misionAsociada: {fileID: 11400000, guid: 956162deacf38ce4d8b09238122c1716, type: 2}
     misionDelay: 0
+  - id: Riku-Universidad-Exito
+    name: Riku Universidad Exito
+    position:
+      serializedVersion: 2
+      x: 1688.9875
+      y: 569.78516
+      width: 200
+      height: 150
+    activeObjectIDs:
+    - Entrada-Portal
+    - Riku-Portal
+    inactiveObjectIDs: []
+    connectedNodeIDs:
+    - Juego-Completado
+    isInitialNode: 0
+    misionAsociada: {fileID: 11400000, guid: 44747803856d7344a827c0f336be4463, type: 2}
+    misionDelay: 0
+  - id: Riku-Universidad-Fail
+    name: Riku Universidad Fail
+    position:
+      serializedVersion: 2
+      x: 1689.9875
+      y: 800.78516
+      width: 200
+      height: 150
+    activeObjectIDs:
+    - Entrada-Portal
+    inactiveObjectIDs: []
+    connectedNodeIDs:
+    - Juego-Completado
+    isInitialNode: 0
+    misionAsociada: {fileID: 11400000, guid: 44747803856d7344a827c0f336be4463, type: 2}
+    misionDelay: 0
   connections:
   - fromNodeID: InitialState_Colegio
     toNodeID: Nota_Interactuada
@@ -303,8 +320,6 @@ MonoBehaviour:
     toNodeID: Ordenador_2_Interactuado
   - fromNodeID: Post-Secta
     toNodeID: "Cap\xEDtulo-2-Completado"
-  - fromNodeID: "Cap\xEDtulo-2-Completado"
-    toNodeID: Post-Universidad
   - fromNodeID: Riku-Fracaso
     toNodeID: Post-Fracaso-Sectario
   - fromNodeID: Riku-Exito
@@ -315,6 +330,12 @@ MonoBehaviour:
     toNodeID: Riku-Exito
   - fromNodeID: Ordenador_2_Interactuado
     toNodeID: Riku-Fracaso
-  - fromNodeID: Post-Universidad
+  - fromNodeID: "Cap\xEDtulo-2-Completado"
+    toNodeID: Riku-Universidad-Exito
+  - fromNodeID: "Cap\xEDtulo-2-Completado"
+    toNodeID: Riku-Universidad-Fail
+  - fromNodeID: Riku-Universidad-Fail
+    toNodeID: Juego-Completado
+  - fromNodeID: Riku-Universidad-Exito
     toNodeID: Juego-Completado
   initialNodeID: InitialState_Colegio

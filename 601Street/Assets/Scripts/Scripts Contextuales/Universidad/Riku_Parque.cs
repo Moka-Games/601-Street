@@ -1,13 +1,16 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Riku_Parque : MonoBehaviour
 {
-    public GameObject followActivator;
-
-    public GameObject riku;
-
     private bool enableTrigger = false;
     private static Riku_Parque instance;
+
+    [SerializeField] private GameObject Riku;
+
+    private GameStateController gameStateController;
+
+    [SerializeField] private string OnFail_State;
+    [SerializeField] private string OnSuccess_State;
     public static Riku_Parque Instance
     {
         get
@@ -25,13 +28,6 @@ public class Riku_Parque : MonoBehaviour
         }
     }
 
-    public GameObject puertaPortal;
-
-    public void PuertaPortal()
-    {
-        puertaPortal.SetActive(true);
-    }
-
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -40,27 +36,37 @@ public class Riku_Parque : MonoBehaviour
             return;
         }
         instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
-    public void Follow_Riku()
+    private void Start()
     {
-        followActivator.SetActive(true);
+        gameStateController = FindFirstObjectByType<GameStateController>();
+        if (gameStateController == null)
+        {
+            Debug.LogError("No se encontr� el GameStateController en la escena.");
+        }
+    }
+    public void RikuSucces()
+    {
+        gameStateController.ChangeGameState(OnSuccess_State);
         enableTrigger = true;
-        PuertaPortal();
+    }
+
+    public void RikuFail()
+    {
+        gameStateController.ChangeGameState(OnFail_State);
     }
 
     public void DestroyRiku()
     {
-        Destroy(riku);
+        Destroy(Riku);
     }
-
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && enableTrigger)
+        if(other.CompareTag("Player") && enableTrigger)
         {
             DestroyRiku();
-        } 
+        }
     }
 }
