@@ -22,8 +22,8 @@ MonoBehaviour:
     content: My name is Nyssa. I'm Nekisha's daughter. From what I understand, you
       handled her case.
   - speakerName: Nakamura
-    content: (averts his gaze, uncomfortable) I don't know what you're talking about...
-      I'm retired. Leave me alone.
+    content: ' I don''t know what you''re talking about... I''m retired. Leave me
+      alone.'
   dialogueOptions:
   - optionText: I need to know what happened to my mother
     actionId: 1
@@ -32,6 +32,7 @@ MonoBehaviour:
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: 8a6bd95861830ff4d8e7ef685635baf7, type: 2}
     failureDialogue: {fileID: 0}
+    preDiceConversation: {fileID: 0}
   - optionText: You're not going to get rid of me that easy
     actionId: 2
     requiresDiceRoll: 1
@@ -39,6 +40,7 @@ MonoBehaviour:
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: 8a6bd95861830ff4d8e7ef685635baf7, type: 2}
     failureDialogue: {fileID: 0}
+    preDiceConversation: {fileID: 0}
   - optionText: I know you remember my mother's case, I want answers.
     actionId: 3
     requiresDiceRoll: 1
@@ -46,3 +48,4 @@ MonoBehaviour:
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: 8a6bd95861830ff4d8e7ef685635baf7, type: 2}
     failureDialogue: {fileID: 0}
+    preDiceConversation: {fileID: 0}
