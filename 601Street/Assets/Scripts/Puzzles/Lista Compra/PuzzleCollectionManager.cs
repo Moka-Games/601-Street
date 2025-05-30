@@ -32,11 +32,7 @@ public class PuzzleCollectionManager : MonoBehaviour
     // Contador interno de objetos recogidos
     private int collectedCount = 0;
 
-    public GameObject aplleObject; //Para el puesto de la manzana
-    public GameObject sectGuard; 
-    public GameObject sectGuard_Fracaso;
-    public GameObject llamadaDaichi_Fracaso;
-    public GameObject colliderGuardia;
+    public GameObject aplleObject; 
 
     [Header("Elementos Fracaso Guardia 2")]
     public GameObject puertaSecta;

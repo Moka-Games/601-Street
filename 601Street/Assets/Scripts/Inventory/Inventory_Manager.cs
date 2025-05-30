@@ -10,6 +10,7 @@ using System.Collections;
 /// Versión final corregida del gestor de inventario donde ToggleInventory funciona como verdadero TOGGLE
 /// - ToggleInventory puede abrir Y cerrar el inventario
 /// - Cancel está completamente eliminado del sistema de inventario
+/// - La cámara se congela automáticamente al abrir el inventario y se descongela al cerrarlo
 /// </summary>
 public class Inventory_Manager : MonoBehaviour
 {
@@ -43,6 +44,10 @@ public class Inventory_Manager : MonoBehaviour
     [Tooltip("Si está marcado, bloqueará automáticamente la cámara durante las interacciones")]
     public bool blockCameraDuringInteraction = true;
 
+    [Header("Camera Control")]
+    [Tooltip("Si está marcado, la cámara se congelará automáticamente al abrir el inventario")]
+    public bool freezeCameraOnInventoryOpen = true;
+
     // Input System - CAMBIO IMPORTANTE: Mantenemos ambas referencias activas
     private PlayerControls playerControls;
     private InputAction toggleInventoryGameplay; // Para cuando está cerrado
@@ -72,7 +77,6 @@ public class Inventory_Manager : MonoBehaviour
 
     // Nombre del último ítem añadido (para el popup)
     private string lastAddedItemName = "";
-
 
     [Header("Navigation System")]
     [SerializeField] private InventoryNavigationManager inventoryNavigation;
@@ -173,7 +177,7 @@ public class Inventory_Manager : MonoBehaviour
         popUpParent.SetActive(false);
 
         EnsurePrefabContainerPersistence();
-        
+
         inventoryNavigation = GetComponent<InventoryNavigationManager>();
         if (inventoryNavigation == null)
         {
@@ -190,7 +194,7 @@ public class Inventory_Manager : MonoBehaviour
         {
             Debug.LogWarning("InventoryNavigationManager no encontrado. La navegación del inventario no funcionará.");
         }
-        
+
         playerController = FindAnyObjectByType<PlayerController>();
         cameraScript = FindAnyObjectByType<Camera_Script>();
 
@@ -198,7 +202,7 @@ public class Inventory_Manager : MonoBehaviour
             Debug.LogWarning("No se encontró PlayerController en la escena. No se podrá bloquear al jugador.");
 
         if (cameraScript == null)
-            Debug.LogWarning("No se encontró Camera_Script en la escena. No se podrá bloquear la cámara.");
+            Debug.LogWarning("No se encontró Camera_Script en la escena. No se podrá congelar la cámara automáticamente.");
     }
 
     /// <summary>
@@ -282,7 +286,15 @@ public class Inventory_Manager : MonoBehaviour
         }
 
         BlockPlayerAndCameraForInventory();
-        Debug.Log("Inventario ABIERTO: Gameplay disabled, UI enabled, Navigation activated");
+
+        // NUEVO: Congelar la cámara al abrir el inventario
+        if (freezeCameraOnInventoryOpen && cameraScript != null)
+        {
+            cameraScript.FreezeCamera();
+            Debug.Log("Cámara congelada automáticamente al abrir el inventario");
+        }
+
+        Debug.Log("Inventario ABIERTO: Gameplay disabled, UI enabled, Navigation activated, Camera frozen");
     }
 
     // AÑADIR ESTE NUEVO MÉTODO:
@@ -330,7 +342,15 @@ public class Inventory_Manager : MonoBehaviour
         playerControls.Gameplay.Enable();
 
         UnblockPlayerAndCameraFromInventory();
-        Debug.Log("Inventario CERRADO: UI disabled, Navigation deactivated, Gameplay enabled");
+
+        // NUEVO: Descongelar la cámara al cerrar el inventario
+        if (freezeCameraOnInventoryOpen && cameraScript != null)
+        {
+            cameraScript.UnfreezeCamera();
+            Debug.Log("Cámara descongelada automáticamente al cerrar el inventario");
+        }
+
+        Debug.Log("Inventario CERRADO: UI disabled, Navigation deactivated, Gameplay enabled, Camera unfrozen");
     }
 
     /// <summary>

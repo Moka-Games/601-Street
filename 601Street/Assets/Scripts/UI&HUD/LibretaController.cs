@@ -8,8 +8,10 @@ public class LibretaController : MonoBehaviour
     [SerializeField] private List<GameObject> paginas;
     [SerializeField] private Button botonIzquierda;
     [SerializeField] private Button botonDerecha;
+    [SerializeField] private float tiempoCooldown = 0.5f; // Tiempo de espera en segundos
 
     private int paginaActual = 0;
+    private bool enCooldown = false;
 
     private void Start()
     {
@@ -19,7 +21,6 @@ public class LibretaController : MonoBehaviour
             Debug.LogError("No hay páginas asignadas a la libreta");
             return;
         }
-
         if (botonIzquierda == null || botonDerecha == null)
         {
             Debug.LogError("Falta asignar uno o ambos botones de navegación");
@@ -29,7 +30,6 @@ public class LibretaController : MonoBehaviour
         // Limpiar y volver a asignar los eventos de los botones para evitar duplicados
         botonIzquierda.onClick.RemoveAllListeners();
         botonDerecha.onClick.RemoveAllListeners();
-
         botonIzquierda.onClick.AddListener(PaginaAnterior);
         botonDerecha.onClick.AddListener(PaginaSiguiente);
 
@@ -55,6 +55,13 @@ public class LibretaController : MonoBehaviour
 
     public void PaginaAnterior()
     {
+        // Verificar si estamos en cooldown
+        if (enCooldown)
+        {
+            Debug.Log("Botón en cooldown, ignorando clic");
+            return;
+        }
+
         Debug.Log($"Botón Izquierda presionado. Página actual antes: {paginaActual}");
 
         if (paginaActual > 0)
@@ -62,6 +69,7 @@ public class LibretaController : MonoBehaviour
             paginaActual--;
             Debug.Log($"Cambiando a página anterior: {paginaActual}");
             MostrarPaginaActual();
+            IniciarCooldown();
         }
         else
         {
@@ -71,6 +79,13 @@ public class LibretaController : MonoBehaviour
 
     public void PaginaSiguiente()
     {
+        // Verificar si estamos en cooldown
+        if (enCooldown)
+        {
+            Debug.Log("Botón en cooldown, ignorando clic");
+            return;
+        }
+
         Debug.Log($"Botón Derecha presionado. Página actual antes: {paginaActual}");
 
         if (paginaActual < paginas.Count - 1)
@@ -78,11 +93,42 @@ public class LibretaController : MonoBehaviour
             paginaActual++;
             Debug.Log($"Cambiando a página siguiente: {paginaActual}");
             MostrarPaginaActual();
+            IniciarCooldown();
         }
         else
         {
             Debug.Log("Ya estamos en la última página, no se puede avanzar más");
         }
+    }
+
+    private void IniciarCooldown()
+    {
+        if (!enCooldown)
+        {
+            StartCoroutine(CooldownCoroutine());
+        }
+    }
+
+    private IEnumerator CooldownCoroutine()
+    {
+        enCooldown = true;
+        Debug.Log($"Iniciando cooldown de {tiempoCooldown} segundos");
+
+        // Opcional: Cambiar la apariencia de los botones durante el cooldown
+        Color colorOriginal = botonIzquierda.image.color;
+        Color colorCooldown = new Color(colorOriginal.r, colorOriginal.g, colorOriginal.b, 0.5f);
+
+        botonIzquierda.image.color = colorCooldown;
+        botonDerecha.image.color = colorCooldown;
+
+        yield return new WaitForSeconds(tiempoCooldown);
+
+        // Restaurar color original
+        botonIzquierda.image.color = colorOriginal;
+        botonDerecha.image.color = colorOriginal;
+
+        enCooldown = false;
+        Debug.Log("Cooldown terminado");
     }
 
     private void MostrarPaginaActual()

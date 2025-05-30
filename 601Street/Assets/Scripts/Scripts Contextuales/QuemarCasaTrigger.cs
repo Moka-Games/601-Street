@@ -15,5 +15,7 @@ public class QuemarCasaTrigger : MonoBehaviour
     public void NoQuemarCasa()
     {
         panelNegro.SetActive(false);
+        CámaraSecuencia.SetActive(false);
+        VFXFuego.SetActive(false);
     }
 }
