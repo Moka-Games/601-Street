@@ -1256,11 +1256,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   noteContainer: {fileID: 1756287153}
   objectContainer: {fileID: 1756287152}
+  noteScrollRect: {fileID: 1756287155}
+  objectScrollRect: {fileID: 1756287154}
   elementsPerRow: 6
   navigationDelay: 0.15
+  scrollSensitivity: 10000
+  scrollDeadZone: 0.3
+  autoScrollSpeed: 1000000
+  enableAutoScrollToSelected: 1
+  useSmoothedScrolling: 1
+  scrollSmoothTime: 0.1
+  manualScrollMemoryTime: 3
   selectedScale: 1.15
   animationDuration: 0.2
   animationEase: 27
+  enablePulseAnimation: 1
+  pulseScale: 0.05
+  pulseDuration: 1.5
+  pulseEase: 4
   logNavigationActions: 1
 --- !u!4 &953174615
 Transform:
@@ -4712,6 +4725,11 @@ PrefabInstance:
       propertyPath: elementWidth
       value: 150
       objectReference: {fileID: 0}
+    - target: {fileID: 2350511389766766625, guid: 8f4e14d956cc52a4b97a8a4992f17415,
+        type: 3}
+      propertyPath: horizontalSpacing
+      value: 150
+      objectReference: {fileID: 0}
     - target: {fileID: 2855395111144699478, guid: 8f4e14d956cc52a4b97a8a4992f17415,
         type: 3}
       propertyPath: m_SizeDelta.y
@@ -4739,7 +4757,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4130731614660365038, guid: 8f4e14d956cc52a4b97a8a4992f17415,
         type: 3}
+      propertyPath: leftPadding
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4130731614660365038, guid: 8f4e14d956cc52a4b97a8a4992f17415,
+        type: 3}
       propertyPath: elementWidth
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 4130731614660365038, guid: 8f4e14d956cc52a4b97a8a4992f17415,
+        type: 3}
+      propertyPath: horizontalSpacing
       value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 5743276537001577198, guid: 8f4e14d956cc52a4b97a8a4992f17415,
@@ -4925,6 +4953,30 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1756287150}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1756287154 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3926818345833003236, guid: 8f4e14d956cc52a4b97a8a4992f17415,
+    type: 3}
+  m_PrefabInstance: {fileID: 1756287150}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1756287155 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7949079597965337928, guid: 8f4e14d956cc52a4b97a8a4992f17415,
+    type: 3}
+  m_PrefabInstance: {fileID: 1756287150}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &1756287157 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8680226951781635164, guid: 8f4e14d956cc52a4b97a8a4992f17415,
@@ -5012,7 +5064,7 @@ MonoBehaviour:
   enableAutoScrollOnNavigation: 1
   onlyScrollIfElementNotVisible: 1
   manualScrollGracePeriod: 2
-  visibilityMargin: 50
+  visibilityMargin: 25
 --- !u!114 &1808981688
 MonoBehaviour:
   m_ObjectHideFlags: 0
