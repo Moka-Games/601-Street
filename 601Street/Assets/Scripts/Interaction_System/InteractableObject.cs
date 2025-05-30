@@ -16,16 +16,12 @@ public class InteractableObject : MonoBehaviour, IInteractable
 {
     [Header("Configuración básica")]
     [SerializeField] private string interactionID;
-    [Tooltip("Texto que se mostrará en el indicador de interacción")]
     [SerializeField] private string interactionPrompt = "Presiona E para interactuar";
-    [Tooltip("Evento que se disparará cuando el jugador interactúe con este objeto")]
     public UnityEvent onInteraction;
     [SerializeField] private UnityEvent onInteracted;
 
     [Header("Comportamiento de interacción")]
-    [Tooltip("Si está activado, este objeto solo podrá ser interactuado una vez")]
     [SerializeField] private bool singleUseInteraction = false;
-    [Tooltip("Si está activado, el objeto se desactivará después de una interacción (solo aplica si singleUseInteraction = true)")]
     [SerializeField] private bool disableAfterInteraction = false;
 
     [Header("Detección de Rango")]
@@ -44,12 +40,14 @@ public class InteractableObject : MonoBehaviour, IInteractable
     private bool isInitialized = false;
     public bool objectInteracted = false;
 
-    // GameObject hijo para el collider de detección
+    // NUEVO: Variable para rastrear el ID de instancia
+    private int instanceID;
+    private bool indicatorsCreated = false;
+
+    // Referencias del sistema
     private GameObject detectionTriggerObject;
     private SphereCollider detectionCollider;
     private DetectionTriggerHandler triggerHandler;
-
-    // Referencias del sistema
     private PlayerInteraction playerInteraction;
     private Camera mainCamera;
     private RectTransform rangeIndicatorRect;
@@ -62,11 +60,19 @@ public class InteractableObject : MonoBehaviour, IInteractable
     private bool isExiting = false;
     private Vector3 lastScale;
 
-    // Constantes para mejorar el rendimiento
     private const float UPDATE_DELAY = 0.2f;
     private const float MIN_BORDER_WIDTH = 100f;
     private const float TEXT_PADDING = 30f;
     private const float TEXT_MARGIN = 10f;
+
+    // NUEVO: Evento estático para notificar destrucción
+    public static System.Action<int> OnObjectDestroyed;
+
+    private void Awake()
+    {
+        // NUEVO: Obtener y almacenar el ID de instancia
+        instanceID = GetInstanceID();
+    }
 
     private void Start()
     {
@@ -76,39 +82,27 @@ public class InteractableObject : MonoBehaviour, IInteractable
         isInitialized = true;
     }
 
-    /// <summary>
-    /// Crea un GameObject hijo con el collider de detección
-    /// </summary>
     private void CreateDetectionTrigger()
     {
-        // Crear el GameObject hijo para el trigger de detección
         detectionTriggerObject = new GameObject(detectionTriggerName);
         detectionTriggerObject.transform.SetParent(transform);
         detectionTriggerObject.transform.localPosition = Vector3.zero;
         detectionTriggerObject.transform.localRotation = Quaternion.identity;
         detectionTriggerObject.transform.localScale = Vector3.one;
-
-        // Configurar el layer del trigger (usar el mismo layer que el padre)
         detectionTriggerObject.layer = gameObject.layer;
 
-        // Añadir y configurar el SphereCollider
         detectionCollider = detectionTriggerObject.AddComponent<SphereCollider>();
         detectionCollider.radius = detectionRadius;
         detectionCollider.isTrigger = true;
 
-        // Ajustar el radio basado en la escala del objeto padre
         UpdateColliderRadius();
 
-        // Añadir el componente que manejará los eventos del trigger
         triggerHandler = detectionTriggerObject.AddComponent<DetectionTriggerHandler>();
         triggerHandler.Initialize(this);
 
         Debug.Log($"Trigger de detección creado para {gameObject.name}");
     }
 
-    /// <summary>
-    /// Actualiza el radio del collider basado en la escala del objeto
-    /// </summary>
     private void UpdateColliderRadius()
     {
         if (detectionCollider == null) return;
@@ -122,14 +116,10 @@ public class InteractableObject : MonoBehaviour, IInteractable
         lastScale = transform.lossyScale;
     }
 
-    /// <summary>
-    /// Inicializa las referencias del sistema
-    /// </summary>
     private void InitializeReferences()
     {
         mainCamera = Camera.main;
 
-        // Obtener el Canvas HUD
         if (UIFeedbackManager.Instance != null)
         {
             hudCanvas = UIFeedbackManager.Instance.GetHUDCanvas();
@@ -139,7 +129,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
             }
         }
 
-        // Buscar el PlayerInteraction
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
@@ -148,7 +137,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
     }
 
     /// <summary>
-    /// Crea los indicadores de feedback visual
+    /// MEJORADO: Crear indicadores con registro automático
     /// </summary>
     private void CreateFeedbackIndicators()
     {
@@ -159,17 +148,15 @@ public class InteractableObject : MonoBehaviour, IInteractable
             return;
         }
 
-        string objectIdentifier = gameObject.name + "_" + GetInstanceID();
+        string objectIdentifier = gameObject.name + "_" + instanceID;
 
-        // Crear indicadores
-        rangeIndicator = UIFeedbackManager.Instance.CreateRangeIndicator(objectIdentifier);
-        interactIndicator = UIFeedbackManager.Instance.CreateInteractIndicator(objectIdentifier);
+        // MEJORADO: Crear indicadores pasando el instanceID para registro
+        rangeIndicator = UIFeedbackManager.Instance.CreateRangeIndicator(objectIdentifier, instanceID);
+        interactIndicator = UIFeedbackManager.Instance.CreateInteractIndicator(objectIdentifier, instanceID);
 
-        // Obtener los RectTransform
         rangeIndicatorRect = GetRectTransform(rangeIndicator);
         interactIndicatorRect = GetRectTransform(interactIndicator);
 
-        // Verificar que todo esté correctamente configurado
         if (rangeIndicator == null || interactIndicator == null ||
             rangeIndicatorRect == null || interactIndicatorRect == null)
         {
@@ -178,12 +165,10 @@ public class InteractableObject : MonoBehaviour, IInteractable
             return;
         }
 
-        Debug.Log($"Indicadores de feedback creados para {gameObject.name}");
+        indicatorsCreated = true;
+        Debug.Log($"Indicadores de feedback creados para {gameObject.name} (ID: {instanceID})");
     }
 
-    /// <summary>
-    /// Obtiene el RectTransform de un GameObject, incluyendo componentes hijos
-    /// </summary>
     private RectTransform GetRectTransform(GameObject obj)
     {
         if (obj == null) return null;
@@ -206,7 +191,8 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
         if (singleUseInteraction)
         {
-            DestroyFeedbackIndicators();
+            // MEJORADO: Llamar limpieza inmediata y segura
+            SafeDestroyFeedbackIndicators();
 
             if (disableAfterInteraction)
             {
@@ -243,57 +229,44 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
     private void Update()
     {
-        // Actualizar radio del collider si la escala cambió
         if (transform.lossyScale != lastScale)
         {
             UpdateColliderRadius();
         }
 
-        // Si es de un solo uso y ya fue interactuado, no hacer nada más
         if (singleUseInteraction && objectInteracted)
         {
             return;
         }
 
-        // Si no está inicializado o el jugador no está en rango, desactivar indicadores
         if (!isInitialized || !playerOnRange)
         {
             DeactivateIndicators();
             return;
         }
 
-        // Actualizar posición de indicadores
         UpdateIndicatorPosition();
 
-        // Verificar si puede mostrar indicador de interacción (con delay para evitar parpadeos)
         if (Time.time - enterTime > UPDATE_DELAY)
         {
             UpdateIndicatorVisibility();
         }
     }
 
-    /// <summary>
-    /// Actualiza la visibilidad de los indicadores basado en el estado actual
-    /// </summary>
     private void UpdateIndicatorVisibility()
     {
         bool isTargetObject = IsTargetOfPlayerInteraction();
 
         if (isTargetObject && playerInteraction != null && playerInteraction.canInteract)
         {
-            // Mostrar indicador de interacción
             SetIndicatorState(false, true);
         }
         else
         {
-            // Mostrar indicador de rango
             SetIndicatorState(true, false);
         }
     }
 
-    /// <summary>
-    /// Establece el estado de los indicadores de manera segura
-    /// </summary>
     private void SetIndicatorState(bool showRange, bool showInteract)
     {
         if (rangeIndicator != null)
@@ -309,18 +282,12 @@ public class InteractableObject : MonoBehaviour, IInteractable
         }
     }
 
-    /// <summary>
-    /// Desactiva todos los indicadores
-    /// </summary>
     private void DeactivateIndicators()
     {
         if (rangeIndicator != null) rangeIndicator.SetActive(false);
         if (interactIndicator != null) interactIndicator.SetActive(false);
     }
 
-    /// <summary>
-    /// Verifica si este objeto es el objetivo actual del raycast del jugador
-    /// </summary>
     private bool IsTargetOfPlayerInteraction()
     {
         if (playerInteraction == null) return false;
@@ -328,11 +295,10 @@ public class InteractableObject : MonoBehaviour, IInteractable
         RaycastHit hit;
         Vector3 rayOrigin = playerInteraction.transform.position;
         Vector3 rayDirection = playerInteraction.transform.forward;
-        float rayDistance = detectionRadius * 1.5f; // Un poco más que el radio de detección
+        float rayDistance = detectionRadius * 1.5f;
 
         if (Physics.Raycast(rayOrigin, rayDirection, out hit, rayDistance))
         {
-            // Verificar si el raycast golpeó este objeto específico o su trigger
             GameObject hitObject = hit.collider.gameObject;
             return hitObject == gameObject || hitObject == detectionTriggerObject;
         }
@@ -340,9 +306,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
         return false;
     }
 
-    /// <summary>
-    /// Actualiza la posición de los indicadores en pantalla
-    /// </summary>
+    // [Métodos de actualización de posición e interfaz - mantener como estaban]
     private void UpdateIndicatorPosition()
     {
         if (mainCamera == null || rangeIndicatorRect == null || interactIndicatorRect == null)
@@ -364,9 +328,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
         }
     }
 
-    /// <summary>
-    /// Actualiza la posición cuando el objeto está frente a la cámara
-    /// </summary>
     private void UpdateIndicatorPositionInFront(Vector3 screenPos)
     {
         Vector2 screenSize = new Vector2(Screen.width, Screen.height);
@@ -375,14 +336,12 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
         if (isVisible)
         {
-            // Objeto visible - posicionar directamente sobre él
             SetUIPosition(rangeIndicatorRect, screenPos);
             SetUIPosition(interactIndicatorRect, screenPos);
             ResetIndicatorRotation();
         }
         else
         {
-            // Objeto fuera de pantalla - posicionar en el borde
             Vector2 screenCenter = screenSize * 0.5f;
             Vector2 directionToObject = new Vector2(screenPos.x - screenCenter.x, screenPos.y - screenCenter.y).normalized;
             Vector2 edgePosition = CalculateEdgePosition(screenCenter, directionToObject, screenSize);
@@ -393,23 +352,16 @@ public class InteractableObject : MonoBehaviour, IInteractable
         }
     }
 
-    /// <summary>
-    /// Actualiza la posición cuando el objeto está detrás de la cámara
-    /// </summary>
     private void UpdateIndicatorPositionBehind()
     {
         Vector2 edgePosition = new Vector2(Screen.width * 0.5f, edgeOffset);
         SetUIPosition(rangeIndicatorRect, edgePosition);
         SetUIPosition(interactIndicatorRect, edgePosition);
 
-        // Apuntar hacia abajo
         rangeIndicatorRect.rotation = Quaternion.Euler(0, 0, 180);
         interactIndicatorRect.rotation = Quaternion.Euler(0, 0, 180);
     }
 
-    /// <summary>
-    /// Calcula la posición en el borde de la pantalla
-    /// </summary>
     private Vector2 CalculateEdgePosition(Vector2 screenCenter, Vector2 direction, Vector2 screenSize)
     {
         Vector2 edgePosition = screenCenter + direction *
@@ -421,9 +373,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
         return edgePosition;
     }
 
-    /// <summary>
-    /// Establece la rotación de los indicadores
-    /// </summary>
     private void SetIndicatorRotation(Vector2 direction)
     {
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -433,18 +382,12 @@ public class InteractableObject : MonoBehaviour, IInteractable
         interactIndicatorRect.rotation = rotation;
     }
 
-    /// <summary>
-    /// Resetea la rotación de los indicadores
-    /// </summary>
     private void ResetIndicatorRotation()
     {
         rangeIndicatorRect.rotation = Quaternion.identity;
         interactIndicatorRect.rotation = Quaternion.identity;
     }
 
-    /// <summary>
-    /// Actualiza el texto del prompt y ajusta el tamaño del contenedor
-    /// </summary>
     private void UpdateInteractionPrompt(GameObject indicator)
     {
         Transform borderTransform = indicator.transform.Find("Interaction_Prompt_Border");
@@ -463,9 +406,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
         }
     }
 
-    /// <summary>
-    /// Actualiza el tamaño del borde del indicador
-    /// </summary>
     private void UpdateBorderSize(Transform borderTransform, float borderWidth)
     {
         if (borderTransform == null) return;
@@ -479,7 +419,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
             sizeDelta.x = Mathf.Max(MIN_BORDER_WIDTH, borderWidth);
             borderRect.sizeDelta = sizeDelta;
 
-            // Configurar anclajes y posición
             borderRect.anchorMin = new Vector2(0f, borderRect.anchorMin.y);
             borderRect.anchorMax = new Vector2(0f, borderRect.anchorMax.y);
 
@@ -489,9 +428,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
         }
     }
 
-    /// <summary>
-    /// Actualiza el tamaño del texto
-    /// </summary>
     private void UpdateTextSize(TMP_Text descriptionText, float textWidth)
     {
         RectTransform textRect = descriptionText.rectTransform;
@@ -503,7 +439,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
             textSizeDelta.x = Mathf.Max(80f, textWidth + TEXT_MARGIN);
             textRect.sizeDelta = textSizeDelta;
 
-            // Configurar anclajes y posición
             textRect.anchorMin = new Vector2(0f, textRect.anchorMin.y);
             textRect.anchorMax = new Vector2(0f, textRect.anchorMax.y);
 
@@ -513,9 +448,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
         }
     }
 
-    /// <summary>
-    /// Establece la posición de un elemento UI
-    /// </summary>
     private void SetUIPosition(RectTransform rectTransform, Vector2 screenPosition)
     {
         if (rectTransform == null || hudCanvas == null) return;
@@ -570,9 +502,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
     #region Métodos públicos para el trigger handler
 
-    /// <summary>
-    /// Llamado cuando el jugador entra en el rango de detección
-    /// </summary>
     public void OnPlayerEnterRange(Collider playerCollider)
     {
         if (singleUseInteraction && objectInteracted) return;
@@ -583,40 +512,25 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
         Debug.Log($"Jugador en rango de detección de {gameObject.name}");
 
-        // Desactivar indicadores inmediatamente para evitar parpadeos
         DeactivateIndicators();
-
-        // Activar indicadores con delay
         StartCoroutine(DelayedIndicatorActivation());
     }
 
-    /// <summary>
-    /// Llamado cuando el jugador sale del rango de detección
-    /// </summary>
     public void OnPlayerExitRange()
     {
         isExiting = true;
-
-        // Desactivar indicadores inmediatamente
         DeactivateIndicators();
-
         playerOnRange = false;
         playerInteraction = null;
 
         Debug.Log($"Jugador fuera de rango de detección de {gameObject.name}");
 
-        // Cancelar corrutinas pendientes
         StopAllCoroutines();
-
-        // Limpiar después de salir
         StartCoroutine(CleanupAfterExit());
     }
 
     #endregion
 
-    /// <summary>
-    /// Activa los indicadores con un pequeño delay para evitar parpadeos
-    /// </summary>
     private IEnumerator DelayedIndicatorActivation()
     {
         yield return new WaitForSeconds(0.1f);
@@ -627,15 +541,11 @@ public class InteractableObject : MonoBehaviour, IInteractable
         }
     }
 
-    /// <summary>
-    /// Limpia el estado después de que el jugador salga del rango
-    /// </summary>
     private IEnumerator CleanupAfterExit()
     {
         yield return null;
         yield return null;
 
-        // Asegurar que los indicadores estén desactivados
         DeactivateIndicators();
 
         yield return new WaitForSeconds(0.1f);
@@ -644,9 +554,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
         isExiting = false;
     }
 
-    /// <summary>
-    /// Desactiva el objeto después de un delay
-    /// </summary>
     private IEnumerator DisableAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -654,10 +561,17 @@ public class InteractableObject : MonoBehaviour, IInteractable
     }
 
     /// <summary>
-    /// Destruye los indicadores de feedback
+    /// MEJORADO: Método más seguro para destruir indicadores
     /// </summary>
-    private void DestroyFeedbackIndicators()
+    private void SafeDestroyFeedbackIndicators()
     {
+        // Notificar al manager para limpieza inmediata
+        if (UIFeedbackManager.Instance != null && indicatorsCreated)
+        {
+            UIFeedbackManager.Instance.CleanupIndicatorsForObject(instanceID);
+        }
+
+        // Limpieza local adicional por seguridad
         if (rangeIndicator != null)
         {
             rangeIndicator.SetActive(false);
@@ -677,20 +591,68 @@ public class InteractableObject : MonoBehaviour, IInteractable
         {
             detectionCollider.enabled = false;
         }
+
+        indicatorsCreated = false;
+    }
+
+    /// <summary>
+    /// MEJORADO: Limpieza con respaldo seguro
+    /// </summary>
+    private void CleanupIndicators()
+    {
+        if (indicatorsCreated)
+        {
+            SafeDestroyFeedbackIndicators();
+        }
     }
 
     #region Unity Events
 
+    /// <summary>
+    /// MEJORADO: OnDisable con limpieza garantizada
+    /// </summary>
     private void OnDisable()
     {
         DeactivateIndicators();
+
+        // Si se está desactivando, notificar para limpieza
+        if (UIFeedbackManager.Instance != null && indicatorsCreated)
+        {
+            UIFeedbackManager.Instance.CleanupIndicatorsForObject(instanceID);
+        }
     }
 
+    /// <summary>
+    /// MEJORADO: OnDestroy con múltiples sistemas de respaldo
+    /// </summary>
     private void OnDestroy()
     {
-        if (rangeIndicator != null) Destroy(rangeIndicator);
-        if (interactIndicator != null) Destroy(interactIndicator);
-        if (detectionTriggerObject != null) Destroy(detectionTriggerObject);
+        // Notificar destrucción vía evento estático
+        OnObjectDestroyed?.Invoke(instanceID);
+
+        // Limpieza inmediata a través del manager
+        if (UIFeedbackManager.Instance != null && indicatorsCreated)
+        {
+            UIFeedbackManager.Instance.CleanupIndicatorsForObject(instanceID);
+        }
+
+        // Limpieza manual como respaldo final
+        if (rangeIndicator != null)
+        {
+            rangeIndicator.SetActive(false);
+            Destroy(rangeIndicator);
+        }
+        if (interactIndicator != null)
+        {
+            interactIndicator.SetActive(false);
+            Destroy(interactIndicator);
+        }
+        if (detectionTriggerObject != null)
+        {
+            Destroy(detectionTriggerObject);
+        }
+
+        Debug.Log($"InteractableObject {gameObject.name} (ID: {instanceID}) destruido con limpieza completa");
     }
 
     private void OnDrawGizmosSelected()

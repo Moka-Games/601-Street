@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7892010213646877732}
   - component: {fileID: 332728768315286433}
   - component: {fileID: 1462616695921060075}
+  - component: {fileID: 4438929236708873023}
   m_Layer: 9
   m_Name: Clear
   m_TagString: Untagged
@@ -170,6 +171,28 @@ MonoBehaviour:
   customButtonSound: {fileID: 8300000, guid: 4e8064290cd6d9c49a111a43491ee058, type: 3}
   localAudioSource: {fileID: 3497125519718793742}
   buttonAnimator: {fileID: 332728768315286433}
+--- !u!64 &4438929236708873023
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 224140955854437439}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2228417370725966487, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &452215266712749587
 GameObject:
   m_ObjectHideFlags: 0
@@ -181,6 +204,7 @@ GameObject:
   - component: {fileID: 8325231117844313759}
   - component: {fileID: 1075256364496765095}
   - component: {fileID: 5382253080014326511}
+  - component: {fileID: 8854304742495057258}
   m_Layer: 6
   m_Name: 'Button_Txt '
   m_TagString: Untagged
@@ -346,6 +370,28 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 1075256364496765095}
   m_maskType: 0
+--- !u!64 &8854304742495057258
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 452215266712749587}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &472354519545826712
 GameObject:
   m_ObjectHideFlags: 0
@@ -361,6 +407,7 @@ GameObject:
   - component: {fileID: 6049421972202376095}
   - component: {fileID: 2848784265111857135}
   - component: {fileID: 6800992511191817927}
+  - component: {fileID: 4977547696231888261}
   m_Layer: 9
   m_Name: Button_6
   m_TagString: Untagged
@@ -516,6 +563,28 @@ MonoBehaviour:
   customButtonSound: {fileID: 8300000, guid: 6dda7910fe6c88d4a9d394725f78dc53, type: 3}
   localAudioSource: {fileID: 3497125519718793742}
   buttonAnimator: {fileID: 2848784265111857135}
+--- !u!64 &4977547696231888261
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 472354519545826712}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2477511411847689622, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &941842531284973084
 GameObject:
   m_ObjectHideFlags: 0
@@ -527,6 +596,7 @@ GameObject:
   - component: {fileID: 7316441675645058265}
   - component: {fileID: 389125198827937128}
   - component: {fileID: 3253915641866244929}
+  - component: {fileID: 7140199461672624206}
   m_Layer: 6
   m_Name: 'Button_Txt '
   m_TagString: Untagged
@@ -692,6 +762,28 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 389125198827937128}
   m_maskType: 0
+--- !u!64 &7140199461672624206
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941842531284973084}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &1230962210598319132
 GameObject:
   m_ObjectHideFlags: 0
@@ -703,6 +795,7 @@ GameObject:
   - component: {fileID: 6525288349953732798}
   - component: {fileID: 3485260286753486656}
   - component: {fileID: 8415522170345543604}
+  - component: {fileID: 45362444644348083}
   m_Layer: 6
   m_Name: Cube.001
   m_TagString: Untagged
@@ -778,6 +871,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &45362444644348083
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1230962210598319132}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4493585093827132993, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &1883301396089385501
 GameObject:
   m_ObjectHideFlags: 0
@@ -793,6 +908,7 @@ GameObject:
   - component: {fileID: 1704715140176426620}
   - component: {fileID: 8755482006251855065}
   - component: {fileID: 6224355670408583143}
+  - component: {fileID: 5775623764717601158}
   m_Layer: 9
   m_Name: Button_2
   m_TagString: Untagged
@@ -948,6 +1064,28 @@ MonoBehaviour:
   customButtonSound: {fileID: 8300000, guid: 6dda7910fe6c88d4a9d394725f78dc53, type: 3}
   localAudioSource: {fileID: 3497125519718793742}
   buttonAnimator: {fileID: 8755482006251855065}
+--- !u!64 &5775623764717601158
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1883301396089385501}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 1353746659569323740, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &1906819230729106475
 GameObject:
   m_ObjectHideFlags: 0
@@ -959,6 +1097,7 @@ GameObject:
   - component: {fileID: 3049250390193717545}
   - component: {fileID: 3127531149510204649}
   - component: {fileID: 3755283760377975692}
+  - component: {fileID: 2746605639930170264}
   m_Layer: 6
   m_Name: Button_Txt
   m_TagString: Untagged
@@ -1124,6 +1263,28 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 3127531149510204649}
   m_maskType: 0
+--- !u!64 &2746605639930170264
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906819230729106475}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &1990721560323145140
 GameObject:
   m_ObjectHideFlags: 0
@@ -1135,6 +1296,7 @@ GameObject:
   - component: {fileID: 1812818894583168383}
   - component: {fileID: 1527617168094464183}
   - component: {fileID: 6562946033011855293}
+  - component: {fileID: 4791519748489387396}
   m_Layer: 6
   m_Name: 'Button_Txt '
   m_TagString: Untagged
@@ -1300,6 +1462,28 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 1527617168094464183}
   m_maskType: 0
+--- !u!64 &4791519748489387396
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1990721560323145140}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &2130662133490360927
 GameObject:
   m_ObjectHideFlags: 0
@@ -1311,6 +1495,7 @@ GameObject:
   - component: {fileID: 1014323058032313330}
   - component: {fileID: 7570388040123826164}
   - component: {fileID: 412339269212299703}
+  - component: {fileID: 5516300104955422480}
   m_Layer: 6
   m_Name: 'Button_Txt '
   m_TagString: Untagged
@@ -1476,6 +1661,28 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 7570388040123826164}
   m_maskType: 0
+--- !u!64 &5516300104955422480
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130662133490360927}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &2325475263788770251
 GameObject:
   m_ObjectHideFlags: 0
@@ -1490,6 +1697,7 @@ GameObject:
   - component: {fileID: 5136646863411926590}
   - component: {fileID: 1833477273651023365}
   - component: {fileID: 1408735295433152742}
+  - component: {fileID: 1083379443931965146}
   m_Layer: 6
   m_Name: CajaFuerte_Parent
   m_TagString: Untagged
@@ -1505,8 +1713,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2325475263788770251}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -3.37, y: 1.855326, z: 31.45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1516,7 +1724,7 @@ Transform:
   - {fileID: 8215503768119861702}
   - {fileID: 4448313353238307729}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &422334847174790149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1538,6 +1746,8 @@ MonoBehaviour:
   purpleMaterial: {fileID: 2100000, guid: 107397c079cd7ae4ab63ef0ab69e7dd9, type: 2}
   audioSource: {fileID: 3497125519718793742}
   buttonPressSound: {fileID: 8300000, guid: 6dda7910fe6c88d4a9d394725f78dc53, type: 3}
+  buttonNavigationSound: {fileID: 8300000, guid: 4e7518d8d91f6ac4b83e6964d9a78204,
+    type: 3}
   correctPasswordSound: {fileID: 8300000, guid: 4791460787144c74ba1222d0e90785f2,
     type: 3}
   wrongPasswordSound: {fileID: 8300000, guid: dc7f5d31d30d74f45a941a9bcfbb6fb6, type: 3}
@@ -1548,6 +1758,8 @@ MonoBehaviour:
     m_Bits: 512
   maxDigits: 4
   blinkDuration: 1
+  enableMouseInput: 1
+  enableGamepadNavigation: 1
   OnSafeUnlocked:
     m_PersistentCalls:
       m_Calls:
@@ -1599,6 +1811,42 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+      - m_Target: {fileID: 422334847174790149}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 5136646863411926590}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1408735295433152742}
+        m_TargetAssemblyTypeName: UnityEngine.Collider, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnWrongPassword:
     m_PersistentCalls:
       m_Calls: []
@@ -1641,7 +1889,11 @@ MonoBehaviour:
   safeSystem: {fileID: 422334847174790149}
   unlockSequence: {fileID: 8091287239678105364}
   returnToGameplayDelay: 2
-  oneTimeInteraction: 1
+  safeInteractableObject: {fileID: 0}
+  disableInteractionDuringSafeMode: 1
+  playerController: {fileID: 0}
+  disablePlayerMovement: 1
+  enableGamepadNavigationInSafeMode: 1
 --- !u!114 &1833477273651023365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1655,6 +1907,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionID: 1
+  interactionPrompt: Open Safe
   onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -1687,7 +1940,8 @@ MonoBehaviour:
       m_Calls: []
   singleUseInteraction: 0
   disableAfterInteraction: 0
-  detectionRadius: 7.5
+  detectionRadius: 5
+  detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
 --- !u!135 &1408735295433152742
@@ -1705,12 +1959,29 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.95
-  m_Center: {x: 0, y: 1.05, z: 0}
+  m_Radius: 1.5
+  m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &1083379443931965146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2325475263788770251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9349a2a6b3544a4a9d965f2533c94e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navigationThreshold: 0.5
+  navigationCooldown: 0.2
+  highlightMaterial: {fileID: 2100000, guid: d0302848c97a37a4ebfdd50c0af86b42, type: 2}
+  highlightScale: 1.1
+  highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &2399520020107166119
 GameObject:
   m_ObjectHideFlags: 0
@@ -1722,6 +1993,7 @@ GameObject:
   - component: {fileID: 725336316212484331}
   - component: {fileID: 1834958163552689674}
   - component: {fileID: 4689138548120169507}
+  - component: {fileID: 668174423909258036}
   m_Layer: 6
   m_Name: Texto_Pantalla
   m_TagString: Untagged
@@ -1887,6 +2159,28 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 1834958163552689674}
   m_maskType: 0
+--- !u!64 &668174423909258036
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2399520020107166119}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &2426080378020531092
 GameObject:
   m_ObjectHideFlags: 0
@@ -1898,6 +2192,7 @@ GameObject:
   - component: {fileID: 4667254838647307696}
   - component: {fileID: 6179389374732206562}
   - component: {fileID: 7696092464391132550}
+  - component: {fileID: 3031582713450014301}
   m_Layer: 6
   m_Name: 'Button_Txt '
   m_TagString: Untagged
@@ -2063,6 +2358,28 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 6179389374732206562}
   m_maskType: 0
+--- !u!64 &3031582713450014301
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2426080378020531092}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &2573471538490858700
 GameObject:
   m_ObjectHideFlags: 0
@@ -2078,6 +2395,7 @@ GameObject:
   - component: {fileID: 388906692646046629}
   - component: {fileID: 6775999618373802925}
   - component: {fileID: 2554525471304541449}
+  - component: {fileID: 8183999217151409736}
   m_Layer: 9
   m_Name: Button_9
   m_TagString: Untagged
@@ -2233,6 +2551,28 @@ MonoBehaviour:
   customButtonSound: {fileID: 8300000, guid: 6dda7910fe6c88d4a9d394725f78dc53, type: 3}
   localAudioSource: {fileID: 3497125519718793742}
   buttonAnimator: {fileID: 6775999618373802925}
+--- !u!64 &8183999217151409736
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2573471538490858700}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 2212009239438826721, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &2830157201309651990
 GameObject:
   m_ObjectHideFlags: 0
@@ -2343,6 +2683,7 @@ GameObject:
   - component: {fileID: 5554734217261527419}
   - component: {fileID: 4557286743232931787}
   - component: {fileID: 4835799451094698891}
+  - component: {fileID: 2038271463534211081}
   m_Layer: 9
   m_Name: Button_7
   m_TagString: Untagged
@@ -2498,6 +2839,28 @@ MonoBehaviour:
   customButtonSound: {fileID: 8300000, guid: 6dda7910fe6c88d4a9d394725f78dc53, type: 3}
   localAudioSource: {fileID: 3497125519718793742}
   buttonAnimator: {fileID: 4557286743232931787}
+--- !u!64 &2038271463534211081
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2976327313638447869}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -8678823145569952518, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &3312866870633846117
 GameObject:
   m_ObjectHideFlags: 0
@@ -2513,6 +2876,7 @@ GameObject:
   - component: {fileID: 6363484592331964950}
   - component: {fileID: 1070755463028096760}
   - component: {fileID: 211653881448402604}
+  - component: {fileID: 1622789324664268587}
   m_Layer: 9
   m_Name: Button_4
   m_TagString: Untagged
@@ -2668,6 +3032,28 @@ MonoBehaviour:
   customButtonSound: {fileID: 8300000, guid: 6dda7910fe6c88d4a9d394725f78dc53, type: 3}
   localAudioSource: {fileID: 3497125519718793742}
   buttonAnimator: {fileID: 1070755463028096760}
+--- !u!64 &1622789324664268587
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3312866870633846117}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -3329902420748629119, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &3853657882450592258
 GameObject:
   m_ObjectHideFlags: 0
@@ -2684,7 +3070,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5057657977918626904
 Transform:
   m_ObjectHideFlags: 0
@@ -2694,7 +3080,7 @@ Transform:
   m_GameObject: {fileID: 3853657882450592258}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 1.0400001, y: 0.90499973, z: -0.20000064}
+  m_LocalPosition: {x: 1.058, y: 0.90499973, z: -0.20000064}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2758,6 +3144,7 @@ GameObject:
   - component: {fileID: 851112158631920785}
   - component: {fileID: 259089442040624107}
   - component: {fileID: 8671500287525857542}
+  - component: {fileID: 1160737634796464679}
   m_Layer: 6
   m_Name: 'Button_Txt '
   m_TagString: Untagged
@@ -2923,6 +3310,28 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 259089442040624107}
   m_maskType: 0
+--- !u!64 &1160737634796464679
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4337277617855979342}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &4372749944089757587
 GameObject:
   m_ObjectHideFlags: 0
@@ -2934,6 +3343,7 @@ GameObject:
   - component: {fileID: 3414533218732079682}
   - component: {fileID: 6712107010288639275}
   - component: {fileID: 4840328920340510287}
+  - component: {fileID: 5994276379208020845}
   m_Layer: 6
   m_Name: 'Button_Txt '
   m_TagString: Untagged
@@ -3099,6 +3509,28 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 6712107010288639275}
   m_maskType: 0
+--- !u!64 &5994276379208020845
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4372749944089757587}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &4438198728414377976
 GameObject:
   m_ObjectHideFlags: 0
@@ -3110,6 +3542,7 @@ GameObject:
   - component: {fileID: 5251147321968338256}
   - component: {fileID: 7281310941533509527}
   - component: {fileID: 2286098628731333653}
+  - component: {fileID: 8542165361350136161}
   m_Layer: 6
   m_Name: 'Button_Txt '
   m_TagString: Untagged
@@ -3275,6 +3708,28 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 7281310941533509527}
   m_maskType: 0
+--- !u!64 &8542165361350136161
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4438198728414377976}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &4850281698012271515
 GameObject:
   m_ObjectHideFlags: 0
@@ -3290,6 +3745,7 @@ GameObject:
   - component: {fileID: 8004218848788232214}
   - component: {fileID: 8651990070721942172}
   - component: {fileID: 5178488859571020363}
+  - component: {fileID: 2063083432149657233}
   m_Layer: 9
   m_Name: Delete_Button
   m_TagString: Untagged
@@ -3445,6 +3901,28 @@ MonoBehaviour:
   customButtonSound: {fileID: 8300000, guid: 6dda7910fe6c88d4a9d394725f78dc53, type: 3}
   localAudioSource: {fileID: 3497125519718793742}
   buttonAnimator: {fileID: 8651990070721942172}
+--- !u!64 &2063083432149657233
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4850281698012271515}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -257278029260952120, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &5263237342803783126
 GameObject:
   m_ObjectHideFlags: 0
@@ -3456,6 +3934,7 @@ GameObject:
   - component: {fileID: 9048297813313698373}
   - component: {fileID: 5127223077894084182}
   - component: {fileID: 1145890844375631245}
+  - component: {fileID: 5120807490610420158}
   m_Layer: 6
   m_Name: Pantalla
   m_TagString: Untagged
@@ -3532,6 +4011,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &5120807490610420158
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5263237342803783126}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 2534964839176971238, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &5673522624273577433
 GameObject:
   m_ObjectHideFlags: 0
@@ -3543,6 +4044,7 @@ GameObject:
   - component: {fileID: 1359231907295800823}
   - component: {fileID: 8365992944990912549}
   - component: {fileID: 6486211162969667981}
+  - component: {fileID: 3298478347257020003}
   m_Layer: 6
   m_Name: 'Button_Txt '
   m_TagString: Untagged
@@ -3708,6 +4210,28 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 8365992944990912549}
   m_maskType: 0
+--- !u!64 &3298478347257020003
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5673522624273577433}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &5857639781654388448
 GameObject:
   m_ObjectHideFlags: 0
@@ -3849,6 +4373,7 @@ GameObject:
   - component: {fileID: 5393068279905754258}
   - component: {fileID: 5778162839068376999}
   - component: {fileID: 9215128137887544405}
+  - component: {fileID: 7427848160109006338}
   m_Layer: 6
   m_Name: Puerta_CajaFuerte
   m_TagString: Untagged
@@ -3959,6 +4484,28 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!64 &7427848160109006338
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6579667887309593739}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 8691780276856062721, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &6813460077342680358
 GameObject:
   m_ObjectHideFlags: 0
@@ -3970,6 +4517,7 @@ GameObject:
   - component: {fileID: 3589441831583508316}
   - component: {fileID: 3276995830574580484}
   - component: {fileID: 5234498643957546503}
+  - component: {fileID: 2807926722653280339}
   m_Layer: 6
   m_Name: 'Button_Txt '
   m_TagString: Untagged
@@ -4135,6 +4683,28 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 3276995830574580484}
   m_maskType: 0
+--- !u!64 &2807926722653280339
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6813460077342680358}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &7159836850387908389
 GameObject:
   m_ObjectHideFlags: 0
@@ -4150,6 +4720,7 @@ GameObject:
   - component: {fileID: 1928184645755989700}
   - component: {fileID: 8649302291258357196}
   - component: {fileID: 2984241477958320119}
+  - component: {fileID: 2105989657197264787}
   m_Layer: 9
   m_Name: Button_1
   m_TagString: Untagged
@@ -4305,6 +4876,28 @@ MonoBehaviour:
   customButtonSound: {fileID: 8300000, guid: 6dda7910fe6c88d4a9d394725f78dc53, type: 3}
   localAudioSource: {fileID: 3497125519718793742}
   buttonAnimator: {fileID: 8649302291258357196}
+--- !u!64 &2105989657197264787
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7159836850387908389}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -1550514412580984892, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &7355597579421174703
 GameObject:
   m_ObjectHideFlags: 0
@@ -4320,6 +4913,7 @@ GameObject:
   - component: {fileID: 451049477635976694}
   - component: {fileID: 6619220895976635082}
   - component: {fileID: 2866793045020020103}
+  - component: {fileID: 4186815544205637465}
   m_Layer: 9
   m_Name: Button_5
   m_TagString: Untagged
@@ -4475,6 +5069,28 @@ MonoBehaviour:
   customButtonSound: {fileID: 8300000, guid: 6dda7910fe6c88d4a9d394725f78dc53, type: 3}
   localAudioSource: {fileID: 3497125519718793742}
   buttonAnimator: {fileID: 6619220895976635082}
+--- !u!64 &4186815544205637465
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7355597579421174703}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 8552134717624371188, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &7373051836883459603
 GameObject:
   m_ObjectHideFlags: 0
@@ -4486,6 +5102,7 @@ GameObject:
   - component: {fileID: 257587258532075205}
   - component: {fileID: 5143825224254479728}
   - component: {fileID: 6087068280172897965}
+  - component: {fileID: 7864109132500514848}
   m_Layer: 6
   m_Name: 'Button_Txt '
   m_TagString: Untagged
@@ -4651,6 +5268,28 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 5143825224254479728}
   m_maskType: 0
+--- !u!64 &7864109132500514848
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7373051836883459603}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &7379902601554409980
 GameObject:
   m_ObjectHideFlags: 0
@@ -4699,6 +5338,7 @@ GameObject:
   - component: {fileID: 7621959636996666609}
   - component: {fileID: 4199940328254274459}
   - component: {fileID: 3741326349009640525}
+  - component: {fileID: 927611281961600047}
   m_Layer: 9
   m_Name: Enter_Button
   m_TagString: Untagged
@@ -4854,6 +5494,28 @@ MonoBehaviour:
   customButtonSound: {fileID: 8300000, guid: 6dda7910fe6c88d4a9d394725f78dc53, type: 3}
   localAudioSource: {fileID: 3497125519718793742}
   buttonAnimator: {fileID: 4199940328254274459}
+--- !u!64 &927611281961600047
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7545419693440528259}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 8385836491182413749, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &8124247221097318135
 GameObject:
   m_ObjectHideFlags: 0
@@ -4869,6 +5531,7 @@ GameObject:
   - component: {fileID: 5962360846821772555}
   - component: {fileID: 8734699665544206185}
   - component: {fileID: 7356870476683622757}
+  - component: {fileID: 8957262968023349512}
   m_Layer: 9
   m_Name: Button_3
   m_TagString: Untagged
@@ -5024,6 +5687,28 @@ MonoBehaviour:
   customButtonSound: {fileID: 8300000, guid: 6dda7910fe6c88d4a9d394725f78dc53, type: 3}
   localAudioSource: {fileID: 3497125519718793742}
   buttonAnimator: {fileID: 8734699665544206185}
+--- !u!64 &8957262968023349512
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8124247221097318135}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -7771613508976059695, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &8554641042585944807
 GameObject:
   m_ObjectHideFlags: 0
@@ -5036,13 +5721,14 @@ GameObject:
   - component: {fileID: 5575607293389307195}
   - component: {fileID: 497180553225306326}
   - component: {fileID: 3864388322003348850}
+  - component: {fileID: 8131069752505718993}
   m_Layer: 6
   m_Name: Main Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8416730440746548019
 Transform:
   m_ObjectHideFlags: 0
@@ -5051,8 +5737,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8554641042585944807}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.09033259, y: -0.46659315, z: 0.09643355, w: 0.87454647}
-  m_LocalPosition: {x: 1.7840011, y: 1.2799997, z: -0.65299964}
+  m_LocalRotation: {x: 0.09033258, y: -0.46659312, z: 0.09643354, w: 0.87454647}
+  m_LocalPosition: {x: 1.7840014, y: 1.2799999, z: -0.6529999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5102,8 +5788,8 @@ Camera:
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
+  m_HDR: 0
+  m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
@@ -5187,6 +5873,145 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8131069752505718993
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8554641042585944807}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23c1ce4fb46143f46bc5cb5224c934f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clearColorMode: 0
+  backgroundColorHDR: {r: 0.025, g: 0.07, b: 0.19, a: 0}
+  clearDepth: 1
+  volumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  volumeAnchorOverride: {fileID: 0}
+  antialiasing: 0
+  SMAAQuality: 2
+  dithering: 0
+  stopNaNs: 0
+  taaSharpenStrength: 0.5
+  TAAQuality: 1
+  taaSharpenMode: 0
+  taaRingingReduction: 0
+  taaHistorySharpening: 0.35
+  taaAntiFlicker: 0.5
+  taaMotionVectorRejection: 0
+  taaAntiHistoryRinging: 0
+  taaBaseBlendFactor: 0.875
+  taaJitterScale: 1
+  physicalParameters:
+    m_Iso: 200
+    m_ShutterSpeed: 0.005
+    m_Aperture: 16
+    m_FocusDistance: 10
+    m_BladeCount: 5
+    m_Curvature: {x: 2, y: 11}
+    m_BarrelClipping: 0.25
+    m_Anamorphism: 0
+  flipYMode: 0
+  xrRendering: 1
+  fullscreenPassthrough: 0
+  allowDynamicResolution: 0
+  customRenderingSettings: 0
+  invertFaceCulling: 0
+  probeLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  hasPersistentHistory: 0
+  screenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  screenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  allowDeepLearningSuperSampling: 1
+  deepLearningSuperSamplingUseCustomQualitySettings: 0
+  deepLearningSuperSamplingQuality: 0
+  deepLearningSuperSamplingUseCustomAttributes: 0
+  deepLearningSuperSamplingUseOptimalSettings: 1
+  deepLearningSuperSamplingSharpening: 0
+  allowFidelityFX2SuperResolution: 1
+  fidelityFX2SuperResolutionUseCustomQualitySettings: 0
+  fidelityFX2SuperResolutionQuality: 0
+  fidelityFX2SuperResolutionUseCustomAttributes: 0
+  fidelityFX2SuperResolutionUseOptimalSettings: 1
+  fidelityFX2SuperResolutionEnableSharpening: 0
+  fidelityFX2SuperResolutionSharpening: 0
+  fsrOverrideSharpness: 0
+  fsrSharpness: 0.92
+  exposureTarget: {fileID: 0}
+  materialMipBias: 0
+  m_RenderingPathCustomFrameSettings:
+    bitDatas:
+      data1: 5770166122053453
+      data2: 12934340311651418136
+    lodBias: 1
+    lodBiasMode: 0
+    lodBiasQualityLevel: 0
+    maximumLODLevel: 0
+    maximumLODLevelMode: 0
+    maximumLODLevelQualityLevel: 0
+    sssQualityMode: 0
+    sssQualityLevel: 0
+    sssCustomSampleBudget: 20
+    sssCustomDownsampleSteps: 0
+    msaaMode: 1
+    materialQuality: 0
+  renderingPathCustomFrameSettingsOverrideMask:
+    mask:
+      data1: 0
+      data2: 0
+  defaultFrameSettings: 0
+  m_Version: 9
+  m_ObsoleteRenderingPath: 0
+  m_ObsoleteFrameSettings:
+    overrides: 0
+    enableShadow: 0
+    enableContactShadows: 0
+    enableShadowMask: 0
+    enableSSR: 0
+    enableSSAO: 0
+    enableSubsurfaceScattering: 0
+    enableTransmission: 0
+    enableAtmosphericScattering: 0
+    enableVolumetrics: 0
+    enableReprojectionForVolumetrics: 0
+    enableLightLayers: 0
+    enableExposureControl: 1
+    diffuseGlobalDimmer: 0
+    specularGlobalDimmer: 0
+    shaderLitMode: 0
+    enableDepthPrepassWithDeferredRendering: 0
+    enableTransparentPrepass: 0
+    enableMotionVectors: 0
+    enableObjectMotionVectors: 0
+    enableDecals: 0
+    enableRoughRefraction: 0
+    enableTransparentPostpass: 0
+    enableDistortion: 0
+    enablePostprocess: 0
+    enableOpaqueObjects: 0
+    enableTransparentObjects: 0
+    enableRealtimePlanarReflection: 0
+    enableMSAA: 0
+    enableAsyncCompute: 0
+    runLightListAsync: 0
+    runSSRAsync: 0
+    runSSAOAsync: 0
+    runContactShadowsAsync: 0
+    runVolumeVoxelizationAsync: 0
+    lightLoopSettings:
+      overrides: 0
+      enableDeferredTileAndCluster: 0
+      enableComputeLightEvaluation: 0
+      enableComputeLightVariants: 0
+      enableComputeMaterialVariants: 0
+      enableFptlForForwardOpaque: 0
+      enableBigTilePrepass: 0
+      isFptlEnabled: 0
 --- !u!1 &8992744371241256496
 GameObject:
   m_ObjectHideFlags: 0
@@ -5202,6 +6027,7 @@ GameObject:
   - component: {fileID: 4586799955614488133}
   - component: {fileID: 1897727481544749155}
   - component: {fileID: 211171668891359845}
+  - component: {fileID: 3303508791730619380}
   m_Layer: 9
   m_Name: Button_8
   m_TagString: Untagged
@@ -5357,6 +6183,28 @@ MonoBehaviour:
   customButtonSound: {fileID: 8300000, guid: 6dda7910fe6c88d4a9d394725f78dc53, type: 3}
   localAudioSource: {fileID: 3497125519718793742}
   buttonAnimator: {fileID: 1897727481544749155}
+--- !u!64 &3303508791730619380
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8992744371241256496}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -5053925668127403250, guid: bc40174aaf9ffcc4d99141d55e1131f1, type: 3}
 --- !u!1 &9062308487270539046
 GameObject:
   m_ObjectHideFlags: 0
@@ -5373,7 +6221,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8215503768119861702
 Transform:
   m_ObjectHideFlags: 0

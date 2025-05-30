@@ -95,7 +95,7 @@ MonoBehaviour:
     name: Policia Interactuado
     position:
       serializedVersion: 2
-      x: 134.92505
+      x: 133.92505
       y: 475
       width: 200
       height: 150
@@ -111,13 +111,14 @@ MonoBehaviour:
     name: Nakamura Interactuado
     position:
       serializedVersion: 2
-      x: 398.92502
+      x: 395.92502
       y: 477
       width: 200
       height: 150
     activeObjectIDs:
     - Policia_2
     - "Contrase\xF1a_Caja_Fuerte"
+    - Puerta-Bar-Salida
     inactiveObjectIDs:
     - Policia_1
     connectedNodeIDs:
@@ -279,7 +280,10 @@ MonoBehaviour:
     activeObjectIDs:
     - Entrada-Portal
     - Riku-Portal
-    inactiveObjectIDs: []
+    - Entrada_Colegio_1
+    - Entrada_Colegio_2
+    inactiveObjectIDs:
+    - Valla-Colegio
     connectedNodeIDs:
     - Juego-Completado
     isInitialNode: 0
@@ -289,13 +293,16 @@ MonoBehaviour:
     name: Riku Universidad Fail
     position:
       serializedVersion: 2
-      x: 1689.9875
-      y: 800.78516
+      x: 1690.9875
+      y: 801.78516
       width: 200
       height: 150
     activeObjectIDs:
     - Entrada-Portal
-    inactiveObjectIDs: []
+    - Entrada_Colegio_1
+    - Entrada_Colegio_2
+    inactiveObjectIDs:
+    - Valla-Colegio
     connectedNodeIDs:
     - Juego-Completado
     isInitialNode: 0

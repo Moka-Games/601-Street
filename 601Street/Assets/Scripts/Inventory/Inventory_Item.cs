@@ -3,7 +3,7 @@ using UnityEngine.Events;
 using TMPro;
 
 /// <summary>
-/// Versión mejorada del componente Inventory_Item que muestra un canvas de información al recogerlo
+/// Versión mejorada del Inventory_Item con limpieza garantizada de indicadores
 /// </summary>
 public class Inventory_Item : MonoBehaviour
 {
@@ -11,28 +11,25 @@ public class Inventory_Item : MonoBehaviour
     public ItemData itemData;
 
     [Header("Configuración de Interacción")]
-    [Tooltip("Texto que se mostrará en el indicador de interacción")]
-    [SerializeField] private string interactionPrompt = "Recoger"; // Nueva variable
-    [Tooltip("Prefab que se instanciará cuando se interactúe con este objeto o se seleccione en el inventario")]
+    [SerializeField] private string interactionPrompt = "Recoger";
     public GameObject interactionPrefab;
-
-    [Tooltip("Función que se ejecuta al pulsar el objeto en el inventario")]
     public UnityEvent onItemClick;
-
-    [Tooltip("Función que se ejecuta al interactuar con el objeto en el mundo")]
     public UnityEvent OnItemInteracted;
 
     [Header("Configuración de Feedback")]
-    public float edgeOffset = 50f; // Distancia desde el borde de la pantalla
+    public float edgeOffset = 50f;
 
-    // Colliders para detección
     [Header("Colliders")]
-    public SphereCollider detectionCollider; // Collider para mostrar feedback inicial
+    public SphereCollider detectionCollider;
+
+    // NUEVO: Variables para rastreo de limpieza
+    private int instanceID;
+    private bool indicatorsCreated = false;
 
     // Referencias de instancias para este item específico
     private Canvas hudCanvas;
-    private GameObject rangeIndicator; // Instancia del indicador de rango
-    private GameObject interactIndicator; // Instancia del indicador de interacción
+    private GameObject rangeIndicator;
+    private GameObject interactIndicator;
 
     private PlayerInteraction playerInteraction;
     private bool playerInDetectionRange = false;
@@ -44,11 +41,14 @@ public class Inventory_Item : MonoBehaviour
 
     private void Awake()
     {
+        // NUEVO: Obtener y almacenar el ID de instancia
+        instanceID = GetInstanceID();
+
         // Crear collider si no existe
         if (detectionCollider == null)
         {
             detectionCollider = gameObject.AddComponent<SphereCollider>();
-            detectionCollider.radius = 3.0f; // Radio para detección
+            detectionCollider.radius = 3.0f;
             detectionCollider.isTrigger = true;
         }
     }
@@ -66,7 +66,7 @@ public class Inventory_Item : MonoBehaviour
             canvasRectTransform = hudCanvas.GetComponent<RectTransform>();
         }
 
-        // Crear los indicadores para este ítem específico
+        // MEJORADO: Crear los indicadores con registro
         CreateFeedbackIndicators();
 
         // Verificación final
@@ -74,25 +74,34 @@ public class Inventory_Item : MonoBehaviour
         {
             Debug.LogWarning("No se pudo encontrar PlayerInteraction en la escena");
         }
-       
+
         if (interactIndicator != null)
         {
             UpdateInteractionPrompt(interactIndicator);
             Debug.Log($"Inicialización de prompt para {gameObject.name}: '{interactionPrompt}'");
         }
 
-
         isInitialized = true;
     }
 
+    /// <summary>
+    /// MEJORADO: Crear indicadores con registro automático
+    /// </summary>
     private void CreateFeedbackIndicators()
     {
-        // Obtener el nombre único para este objeto
-        string objectIdentifier = gameObject.name + "_" + GetInstanceID();
+        if (UIFeedbackManager.Instance == null)
+        {
+            Debug.LogError($"UIFeedbackManager no encontrado para {gameObject.name}");
+            enabled = false;
+            return;
+        }
 
-        // Crear indicadores a través del gestor
-        rangeIndicator = UIFeedbackManager.Instance.CreateRangeIndicator(objectIdentifier);
-        interactIndicator = UIFeedbackManager.Instance.CreateInteractIndicator(objectIdentifier);
+        // Obtener el nombre único para este objeto
+        string objectIdentifier = gameObject.name + "_" + instanceID;
+
+        // MEJORADO: Crear indicadores a través del gestor con registro
+        rangeIndicator = UIFeedbackManager.Instance.CreateRangeIndicator(objectIdentifier, instanceID);
+        interactIndicator = UIFeedbackManager.Instance.CreateInteractIndicator(objectIdentifier, instanceID);
 
         // Obtener los RectTransform
         if (rangeIndicator != null)
@@ -126,7 +135,8 @@ public class Inventory_Item : MonoBehaviour
         rangeIndicator.SetActive(false);
         interactIndicator.SetActive(false);
 
-        Debug.Log("Indicadores de feedback creados para " + gameObject.name);
+        indicatorsCreated = true;
+        Debug.Log($"Indicadores de feedback creados para {gameObject.name} (ID: {instanceID})");
     }
 
     private void Update()
@@ -134,14 +144,14 @@ public class Inventory_Item : MonoBehaviour
         // Verificar si el objeto sigue existiendo
         if (this == null || !gameObject.activeInHierarchy || !isInitialized)
         {
-            CleanupIndicators();
+            SafeCleanupIndicators();
             return;
         }
 
         // Comprobaciones de seguridad
         if (rangeIndicator == null || interactIndicator == null || !enabled)
         {
-            CleanupIndicators();
+            SafeCleanupIndicators();
             return;
         }
 
@@ -149,7 +159,6 @@ public class Inventory_Item : MonoBehaviour
         UpdateFeedbackLogic();
     }
 
-    // En el método UpdateFeedbackLogic
     private void UpdateFeedbackLogic()
     {
         if (playerInDetectionRange)
@@ -160,8 +169,7 @@ public class Inventory_Item : MonoBehaviour
             // Verificar si el jugador está mirando este objeto específico y puede interactuar
             bool canInteractWithThis = IsTargetOfPlayerInteraction();
 
-            // Modificación clave: Primero actualizamos el texto del prompt SIEMPRE,
-            // independientemente de si se muestra o no
+            // Actualizar el texto del prompt
             if (interactIndicator != null)
             {
                 UpdateInteractionPrompt(interactIndicator);
@@ -191,21 +199,18 @@ public class Inventory_Item : MonoBehaviour
         }
     }
 
-    // Método para verificar si este objeto es el objetivo actual de la interacción del jugador
     private bool IsTargetOfPlayerInteraction()
     {
         if (playerInteraction == null || !playerInteraction.canInteract)
             return false;
 
-        // Lanzar un raycast desde la posición del jugador en la dirección que mira
         RaycastHit hit;
         if (Physics.Raycast(playerInteraction.transform.position,
                           playerInteraction.transform.forward,
                           out hit,
-                          5f, // Usar un valor similar al rango de interacción
+                          5f,
                           1 << gameObject.layer))
         {
-            // Comprobar si el raycast golpeó este objeto específico
             return hit.collider.gameObject == this.gameObject;
         }
         return false;
@@ -213,54 +218,43 @@ public class Inventory_Item : MonoBehaviour
 
     private void UpdateIndicatorPosition()
     {
-        // Verificar que tengamos todas las referencias necesarias
         if (mainCamera == null || rangeIndicatorRect == null || interactIndicatorRect == null)
         {
             Debug.LogWarning("Faltan referencias para actualizar la posición de los indicadores");
             return;
         }
 
-        // Convertir la posición del objeto a coordenadas de pantalla
         Vector3 screenPos = mainCamera.WorldToScreenPoint(transform.position);
-
-        // Verificar si el objeto está frente a la cámara
         bool isInFrontOfCamera = screenPos.z > 0;
 
         if (isInFrontOfCamera)
         {
-            // Obtener las dimensiones de la pantalla
             Vector2 screenSize = new Vector2(Screen.width, Screen.height);
             Vector2 screenCenter = screenSize * 0.5f;
 
-            // Comprobar si está dentro de la vista de la cámara
             bool isVisible = screenPos.x >= 0 && screenPos.x <= screenSize.x &&
                             screenPos.y >= 0 && screenPos.y <= screenSize.y;
 
             if (isVisible)
             {
-                // El objeto es visible, posiciona el indicador directamente sobre él
                 SetUIPosition(rangeIndicatorRect, screenPos);
                 SetUIPosition(interactIndicatorRect, screenPos);
 
-                // Restablecer la rotación cuando está visible
                 rangeIndicatorRect.rotation = Quaternion.identity;
                 interactIndicatorRect.rotation = Quaternion.identity;
             }
             else
             {
-                // El objeto está fuera de la pantalla, posicionar en el borde
                 Vector2 directionToObject = new Vector2(screenPos.x - screenCenter.x, screenPos.y - screenCenter.y).normalized;
                 Vector2 edgePosition = screenCenter + directionToObject *
                     (Vector2.Distance(Vector2.zero, new Vector2(screenCenter.x - edgeOffset, screenCenter.y - edgeOffset)));
 
-                // Asegurarse de que no se sale de los bordes de la pantalla
                 edgePosition.x = Mathf.Clamp(edgePosition.x, edgeOffset, screenSize.x - edgeOffset);
                 edgePosition.y = Mathf.Clamp(edgePosition.y, edgeOffset, screenSize.y - edgeOffset);
 
                 SetUIPosition(rangeIndicatorRect, edgePosition);
                 SetUIPosition(interactIndicatorRect, edgePosition);
 
-                // Rotar el indicador para que apunte hacia el objeto
                 float angle = Mathf.Atan2(directionToObject.y, directionToObject.x) * Mathf.Rad2Deg;
                 rangeIndicatorRect.rotation = Quaternion.Euler(0, 0, angle - 90);
                 interactIndicatorRect.rotation = Quaternion.Euler(0, 0, angle - 90);
@@ -268,102 +262,75 @@ public class Inventory_Item : MonoBehaviour
         }
         else
         {
-            // Si el objeto está detrás de la cámara, colocar en el borde inferior
             Vector2 edgePosition = new Vector2(Screen.width * 0.5f, edgeOffset);
             SetUIPosition(rangeIndicatorRect, edgePosition);
             SetUIPosition(interactIndicatorRect, edgePosition);
 
-            // Apuntar hacia abajo (objeto está detrás)
             rangeIndicatorRect.rotation = Quaternion.Euler(0, 0, 180);
             interactIndicatorRect.rotation = Quaternion.Euler(0, 0, 180);
         }
     }
 
-    // Método para actualizar el prompt y redimensionar el indicador expandiendo solo hacia la derecha
     private void UpdateInteractionPrompt(GameObject indicator)
     {
         if (indicator == null) return;
 
-        // Buscar los componentes necesarios de manera más robusta
         Transform borderTransform = indicator.transform.Find("Interaction_Prompt_Border");
         TMPro.TMP_Text descriptionText = indicator.transform.Find("Interaction_Description")?.GetComponent<TMPro.TMP_Text>();
 
         if (descriptionText != null)
         {
-            // Asignar el texto (usar itemData.itemName si está disponible)
             string displayText = !string.IsNullOrEmpty(interactionPrompt) ?
             interactionPrompt :
             (itemData != null ? "Recoger " + itemData.itemName : "Recoger");
 
             Debug.Log($"Actualizando texto prompt de {gameObject.name} a: '{displayText}'");
             descriptionText.text = displayText;
-
-            // Forzar actualización del texto
             descriptionText.ForceMeshUpdate(true);
 
-            // Obtener el ancho preferido del texto
             float textWidth = descriptionText.preferredWidth;
-
-            // Añadir padding para el borde
             float padding = 30f;
             float borderWidth = textWidth + padding;
 
-            // Ajustar el ancho del borde
             if (borderTransform != null)
             {
                 RectTransform borderRect = borderTransform as RectTransform;
                 if (borderRect != null)
                 {
-                    // Asegurar que el pivote esté a la izquierda (para crecer hacia la derecha)
                     borderRect.pivot = new Vector2(0f, 0.5f);
 
-                    // Mantener la altura actual, cambiar solo el ancho
                     Vector2 sizeDelta = borderRect.sizeDelta;
-                    sizeDelta.x = Mathf.Max(100f, borderWidth); // Mínimo 100 unidades de ancho
+                    sizeDelta.x = Mathf.Max(100f, borderWidth);
                     borderRect.sizeDelta = sizeDelta;
 
-                    // Si la posición del borde se basa en un anclaje que no es izquierdo,
-                    // ajustar la posición para mantenerla consistente
                     if (borderRect.anchorMin.x != 0f || borderRect.anchorMax.x != 0f)
                     {
-                        // Establecer anclajes a la izquierda
                         borderRect.anchorMin = new Vector2(0f, borderRect.anchorMin.y);
                         borderRect.anchorMax = new Vector2(0f, borderRect.anchorMax.y);
 
-                        // Asegurar que la posición sea correcta
                         Vector2 anchoredPosition = borderRect.anchoredPosition;
-                        anchoredPosition.x = 0f; // Alinear con el borde izquierdo
+                        anchoredPosition.x = 0f;
                         borderRect.anchoredPosition = anchoredPosition;
                     }
                 }
             }
-            else
-            {
-                Debug.LogWarning($"No se pudo encontrar 'Interaction_Description' en {indicator.name}");
-            }
 
-            // Ajustar el rectTransform del texto
             RectTransform textRect = descriptionText.rectTransform;
             if (textRect != null)
             {
-                // Asegurar que el pivote del texto también esté a la izquierda
                 textRect.pivot = new Vector2(0f, 0.5f);
 
-                // Ajustar el ancho del texto (dejando un poco de margen interno)
                 Vector2 textSizeDelta = textRect.sizeDelta;
                 textSizeDelta.x = Mathf.Max(80f, textWidth + 10f);
                 textRect.sizeDelta = textSizeDelta;
 
-                // Si la posición del texto depende de un anclaje no izquierdo, ajustarla
                 if (textRect.anchorMin.x != 0f || textRect.anchorMax.x != 0f)
                 {
-                    // Establecer anclajes a la izquierda
                     textRect.anchorMin = new Vector2(0f, textRect.anchorMin.y);
                     textRect.anchorMax = new Vector2(0f, textRect.anchorMax.y);
 
-                    // Asegurar la posición correcta
                     Vector2 textPosition = textRect.anchoredPosition;
-                    textPosition.x = 10f; // Un pequeño margen desde el borde izquierdo
+                    textPosition.x = 10f;
                     textRect.anchoredPosition = textPosition;
                 }
             }
@@ -375,18 +342,14 @@ public class Inventory_Item : MonoBehaviour
         if (hudCanvas == null || rectTransform == null)
             return;
 
-        // Determinar el tipo de renderizado del canvas
         if (hudCanvas.renderMode == RenderMode.ScreenSpaceOverlay)
         {
-            // Para ScreenSpaceOverlay, las coordenadas de pantalla se pueden usar directamente
             rectTransform.position = new Vector3(screenPosition.x, screenPosition.y, 0);
         }
         else if (hudCanvas.renderMode == RenderMode.ScreenSpaceCamera)
         {
-            // Para ScreenSpaceCamera, convertir de coordenadas de pantalla a viewport
             Vector2 viewportPosition = new Vector2(screenPosition.x / Screen.width, screenPosition.y / Screen.height);
 
-            // Y luego a coordenadas de mundo
             Vector3 worldPos = hudCanvas.worldCamera != null ?
                 hudCanvas.worldCamera.ViewportToWorldPoint(new Vector3(viewportPosition.x, viewportPosition.y, hudCanvas.planeDistance)) :
                 Camera.main.ViewportToWorldPoint(new Vector3(viewportPosition.x, viewportPosition.y, 10));
@@ -395,20 +358,15 @@ public class Inventory_Item : MonoBehaviour
         }
         else // RenderMode.WorldSpace
         {
-            // Para WorldSpace, usar un enfoque diferente
             if (canvasRectTransform != null)
             {
-                // Calcular la posición relativa al canvas
                 Vector2 canvasSize = canvasRectTransform.sizeDelta;
-                float canvasScale = canvasRectTransform.localScale.x;
 
-                // Convertir de coordenadas de pantalla a coordenadas normalizadas (0-1)
                 Vector2 normalizedPos = new Vector2(
                     screenPosition.x / Screen.width,
                     screenPosition.y / Screen.height
                 );
 
-                // Convertir a coordenadas locales del canvas
                 Vector2 localPos = new Vector2(
                     (normalizedPos.x - 0.5f) * canvasSize.x,
                     (normalizedPos.y - 0.5f) * canvasSize.y
@@ -455,20 +413,16 @@ public class Inventory_Item : MonoBehaviour
         // Invocar el evento de interacción
         OnItemInteracted?.Invoke();
 
-        // Añadir el ítem al inventario con su prefab de interacción
-        // Usamos la opción suppressPopup=true para evitar que se muestre el popup ahora
+        // Añadir el ítem al inventario
         if (Inventory_Manager.Instance != null)
         {
             if (interactionPrefab != null)
             {
                 Inventory_Manager.Instance.AddItem(itemData, interactionPrefab, onItemClick, true);
-
-                // Mostrar el prefab de interacción y configurarlo para que al cerrarlo muestre el popup
                 Inventory_Manager.Instance.ShowInteractionForNewItem(interactionPrefab, itemData.itemName);
             }
             else
             {
-                // Mantener compatibilidad con el sistema anterior
                 Inventory_Manager.Instance.AddItem(itemData, onItemClick);
                 Inventory_Manager.Instance.DisplayPopUp(itemData.itemName);
             }
@@ -478,13 +432,25 @@ public class Inventory_Item : MonoBehaviour
             Debug.LogError("No se encontró instancia de Inventory_Manager");
         }
 
+        // MEJORADO: Limpieza segura antes de destruir
+        SafeCleanupIndicators();
+
         // Destruir el objeto del mundo tras recogerlo
         Destroy(gameObject);
     }
 
-    private void CleanupIndicators()
+    /// <summary>
+    /// NUEVO: Limpieza segura de indicadores
+    /// </summary>
+    private void SafeCleanupIndicators()
     {
-        // Eliminar los indicadores si existen
+        // Notificar al manager para limpieza inmediata
+        if (UIFeedbackManager.Instance != null && indicatorsCreated)
+        {
+            UIFeedbackManager.Instance.CleanupIndicatorsForObject(instanceID);
+        }
+
+        // Limpieza local adicional por seguridad
         if (rangeIndicator != null)
         {
             rangeIndicator.SetActive(false);
@@ -498,17 +464,55 @@ public class Inventory_Item : MonoBehaviour
             Destroy(interactIndicator);
             interactIndicator = null;
         }
+
+        indicatorsCreated = false;
     }
 
+    /// <summary>
+    /// MEJORADO: Wrapper para compatibilidad
+    /// </summary>
+    private void CleanupIndicators()
+    {
+        if (indicatorsCreated)
+        {
+            SafeCleanupIndicators();
+        }
+    }
+
+    /// <summary>
+    /// MEJORADO: OnDisable con limpieza garantizada
+    /// </summary>
     private void OnDisable()
     {
-        // Limpiar cuando se deshabilite este script
-        CleanupIndicators();
+        if (UIFeedbackManager.Instance != null && indicatorsCreated)
+        {
+            UIFeedbackManager.Instance.CleanupIndicatorsForObject(instanceID);
+        }
     }
 
+    /// <summary>
+    /// MEJORADO: OnDestroy con múltiples sistemas de respaldo
+    /// </summary>
     private void OnDestroy()
     {
-        // Limpiar cuando se destruya este objeto
-        CleanupIndicators();
+        // Limpieza inmediata a través del manager
+        if (UIFeedbackManager.Instance != null && indicatorsCreated)
+        {
+            UIFeedbackManager.Instance.CleanupIndicatorsForObject(instanceID);
+        }
+
+        // Limpieza manual como respaldo final
+        if (rangeIndicator != null)
+        {
+            rangeIndicator.SetActive(false);
+            Destroy(rangeIndicator);
+        }
+        if (interactIndicator != null)
+        {
+            interactIndicator.SetActive(false);
+            Destroy(interactIndicator);
+        }
+
+        Debug.Log($"Inventory_Item {gameObject.name} (ID: {instanceID}) destruido con limpieza completa");
     }
 }

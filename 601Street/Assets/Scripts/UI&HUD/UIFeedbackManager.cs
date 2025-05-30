@@ -1,7 +1,10 @@
+// 1. MEJORAR UIFeedbackManager.cs - Agregar registro de indicadores
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// Gestor de indicadores de UI para feedback visual de interacción
+/// Versión mejorada con registro y limpieza automática de indicadores
 /// </summary>
 public class UIFeedbackManager : MonoBehaviour
 {
@@ -13,10 +16,7 @@ public class UIFeedbackManager : MonoBehaviour
         {
             if (_instance == null)
             {
-                // Buscar instancia en la escena
                 _instance = FindAnyObjectByType<UIFeedbackManager>();
-
-                // Si no existe, crear un objeto con este componente
                 if (_instance == null)
                 {
                     GameObject managerObject = new GameObject("UIFeedbackManager");
@@ -28,35 +28,30 @@ public class UIFeedbackManager : MonoBehaviour
     }
 
     [Header("Prefabs de Indicadores UI")]
-    [Tooltip("Prefab para indicar que un objeto está en rango")]
     [SerializeField] private GameObject rangeIndicatorPrefab;
-
-    [Tooltip("Prefab para indicar que se puede interactuar con un objeto")]
     [SerializeField] private GameObject interactIndicatorPrefab;
 
     [Header("Canvas de HUD")]
-    [Tooltip("Canvas donde se instanciarán los indicadores")]
     [SerializeField] private Canvas hudCanvas;
+
+    // NUEVO: Registro de indicadores para limpieza automática
+    private Dictionary<int, List<GameObject>> objectIndicators = new Dictionary<int, List<GameObject>>();
 
     private void Awake()
     {
-        // Singleton pattern
         if (_instance != null && _instance != this)
         {
             Destroy(gameObject);
             return;
         }
-
         _instance = this;
 
-        // Intentar encontrar el canvas si no está asignado
         if (hudCanvas == null)
         {
             FindHUDCanvas();
         }
     }
 
-    // Método para buscar el canvas de HUD
     private void FindHUDCanvas()
     {
         GameObject hudObj = GameObject.Find("HUD");
@@ -71,16 +66,14 @@ public class UIFeedbackManager : MonoBehaviour
 
         if (hudCanvas == null)
         {
-            Debug.LogWarning("UIFeedbackManager: No se encontró el Canvas HUD. Algunos indicadores podrían no mostrarse correctamente.");
+            Debug.LogWarning("UIFeedbackManager: No se encontró el Canvas HUD.");
         }
     }
 
     /// <summary>
-    /// Crea un indicador de rango como hijo del canvas HUD
+    /// Crea un indicador de rango y lo registra para limpieza automática
     /// </summary>
-    /// <param name="name">Nombre para el nuevo indicador</param>
-    /// <returns>Instancia del indicador creado</returns>
-    public GameObject CreateRangeIndicator(string name)
+    public GameObject CreateRangeIndicator(string name, int ownerInstanceID)
     {
         if (rangeIndicatorPrefab == null)
         {
@@ -88,11 +81,9 @@ public class UIFeedbackManager : MonoBehaviour
             return null;
         }
 
-        // Buscar el canvas HUD si no lo tenemos aún
         if (hudCanvas == null)
         {
             FindHUDCanvas();
-
             if (hudCanvas == null)
             {
                 Debug.LogError("UIFeedbackManager: No se puede crear indicador sin un Canvas HUD");
@@ -100,22 +91,20 @@ public class UIFeedbackManager : MonoBehaviour
             }
         }
 
-        // Instanciar el indicador como hijo del canvas
         GameObject indicator = Instantiate(rangeIndicatorPrefab, hudCanvas.transform);
         indicator.name = "RangeIndicator_" + name;
-
-        // Inicialmente desactivado
         indicator.SetActive(false);
+
+        // NUEVO: Registrar el indicador
+        RegisterIndicator(ownerInstanceID, indicator);
 
         return indicator;
     }
 
     /// <summary>
-    /// Crea un indicador de interacción como hijo del canvas HUD
+    /// Crea un indicador de interacción y lo registra para limpieza automática
     /// </summary>
-    /// <param name="name">Nombre para el nuevo indicador</param>
-    /// <returns>Instancia del indicador creado</returns>
-    public GameObject CreateInteractIndicator(string name)
+    public GameObject CreateInteractIndicator(string name, int ownerInstanceID)
     {
         if (interactIndicatorPrefab == null)
         {
@@ -123,11 +112,9 @@ public class UIFeedbackManager : MonoBehaviour
             return null;
         }
 
-        // Buscar el canvas HUD si no lo tenemos aún
         if (hudCanvas == null)
         {
             FindHUDCanvas();
-
             if (hudCanvas == null)
             {
                 Debug.LogError("UIFeedbackManager: No se puede crear indicador sin un Canvas HUD");
@@ -135,91 +122,197 @@ public class UIFeedbackManager : MonoBehaviour
             }
         }
 
-        // Instanciar el indicador como hijo del canvas
         GameObject indicator = Instantiate(interactIndicatorPrefab, hudCanvas.transform);
         indicator.name = "InteractIndicator_" + name;
-
-        // Inicialmente desactivado
         indicator.SetActive(false);
 
-        // Configurar el texto y el borde para que crezcan hacia la derecha
         ConfigureInteractIndicatorForRightwardsExpansion(indicator);
+
+        // NUEVO: Registrar el indicador
+        RegisterIndicator(ownerInstanceID, indicator);
 
         return indicator;
     }
 
     /// <summary>
-    /// Configura el indicador de interacción para que se expanda hacia la derecha
+    /// NUEVO: Registra un indicador asociado a un objeto específico
     /// </summary>
+    private void RegisterIndicator(int ownerInstanceID, GameObject indicator)
+    {
+        if (!objectIndicators.ContainsKey(ownerInstanceID))
+        {
+            objectIndicators[ownerInstanceID] = new List<GameObject>();
+        }
+
+        objectIndicators[ownerInstanceID].Add(indicator);
+
+        // Agregar un componente que detecte cuando el indicador es destruido
+        var cleanupComponent = indicator.AddComponent<IndicatorCleanupHelper>();
+        cleanupComponent.Initialize(this, ownerInstanceID, indicator);
+    }
+
+    /// <summary>
+    /// NUEVO: Limpia todos los indicadores asociados a un objeto específico
+    /// </summary>
+    public void CleanupIndicatorsForObject(int ownerInstanceID)
+    {
+        if (objectIndicators.ContainsKey(ownerInstanceID))
+        {
+            foreach (var indicator in objectIndicators[ownerInstanceID])
+            {
+                if (indicator != null)
+                {
+                    indicator.SetActive(false);
+                    Destroy(indicator);
+                }
+            }
+            objectIndicators.Remove(ownerInstanceID);
+            Debug.Log($"Limpiados indicadores para objeto con ID: {ownerInstanceID}");
+        }
+    }
+
+    /// <summary>
+    /// NUEVO: Limpia indicadores huérfanos (cuyo objeto padre ya no existe)
+    /// </summary>
+    public void CleanupOrphanedIndicators()
+    {
+        var keysToRemove = new List<int>();
+
+        foreach (var kvp in objectIndicators)
+        {
+            var indicatorsToRemove = new List<GameObject>();
+
+            foreach (var indicator in kvp.Value)
+            {
+                if (indicator == null)
+                {
+                    indicatorsToRemove.Add(indicator);
+                }
+            }
+
+            // Remover indicadores nulos
+            foreach (var indicator in indicatorsToRemove)
+            {
+                kvp.Value.Remove(indicator);
+            }
+
+            // Si no quedan indicadores, marcar para remover la entrada
+            if (kvp.Value.Count == 0)
+            {
+                keysToRemove.Add(kvp.Key);
+            }
+        }
+
+        // Remover entradas vacías
+        foreach (var key in keysToRemove)
+        {
+            objectIndicators.Remove(key);
+        }
+    }
+
+    /// <summary>
+    /// NUEVO: Permite desregistrar un indicador específico
+    /// </summary>
+    public void UnregisterIndicator(int ownerInstanceID, GameObject indicator)
+    {
+        if (objectIndicators.ContainsKey(ownerInstanceID))
+        {
+            objectIndicators[ownerInstanceID].Remove(indicator);
+
+            if (objectIndicators[ownerInstanceID].Count == 0)
+            {
+                objectIndicators.Remove(ownerInstanceID);
+            }
+        }
+    }
+
     private void ConfigureInteractIndicatorForRightwardsExpansion(GameObject indicator)
     {
-        // Buscar componentes necesarios
         Transform borderTransform = indicator.transform.Find("Interaction_Prompt_Border");
         TMPro.TMP_Text descriptionText = indicator.transform.Find("Interaction_Description")?.GetComponent<TMPro.TMP_Text>();
 
-        // Configurar el borde
         if (borderTransform != null)
         {
             RectTransform borderRect = borderTransform as RectTransform;
             if (borderRect != null)
             {
-                // Configurar pivot a la izquierda para que crezca hacia la derecha
                 borderRect.pivot = new Vector2(0f, 0.5f);
-
-                // Establecer anclajes a la izquierda
                 borderRect.anchorMin = new Vector2(0f, borderRect.anchorMin.y);
                 borderRect.anchorMax = new Vector2(0f, borderRect.anchorMax.y);
-
-                // Posición fija desde la izquierda
                 Vector2 anchoredPosition = borderRect.anchoredPosition;
                 anchoredPosition.x = 0f;
                 borderRect.anchoredPosition = anchoredPosition;
             }
         }
 
-        // Configurar el texto
         if (descriptionText != null)
         {
-            // Configurar el texto para que no haga wrapping
-            descriptionText.textWrappingMode = TMPro.TextWrappingModes.NoWrap; 
+            descriptionText.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
             descriptionText.overflowMode = TMPro.TextOverflowModes.Overflow;
 
-            // Configurar pivot y anclajes
             RectTransform textRect = descriptionText.rectTransform;
             if (textRect != null)
             {
-                // Pivot a la izquierda
                 textRect.pivot = new Vector2(0f, 0.5f);
-
-                // Anclajes a la izquierda
                 textRect.anchorMin = new Vector2(0f, textRect.anchorMin.y);
                 textRect.anchorMax = new Vector2(0f, textRect.anchorMax.y);
-
-                // Posición con un pequeño margen izquierdo
                 Vector2 textPosition = textRect.anchoredPosition;
-                textPosition.x = 10f; // Margen desde el borde
+                textPosition.x = 10f;
                 textRect.anchoredPosition = textPosition;
             }
 
-            // No establecemos un texto inicial aquí, lo dejamos vacío o con un placeholder
-            // para que sea establecido por el componente del objeto interactuable
-            descriptionText.text = ""; // Esto será sobrescrito por el valor de interactionPrompt
-            
             descriptionText.text = "[PENDING UPDATE]";
-
-            // Forzar actualización del texto para que se calcule el tamaño correcto
             descriptionText.ForceMeshUpdate();
         }
     }
 
-    // Getter para el Canvas HUD
     public Canvas GetHUDCanvas()
     {
         if (hudCanvas == null)
         {
             FindHUDCanvas();
         }
-
         return hudCanvas;
+    }
+
+    // NUEVO: Limpieza general al destruir el manager
+    private void OnDestroy()
+    {
+        foreach (var kvp in objectIndicators)
+        {
+            foreach (var indicator in kvp.Value)
+            {
+                if (indicator != null)
+                {
+                    Destroy(indicator);
+                }
+            }
+        }
+        objectIndicators.Clear();
+    }
+}
+
+/// <summary>
+/// NUEVO: Componente auxiliar para detectar cuando un indicador es destruido
+/// </summary>
+public class IndicatorCleanupHelper : MonoBehaviour
+{
+    private UIFeedbackManager manager;
+    private int ownerInstanceID;
+    private GameObject indicator;
+
+    public void Initialize(UIFeedbackManager mgr, int ownerID, GameObject ind)
+    {
+        manager = mgr;
+        ownerInstanceID = ownerID;
+        indicator = ind;
+    }
+
+    private void OnDestroy()
+    {
+        if (manager != null)
+        {
+            manager.UnregisterIndicator(ownerInstanceID, indicator);
+        }
     }
 }
