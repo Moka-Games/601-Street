@@ -134,6 +134,8 @@ GameObject:
   - component: {fileID: 14611194}
   - component: {fileID: 14611191}
   - component: {fileID: 14611192}
+  - component: {fileID: 14611196}
+  - component: {fileID: 14611195}
   m_Layer: 6
   m_Name: PuertaAula_Interactable
   m_TagString: Untagged
@@ -250,6 +252,45 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.1674385, y: 2.1390305, z: 0.56443024}
   m_Center: {x: 0.19708061, y: -0.13655281, z: 0.21778488}
+--- !u!114 &14611195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 14611189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: Puerta-Aula
+  useSceneName: 0
+  sceneName: Colegio
+  defaultActiveState: 1
+  applyStateImmediately: 1
+  onActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  listenOnlyWhenActive: 0
+  useTransition: 0
+  transitionDuration: 0.5
+--- !u!114 &14611196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 14611189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e64f5cbc289c58948a4d0c6173aeafe3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: Puerta-Aula
 --- !u!1 &20009738
 GameObject:
   m_ObjectHideFlags: 0
@@ -1674,6 +1715,7 @@ Transform:
   - {fileID: 1896980300}
   - {fileID: 987626805}
   - {fileID: 1029948569}
+  - {fileID: 1806420500}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &147770424
@@ -2848,7 +2890,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!108 &198226345
 Light:
   m_ObjectHideFlags: 0
@@ -30492,6 +30534,158 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1896980293}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1806420499
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 138147909}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 101.93942
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 101.93945
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 101.93945
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 8.252436
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -8.67659
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -33.97626
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7070792
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7070793
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.0062433183
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.0062433174
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -1.012
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7a187ae829348cd4db9f9b0ad4511cc6, type: 2}
+    - target: {fileID: 919132149155446097, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_Name
+      value: PuertaAulaExtra_Final
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1806420503}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b511defc5750395498da6b944c0df49b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1806420502}
+  m_SourcePrefab: {fileID: 100100000, guid: b511defc5750395498da6b944c0df49b, type: 3}
+--- !u!4 &1806420500 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b511defc5750395498da6b944c0df49b,
+    type: 3}
+  m_PrefabInstance: {fileID: 1806420499}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1806420501 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b511defc5750395498da6b944c0df49b,
+    type: 3}
+  m_PrefabInstance: {fileID: 1806420499}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1806420502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1806420501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e64f5cbc289c58948a4d0c6173aeafe3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: Puerta-Colegio-Final
+--- !u!114 &1806420503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1806420501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: Puerta-Colegio-Final
+  useSceneName: 0
+  sceneName: Colegio
+  defaultActiveState: 0
+  applyStateImmediately: 1
+  onActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  listenOnlyWhenActive: 0
+  useTransition: 0
+  transitionDuration: 0.5
 --- !u!64 &1810353144
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -42946,9 +43140,9 @@ SceneRoots:
   - {fileID: 1291360549111379746}
   - {fileID: 1878364236}
   - {fileID: 2516743648678383598}
+  - {fileID: 1096850156}
+  - {fileID: 513446924}
   - {fileID: 1756483843}
   - {fileID: 1130092833}
   - {fileID: 1670502499}
   - {fileID: 2126606800}
-  - {fileID: 1096850156}
-  - {fileID: 513446924}
