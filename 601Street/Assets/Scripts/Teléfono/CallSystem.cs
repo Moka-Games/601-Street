@@ -203,9 +203,25 @@ public class CallSystem : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Prepara el sistema para una nueva llamada (llamar antes de StartCall)
+    /// </summary>
+    private void PrepareForNewCall()
+    {
+        // Preparar el sistema de animaciones
+        if (CallAnimationManager.Instance != null)
+        {
+            CallAnimationManager.Instance.PrepareForNewCall();
+            Debug.Log("CallSystem: Sistema de animaciones preparado para nueva llamada");
+        }
+    }
+
     // Método público para iniciar una llamada
     public void StartCall(CallData callData)
     {
+        // Preparar para nueva llamada
+        PrepareForNewCall();
+
         if (isCallActive)
         {
             Debug.LogWarning("CallSystem: Ya hay una llamada en curso");
@@ -344,6 +360,13 @@ public class CallSystem : MonoBehaviour
         OnCallStateChanged?.Invoke(true);
         StartSafetyCheck();
 
+        // Iniciar animación de llamada
+        if (CallAnimationManager.Instance != null)
+        {
+            CallAnimationManager.Instance.StartCallAnimation();
+            Debug.Log("CallSystem: Iniciando animación de llamada");
+        }
+
         if (popupTimerCoroutine != null)
         {
             StopCoroutine(popupTimerCoroutine);
@@ -403,6 +426,13 @@ public class CallSystem : MonoBehaviour
 
         currentCallRejectedEvent?.Invoke();
         Debug.Log("CallSystem: Evento OnCallRejected invocado");
+
+        // Asegurar que el parámetro callEnded esté reseteado para futuras llamadas
+        if (CallAnimationManager.Instance != null)
+        {
+            CallAnimationManager.Instance.ResetCallEndedParameter();
+            Debug.Log("CallSystem: Parámetro callEnded reseteado tras rechazar llamada");
+        }
 
         HideCallPopup();
 
@@ -478,6 +508,13 @@ public class CallSystem : MonoBehaviour
     {
         Debug.Log("CallSystem: Llamada finalizada");
 
+        // Finalizar animación de llamada
+        if (CallAnimationManager.Instance != null)
+        {
+            CallAnimationManager.Instance.EndCallAnimation();
+            Debug.Log("CallSystem: Finalizando animación de llamada");
+        }
+
         if (audioSource != null && audioSource.isPlaying)
         {
             audioSource.Stop();
@@ -501,6 +538,13 @@ public class CallSystem : MonoBehaviour
     public void ForceEndCall()
     {
         Debug.Log("CallSystem: Finalizando llamada forzosamente");
+
+        // Forzar fin de animación
+        if (CallAnimationManager.Instance != null)
+        {
+            CallAnimationManager.Instance.ForceEndCallAnimation();
+        }
+
         HideCallPopup();
         EndCall();
     }

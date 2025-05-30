@@ -11,7 +11,6 @@ public interface IInteractable
     bool CanBeInteractedAgain();
     string GetInteractionPrompt();
 }
-
 public class InteractableObject : MonoBehaviour, IInteractable
 {
     [Header("Configuración básica")]
@@ -150,9 +149,9 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
         string objectIdentifier = gameObject.name + "_" + instanceID;
 
-        // MEJORADO: Crear indicadores pasando el instanceID para registro
-        rangeIndicator = UIFeedbackManager.Instance.CreateRangeIndicator(objectIdentifier, instanceID);
-        interactIndicator = UIFeedbackManager.Instance.CreateInteractIndicator(objectIdentifier, instanceID);
+        // MEJORADO: Crear indicadores pasando el instanceID y la referencia del componente
+        rangeIndicator = UIFeedbackManager.Instance.CreateRangeIndicator(objectIdentifier, instanceID, this);
+        interactIndicator = UIFeedbackManager.Instance.CreateInteractIndicator(objectIdentifier, instanceID, this);
 
         rangeIndicatorRect = GetRectTransform(rangeIndicator);
         interactIndicatorRect = GetRectTransform(interactIndicator);
@@ -191,8 +190,8 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
         if (singleUseInteraction)
         {
-            // MEJORADO: Llamar limpieza inmediata y segura
-            SafeDestroyFeedbackIndicators();
+            // CORREGIDO: Solo ocultar indicadores, no destruirlos aún
+            HideFeedbackIndicators();
 
             if (disableAfterInteraction)
             {
@@ -255,6 +254,20 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
     private void UpdateIndicatorVisibility()
     {
+        // NUEVO: Verificar primero si este componente está habilitado
+        if (!enabled || !gameObject.activeInHierarchy)
+        {
+            DeactivateIndicators();
+            return;
+        }
+
+        // NUEVO: Verificar también a través del manager
+        if (UIFeedbackManager.Instance != null && !UIFeedbackManager.Instance.IsComponentValid(instanceID))
+        {
+            DeactivateIndicators();
+            return;
+        }
+
         bool isTargetObject = IsTargetOfPlayerInteraction();
 
         if (isTargetObject && playerInteraction != null && playerInteraction.canInteract)
@@ -561,14 +574,14 @@ public class InteractableObject : MonoBehaviour, IInteractable
     }
 
     /// <summary>
-    /// MEJORADO: Método más seguro para destruir indicadores
+    /// CORREGIDO: Método para destruir indicadores (solo cuando el objeto se destruye)
     /// </summary>
-    private void SafeDestroyFeedbackIndicators()
+    private void DestroyFeedbackIndicators()
     {
-        // Notificar al manager para limpieza inmediata
+        // Notificar al manager para destrucción inmediata
         if (UIFeedbackManager.Instance != null && indicatorsCreated)
         {
-            UIFeedbackManager.Instance.CleanupIndicatorsForObject(instanceID);
+            UIFeedbackManager.Instance.DestroyIndicatorsForObject(instanceID);
         }
 
         // Limpieza local adicional por seguridad
@@ -596,44 +609,51 @@ public class InteractableObject : MonoBehaviour, IInteractable
     }
 
     /// <summary>
-    /// MEJORADO: Limpieza con respaldo seguro
+    /// NUEVO: Método para ocultar indicadores (cuando el objeto se desactiva)
     /// </summary>
-    private void CleanupIndicators()
+    private void HideFeedbackIndicators()
     {
-        if (indicatorsCreated)
+        // Solo ocultar a través del manager
+        if (UIFeedbackManager.Instance != null && indicatorsCreated)
         {
-            SafeDestroyFeedbackIndicators();
+            UIFeedbackManager.Instance.HideIndicatorsForObject(instanceID);
+        }
+
+        // Ocultar localmente también
+        if (rangeIndicator != null)
+        {
+            rangeIndicator.SetActive(false);
+        }
+
+        if (interactIndicator != null)
+        {
+            interactIndicator.SetActive(false);
         }
     }
 
     #region Unity Events
 
     /// <summary>
-    /// MEJORADO: OnDisable con limpieza garantizada
+    /// CORREGIDO: OnDisable solo oculta indicadores, no los destruye
     /// </summary>
     private void OnDisable()
     {
-        DeactivateIndicators();
-
-        // Si se está desactivando, notificar para limpieza
-        if (UIFeedbackManager.Instance != null && indicatorsCreated)
-        {
-            UIFeedbackManager.Instance.CleanupIndicatorsForObject(instanceID);
-        }
+        // Solo ocultar indicadores cuando se desactiva
+        HideFeedbackIndicators();
     }
 
     /// <summary>
-    /// MEJORADO: OnDestroy con múltiples sistemas de respaldo
+    /// CORREGIDO: OnDestroy ahora sí destruye los indicadores completamente
     /// </summary>
     private void OnDestroy()
     {
         // Notificar destrucción vía evento estático
         OnObjectDestroyed?.Invoke(instanceID);
 
-        // Limpieza inmediata a través del manager
+        // DESTRUIR indicadores completamente porque el objeto se está destruyendo
         if (UIFeedbackManager.Instance != null && indicatorsCreated)
         {
-            UIFeedbackManager.Instance.CleanupIndicatorsForObject(instanceID);
+            UIFeedbackManager.Instance.DestroyIndicatorsForObject(instanceID);
         }
 
         // Limpieza manual como respaldo final
@@ -655,6 +675,18 @@ public class InteractableObject : MonoBehaviour, IInteractable
         Debug.Log($"InteractableObject {gameObject.name} (ID: {instanceID}) destruido con limpieza completa");
     }
 
+    /// <summary>
+    /// NUEVO: OnEnable para mostrar indicadores cuando se reactiva
+    /// </summary>
+    private void OnEnable()
+    {
+        // Si el objeto se reactiva y ya estaba inicializado, mostrar indicadores si el jugador está en rango
+        if (isInitialized && playerOnRange && indicatorsCreated)
+        {
+            UpdateIndicatorVisibility();
+        }
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;
@@ -663,7 +695,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
     #endregion
 }
-
 /// <summary>
 /// Componente auxiliar para manejar los eventos del trigger de detección
 /// </summary>

@@ -99,9 +99,9 @@ public class Inventory_Item : MonoBehaviour
         // Obtener el nombre único para este objeto
         string objectIdentifier = gameObject.name + "_" + instanceID;
 
-        // MEJORADO: Crear indicadores a través del gestor con registro
-        rangeIndicator = UIFeedbackManager.Instance.CreateRangeIndicator(objectIdentifier, instanceID);
-        interactIndicator = UIFeedbackManager.Instance.CreateInteractIndicator(objectIdentifier, instanceID);
+        // MEJORADO: Crear indicadores a través del gestor con registro y referencia del componente
+        rangeIndicator = UIFeedbackManager.Instance.CreateRangeIndicator(objectIdentifier, instanceID, this);
+        interactIndicator = UIFeedbackManager.Instance.CreateInteractIndicator(objectIdentifier, instanceID, this);
 
         // Obtener los RectTransform
         if (rangeIndicator != null)
@@ -144,14 +144,14 @@ public class Inventory_Item : MonoBehaviour
         // Verificar si el objeto sigue existiendo
         if (this == null || !gameObject.activeInHierarchy || !isInitialized)
         {
-            SafeCleanupIndicators();
+            HideFeedbackIndicators();
             return;
         }
 
         // Comprobaciones de seguridad
         if (rangeIndicator == null || interactIndicator == null || !enabled)
         {
-            SafeCleanupIndicators();
+            HideFeedbackIndicators();
             return;
         }
 
@@ -161,6 +161,22 @@ public class Inventory_Item : MonoBehaviour
 
     private void UpdateFeedbackLogic()
     {
+        // NUEVO: Verificar primero si este componente está habilitado
+        if (!enabled || !gameObject.activeInHierarchy)
+        {
+            if (rangeIndicator != null) rangeIndicator.SetActive(false);
+            if (interactIndicator != null) interactIndicator.SetActive(false);
+            return;
+        }
+
+        // NUEVO: Verificar también a través del manager
+        if (UIFeedbackManager.Instance != null && !UIFeedbackManager.Instance.IsComponentValid(instanceID))
+        {
+            if (rangeIndicator != null) rangeIndicator.SetActive(false);
+            if (interactIndicator != null) interactIndicator.SetActive(false);
+            return;
+        }
+
         if (playerInDetectionRange)
         {
             // Actualizar la posición de los indicadores en pantalla
@@ -432,22 +448,22 @@ public class Inventory_Item : MonoBehaviour
             Debug.LogError("No se encontró instancia de Inventory_Manager");
         }
 
-        // MEJORADO: Limpieza segura antes de destruir
-        SafeCleanupIndicators();
+        // CORREGIDO: Destruir indicadores antes de destruir el objeto
+        DestroyFeedbackIndicators();
 
         // Destruir el objeto del mundo tras recogerlo
         Destroy(gameObject);
     }
 
     /// <summary>
-    /// NUEVO: Limpieza segura de indicadores
+    /// NUEVO: Destruir indicadores (solo cuando el objeto se destruye)
     /// </summary>
-    private void SafeCleanupIndicators()
+    private void DestroyFeedbackIndicators()
     {
-        // Notificar al manager para limpieza inmediata
+        // Notificar al manager para destrucción inmediata
         if (UIFeedbackManager.Instance != null && indicatorsCreated)
         {
-            UIFeedbackManager.Instance.CleanupIndicatorsForObject(instanceID);
+            UIFeedbackManager.Instance.DestroyIndicatorsForObject(instanceID);
         }
 
         // Limpieza local adicional por seguridad
@@ -469,36 +485,46 @@ public class Inventory_Item : MonoBehaviour
     }
 
     /// <summary>
-    /// MEJORADO: Wrapper para compatibilidad
+    /// NUEVO: Ocultar indicadores (cuando el objeto se desactiva)
     /// </summary>
-    private void CleanupIndicators()
+    private void HideFeedbackIndicators()
     {
-        if (indicatorsCreated)
+        // Solo ocultar a través del manager
+        if (UIFeedbackManager.Instance != null && indicatorsCreated)
         {
-            SafeCleanupIndicators();
+            UIFeedbackManager.Instance.HideIndicatorsForObject(instanceID);
+        }
+
+        // Ocultar localmente también
+        if (rangeIndicator != null)
+        {
+            rangeIndicator.SetActive(false);
+        }
+
+        if (interactIndicator != null)
+        {
+            interactIndicator.SetActive(false);
         }
     }
 
     /// <summary>
-    /// MEJORADO: OnDisable con limpieza garantizada
+    /// CORREGIDO: OnDisable solo oculta indicadores, no los destruye
     /// </summary>
     private void OnDisable()
     {
-        if (UIFeedbackManager.Instance != null && indicatorsCreated)
-        {
-            UIFeedbackManager.Instance.CleanupIndicatorsForObject(instanceID);
-        }
+        // Solo ocultar indicadores cuando se desactiva
+        HideFeedbackIndicators();
     }
 
     /// <summary>
-    /// MEJORADO: OnDestroy con múltiples sistemas de respaldo
+    /// CORREGIDO: OnDestroy ahora sí destruye los indicadores completamente
     /// </summary>
     private void OnDestroy()
     {
-        // Limpieza inmediata a través del manager
+        // DESTRUIR indicadores completamente porque el objeto se está destruyendo
         if (UIFeedbackManager.Instance != null && indicatorsCreated)
         {
-            UIFeedbackManager.Instance.CleanupIndicatorsForObject(instanceID);
+            UIFeedbackManager.Instance.DestroyIndicatorsForObject(instanceID);
         }
 
         // Limpieza manual como respaldo final
@@ -514,5 +540,17 @@ public class Inventory_Item : MonoBehaviour
         }
 
         Debug.Log($"Inventory_Item {gameObject.name} (ID: {instanceID}) destruido con limpieza completa");
+    }
+
+    /// <summary>
+    /// NUEVO: OnEnable para mostrar indicadores cuando se reactiva
+    /// </summary>
+    private void OnEnable()
+    {
+        // Si el objeto se reactiva y ya estaba inicializado, mostrar indicadores si el jugador está en rango
+        if (isInitialized && playerInDetectionRange && indicatorsCreated)
+        {
+            UpdateFeedbackLogic();
+        }
     }
 }
