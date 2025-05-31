@@ -40,30 +40,30 @@ MonoBehaviour:
     content: (visibly uncomfortable) Look... I don't know if I want to get into all
       this. If what you say is true, then this is beyond us.
   dialogueOptions:
-  - optionText: I know you are afraid. I'm afraid too. But if we don't do it together,
-      maybe no one else will.
+  - optionText: Empathy
     actionId: Riku_Universidad
     requiresDiceRoll: 1
-    difficultyClass: 9
+    difficultyClass: 15
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: 308280a704b3ea24593ee3a8405f4a2d, type: 2}
     failureDialogue: {fileID: 11400000, guid: 06131466929dafd479a15f08597a9f47, type: 2}
-    preDiceConversation: {fileID: 0}
-  - optionText: This affects you as much as it does me. Your family is at the center
-      of it all. If you don't seek answers now, it may already be too late.
+    preDiceConversation: {fileID: 11400000, guid: c69cfe7b5774374498b5c2221a56a85a,
+      type: 2}
+  - optionText: Persuasion
     actionId: Riku_Universidad
     requiresDiceRoll: 1
-    difficultyClass: 3
+    difficultyClass: 5
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: 308280a704b3ea24593ee3a8405f4a2d, type: 2}
     failureDialogue: {fileID: 11400000, guid: 06131466929dafd479a15f08597a9f47, type: 2}
-    preDiceConversation: {fileID: 0}
-  - optionText: You are part of this, whether you want to be or not. So you'd better
-      start cooperating, before someone else disappears.
+    preDiceConversation: {fileID: 11400000, guid: 09e193cfff831e04da5931ad82b7b331,
+      type: 2}
+  - optionText: Intimidation
     actionId: Riku_Universidad
     requiresDiceRoll: 1
-    difficultyClass: 6
+    difficultyClass: 10
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: 308280a704b3ea24593ee3a8405f4a2d, type: 2}
     failureDialogue: {fileID: 11400000, guid: 06131466929dafd479a15f08597a9f47, type: 2}
-    preDiceConversation: {fileID: 0}
+    preDiceConversation: {fileID: 11400000, guid: d508fa1617ccd804d8c816d801612a56,
+      type: 2}
