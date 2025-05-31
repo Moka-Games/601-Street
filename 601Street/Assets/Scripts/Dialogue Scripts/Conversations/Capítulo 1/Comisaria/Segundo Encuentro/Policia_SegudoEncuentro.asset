@@ -30,27 +30,30 @@ MonoBehaviour:
   - speakerName: Police Officer
     content: "I don\u2019t know if I believe you\u2026"
   dialogueOptions:
-  - optionText: I wouldn't ask for this if it wasn't really important
+  - optionText: Empathy
     actionId: policia_1_id
     requiresDiceRoll: 1
     difficultyClass: 10
     nextDialogue: {fileID: 11400000, guid: cab47bc037ab2bd47852eba75a31992a, type: 2}
     successDialogue: {fileID: 11400000, guid: cab47bc037ab2bd47852eba75a31992a, type: 2}
     failureDialogue: {fileID: 11400000, guid: 30adfedf8b1ee994692e3c4cf50767ee, type: 2}
-    preDiceConversation: {fileID: 0}
-  - optionText: If you let me in, we can win some time and solve this faster.
+    preDiceConversation: {fileID: 11400000, guid: 4d89b033e3d22854aad35795d6ec4f37,
+      type: 2}
+  - optionText: Persuasion
     actionId: policia_1_id
     requiresDiceRoll: 1
     difficultyClass: 5
     nextDialogue: {fileID: 11400000, guid: cab47bc037ab2bd47852eba75a31992a, type: 2}
     successDialogue: {fileID: 11400000, guid: cab47bc037ab2bd47852eba75a31992a, type: 2}
     failureDialogue: {fileID: 11400000, guid: 30adfedf8b1ee994692e3c4cf50767ee, type: 2}
-    preDiceConversation: {fileID: 0}
-  - optionText: I have permission, I will get in one way or another.
+    preDiceConversation: {fileID: 11400000, guid: cd2b6ccd435f50b4684867b9878138e9,
+      type: 2}
+  - optionText: Intimidation
     actionId: policia_1_id
     requiresDiceRoll: 1
     difficultyClass: 15
     nextDialogue: {fileID: 11400000, guid: cab47bc037ab2bd47852eba75a31992a, type: 2}
     successDialogue: {fileID: 11400000, guid: cab47bc037ab2bd47852eba75a31992a, type: 2}
     failureDialogue: {fileID: 11400000, guid: 30adfedf8b1ee994692e3c4cf50767ee, type: 2}
-    preDiceConversation: {fileID: 0}
+    preDiceConversation: {fileID: 11400000, guid: f8c2c57ae9e912c46b7a4ec6bc6e23a3,
+      type: 2}
