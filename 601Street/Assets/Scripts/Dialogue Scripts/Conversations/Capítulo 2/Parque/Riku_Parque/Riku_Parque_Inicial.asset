@@ -32,29 +32,30 @@ MonoBehaviour:
   - speakerName: Riku
     content: Come on! Apple is my favorite fruit, why should I leave it to you?
   dialogueOptions:
-  - optionText: I'm not asking for just any favor... It's important to me.
+  - optionText: Empathy
     actionId: Riku_Parque
     requiresDiceRoll: 1
-    difficultyClass: 9
+    difficultyClass: 15
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: ed25ea207d1f6e24b8e554c5fe726f70, type: 2}
     failureDialogue: {fileID: 11400000, guid: 1c7bac0184a97644589262a62b272d3e, type: 2}
-    preDiceConversation: {fileID: 0}
-  - optionText: If you let me have it now I will compensate you later, we can make
-      a deal.
+    preDiceConversation: {fileID: 11400000, guid: 919062d0083055e41bbb63d004d28b75,
+      type: 2}
+  - optionText: Persuasion
     actionId: Riku_Parque
     requiresDiceRoll: 1
-    difficultyClass: 3
+    difficultyClass: 5
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: ed25ea207d1f6e24b8e554c5fe726f70, type: 2}
     failureDialogue: {fileID: 11400000, guid: 1c7bac0184a97644589262a62b272d3e, type: 2}
-    preDiceConversation: {fileID: 0}
-  - optionText: I don't have time for games, give me the apple or you will regret
-      it.
+    preDiceConversation: {fileID: 11400000, guid: be5bab01cd2f7f640b52f0d7340dc9b4,
+      type: 2}
+  - optionText: Intimidation
     actionId: Riku_Parque
     requiresDiceRoll: 1
-    difficultyClass: 6
+    difficultyClass: 10
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: ed25ea207d1f6e24b8e554c5fe726f70, type: 2}
     failureDialogue: {fileID: 11400000, guid: 1c7bac0184a97644589262a62b272d3e, type: 2}
-    preDiceConversation: {fileID: 0}
+    preDiceConversation: {fileID: 11400000, guid: 7cc94468fc7db7f4a8b033488bd431fb,
+      type: 2}
