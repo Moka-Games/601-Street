@@ -3,6 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// Gestor centralizado de prioridades de navegación que evita conflictos entre sistemas
+/// VERSIÓN CORREGIDA: UINavigationManager NUNCA se desactiva
 /// </summary>
 public class NavigationPriorityManager : MonoBehaviour
 {
@@ -34,12 +35,11 @@ public class NavigationPriorityManager : MonoBehaviour
         {
             isCurrentlyActive = active;
 
+            // CAMBIO CRÍTICO: UINavigationManager NUNCA se desactiva
             if (uiNavigationManager != null)
             {
-                if (active)
-                    uiNavigationManager.EnableUINavigation();
-                else
-                    uiNavigationManager.DisableUINavigation();
+                // NO hacer nada - mantener UINavigationManager siempre activo
+                Debug.Log($"UINavigationManager {uiNavigationManager.name} mantiene su estado actual (no se modifica)");
             }
 
             if (inventoryNavigationManager != null)
@@ -177,11 +177,11 @@ public class NavigationPriorityManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Activa un sistema con prioridad específica y gestiona conflictos
+    /// CORREGIDO: Activa un sistema con prioridad específica sin desactivar UINavigationManagers
     /// </summary>
     public void ActivateSystemWithPriority(NavigationPriority priority, string systemName = "")
     {
-        Debug.Log($"Activando sistema con prioridad {priority} ({systemName})");
+        Debug.Log($"Activando sistema con prioridad {priority} ({systemName}) - UINavigationManagers mantenidos activos");
 
         // Guardar estados actuales antes de cambiar
         SaveCurrentStates();
@@ -193,8 +193,8 @@ public class NavigationPriorityManager : MonoBehaviour
             return;
         }
 
-        // Desactivar sistemas de menor prioridad
-        DeactivateLowerPrioritySystems(priority);
+        // CAMBIO: Solo gestionar sistemas NO-UI (InventoryNavigation e InteractionCanvas)
+        ManageNonUISystemsForPriority(priority, true);
 
         // Activar sistemas de la nueva prioridad
         ActivateSystemsOfPriority(priority, systemName);
@@ -203,11 +203,11 @@ public class NavigationPriorityManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Desactiva un sistema con prioridad específica y restaura sistemas anteriores
+    /// CORREGIDO: Desactiva un sistema con prioridad específica sin tocar UINavigationManagers
     /// </summary>
     public void DeactivateSystemWithPriority(NavigationPriority priority, string systemName = "")
     {
-        Debug.Log($"Desactivando sistema con prioridad {priority} ({systemName})");
+        Debug.Log($"Desactivando sistema con prioridad {priority} ({systemName}) - UINavigationManagers mantenidos activos");
 
         // Si no es la prioridad actual más alta, no hacer nada
         if (priority != currentHighestPriority)
@@ -216,17 +216,37 @@ public class NavigationPriorityManager : MonoBehaviour
             return;
         }
 
-        // Desactivar sistemas de esta prioridad
-        DeactivateSystemsOfPriority(priority, systemName);
+        // Desactivar sistemas de esta prioridad (excluyendo UI)
+        DeactivateNonUISystemsOfPriority(priority, systemName);
 
         // Encontrar la siguiente prioridad más alta que tenga sistemas activos
         NavigationPriority nextHighestPriority = FindNextHighestPriority();
 
-        // Restaurar sistemas de la siguiente prioridad más alta
+        // Restaurar sistemas de la siguiente prioridad más alta (excluyendo UI)
         if (nextHighestPriority != currentHighestPriority)
         {
-            RestoreSystemsOfPriority(nextHighestPriority);
+            RestoreNonUISystemsOfPriority(nextHighestPriority);
             currentHighestPriority = nextHighestPriority;
+        }
+    }
+
+    /// <summary>
+    /// NUEVO: Gestiona solo sistemas no-UI para una prioridad dada
+    /// </summary>
+    private void ManageNonUISystemsForPriority(NavigationPriority targetPriority, bool activate)
+    {
+        foreach (var system in registeredSystems)
+        {
+            // Solo gestionar sistemas no-UI de menor prioridad
+            if (system.priority < targetPriority && system.uiNavigationManager == null)
+            {
+                if (system.isCurrentlyActive && !activate)
+                {
+                    system.wasActiveBeforeDisable = true;
+                    system.SetActive(false);
+                    Debug.Log($"Desactivado temporalmente sistema no-UI: {system.systemName} (prioridad {system.priority})");
+                }
+            }
         }
     }
 
@@ -241,19 +261,6 @@ public class NavigationPriorityManager : MonoBehaviour
         }
     }
 
-    private void DeactivateLowerPrioritySystems(NavigationPriority targetPriority)
-    {
-        foreach (var system in registeredSystems)
-        {
-            if (system.priority < targetPriority && system.isCurrentlyActive)
-            {
-                system.wasActiveBeforeDisable = true;
-                system.SetActive(false);
-                Debug.Log($"Desactivado temporalmente: {system.systemName} (prioridad {system.priority})");
-            }
-        }
-    }
-
     private void ActivateSystemsOfPriority(NavigationPriority priority, string specificSystemName = "")
     {
         if (systemsByPriority.ContainsKey(priority))
@@ -263,13 +270,25 @@ public class NavigationPriorityManager : MonoBehaviour
                 if (string.IsNullOrEmpty(specificSystemName) || system.systemName.Contains(specificSystemName))
                 {
                     system.SetActive(true);
-                    Debug.Log($"Activado: {system.systemName} (prioridad {priority})");
+
+                    // Log específico para UI systems
+                    if (system.uiNavigationManager != null)
+                    {
+                        Debug.Log($"Sistema UI {system.systemName} mantiene su estado activo (prioridad {priority})");
+                    }
+                    else
+                    {
+                        Debug.Log($"Activado sistema no-UI: {system.systemName} (prioridad {priority})");
+                    }
                 }
             }
         }
     }
 
-    private void DeactivateSystemsOfPriority(NavigationPriority priority, string specificSystemName = "")
+    /// <summary>
+    /// NUEVO: Desactiva solo sistemas no-UI de una prioridad específica
+    /// </summary>
+    private void DeactivateNonUISystemsOfPriority(NavigationPriority priority, string specificSystemName = "")
     {
         if (systemsByPriority.ContainsKey(priority))
         {
@@ -277,24 +296,36 @@ public class NavigationPriorityManager : MonoBehaviour
             {
                 if (string.IsNullOrEmpty(specificSystemName) || system.systemName.Contains(specificSystemName))
                 {
-                    system.SetActive(false);
-                    Debug.Log($"Desactivado: {system.systemName} (prioridad {priority})");
+                    // Solo desactivar sistemas no-UI
+                    if (system.uiNavigationManager == null)
+                    {
+                        system.SetActive(false);
+                        Debug.Log($"Desactivado sistema no-UI: {system.systemName} (prioridad {priority})");
+                    }
+                    else
+                    {
+                        Debug.Log($"Sistema UI {system.systemName} mantiene su estado activo (no se desactiva)");
+                    }
                 }
             }
         }
     }
 
-    private void RestoreSystemsOfPriority(NavigationPriority priority)
+    /// <summary>
+    /// NUEVO: Restaura solo sistemas no-UI de una prioridad específica
+    /// </summary>
+    private void RestoreNonUISystemsOfPriority(NavigationPriority priority)
     {
         if (systemsByPriority.ContainsKey(priority))
         {
             foreach (var system in systemsByPriority[priority])
             {
-                if (system.wasActiveBeforeDisable)
+                // Solo restaurar sistemas no-UI que estaban activos antes
+                if (system.uiNavigationManager == null && system.wasActiveBeforeDisable)
                 {
                     system.SetActive(true);
                     system.wasActiveBeforeDisable = false; // Reset flag
-                    Debug.Log($"Restaurado: {system.systemName} (prioridad {priority})");
+                    Debug.Log($"Restaurado sistema no-UI: {system.systemName} (prioridad {priority})");
                 }
             }
         }
@@ -341,35 +372,41 @@ public class NavigationPriorityManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Métodos de conveniencia para sistemas específicos
+    /// Métodos de conveniencia para sistemas específicos - CORREGIDOS
     /// </summary>
     public void ActivateInventoryNavigation()
     {
+        Debug.Log("ActivateInventoryNavigation - UINavigationManagers mantienen su estado");
         ActivateSystemWithPriority(NavigationPriority.Inventory, "Inventory");
     }
 
     public void DeactivateInventoryNavigation()
     {
+        Debug.Log("DeactivateInventoryNavigation - UINavigationManagers mantienen su estado");
         DeactivateSystemWithPriority(NavigationPriority.Inventory, "Inventory");
     }
 
     public void ActivateInteractionNavigation()
     {
+        Debug.Log("ActivateInteractionNavigation - UINavigationManagers mantienen su estado");
         ActivateSystemWithPriority(NavigationPriority.Interaction, "Interaction");
     }
 
     public void DeactivateInteractionNavigation()
     {
+        Debug.Log("DeactivateInteractionNavigation - UINavigationManagers mantienen su estado");
         DeactivateSystemWithPriority(NavigationPriority.Interaction, "Interaction");
     }
 
     public void ActivatePauseMenuNavigation()
     {
+        Debug.Log("ActivatePauseMenuNavigation - UINavigationManagers mantienen su estado");
         ActivateSystemWithPriority(NavigationPriority.PauseMenu, "Pause");
     }
 
     public void DeactivatePauseMenuNavigation()
     {
+        Debug.Log("DeactivatePauseMenuNavigation - UINavigationManagers mantienen su estado");
         DeactivateSystemWithPriority(NavigationPriority.PauseMenu, "Pause");
     }
 
@@ -379,14 +416,16 @@ public class NavigationPriorityManager : MonoBehaviour
     [ContextMenu("Debug Current State")]
     public void DebugCurrentState()
     {
-        Debug.Log($"=== NAVIGATION PRIORITY MANAGER STATE ===");
+        Debug.Log($"=== NAVIGATION PRIORITY MANAGER STATE (UI-SAFE) ===");
         Debug.Log($"Current Highest Priority: {currentHighestPriority}");
         Debug.Log($"Registered Systems: {registeredSystems.Count}");
 
         foreach (var system in registeredSystems)
         {
-            Debug.Log($"  {system.systemName} - Priority: {system.priority} - Active: {system.isCurrentlyActive} - Was Active: {system.wasActiveBeforeDisable}");
+            string systemType = system.uiNavigationManager != null ? "[UI-SAFE]" : "[MANAGEABLE]";
+            Debug.Log($"  {systemType} {system.systemName} - Priority: {system.priority} - Active: {system.isCurrentlyActive} - Was Active: {system.wasActiveBeforeDisable}");
         }
+        Debug.Log("UINavigationManager components are NEVER deactivated by this system");
     }
 
     /// <summary>
@@ -401,6 +440,6 @@ public class NavigationPriorityManager : MonoBehaviour
         }
 
         RefreshSystemPriorities();
-        Debug.Log("Estados de navegación actualizados");
+        Debug.Log("Estados de navegación actualizados - UINavigationManagers mantienen su estado");
     }
 }

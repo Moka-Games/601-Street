@@ -3,8 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// VERSIÓN CORREGIDA: Controla el menú de pausa del juego usando NavigationPriorityManager
-/// para evitar conflictos con otros sistemas de navegación
+/// VERSIÓN CORREGIDA: Controla el menú de pausa del juego SIN DESACTIVAR UINavigationManager
 /// </summary>
 public class PauseMenu : MonoBehaviour
 {
@@ -74,7 +73,7 @@ public class PauseMenu : MonoBehaviour
                     NavigationPriorityManager.NavigationPriority.PauseMenu,
                     uiNavManager, null, null
                 );
-                Debug.Log("PauseMenu registrado en el NavigationPriorityManager");
+                Debug.Log("PauseMenu registrado en el NavigationPriorityManager - UINavigationManager NUNCA será desactivado");
             }
             else
             {
@@ -137,7 +136,7 @@ public class PauseMenu : MonoBehaviour
     }
 
     /// <summary>
-    /// VERSIÓN CORREGIDA: Reanuda el juego usando NavigationPriorityManager
+    /// VERSIÓN CORREGIDA: Reanuda el juego SIN TOCAR UINavigationManager
     /// </summary>
     public void ResumeGame()
     {
@@ -155,21 +154,16 @@ public class PauseMenu : MonoBehaviour
             controlsUI.SetActive(false);
         }
 
-        // CAMBIO IMPORTANTE: Desactivar navegación del menú de pausa usando el sistema de prioridades
+        // CAMBIO CRÍTICO: Solo notificar al NavigationPriorityManager sin desactivar UINavigationManager
         if (NavigationPriorityManager.Instance != null)
         {
             NavigationPriorityManager.Instance.DeactivatePauseMenuNavigation();
-            Debug.Log("PauseMenu: Navegación desactivada mediante NavigationPriorityManager");
+            Debug.Log("PauseMenu: Notificado NavigationPriorityManager - UINavigationManager mantiene su estado");
         }
         else
         {
-            // Fallback al método directo
-            UINavigationManager uiNavManager = GetComponent<UINavigationManager>();
-            if (uiNavManager != null)
-            {
-                uiNavManager.DisableUINavigation();
-            }
-            Debug.LogWarning("PauseMenu: Usando desactivación directa (sin NavigationPriorityManager)");
+            // CAMBIO: Sin fallback que desactive UINavigationManager
+            Debug.Log("PauseMenu: Sin NavigationPriorityManager - UINavigationManager mantiene su estado activo");
         }
 
         // Restablecer la escala de tiempo
@@ -185,11 +179,11 @@ public class PauseMenu : MonoBehaviour
             stateManager.EnterGameplayState();
         }
 
-        Debug.Log("Juego reanudado");
+        Debug.Log("Juego reanudado - UINavigationManager no fue modificado");
     }
 
     /// <summary>
-    /// VERSIÓN CORREGIDA: Pausa el juego usando NavigationPriorityManager
+    /// VERSIÓN CORREGIDA: Pausa el juego SIN TOCAR UINavigationManager
     /// </summary>
     public void PauseGame()
     {
@@ -211,22 +205,16 @@ public class PauseMenu : MonoBehaviour
             pauseMenuUI.SetActive(true);
         }
 
-        // CAMBIO IMPORTANTE: Activar navegación del menú de pausa usando el sistema de prioridades
-        // Esto automáticamente desactivará sistemas de menor prioridad y los restaurará al cerrar
+        // CAMBIO CRÍTICO: Solo notificar al NavigationPriorityManager sin tocar UINavigationManager
         if (NavigationPriorityManager.Instance != null)
         {
             NavigationPriorityManager.Instance.ActivatePauseMenuNavigation();
-            Debug.Log("PauseMenu: Navegación activada mediante NavigationPriorityManager");
+            Debug.Log("PauseMenu: Notificado NavigationPriorityManager - UINavigationManager mantiene su estado");
         }
         else
         {
-            // Fallback al método directo
-            UINavigationManager uiNavManager = GetComponent<UINavigationManager>();
-            if (uiNavManager != null)
-            {
-                uiNavManager.EnableUINavigation();
-            }
-            Debug.LogWarning("PauseMenu: Usando activación directa (sin NavigationPriorityManager)");
+            // CAMBIO: Sin fallback que active/desactive UINavigationManager
+            Debug.Log("PauseMenu: Sin NavigationPriorityManager - UINavigationManager mantiene su estado actual");
         }
 
         // Detener el tiempo
@@ -236,7 +224,7 @@ public class PauseMenu : MonoBehaviour
         // Bloquear al jugador durante la pausa
         BlockPlayerDuringPause();
 
-        Debug.Log("Juego pausado");
+        Debug.Log("Juego pausado - UINavigationManager no fue modificado");
     }
 
     /// <summary>
@@ -248,10 +236,11 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1f;
         gamePaused = false;
 
-        // IMPORTANTE: Desactivar navegación antes de cambiar de escena
+        // CAMBIO: Solo notificar sin desactivar UINavigationManager
         if (NavigationPriorityManager.Instance != null)
         {
             NavigationPriorityManager.Instance.DeactivatePauseMenuNavigation();
+            Debug.Log("BackToMainMenu: Notificado NavigationPriorityManager - UINavigationManager mantiene su estado");
         }
 
         StartCoroutine(CleanupAndLoadMainMenu());
@@ -423,11 +412,12 @@ public class PauseMenu : MonoBehaviour
     [ContextMenu("Debug Pause Menu State")]
     public void DebugPauseMenuState()
     {
-        Debug.Log($"=== PAUSE MENU STATE ===");
+        Debug.Log($"=== PAUSE MENU STATE (UI-SAFE) ===");
         Debug.Log($"Game Paused: {gamePaused}");
         Debug.Log($"PauseMenuUI Active: {pauseMenuUI?.activeInHierarchy}");
         Debug.Log($"ControlsUI Active: {controlsUI?.activeInHierarchy}");
         Debug.Log($"Time Scale: {Time.timeScale}");
+        Debug.Log("UINavigationManager: NUNCA modificado por PauseMenu");
 
         if (NavigationPriorityManager.Instance != null)
         {
