@@ -1159,7 +1159,8 @@ MonoBehaviour:
   bonusDisplayDelay: 0.5
   bonusDisplayDuration: 1
   finalResultDelay: 0.5
-  diceMovementRange: 0.3
+  minBounds: {x: -180, y: -133}
+  maxBounds: {x: 180, y: 150}
   diceMovementSpeed: 0.15
   bonusColor: {r: 0, g: 1, b: 0, a: 1}
   bonusScaleAnimation: 1.2
@@ -4250,12 +4251,12 @@ PrefabInstance:
     - target: {fileID: 6766928858680953608, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 187
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6766928858680953608, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 157
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6766928858680953608, guid: 0decf5d59f92d9a4b8750f6a27fc17a5,
         type: 3}

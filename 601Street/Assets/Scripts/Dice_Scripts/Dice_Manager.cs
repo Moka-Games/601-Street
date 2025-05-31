@@ -26,7 +26,8 @@ public class Dice_Manager : MonoBehaviour
     [SerializeField] private float finalResultDelay = 0.5f;
 
     [Header("Configuración de Movimiento del Dado")]
-    [SerializeField] private float diceMovementRange = 0.3f; // Rango de movimiento del dado
+    [SerializeField] private Vector2 minBounds = new Vector2(-180f, -133f); // Límites mínimos X, Y
+    [SerializeField] private Vector2 maxBounds = new Vector2(180f, 150f);   // Límites máximos X, Y
     [SerializeField] private float diceMovementSpeed = 0.15f; // Velocidad de cada movimiento
 
     [Header("Configuración Visual del Bonus")]
@@ -196,7 +197,7 @@ public class Dice_Manager : MonoBehaviour
 
     /// <summary>
     /// Anima la rotación del dado durante la tirada
-    /// MODIFICADO: Mueve el contenedor y rota solo el modelo
+    /// MODIFICADO: Mueve el contenedor dentro de los límites y rota solo el modelo
     /// </summary>
     private IEnumerator AnimateDiceRoll()
     {
@@ -217,15 +218,16 @@ public class Dice_Manager : MonoBehaviour
             // Animación de rotación y movimiento
             for (int i = 0; i < rotationSteps; i++)
             {
-                // CAMBIO 2: Mover el contenedor principal (diceObject)
-                Vector3 randomOffset = new Vector3(
-                    Random.Range(-diceMovementRange, diceMovementRange),
-                    Random.Range(-diceMovementRange, diceMovementRange),
-                    Random.Range(-diceMovementRange, diceMovementRange)
-                );
+                // Generar posición aleatoria dentro de los límites
+                float randomX = Random.Range(minBounds.x, maxBounds.x);
+                float randomY = Random.Range(minBounds.y, maxBounds.y);
 
+                // Mantener la Z actual (no modificar la profundidad)
+                Vector3 newPosition = new Vector3(randomX, randomY, initialDicePosition.z);
+
+                // Mover el contenedor principal dentro de los límites de la interfaz
                 diceSequence.Append(diceObject.transform.DOLocalMove(
-                    initialDicePosition + randomOffset,
+                    newPosition,
                     diceMovementSpeed
                 ).SetEase(Ease.Linear));
 
@@ -239,8 +241,8 @@ public class Dice_Manager : MonoBehaviour
                 totalDuration += diceMovementSpeed;
             }
 
-            // CAMBIO 1: Volver a la posición Y rotación inicial
-            // Primero volver a la posición inicial
+            // Volver a la posición Y rotación inicial
+            // Primero volver a la posición inicial con animación suave
             diceSequence.Append(diceObject.transform.DOLocalMove(
                 initialDicePosition, 0.5f).SetEase(Ease.OutBack));
 
@@ -277,7 +279,7 @@ public class Dice_Manager : MonoBehaviour
 
         yield return new WaitForSeconds(0.2f);
 
-        Debug.Log("Animación del dado completada - Dado mirando al jugador");
+        Debug.Log($"Animación del dado completada - Dado en posición inicial ({initialDicePosition.x}, {initialDicePosition.y})");
     }
 
     /// <summary>
@@ -597,6 +599,7 @@ public class Dice_Manager : MonoBehaviour
         Debug.Log($"Esperando continuación de diálogo: {isWaitingForDialogueContinuation}");
         Debug.Log($"BonusManager encontrado: {bonusManager != null}");
         Debug.Log($"DiceModelTransform asignado: {diceModelTransform != null}");
+        Debug.Log($"Límites de movimiento: X({minBounds.x}, {maxBounds.x}), Y({minBounds.y}, {maxBounds.y})");
 
         if (bonusManager != null)
         {
