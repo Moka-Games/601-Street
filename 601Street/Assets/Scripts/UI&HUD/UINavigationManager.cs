@@ -6,9 +6,10 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using DG.Tweening;
 
+
 /// <summary>
-/// VERSIÓN CORREGIDA: Eliminados todos los métodos de desactivación problemáticos
-/// Mantiene la navegación siempre activa para evitar conflictos
+/// Maneja la navegación por UI usando el nuevo Input System de Unity
+/// Sistema reutilizable para cualquier menú con selección automática mejorada
 /// </summary>
 public class UINavigationManager : MonoBehaviour
 {
@@ -63,6 +64,8 @@ public class UINavigationManager : MonoBehaviour
     public System.Action<Selectable> OnElementSubmitted;
     public System.Action OnCancelled;
 
+
+
     private void Awake()
     {
         // Configurar controles de input
@@ -86,7 +89,6 @@ public class UINavigationManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // CORREGIDO: Siempre habilitar UI desde el inicio
         playerControls.UI.Enable();
 
         // Limpiar estado anterior
@@ -101,8 +103,7 @@ public class UINavigationManager : MonoBehaviour
 
     private void OnDisable()
     {
-        // CORREGIDO: Solo deshabilitar si realmente se está destruyendo
-        // No hacer nada aquí para evitar desactivaciones problemáticas
+        playerControls.UI.Disable();
         StopAutoSelectionSystem();
         CleanupAnimations();
     }
@@ -753,40 +754,19 @@ public class UINavigationManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// CORREGIDO: EnableUINavigation mantiene navegación activa
-    /// </summary>
     public void EnableUINavigation()
     {
-        Debug.Log("EnableUINavigation llamado - Navegación mantenida activa");
-
         enabled = true;
-
-        // CORREGIDO: Asegurar que UI esté habilitado
-        if (playerControls != null && !playerControls.UI.enabled)
-        {
-            playerControls.UI.Enable();
-        }
-
+        playerControls.UI.Enable();
         StartAutoSelectionSystem();
     }
 
-    /// <summary>
-    /// CORREGIDO: DisableUINavigation ya no desactiva para evitar problemas
-    /// </summary>
     public void DisableUINavigation()
     {
-        Debug.LogError($"[NAVEGACIÓN DESACTIVADA] DisableUINavigation llamado en: {gameObject.name}");
-        Debug.LogError($"STACK TRACE: {System.Environment.StackTrace}");
-
-        // CORREGIDO: NO desactivar navegación para evitar problemas
-        Debug.LogWarning("DisableUINavigation IGNORADO para prevenir problemas de navegación");
-
-        // NO hacer nada para mantener la navegación activa
-        // enabled = false;
-        // playerControls.UI.Disable();
-        // StopAutoSelectionSystem();
-        // CleanupAnimations();
+        enabled = false;
+        playerControls.UI.Disable();
+        StopAutoSelectionSystem();
+        CleanupAnimations();
     }
 
     public void SetFirstSelected(Selectable element)
@@ -906,6 +886,38 @@ public class UINavigationManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Obtiene información detallada del estado actual para debugging
+    /// </summary>
+    public string GetDetailedStatus()
+    {
+        List<Selectable> activeElements = GetActiveInteractableElements();
+
+        string status = "=== ESTADO DETALLADO UINavigationManager ===\n";
+        status += $"Elemento Actual: {currentSelected?.name ?? "NINGUNO"}\n";
+        status += $"First Selected Configurado: {firstSelected?.name ?? "NINGUNO"}\n";
+        status += $"Is First Selected Habilitado: {isFirstSelected}\n";
+        status += $"Auto Selection Habilitado: {enableAutoSelection}\n";
+        status += $"Total Elementos en Lista: {navigableElements.Count}\n";
+        status += $"Elementos Activos: {activeElements.Count}\n";
+
+        if (activeElements.Count > 0)
+        {
+            status += "Elementos Activos:\n";
+            for (int i = 0; i < activeElements.Count; i++)
+            {
+                bool isFirstSelected = activeElements[i] == firstSelected;
+                status += $"  {i + 1}. {activeElements[i].name} {(isFirstSelected ? "(FIRST SELECTED)" : "")}\n";
+            }
+
+            Selectable wouldSelect = DetermineElementToSelect(activeElements);
+            status += $"Elemento que se Seleccionaría: {wouldSelect?.name ?? "NINGUNO"}\n";
+        }
+
+        status += "=== FIN ESTADO DETALLADO ===";
+        return status;
+    }
+
+    /// <summary>
     /// Bloquea temporalmente los inputs Submit para prevenir doble activación
     /// </summary>
     public void BlockInputTemporarily(float duration = 0.5f)
@@ -930,23 +942,83 @@ public class UINavigationManager : MonoBehaviour
         submitCooldown = cooldown;
     }
 
+    /// <summary>
+    /// Configura el comportamiento de selección automática
+    /// </summary>
+    public void ConfigureAutoSelection(bool enableAutoSelection, bool isFirstSelected = true, float checkInterval = 0.1f)
+    {
+        this.enableAutoSelection = enableAutoSelection;
+        this.isFirstSelected = isFirstSelected;
+        this.autoSelectionCheckInterval = checkInterval;
+
+        if (enableAutoSelection)
+        {
+            StartAutoSelectionSystem();
+        }
+        else
+        {
+            StopAutoSelectionSystem();
+        }
+
+        Debug.Log($"Auto selección configurada: habilitada={enableAutoSelection}, firstSelected={isFirstSelected}, intervalo={checkInterval}");
+    }
+
+    /// <summary>
+    /// Cambia el elemento configurado como First Selected dinámicamente
+    /// </summary>
+    public void ChangeFirstSelected(Selectable newFirstSelected, bool selectImmediately = true)
+    {
+        firstSelected = newFirstSelected;
+
+        Debug.Log($"First Selected cambiado a: {newFirstSelected?.name ?? "NINGUNO"}");
+
+        if (selectImmediately && newFirstSelected != null && IsElementInteractable(newFirstSelected))
+        {
+            // Asegurar que esté en la lista
+            if (!navigableElements.Contains(newFirstSelected))
+            {
+                navigableElements.Add(newFirstSelected);
+            }
+
+            int index = navigableElements.IndexOf(newFirstSelected);
+            if (index >= 0)
+            {
+                SelectElement(index, true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Obtiene una lista de todos los elementos activos actuales
+    /// </summary>
+    public List<string> GetActiveElementNames()
+    {
+        List<Selectable> activeElements = GetActiveInteractableElements();
+        List<string> names = new List<string>();
+
+        foreach (var element in activeElements)
+        {
+            names.Add(element.name);
+        }
+
+        return names;
+    }
+
     #endregion
 
     #region Debug Methods
 
     [ContextMenu("Debug State")]
-    public void DebugCurrentState()
-    {
-        Debug.Log($"=== DEBUG {gameObject.name} ===");
-        Debug.Log($"GameObject activo: {gameObject.activeInHierarchy}");
-        Debug.Log($"Componente habilitado: {enabled}");
-        Debug.Log($"PlayerControls: {(playerControls != null ? "OK" : "NULL")}");
-        Debug.Log($"UI Controls Enabled: {(playerControls?.UI.enabled ?? false)}");
-        Debug.Log($"EventSystem: {(eventSystem != null ? eventSystem.name : "NULL")}");
-        Debug.Log($"Elementos navegables: {navigableElements.Count}");
-        Debug.Log($"Elemento actual: {currentSelected?.name ?? "NULL"}");
-        Debug.Log($"===============================");
-    }
+public void DebugCurrentState()
+{
+    Debug.Log($"=== DEBUG {gameObject.name} ===");
+    Debug.Log($"GameObject activo: {gameObject.activeInHierarchy}");
+    Debug.Log($"Componente habilitado: {enabled}");
+    Debug.Log($"PlayerControls: {(playerControls != null ? "OK" : "NULL")}");
+    Debug.Log($"EventSystem: {(eventSystem != null ? eventSystem.name : "NULL")}");
+    Debug.Log($"Elementos navegables: {navigableElements.Count}");
+    Debug.Log($"===============================");
+}
 
     [ContextMenu("Force Smart Selection")]
     public void ForceSmartSelectionFromContext()
@@ -960,23 +1032,48 @@ public class UINavigationManager : MonoBehaviour
         ForceAutoSelectionCheck();
     }
 
+    [ContextMenu("Print Detailed Status")]
+    public void PrintDetailedStatusFromContext()
+    {
+        Debug.Log(GetDetailedStatus());
+    }
+
+    [ContextMenu("Test Random Selection")]
+    public void TestRandomSelectionFromContext()
+    {
+        List<Selectable> activeElements = GetActiveInteractableElements();
+
+        if (activeElements.Count > 1)
+        {
+            // Temporalmente desactivar firstSelected para probar selección aleatoria
+            Selectable tempFirstSelected = firstSelected;
+            firstSelected = null;
+
+            Debug.Log($"Probando selección aleatoria entre {activeElements.Count} elementos activos");
+            ForceSmartSelection();
+
+            // Restaurar firstSelected
+            firstSelected = tempFirstSelected;
+        }
+        else
+        {
+            Debug.Log($"Se necesitan al menos 2 elementos activos para probar selección aleatoria. Activos: {activeElements.Count}");
+        }
+    }
+
     [ContextMenu("Force Select Default")]
     public void ForceSelectDefaultFromContext()
     {
         ForceSelectDefault();
     }
 
-    [ContextMenu("Test Enable UI Navigation")]
-    public void TestEnableUINavigation()
+    [ContextMenu("Configure And Select Default")]
+    public void ConfigureAndSelectDefaultFromContext()
     {
-        EnableUINavigation();
+        ConfigureAndSelectDefault();
     }
 
-    [ContextMenu("Test Disable UI Navigation (FIXED)")]
-    public void TestDisableUINavigation()
-    {
-        DisableUINavigation();
-    }
+
 
     #endregion
 

@@ -1,4 +1,4 @@
-Ôªøusing System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -6,24 +6,24 @@ using UnityEngine.InputSystem;
 using DG.Tweening;
 
 /// <summary>
-/// VERSI√ìN CORREGIDA: Eliminadas todas las desactivaciones problem√°ticas
-/// Solo maneja activaci√≥n de navegaci√≥n, nunca desactivaci√≥n
+/// VERSI”N SIMPLIFICADA: Gestor de navegaciÛn especÌfico para los canvas de interacciÛn
+/// SIN desactivaciÛn de otros sistemas - Solo maneja su propia navegaciÛn
 /// </summary>
 public class InteractionCanvasNavigationManager : MonoBehaviour
 {
-    [Header("Configuraci√≥n")]
+    [Header("ConfiguraciÛn")]
     [SerializeField] private float selectedScale = 1.15f;
     [SerializeField] private float animationDuration = 0.2f;
     [SerializeField] private DG.Tweening.Ease animationEase = DG.Tweening.Ease.OutBack;
 
-    [Header("Auto-detecci√≥n")]
+    [Header("Auto-detecciÛn")]
     [SerializeField] private bool autoDetectButtons = true;
     [SerializeField] private string closeButtonName = "Close_Interacted_Button";
 
     // Sistema de Input
     private PlayerControls playerControls;
 
-    // Referencias de navegaci√≥n
+    // Referencias de navegaciÛn
     private List<Button> navigableButtons = new List<Button>();
     private int currentIndex = 0;
     private Button currentSelectedButton;
@@ -45,8 +45,8 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         playerControls = new PlayerControls();
         SetupInputActions();
 
-        // CORREGIDO: Inicialmente habilitado y listo
-        this.enabled = true;
+        // CRÕTICO: Inicialmente completamente desactivado
+        this.enabled = false;
     }
 
     private void SetupInputActions()
@@ -58,73 +58,71 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // CORREGIDO: Siempre habilitar UI si est√° disponible
-        if (playerControls != null)
-        {
-            playerControls.UI.Enable();
-        }
+        // Solo habilitar inputs si el componente est· realmente activo
     }
 
     private void OnDisable()
     {
-        // CORREGIDO: Solo desactivar si realmente se est√° destruyendo
-        // No hacer nada aqu√≠ para evitar desactivaciones problem√°ticas
+        // Asegurar que los inputs estÈn deshabilitados cuando el componente se desactiva
+        if (playerControls != null)
+        {
+            playerControls.UI.Disable();
+        }
     }
 
     public void ActivateForCanvas(GameObject canvasObject)
     {
-        Debug.Log($"Activando navegaci√≥n para canvas: {canvasObject.name}");
+        Debug.Log($"Activando navegaciÛn para canvas: {canvasObject.name}");
 
-        // CORREGIDO: Solo configurar navegaci√≥n, sin afectar otros sistemas
+        // CAMBIO IMPORTANTE: NO desactivar otros sistemas
+        // Solo configurar y activar este sistema
+
+        // Configurar navegaciÛn para este canvas
         SetupCanvasNavigation(canvasObject);
 
         // Activar este sistema
         isActive = true;
         this.enabled = true;
 
-        // CORREGIDO: Asegurar que UI est√© habilitado
+        // Habilitar UI cuando realmente hay un canvas activo
         if (playerControls != null)
         {
             playerControls.UI.Enable();
-            Debug.Log("InteractionCanvas: UI actions enabled para canvas espec√≠fico");
+            Debug.Log("InteractionCanvas: UI actions enabled para canvas especÌfico");
         }
 
-        // Seleccionar primer bot√≥n
+        // Seleccionar primer botÛn
         if (navigableButtons.Count > 0)
         {
             SelectButton(0);
         }
     }
 
-    /// <summary>
-    /// CORREGIDO: DeactivateNavigation ya no desactiva para evitar problemas
-    /// </summary>
     public void DeactivateNavigation()
     {
-        Debug.LogWarning("DeactivateNavigation llamado - IGNORADO para prevenir problemas");
-
-        // CORREGIDO: NO desactivar navegaci√≥n para evitar conflictos
-        // Solo limpiar animaciones y referencias locales
+        Debug.Log("Desactivando navegaciÛn del canvas");
 
         // Limpiar animaciones
         CleanupAnimations();
 
-        // CORREGIDO: NO desactivar UI actions
-        // if (playerControls != null)
-        // {
-        //     playerControls.UI.Disable();
-        // }
+        // Deshabilitar UI antes de desactivar el sistema
+        if (playerControls != null)
+        {
+            playerControls.UI.Disable();
+            Debug.Log("InteractionCanvas: UI actions disabled");
+        }
 
-        // Marcar como inactivo pero mantener componente habilitado
+        // Desactivar este sistema
         isActive = false;
-        // this.enabled = false; // ‚Üê ELIMINADO para evitar desactivaciones
+        this.enabled = false;
 
-        // Limpiar referencias locales
+        // CAMBIO IMPORTANTE: NO reactivar otros sistemas
+        // Dejar que cada sistema maneje su propio estado
+
+        // Limpiar referencias
         navigableButtons.Clear();
         currentSelectedButton = null;
         previousSelectedButton = null;
-
-        Debug.Log("Navegaci√≥n del canvas marcada como inactiva (pero mantenida habilitada)");
     }
 
     private void SetupCanvasNavigation(GameObject canvasObject)
@@ -166,7 +164,7 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         if (closeButton != null)
         {
             navigableButtons.Add(closeButton);
-            Debug.Log("Bot√≥n de cierre movido al final de la lista");
+            Debug.Log("BotÛn de cierre movido al final de la lista");
         }
     }
 
@@ -222,7 +220,7 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
     {
         if (!isActive)
         {
-            Debug.Log("Cancel recibido pero canvas no est√° activo - ignorando");
+            Debug.Log("Cancel recibido pero canvas no est· activo - ignorando");
             return;
         }
 
@@ -231,14 +229,13 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         Button closeButton = FindCloseButton();
         if (closeButton != null)
         {
-            Debug.Log("Ejecutando cierre del canvas de interacci√≥n");
+            Debug.Log("Ejecutando cierre del canvas de interacciÛn");
             closeButton.onClick.Invoke();
         }
         else
         {
-            Debug.LogWarning("No se encontr√≥ bot√≥n de cierre");
-            // CORREGIDO: NO desactivar navegaci√≥n autom√°ticamente
-            // DeactivateNavigation();
+            Debug.LogWarning("No se encontrÛ botÛn de cierre, desactivando navegaciÛn del canvas");
+            DeactivateNavigation();
         }
     }
 
@@ -268,7 +265,7 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
         eventSystem.SetSelectedGameObject(button.gameObject);
         ApplySelectionAnimation();
 
-        Debug.Log($"Bot√≥n seleccionado: {button.name} (√≠ndice: {index})");
+        Debug.Log($"BotÛn seleccionado: {button.name} (Ìndice: {index})");
     }
 
     private void ApplySelectionAnimation()
@@ -308,15 +305,6 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
     private void OnDestroy()
     {
         CleanupAnimations();
-
-        // Limpiar suscripciones
-        if (playerControls != null)
-        {
-            playerControls.UI.Submit.performed -= OnSubmit;
-            playerControls.UI.Cancel.performed -= OnCancel;
-            playerControls.UI.Navigate.performed -= OnNavigate;
-        }
-
         playerControls?.Dispose();
     }
 
@@ -340,20 +328,16 @@ public class InteractionCanvasNavigationManager : MonoBehaviour
     [ContextMenu("Debug Canvas Navigation")]
     public void DebugCurrentState()
     {
-        Debug.Log($"=== InteractionCanvas Navigation State (FIXED) ===");
+        Debug.Log($"=== InteractionCanvas Navigation State ===");
         Debug.Log($"Is Active: {isActive}");
-        Debug.Log($"Component Enabled: {enabled}");
         Debug.Log($"Current Selected: {currentSelectedButton?.name ?? "NULL"}");
         Debug.Log($"Current Index: {currentIndex}");
         Debug.Log($"Total Buttons: {navigableButtons.Count}");
-        Debug.Log($"UI Controls Enabled: {(playerControls?.UI.enabled ?? false)}");
 
         for (int i = 0; i < navigableButtons.Count; i++)
         {
             var button = navigableButtons[i];
             Debug.Log($"  [{i}] {button?.name ?? "NULL"} - Active: {button?.gameObject.activeInHierarchy} - Interactable: {button?.interactable}");
         }
-
-        Debug.Log("=== DESACTIVACIONES ELIMINADAS ===");
     }
 }

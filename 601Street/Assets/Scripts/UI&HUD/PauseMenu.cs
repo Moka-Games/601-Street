@@ -146,19 +146,46 @@ public class PauseMenu : MonoBehaviour
 
         // Ocultar menús
         if (pauseMenuUI != null)
+        {
             pauseMenuUI.SetActive(false);
+        }
 
         if (controlsUI != null)
+        {
             controlsUI.SetActive(false);
+        }
 
-        // NO DESACTIVAR NAVEGACIÓN
-        // Solo restaurar tiempo y estado del juego
+        // CAMBIO IMPORTANTE: Desactivar navegación del menú de pausa usando el sistema de prioridades
+        if (NavigationPriorityManager.Instance != null)
+        {
+            NavigationPriorityManager.Instance.DeactivatePauseMenuNavigation();
+            Debug.Log("PauseMenu: Navegación desactivada mediante NavigationPriorityManager");
+        }
+        else
+        {
+            // Fallback al método directo
+            UINavigationManager uiNavManager = GetComponent<UINavigationManager>();
+            if (uiNavManager != null)
+            {
+                uiNavManager.DisableUINavigation();
+            }
+            Debug.LogWarning("PauseMenu: Usando desactivación directa (sin NavigationPriorityManager)");
+        }
+
+        // Restablecer la escala de tiempo
         Time.timeScale = 1f;
         gamePaused = false;
+
+        // Restaurar estado del juego
         RestoreGameState();
 
+        // Notificar al sistema de estado del juego
         if (stateManager != null)
+        {
             stateManager.EnterGameplayState();
+        }
+
+        Debug.Log("Juego reanudado");
     }
 
     /// <summary>

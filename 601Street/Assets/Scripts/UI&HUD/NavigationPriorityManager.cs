@@ -34,18 +34,6 @@ public class NavigationPriorityManager : MonoBehaviour
         {
             isCurrentlyActive = active;
 
-            if (active)
-            {
-                if (uiNavigationManager != null)
-                    uiNavigationManager.EnableUINavigation();
-
-                if (inventoryNavigationManager != null)
-                    inventoryNavigationManager.enabled = true;
-
-                if (interactionNavigationManager != null)
-                    interactionNavigationManager.enabled = true;
-            }
-/*
             if (uiNavigationManager != null)
             {
                 if (active)
@@ -65,7 +53,7 @@ public class NavigationPriorityManager : MonoBehaviour
                     interactionNavigationManager.enabled = true;
                 else
                     interactionNavigationManager.enabled = false;
-            }*/
+            }
         }
 
         public bool IsActive()

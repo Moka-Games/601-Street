@@ -7,8 +7,10 @@ using UnityEngine.InputSystem;
 using System.Collections;
 
 /// <summary>
-/// VERSIÓN CORREGIDA: Eliminadas todas las desactivaciones problemáticas de navegación
-/// Mantiene todos los Action Maps activos para evitar conflictos
+/// Versión final corregida del gestor de inventario donde ToggleInventory funciona como verdadero TOGGLE
+/// - ToggleInventory puede abrir Y cerrar el inventario
+/// - Cancel está completamente eliminado del sistema de inventario
+/// - La cámara se congela automáticamente al abrir el inventario y se descongela al cerrarlo
 /// </summary>
 public class Inventory_Manager : MonoBehaviour
 {
@@ -46,9 +48,10 @@ public class Inventory_Manager : MonoBehaviour
     [Tooltip("Si está marcado, la cámara se congelará automáticamente al abrir el inventario")]
     public bool freezeCameraOnInventoryOpen = true;
 
-    // CORREGIDO: Mantener ambos Action Maps activos siempre
+    // Input System - CAMBIO IMPORTANTE: Mantenemos ambas referencias activas
     private PlayerControls playerControls;
-    private InputAction toggleInventoryAction; // Una sola acción que funciona en ambos estados
+    private InputAction toggleInventoryGameplay; // Para cuando está cerrado
+    private InputAction toggleInventoryUI;       // Para cuando está abierto (necesitamos crearlo)
 
     // Control de estado para saber por qué están bloqueados
     private bool blockedByInventory = false;
@@ -98,7 +101,7 @@ public class Inventory_Manager : MonoBehaviour
             return;
         }
 
-        // Inicializar Input System CORREGIDO
+        // Inicializar Input System
         InitializeInputSystem();
     }
 
@@ -106,42 +109,63 @@ public class Inventory_Manager : MonoBehaviour
     {
         playerControls = new PlayerControls();
 
-        // CORREGIDO: Usar una sola acción que funcione en ambos contextos
-        toggleInventoryAction = playerControls.Gameplay.ToggleInventory;
-        toggleInventoryAction.performed += OnToggleInventoryInput;
+        // Obtener la acción original de Gameplay
+        toggleInventoryGameplay = playerControls.Gameplay.ToggleInventory;
 
-        Debug.Log("Inventory_Manager: Input System inicializado SIN intercambio de Action Maps");
+        // CREAR una acción temporal para UI con el mismo binding
+        // Esto es un workaround hasta que podamos modificar el Input Action Asset
+        toggleInventoryUI = new InputAction("ToggleInventoryUI", InputActionType.Button);
+        toggleInventoryUI.AddBinding("<Gamepad>/buttonNorth");
+        toggleInventoryUI.AddBinding("<Keyboard>/tab");
+
+        // Suscribirse a ambas acciones
+        toggleInventoryGameplay.performed += OnToggleInventoryInput;
+        toggleInventoryUI.performed += OnToggleInventoryInput;
+
+        Debug.Log("Inventory_Manager: Input System inicializado con ToggleInventory en ambos estados");
     }
 
     private void OnEnable()
     {
-        // CORREGIDO: Mantener ambos Action Maps habilitados siempre
+        // CRÍTICO: Solo habilitar Gameplay al inicio, NUNCA UI
         if (playerControls != null)
         {
             playerControls.Gameplay.Enable();
-            playerControls.UI.Enable(); // Habilitar ambos desde el inicio
+            playerControls.UI.Disable(); // Asegurar que UI esté deshabilitado inicialmente
+            toggleInventoryUI?.Disable(); // Asegurar que la acción personalizada esté deshabilitada
         }
-        Debug.Log("Inventory_Manager: Ambos Action Maps habilitados desde el inicio");
+        Debug.Log("Inventory_Manager: Solo Gameplay habilitado al inicio");
     }
 
     private void OnDisable()
     {
-        // Solo deshabilitar si realmente se está destruyendo el objeto
+        // Deshabilitar todo de forma segura
         if (playerControls != null)
         {
             playerControls.Gameplay.Disable();
             playerControls.UI.Disable();
         }
 
-        Debug.Log("Inventory_Manager: Action Maps deshabilitados en OnDisable");
+        if (toggleInventoryUI != null)
+        {
+            toggleInventoryUI.Disable();
+        }
+
+        Debug.Log("Inventory_Manager: All actions disabled");
     }
 
     private void OnDestroy()
     {
         // Limpiar suscripciones
-        if (toggleInventoryAction != null)
+        if (toggleInventoryGameplay != null)
         {
-            toggleInventoryAction.performed -= OnToggleInventoryInput;
+            toggleInventoryGameplay.performed -= OnToggleInventoryInput;
+        }
+
+        if (toggleInventoryUI != null)
+        {
+            toggleInventoryUI.performed -= OnToggleInventoryInput;
+            toggleInventoryUI.Dispose();
         }
 
         playerControls?.Dispose();
@@ -182,7 +206,7 @@ public class Inventory_Manager : MonoBehaviour
     }
 
     /// <summary>
-    /// CORREGIDO: Callback que no intercambia Action Maps
+    /// Callback ÚNICO para ToggleInventory - funciona tanto para abrir como cerrar
     /// </summary>
     private void OnToggleInventoryInput(InputAction.CallbackContext context)
     {
@@ -216,7 +240,7 @@ public class Inventory_Manager : MonoBehaviour
     }
 
     /// <summary>
-    /// CORREGIDO: Abre el inventario SIN desactivar Action Maps
+    /// Abre el inventario
     /// </summary>
     public void OpenInventory()
     {
@@ -229,15 +253,18 @@ public class Inventory_Manager : MonoBehaviour
         inventoryOpened = true;
         InventoryInterface.SetActive(true);
 
-        // CORREGIDO: NO intercambiar Action Maps - mantener ambos activos
-        // Los Action Maps permanecen como están
+        // CAMBIO CRÍTICO: Cambiar Action Maps Y habilitar la acción de toggle para UI
+        playerControls.Gameplay.Disable();
+        playerControls.UI.Enable();
+        toggleInventoryUI.Enable(); // Habilitar la acción personalizada para cuando esté abierto
 
-        // Activar navegación específica del inventario
+        // CRÍTICO: Activar navegación específica del inventario
         if (inventoryNavigation == null)
         {
             inventoryNavigation = GetComponent<InventoryNavigationManager>();
             if (inventoryNavigation == null)
             {
+                // Buscar en el GameObject del sistema de inventario
                 inventoryNavigation = FindAnyObjectByType<InventoryNavigationManager>();
             }
         }
@@ -252,24 +279,25 @@ public class Inventory_Manager : MonoBehaviour
             Debug.LogWarning("InventoryNavigationManager no encontrado");
         }
 
-        // COMENTADO: No usar NavigationPriorityManager que causa problemas
-        // if (NavigationPriorityManager.Instance != null)
-        // {
-        //     NavigationPriorityManager.Instance.ActivateInventoryNavigation();
-        // }
+        // Usar NavigationPriorityManager si está disponible
+        if (NavigationPriorityManager.Instance != null)
+        {
+            NavigationPriorityManager.Instance.ActivateInventoryNavigation();
+        }
 
         BlockPlayerAndCameraForInventory();
 
-        // Congelar la cámara al abrir el inventario
+        // NUEVO: Congelar la cámara al abrir el inventario
         if (freezeCameraOnInventoryOpen && cameraScript != null)
         {
             cameraScript.FreezeCamera();
             Debug.Log("Cámara congelada automáticamente al abrir el inventario");
         }
 
-        Debug.Log("Inventario ABIERTO: Action Maps mantenidos, Navigation activated, Camera frozen");
+        Debug.Log("Inventario ABIERTO: Gameplay disabled, UI enabled, Navigation activated, Camera frozen");
     }
 
+    // AÑADIR ESTE NUEVO MÉTODO:
     private IEnumerator ActivateNavigationDelayed()
     {
         yield return new WaitForEndOfFrame();
@@ -281,9 +309,8 @@ public class Inventory_Manager : MonoBehaviour
             Debug.Log("Navegación del inventario activada con delay");
         }
     }
-
     /// <summary>
-    /// CORREGIDO: Cierra el inventario SIN desactivar Action Maps problemáticamente
+    /// Cierra el inventario
     /// </summary>
     public void CloseInventory()
     {
@@ -293,35 +320,37 @@ public class Inventory_Manager : MonoBehaviour
             return; // Ya está cerrado
         }
 
-        // COMENTADO: Evitar desactivaciones problemáticas
-        // if (inventoryNavigation != null)
-        // {
-        //     inventoryNavigation.DeactivateInventoryNavigation();
-        //     Debug.Log("Navegación del inventario desactivada");
-        // }
+        // CRÍTICO: Desactivar navegación específica del inventario PRIMERO
+        if (inventoryNavigation != null)
+        {
+            inventoryNavigation.DeactivateInventoryNavigation();
+            Debug.Log("Navegación del inventario desactivada");
+        }
 
-        // COMENTADO: No usar NavigationPriorityManager que causa problemas
-        // if (NavigationPriorityManager.Instance != null)
-        // {
-        //     NavigationPriorityManager.Instance.DeactivateInventoryNavigation();
-        // }
+        // Usar NavigationPriorityManager si está disponible
+        if (NavigationPriorityManager.Instance != null)
+        {
+            NavigationPriorityManager.Instance.DeactivateInventoryNavigation();
+        }
 
         inventoryOpened = false;
         InventoryInterface.SetActive(false);
 
-        // CORREGIDO: NO intercambiar Action Maps - mantener ambos activos
-        // Los Action Maps permanecen como están
+        // CAMBIO CRÍTICO: Volver a Gameplay y deshabilitar la acción de UI
+        playerControls.UI.Disable();
+        toggleInventoryUI.Disable(); // Deshabilitar la acción personalizada
+        playerControls.Gameplay.Enable();
 
         UnblockPlayerAndCameraFromInventory();
 
-        // Descongelar la cámara al cerrar el inventario
+        // NUEVO: Descongelar la cámara al cerrar el inventario
         if (freezeCameraOnInventoryOpen && cameraScript != null)
         {
             cameraScript.UnfreezeCamera();
             Debug.Log("Cámara descongelada automáticamente al cerrar el inventario");
         }
 
-        Debug.Log("Inventario CERRADO: Action Maps mantenidos, Camera unfrozen");
+        Debug.Log("Inventario CERRADO: UI disabled, Navigation deactivated, Gameplay enabled, Camera unfrozen");
     }
 
     /// <summary>
@@ -461,6 +490,7 @@ public class Inventory_Manager : MonoBehaviour
         GameObject newItemUI = Instantiate(template, parentContainer);
         StartCoroutine(RefreshUISetupDelayed());
 
+
         // Configurar imagen
         Image itemImage = newItemUI.GetComponent<Image>();
         if (itemImage != null)
@@ -500,7 +530,6 @@ public class Inventory_Manager : MonoBehaviour
         StartCoroutine(NotifyNavigationChanges());
         StartCoroutine(RefreshUISetupDelayed());
     }
-
     private IEnumerator NotifyNavigationChanges()
     {
         yield return new WaitForEndOfFrame();
@@ -562,6 +591,8 @@ public class Inventory_Manager : MonoBehaviour
         // Instanciar el prefab
         GameObject instance = Instantiate(prefab, prefabContainer);
         EventSystemManager.OnUIContentInstantiated();
+
+
 
         // Configurar botón de cierre si existe
         SetupCloseButton(instance, itemName, isNewItem);
@@ -791,6 +822,7 @@ public class Inventory_Manager : MonoBehaviour
     /// <summary>
     /// Método público para forzar el cierre del inventario desde otros sistemas
     /// </summary>
+    /// 
     public void ForceCloseInventory()
     {
         if (inventoryOpened)
@@ -799,7 +831,6 @@ public class Inventory_Manager : MonoBehaviour
             CloseInventory();
         }
     }
-
     private IEnumerator RefreshUISetupDelayed()
     {
         yield return new WaitForEndOfFrame();
@@ -813,4 +844,6 @@ public class Inventory_Manager : MonoBehaviour
         // También notificar sobre cleanup de EventSystems
         EventSystemManager.OnUIContentInstantiated();
     }
+
+
 }

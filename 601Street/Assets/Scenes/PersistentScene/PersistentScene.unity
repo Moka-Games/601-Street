@@ -5416,6 +5416,7 @@ GameObject:
   - component: {fileID: 1808981684}
   - component: {fileID: 1808981688}
   - component: {fileID: 1808981689}
+  - component: {fileID: 1808981690}
   m_Layer: 0
   m_Name: Inventory Manager
   m_TagString: Untagged
@@ -5466,6 +5467,9 @@ MonoBehaviour:
   blockPlayerDuringInteraction: 1
   blockCameraDuringInteraction: 1
   freezeCameraOnInventoryOpen: 1
+  activeInteractionObject: {fileID: 0}
+  isNewlyAddedItem: 0
+  lastAddedItemName: 
   inventoryNavigation: {fileID: 953174614}
 --- !u!114 &1808981684
 MonoBehaviour:
@@ -5520,6 +5524,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   autoSetupOnStart: 1
   detectionDelay: 0.1
+  logDebugInfo: 1
+  enableGamepadNavigation: 1
+  navigationDelay: 0.5
+--- !u!114 &1808981690
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1808981680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f066060272eb30499ba90003df303bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selectedScale: 1.15
+  animationDuration: 0.2
+  animationEase: 27
+  autoDetectButtons: 1
+  closeButtonName: Close_Interacted_Button
 --- !u!1 &1818005304
 GameObject:
   m_ObjectHideFlags: 0
