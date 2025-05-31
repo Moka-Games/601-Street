@@ -14,13 +14,20 @@ public class Dice_Manager : MonoBehaviour
     [SerializeField] private TMP_Text diceResultText;
     [SerializeField] private TMP_Text bonusText; // El componente "Bonus" de la captura
     [SerializeField] private Button throwDiceButton;
-    [SerializeField] private GameObject diceObject; // El dado 3D
+    [SerializeField] private GameObject diceObject; // El dado 3D (contenedor principal)
+
+    // NUEVO: Referencia al modelo del dado que será el que rote
+    [SerializeField] private Transform diceModelTransform; // El modelo 3D del dado (hijo del diceObject)
 
     [Header("Configuración de Animaciones")]
     [SerializeField] private float diceRollDuration = 2f;
     [SerializeField] private float bonusDisplayDelay = 0.5f;
     [SerializeField] private float bonusDisplayDuration = 1f;
     [SerializeField] private float finalResultDelay = 0.5f;
+
+    [Header("Configuración de Movimiento del Dado")]
+    [SerializeField] private float diceMovementRange = 0.3f; // Rango de movimiento del dado
+    [SerializeField] private float diceMovementSpeed = 0.15f; // Velocidad de cada movimiento
 
     [Header("Configuración Visual del Bonus")]
     [SerializeField] private Color bonusColor = Color.green;
@@ -45,6 +52,10 @@ public class Dice_Manager : MonoBehaviour
     // Control de integración con diálogos
     private bool isWaitingForDialogueContinuation = false;
 
+    // NUEVO: Guardar rotación y posición inicial
+    private Quaternion initialDiceModelRotation;
+    private Vector3 initialDicePosition;
+
     // Callbacks
     public System.Action<bool> OnRollComplete;
 
@@ -52,6 +63,38 @@ public class Dice_Manager : MonoBehaviour
     {
         // Buscar referencias
         bonusManager = BonusManager.Instance;
+
+        // NUEVO: Si no se asignó el modelo del dado, intentar encontrarlo
+        if (diceModelTransform == null && diceObject != null)
+        {
+            // Buscar el hijo que contenga el modelo 3D del dado
+            // Asumiendo que el primer hijo es el modelo
+            if (diceObject.transform.childCount > 0)
+            {
+                // Buscar un hijo que NO sea un texto
+                for (int i = 0; i < diceObject.transform.childCount; i++)
+                {
+                    Transform child = diceObject.transform.GetChild(i);
+                    if (child.GetComponent<TMP_Text>() == null && child.GetComponent<Text>() == null)
+                    {
+                        diceModelTransform = child;
+                        Debug.Log($"Modelo del dado encontrado automáticamente: {diceModelTransform.name}");
+                        break;
+                    }
+                }
+            }
+        }
+
+        // NUEVO: Guardar la rotación inicial del modelo y posición del contenedor
+        if (diceModelTransform != null)
+        {
+            initialDiceModelRotation = diceModelTransform.localRotation;
+        }
+
+        if (diceObject != null)
+        {
+            initialDicePosition = diceObject.transform.localPosition;
+        }
 
         // Configurar interfaz inicial
         SetupInitialUI();
@@ -62,20 +105,22 @@ public class Dice_Manager : MonoBehaviour
             throwDiceButton.onClick.AddListener(ThrowDice);
         }
 
-        Debug.Log("Dice_Manager inicializado con sistema de feedback de bonus");
+        Debug.Log("Dice_Manager inicializado con sistema de feedback de bonus y rotación independiente");
     }
 
     private void SetupInitialUI()
     {
+        // Ocultar texto de bonus inicialmente
         if (bonusText != null)
         {
             bonusText.gameObject.SetActive(false);
             bonusText.color = bonusColor;
         }
 
+        // Configurar texto del resultado
         if (diceResultText != null)
         {
-            diceResultText.text = "0"; // Cambiado de "00"
+            diceResultText.text = "0"; // Cambiado de "00" a "0"
         }
     }
 
@@ -151,43 +196,93 @@ public class Dice_Manager : MonoBehaviour
 
     /// <summary>
     /// Anima la rotación del dado durante la tirada
+    /// MODIFICADO: Mueve el contenedor y rota solo el modelo
     /// </summary>
     private IEnumerator AnimateDiceRoll()
     {
         Debug.Log("Animando tirada del dado...");
 
-        if (diceObject != null)
+        if (diceModelTransform != null && diceObject != null)
         {
-            // Rotación aleatoria del dado (solo el dado, los textos no se ven afectados)
-            diceObject.transform.DORotate(
-                new Vector3(
-                    Random.Range(0, 360) * 3,
-                    Random.Range(0, 360) * 3,
-                    Random.Range(0, 360) * 3
-                ),
-                diceRollDuration,
-                RotateMode.LocalAxisAdd
-            ).SetEase(Ease.OutQuart);
-        }
+            // Crear una secuencia para coordinar movimiento y rotación
+            Sequence diceSequence = DOTween.Sequence();
 
-        if (diceResultText != null)
-        {
-            float elapsedTime = 0f;
-            while (elapsedTime < diceRollDuration)
+            // Añadir efecto de "punch" al lanzar el dado
+            diceSequence.Append(diceObject.transform.DOPunchScale(new Vector3(0.3f, 0.3f, 0.3f), 0.5f, 5, 0.5f));
+
+            // Variables para las rotaciones acumuladas
+            float totalDuration = 0f;
+            int rotationSteps = 8;
+
+            // Animación de rotación y movimiento
+            for (int i = 0; i < rotationSteps; i++)
             {
-                int randomNumber = Random.Range(1, 21);
-                diceResultText.text = randomNumber.ToString(); // Cambiado de ToString("00")
+                // CAMBIO 2: Mover el contenedor principal (diceObject)
+                Vector3 randomOffset = new Vector3(
+                    Random.Range(-diceMovementRange, diceMovementRange),
+                    Random.Range(-diceMovementRange, diceMovementRange),
+                    Random.Range(-diceMovementRange, diceMovementRange)
+                );
+
+                diceSequence.Append(diceObject.transform.DOLocalMove(
+                    initialDicePosition + randomOffset,
+                    diceMovementSpeed
+                ).SetEase(Ease.Linear));
+
+                // Rotar SOLO el modelo del dado
+                diceSequence.Join(diceModelTransform.DOLocalRotate(new Vector3(
+                    Random.Range(0, 360),
+                    Random.Range(0, 360),
+                    Random.Range(0, 360)
+                ), diceMovementSpeed, RotateMode.LocalAxisAdd).SetEase(Ease.Linear));
+
+                totalDuration += diceMovementSpeed;
+            }
+
+            // CAMBIO 1: Volver a la posición Y rotación inicial
+            // Primero volver a la posición inicial
+            diceSequence.Append(diceObject.transform.DOLocalMove(
+                initialDicePosition, 0.5f).SetEase(Ease.OutBack));
+
+            // IMPORTANTE: Volver a la rotación inicial exacta para que el dado mire al jugador
+            diceSequence.Join(diceModelTransform.DOLocalRotateQuaternion(
+                initialDiceModelRotation, 0.5f).SetEase(Ease.OutBack));
+
+            // Ejecutar la secuencia
+            diceSequence.Play();
+
+            // Mientras tanto, mostrar números cambiantes
+            float elapsedTime = 0f;
+            while (elapsedTime < totalDuration + 0.5f) // Incluir el tiempo de vuelta
+            {
+                if (diceResultText != null)
+                {
+                    int randomNumber = Random.Range(1, 21);
+                    diceResultText.text = randomNumber.ToString();
+                }
 
                 elapsedTime += 0.1f;
                 yield return new WaitForSeconds(0.1f);
             }
+
+            // Esperar a que termine completamente la animación
+            yield return diceSequence.WaitForCompletion();
+        }
+        else
+        {
+            // Fallback si no hay referencias correctas
+            Debug.LogWarning("Referencias de dado no configuradas correctamente");
+            yield return new WaitForSeconds(diceRollDuration);
         }
 
         yield return new WaitForSeconds(0.2f);
 
-        Debug.Log("Animación del dado completada");
+        Debug.Log("Animación del dado completada - Dado mirando al jugador");
     }
 
+    /// <summary>
+    /// Muestra el resultado base del dado
+    /// </summary>
     private void ShowBaseResult()
     {
         Debug.Log($"Mostrando resultado base: {baseResult}");
@@ -195,6 +290,8 @@ public class Dice_Manager : MonoBehaviour
         if (diceResultText != null)
         {
             diceResultText.text = baseResult.ToString(); // Cambiado de ToString("00")
+
+            // Animación de énfasis en el resultado
             diceResultText.transform.DOPunchScale(Vector3.one * 0.2f, 0.3f, 5, 0.5f);
         }
     }
@@ -219,7 +316,8 @@ public class Dice_Manager : MonoBehaviour
 
         Debug.Log($"Mostrando bonus: +{bonusValue}");
 
-        // PASO 2: Animar aparición del bonus (respetando rotación fija)
+        // PASO 2: Animar aparición del bonus
+        // El texto NO rotará porque es hijo del contenedor principal, no del modelo
         bonusText.transform.DOScale(bonusScaleAnimation, 0.3f)
             .SetEase(bonusAnimationEase)
             .OnComplete(() => {
@@ -261,7 +359,7 @@ public class Dice_Manager : MonoBehaviour
 
             // Actualizar el texto al resultado final
             yield return new WaitForSeconds(0.2f);
-            diceResultText.text = finalResult.ToString(); 
+            diceResultText.text = finalResult.ToString(); // Cambiado de ToString("00")
 
             // Animación final de énfasis
             diceResultText.transform.DOPunchScale(Vector3.one * 0.4f, 0.5f, 6, 0.8f);
@@ -393,7 +491,7 @@ public class Dice_Manager : MonoBehaviour
     {
         if (diceResultText != null)
         {
-            diceResultText.text = "0"; 
+            diceResultText.text = "0"; // Cambiado de "00"
             diceResultText.transform.localScale = Vector3.one;
         }
 
@@ -408,10 +506,22 @@ public class Dice_Manager : MonoBehaviour
             throwDiceButton.interactable = true;
         }
 
+        // NUEVO: Resetear la rotación del modelo del dado y posición del contenedor
+        if (diceModelTransform != null)
+        {
+            diceModelTransform.localRotation = initialDiceModelRotation;
+        }
+
+        if (diceObject != null)
+        {
+            diceObject.transform.localPosition = initialDicePosition;
+        }
+
         // Detener animaciones en progreso
         DOTween.Kill(diceResultText?.transform);
         DOTween.Kill(bonusText?.transform);
         DOTween.Kill(diceObject?.transform);
+        DOTween.Kill(diceModelTransform); // NUEVO: Detener animaciones del modelo
 
         isRolling = false;
         isWaitingForDialogueContinuation = false;
@@ -486,6 +596,7 @@ public class Dice_Manager : MonoBehaviour
         Debug.Log($"Tirada en progreso: {isRolling}");
         Debug.Log($"Esperando continuación de diálogo: {isWaitingForDialogueContinuation}");
         Debug.Log($"BonusManager encontrado: {bonusManager != null}");
+        Debug.Log($"DiceModelTransform asignado: {diceModelTransform != null}");
 
         if (bonusManager != null)
         {
@@ -507,5 +618,6 @@ public class Dice_Manager : MonoBehaviour
         DOTween.Kill(diceResultText?.transform);
         DOTween.Kill(bonusText?.transform);
         DOTween.Kill(diceObject?.transform);
+        DOTween.Kill(diceModelTransform); // NUEVO: Limpiar tweens del modelo
     }
 }
