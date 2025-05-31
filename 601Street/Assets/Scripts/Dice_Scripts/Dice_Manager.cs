@@ -38,7 +38,7 @@ public class Dice_Manager : MonoBehaviour
 
     [Header("Configuración Visual de Dificultad")]
     [SerializeField] private Color difficultyTextColor = Color.white;
-    [SerializeField] private string difficultyTextPrefix = "DC: "; // Prefijo para el texto de dificultad
+    [SerializeField] private string difficultyTextPrefix = ""; // Prefijo para el texto de dificultad
 
     [Header("Sistema Legacy (Compatibilidad)")]
     public bool bonus1Activated = false;

@@ -127705,7 +127705,6 @@ GameObject:
   m_Component:
   - component: {fileID: 785284279}
   - component: {fileID: 785284281}
-  - component: {fileID: 785284280}
   m_Layer: 0
   m_Name: Barrera
   m_TagString: Untagged
@@ -127728,32 +127727,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 989463240}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &785284280
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 785284278}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d948ebfa5690fc4cb38f28ccf5e7d42, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectID: Barrera_Guardia
-  useSceneName: 0
-  sceneName: MapaExterior
-  defaultActiveState: 1
-  applyStateImmediately: 1
-  onActivate:
-    m_PersistentCalls:
-      m_Calls: []
-  onDeactivate:
-    m_PersistentCalls:
-      m_Calls: []
-  listenOnlyWhenActive: 0
-  useTransition: 0
-  transitionDuration: 0.5
 --- !u!65 &785284281
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -173327,7 +173300,7 @@ MonoBehaviour:
   puertaSecta: {fileID: 533306063}
   ganzua: {fileID: 420297043}
   Estado_Riku_Exito: Riku-Exito
-  Estado_Riku_Fracaso: Riku Fracaso
+  Estado_Riku_Fracaso: Riku-Fracaso
   Estado_Riku_FracasoGuardia: Post-Fracaso-Sectario
 --- !u!114 &1004274089
 MonoBehaviour:
