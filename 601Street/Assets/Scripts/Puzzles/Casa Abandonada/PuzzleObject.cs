@@ -6,12 +6,19 @@ public class PuzzleObject : MonoBehaviour
     [Header("Puzzle Object Configuration")]
     [SerializeField] private PuzzleObjectType objectType;
     [SerializeField] private string collectMessage = "Has recogido un objeto para el puzzle.";
+    [SerializeField] private GameObject objectImage; // Reference to the image that will be activated
 
     private InteractableObject interactableObject;
 
     private void Awake()
     {
         interactableObject = GetComponent<InteractableObject>();
+
+        // Ensure the object image is deactivated by default
+        if (objectImage != null)
+        {
+            objectImage.SetActive(false);
+        }
     }
 
     private void Start()
@@ -34,15 +41,20 @@ public class PuzzleObject : MonoBehaviour
         {
             // Register this object as collected
             PuzzleSystem.Instance.CollectObject(objectType);
-             
+
             // Show collection message to player
             if (PuzzleSystem.Instance.OnShowMessage != null)
             {
                 PuzzleSystem.Instance.OnShowMessage.Invoke(collectMessage);
             }
 
+            // Activate the object image
+            if (objectImage != null)
+            {
+                objectImage.SetActive(true);
+            }
+
             // Deactivate the object so it can't be interacted with again
-            // Alternatively, you could destroy it or handle it differently based on your game's needs
             gameObject.SetActive(false);
         }
         else

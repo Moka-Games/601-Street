@@ -37,6 +37,9 @@ public class PuzzleSystem : MonoBehaviour
     private Dictionary<PuzzleObjectType, GameObject> placedObjects = new Dictionary<PuzzleObjectType, GameObject>();
     private bool puzzleCompleted = false;
 
+    // To keep track of the object images
+    private Dictionary<PuzzleObjectType, GameObject> objectImages = new Dictionary<PuzzleObjectType, GameObject>();
+
     private void Awake()
     {
         // Singleton pattern
@@ -55,14 +58,25 @@ public class PuzzleSystem : MonoBehaviour
         {
             collectedObjects[type] = false;
             placedObjects[type] = null;
+            objectImages[type] = null;
         }
     }
+
     public void CollectObject(PuzzleObjectType objectType)
     {
         if (!collectedObjects[objectType])
         {
             collectedObjects[objectType] = true;
             Debug.Log($"Collected puzzle object: {objectType}");
+        }
+    }
+
+    // Register an object image for a specific puzzle object type
+    public void RegisterObjectImage(PuzzleObjectType objectType, GameObject image)
+    {
+        if (image != null)
+        {
+            objectImages[objectType] = image;
         }
     }
 
@@ -127,6 +141,9 @@ public class PuzzleSystem : MonoBehaviour
         OnShowMessage?.Invoke(puzzleCompletedMessage);
         OnPuzzleCompleted?.Invoke();
         puzzleCompleted = true;
+
+        // Disable the object images since the puzzle is now solved
+        DisableAllObjectImages();
     }
 
     // Place collected objects on the table at their designated positions
@@ -155,7 +172,36 @@ public class PuzzleSystem : MonoBehaviour
                     }
                 }
                 index++;
-                MisionManager.Instance.CompletarMisionActual();
+                // Try to access MisionManager - if it exists, complete the current mission
+                if (typeof(MisionManager).Assembly.GetType("MisionManager") != null &&
+                    MisionManager.Instance != null)
+                {
+                    MisionManager.Instance.CompletarMisionActual();
+                }
+            }
+        }
+    }
+
+    // Enable all object images for collected objects
+    public void EnableObjectImages()
+    {
+        foreach (var entry in collectedObjects)
+        {
+            if (entry.Value && objectImages.ContainsKey(entry.Key) && objectImages[entry.Key] != null)
+            {
+                objectImages[entry.Key].SetActive(true);
+            }
+        }
+    }
+
+    // Disable all object images
+    public void DisableAllObjectImages()
+    {
+        foreach (var entry in objectImages)
+        {
+            if (entry.Value != null)
+            {
+                entry.Value.SetActive(false);
             }
         }
     }
@@ -171,9 +217,13 @@ public class PuzzleSystem : MonoBehaviour
                 Destroy(placedObjects[type]);
                 placedObjects[type] = null;
             }
+
+            // Disable the object image
+            if (objectImages.ContainsKey(type) && objectImages[type] != null)
+            {
+                objectImages[type].SetActive(false);
+            }
         }
         puzzleCompleted = false;
     }
-
-
 }
