@@ -25,27 +25,30 @@ MonoBehaviour:
     content: ' I don''t know what you''re talking about... I''m retired. Leave me
       alone.'
   dialogueOptions:
-  - optionText: I need to know what happened to my mother
+  - optionText: Empathy
     actionId: 1
     requiresDiceRoll: 1
-    difficultyClass: 10
+    difficultyClass: 5
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: 8a6bd95861830ff4d8e7ef685635baf7, type: 2}
     failureDialogue: {fileID: 0}
-    preDiceConversation: {fileID: 0}
-  - optionText: You're not going to get rid of me that easy
+    preDiceConversation: {fileID: 11400000, guid: 47ea40fd85bb37a44a87c94b7b5f34fe,
+      type: 2}
+  - optionText: Persuasion
     actionId: 2
     requiresDiceRoll: 1
-    difficultyClass: 10
+    difficultyClass: 15
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: 8a6bd95861830ff4d8e7ef685635baf7, type: 2}
     failureDialogue: {fileID: 0}
-    preDiceConversation: {fileID: 0}
-  - optionText: I know you remember my mother's case, I want answers.
+    preDiceConversation: {fileID: 11400000, guid: 9e6133f31cebf9843a83267b916a81ad,
+      type: 2}
+  - optionText: Intimidation
     actionId: 3
     requiresDiceRoll: 1
     difficultyClass: 10
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: 8a6bd95861830ff4d8e7ef685635baf7, type: 2}
     failureDialogue: {fileID: 0}
-    preDiceConversation: {fileID: 0}
+    preDiceConversation: {fileID: 11400000, guid: f41ea3805f4d7604ca6de78e6fe73bdf,
+      type: 2}
