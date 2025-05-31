@@ -15,13 +15,15 @@ public class PuzzleCollectionManager : MonoBehaviour
         public GameObject feedbackUI; // Referencia opcional a un elemento UI que muestra el estado
     }
 
-
     [Header("Configuración de objetos")]
     [SerializeField] private List<CollectibleStatus> collectibles = new List<CollectibleStatus>();
 
     [Header("Eventos")]
-    [Tooltip("Evento que se dispara cuando se completa la colección")]
-    public UnityEvent OnCompletedList;
+    [Tooltip("Evento que se dispara cuando se recogen todos los objetos (no cuando se completa el puzzle)")]
+    public UnityEvent OnAllObjectsCollected;
+
+    [Tooltip("Evento que se dispara cuando se completa el puzzle mediante EndPuzzle()")]
+    public UnityEvent OnPuzzleCompleted;
 
     [Tooltip("Evento que se dispara cuando se recoge un objeto específico")]
     public UnityEvent<CollectibleType> OnObjectCollected;
@@ -32,12 +34,17 @@ public class PuzzleCollectionManager : MonoBehaviour
     // Contador interno de objetos recogidos
     private int collectedCount = 0;
 
-    public GameObject aplleObject; 
+    // Flag para saber si todos los objetos han sido recogidos
+    private bool allObjectsCollected = false;
+
+    // Flag para saber si el puzzle ha sido completado
+    private bool puzzleCompleted = false;
+
+    public GameObject aplleObject;
 
     [Header("Elementos Fracaso Guardia 2")]
     public GameObject puertaSecta;
     public GameObject ganzua;
-
 
     private GameStateController gameStateController;
     [Header("Gestión de estados")]
@@ -54,6 +61,7 @@ public class PuzzleCollectionManager : MonoBehaviour
         }
         Instance = this;
     }
+
     private void Start()
     {
         // Inicializar la lista de objetos si no está configurada
@@ -87,14 +95,14 @@ public class PuzzleCollectionManager : MonoBehaviour
                 Debug.Log($"Objeto recogido: {type} ({collectedCount}/{collectibles.Count})");
             }
 
-            // Activar feedback UI si existe
+            // Activar feedback UI (la imagen aparece)
             UpdateFeedbackUI(targetCollectible);
 
             // Disparar evento de objeto recogido
             OnObjectCollected?.Invoke(type);
 
-            // Verificar si hemos completado la colección
-            CheckCompletion();
+            // Verificar si hemos recogido todos los objetos
+            CheckAllObjectsCollected();
         }
         else if (targetCollectible != null && targetCollectible.collected)
         {
@@ -109,7 +117,7 @@ public class PuzzleCollectionManager : MonoBehaviour
         }
     }
 
-    private void CheckCompletion()
+    private void CheckAllObjectsCollected()
     {
         // Verificar si todos los objetos han sido recogidos
         bool allCollected = true;
@@ -122,16 +130,57 @@ public class PuzzleCollectionManager : MonoBehaviour
             }
         }
 
-        // Si todos los objetos han sido recogidos, disparar el evento
-        if (allCollected)
+        // Si todos los objetos han sido recogidos (pero el puzzle no está completado aún)
+        if (allCollected && !allObjectsCollected)
+        {
+            allObjectsCollected = true;
+
+            if (showDebugMessages)
+            {
+                Debug.Log("¡Todos los objetos recogidos! Ahora se puede finalizar el puzzle con EndPuzzle()");
+            }
+
+            // Disparar evento de todos los objetos recogidos
+            OnAllObjectsCollected?.Invoke();
+        }
+    }
+
+    /// <summary>
+    /// Función para finalizar el puzzle. Solo funciona si todos los objetos han sido recogidos.
+    /// </summary>
+    public void EndPuzzle()
+    {
+        if (!allObjectsCollected)
         {
             if (showDebugMessages)
             {
-                Debug.Log("¡Colección completada! Disparando evento OnCompletedList");
+                Debug.LogWarning("No se puede finalizar el puzzle. Aún faltan objetos por recoger.");
             }
-
-            OnCompletedList?.Invoke();
+            return;
         }
+
+        if (puzzleCompleted)
+        {
+            if (showDebugMessages)
+            {
+                Debug.Log("El puzzle ya ha sido completado.");
+            }
+            return;
+        }
+
+        // Marcar el puzzle como completado
+        puzzleCompleted = true;
+
+        if (showDebugMessages)
+        {
+            Debug.Log("¡Puzzle completado exitosamente!");
+        }
+
+        // Aquí puedes ocultar las imágenes de los objetos si lo deseas
+        HideAllFeedbackUI();
+
+        // Disparar evento de puzzle completado
+        OnPuzzleCompleted?.Invoke();
     }
 
     // Método para actualizar un elemento UI específico
@@ -152,6 +201,18 @@ public class PuzzleCollectionManager : MonoBehaviour
         }
     }
 
+    // Método para ocultar todas las imágenes de feedback UI
+    private void HideAllFeedbackUI()
+    {
+        foreach (var collectible in collectibles)
+        {
+            if (collectible.feedbackUI != null)
+            {
+                collectible.feedbackUI.SetActive(false);
+            }
+        }
+    }
+
     // Método para reiniciar el puzzle
     public void ResetCollection()
     {
@@ -161,6 +222,8 @@ public class PuzzleCollectionManager : MonoBehaviour
         }
 
         collectedCount = 0;
+        allObjectsCollected = false;
+        puzzleCompleted = false;
         UpdateAllFeedbackUI();
 
         if (showDebugMessages)
@@ -180,6 +243,18 @@ public class PuzzleCollectionManager : MonoBehaviour
     public int GetCollectedCount()
     {
         return collectedCount;
+    }
+
+    // Método para verificar si todos los objetos han sido recogidos
+    public bool AreAllObjectsCollected()
+    {
+        return allObjectsCollected;
+    }
+
+    // Método para verificar si el puzzle ha sido completado
+    public bool IsPuzzleCompleted()
+    {
+        return puzzleCompleted;
     }
 
     public void ActivateApple()
