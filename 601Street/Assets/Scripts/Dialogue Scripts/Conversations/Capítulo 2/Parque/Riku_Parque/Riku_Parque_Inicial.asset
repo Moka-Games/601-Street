@@ -20,8 +20,8 @@ MonoBehaviour:
   - speakerName: Nyssa
     content: Who are you?
   - speakerName: Riku
-    content: I am Riku. I study at the university next door. I haven't seen you before...
-      And who are you?
+    content: I am Riku. I study at the university near this. I haven't seen you before...
+      Who are you?
   - speakerName: Nyssa
     content: Nyssa. I still go to school.
   - speakerName: Riku
@@ -39,6 +39,7 @@ MonoBehaviour:
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: ed25ea207d1f6e24b8e554c5fe726f70, type: 2}
     failureDialogue: {fileID: 11400000, guid: 1c7bac0184a97644589262a62b272d3e, type: 2}
+    preDiceConversation: {fileID: 0}
   - optionText: If you let me have it now I will compensate you later, we can make
       a deal.
     actionId: Riku_Parque
@@ -47,6 +48,7 @@ MonoBehaviour:
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: ed25ea207d1f6e24b8e554c5fe726f70, type: 2}
     failureDialogue: {fileID: 11400000, guid: 1c7bac0184a97644589262a62b272d3e, type: 2}
+    preDiceConversation: {fileID: 0}
   - optionText: I don't have time for games, give me the apple or you will regret
       it.
     actionId: Riku_Parque
@@ -55,3 +57,4 @@ MonoBehaviour:
     nextDialogue: {fileID: 0}
     successDialogue: {fileID: 11400000, guid: ed25ea207d1f6e24b8e554c5fe726f70, type: 2}
     failureDialogue: {fileID: 11400000, guid: 1c7bac0184a97644589262a62b272d3e, type: 2}
+    preDiceConversation: {fileID: 0}
