@@ -67,17 +67,15 @@ public class Dice_Manager : MonoBehaviour
 
     private void SetupInitialUI()
     {
-        // Ocultar texto de bonus inicialmente
         if (bonusText != null)
         {
             bonusText.gameObject.SetActive(false);
             bonusText.color = bonusColor;
         }
 
-        // Configurar texto del resultado
         if (diceResultText != null)
         {
-            diceResultText.text = "00";
+            diceResultText.text = "0"; // Cambiado de "00"
         }
     }
 
@@ -172,14 +170,13 @@ public class Dice_Manager : MonoBehaviour
             ).SetEase(Ease.OutQuart);
         }
 
-        // Mostrar números cambiantes en el resultado
         if (diceResultText != null)
         {
             float elapsedTime = 0f;
             while (elapsedTime < diceRollDuration)
             {
                 int randomNumber = Random.Range(1, 21);
-                diceResultText.text = randomNumber.ToString("00");
+                diceResultText.text = randomNumber.ToString(); // Cambiado de ToString("00")
 
                 elapsedTime += 0.1f;
                 yield return new WaitForSeconds(0.1f);
@@ -191,18 +188,13 @@ public class Dice_Manager : MonoBehaviour
         Debug.Log("Animación del dado completada");
     }
 
-    /// <summary>
-    /// Muestra el resultado base del dado
-    /// </summary>
     private void ShowBaseResult()
     {
         Debug.Log($"Mostrando resultado base: {baseResult}");
 
         if (diceResultText != null)
         {
-            diceResultText.text = baseResult.ToString("00");
-
-            // Animación de énfasis en el resultado
+            diceResultText.text = baseResult.ToString(); // Cambiado de ToString("00")
             diceResultText.transform.DOPunchScale(Vector3.one * 0.2f, 0.3f, 5, 0.5f);
         }
     }
@@ -269,7 +261,7 @@ public class Dice_Manager : MonoBehaviour
 
             // Actualizar el texto al resultado final
             yield return new WaitForSeconds(0.2f);
-            diceResultText.text = finalResult.ToString("00");
+            diceResultText.text = finalResult.ToString(); 
 
             // Animación final de énfasis
             diceResultText.transform.DOPunchScale(Vector3.one * 0.4f, 0.5f, 6, 0.8f);
@@ -401,7 +393,7 @@ public class Dice_Manager : MonoBehaviour
     {
         if (diceResultText != null)
         {
-            diceResultText.text = "00";
+            diceResultText.text = "0"; 
             diceResultText.transform.localScale = Vector3.one;
         }
 
