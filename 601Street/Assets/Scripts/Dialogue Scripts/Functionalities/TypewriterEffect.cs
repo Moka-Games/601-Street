@@ -8,6 +8,16 @@ public class TypewriterEffect : MonoBehaviour
     public float typeSpeed = 0.05f;
     public AudioSource typingSoundEffect;
 
+    [Header("Configuración de Audio")]
+    [Tooltip("Clip de audio para cada letra (opcional - usa el clip del AudioSource si no se asigna)")]
+    public AudioClip typeLetterClip;
+    [Tooltip("Volumen del sonido de tipeo (0.0 a 1.0)")]
+    [Range(0f, 1f)]
+    public float typeVolume = 1f;
+    [Tooltip("Variación de pitch para hacer el sonido más natural")]
+    [Range(0f, 0.5f)]
+    public float pitchVariation = 0.1f;
+
     private string processedText;
     private float timer;
     private int charIndex;
@@ -40,7 +50,6 @@ public class TypewriterEffect : MonoBehaviour
             textComponent.text = "";
             textComponent.maxVisibleCharacters = 0;
         }
-
     }
 
     // Procesa el texto antes de iniciar la animación de escritura
@@ -70,7 +79,6 @@ public class TypewriterEffect : MonoBehaviour
 
         // Iniciamos la animación después de un breve delay para asegurar que todo esté configurado
         typingCoroutine = StartCoroutine(TypeText());
-
     }
 
     private IEnumerator TypeText()
@@ -93,11 +101,8 @@ public class TypewriterEffect : MonoBehaviour
                 charIndex++;
                 textComponent.maxVisibleCharacters = charIndex;
 
-                // Reproducir sonido de tipeo
-                if (typingSoundEffect != null && !typingSoundEffect.isPlaying)
-                {
-                    typingSoundEffect.Play();
-                }
+                // Reproducir sonido para cada letra
+                PlayTypingSound();
 
                 timer = 0;
             }
@@ -110,6 +115,37 @@ public class TypewriterEffect : MonoBehaviour
 
         // Notificamos que se ha completado la escritura
         DialogueManager.Instance.OnTypingComplete();
+    }
+
+    /// <summary>
+    /// Reproduce el sonido de tipeo para cada letra
+    /// </summary>
+    private void PlayTypingSound()
+    {
+        if (typingSoundEffect == null) return;
+
+        // Si hay un clip específico asignado, usarlo; si no, usar el clip del AudioSource
+        AudioClip clipToPlay = typeLetterClip != null ? typeLetterClip : typingSoundEffect.clip;
+
+        if (clipToPlay != null)
+        {
+            // Añadir variación de pitch para sonido más natural
+            if (pitchVariation > 0f)
+            {
+                float originalPitch = typingSoundEffect.pitch;
+                typingSoundEffect.pitch = originalPitch + Random.Range(-pitchVariation, pitchVariation);
+
+                // PlayOneShot permite múltiples sonidos simultáneos
+                typingSoundEffect.PlayOneShot(clipToPlay, typeVolume);
+
+                // Restaurar pitch original
+                typingSoundEffect.pitch = originalPitch;
+            }
+            else
+            {
+                typingSoundEffect.PlayOneShot(clipToPlay, typeVolume);
+            }
+        }
     }
 
     public void StopTyping()
@@ -129,4 +165,32 @@ public class TypewriterEffect : MonoBehaviour
             DialogueManager.Instance.OnTypingComplete();
         }
     }
+
+    #region Métodos adicionales para control avanzado
+
+    /// <summary>
+    /// Establece el volumen del sonido de tipeo
+    /// </summary>
+    public void SetTypeVolume(float volume)
+    {
+        typeVolume = Mathf.Clamp01(volume);
+    }
+
+    /// <summary>
+    /// Establece la variación de pitch
+    /// </summary>
+    public void SetPitchVariation(float variation)
+    {
+        pitchVariation = Mathf.Clamp(variation, 0f, 0.5f);
+    }
+
+    /// <summary>
+    /// Cambia el clip de audio para el tipeo
+    /// </summary>
+    public void SetTypeClip(AudioClip newClip)
+    {
+        typeLetterClip = newClip;
+    }
+
+    #endregion
 }

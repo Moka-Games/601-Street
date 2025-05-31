@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -39,6 +40,8 @@ public class DiceBonus : MonoBehaviour
     private BonusManager bonusManager;
     private AudioSource audioSource;
     private bool hasBeenCollected = false;
+
+    public GameObject bonus_Mesh;
 
     private void Start()
     {
@@ -125,8 +128,7 @@ public class DiceBonus : MonoBehaviour
         // Desactivar objeto si está configurado
         if (disableAfterCollection)
         {
-            // Pequeño delay para permitir que los efectos se reproduzcan
-            Invoke(nameof(DisableObject), 0.5f);
+            StartCoroutine(DisableObject(1.5f));
         }
     }
 
@@ -190,12 +192,16 @@ public class DiceBonus : MonoBehaviour
         }
     }
 
-    private void DisableObject()
+    IEnumerator DisableObject(float delay)
     {
         if (showDebugMessages)
             Debug.Log($"Desactivando objeto de bonus: {bonusName}");
 
-        gameObject.SetActive(false);
+        bonus_Mesh.SetActive(false);
+
+        yield return new WaitForSeconds(delay);
+
+        Destroy(gameObject);
     }
 
     #region Métodos de Configuración Pública
