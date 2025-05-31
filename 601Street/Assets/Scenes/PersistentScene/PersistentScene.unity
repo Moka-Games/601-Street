@@ -907,6 +907,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3754790435304779438, guid: c33191c6797853f4d8cb4de889205796,
         type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3754790435304779438, guid: c33191c6797853f4d8cb4de889205796,
+        type: 3}
       propertyPath: pensamientoUI
       value: 
       objectReference: {fileID: 1588404276}
@@ -1154,8 +1159,7 @@ MonoBehaviour:
   bonusDisplayDelay: 0.5
   bonusDisplayDuration: 1
   finalResultDelay: 0.5
-  minBounds: {x: -180, y: -133}
-  maxBounds: {x: 180, y: 150}
+  diceMovementRange: 0.3
   diceMovementSpeed: 0.15
   bonusColor: {r: 0, g: 1, b: 0, a: 1}
   bonusScaleAnimation: 1.2
@@ -4754,6 +4758,11 @@ PrefabInstance:
     - target: {fileID: 1582940527306336013, guid: 71fd2317e6d85594693f367bc89aed12,
         type: 3}
       propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2427434270315208795, guid: 71fd2317e6d85594693f367bc89aed12,
+        type: 3}
+      propertyPath: m_hasFontAssetChanged
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2441310221607527150, guid: 71fd2317e6d85594693f367bc89aed12,

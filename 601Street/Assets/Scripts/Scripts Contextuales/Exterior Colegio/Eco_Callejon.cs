@@ -3,9 +3,20 @@ using System.Collections;
 using UnityEngine.Rendering.Universal;
 using Cinemachine;
 using UnityEngine.Events;
+using UnityEngine.Audio;
 
 public class Eco_Callejon : MonoBehaviour
 {
+
+    [Header("Post-Procesado")]
+    public GameObject postProcesadoEco;
+
+    [Header("Raycast Settings")]
+    public AudioClip sonidoEcoDetectado;
+    public AudioClip sonidoEcoDesapareciendo;
+    private AudioSource audioSource;
+    public float audioSource_Volume = 0.25f; 
+
     public float raycastDistance = 10f;
 
     public Transform ecoLookAt;
@@ -23,8 +34,11 @@ public class Eco_Callejon : MonoBehaviour
     private bool ecoInteracted;
 
     public GameObject imagenEco;
+    public GameObject EcoMesh;
 
     public UnityEvent onEcoTriggered;
+
+    public GameObject luzEco;
 
     private void Start()
     {
@@ -32,8 +46,11 @@ public class Eco_Callejon : MonoBehaviour
         playerDetected = false;
         temporalColliders.SetActive(false);
         imagenEco.SetActive(false);
+        postProcesadoEco.SetActive(false);
 
-        //Referencias
+        audioSource = GetComponent<AudioSource>();
+        audioSource.volume = audioSource_Volume;
+
         playerCamera = FindAnyObjectByType<CinemachineFreeLook>();
         pensamientosManager = FindAnyObjectByType<Pensamientos_Manager>();
         playerController = FindAnyObjectByType<PlayerController>();
@@ -53,6 +70,7 @@ public class Eco_Callejon : MonoBehaviour
                     print("Jugador detectado");
                     StartEcoSequence();
                     playerDetected = true;
+                    audioSource.PlayOneShot(sonidoEcoDetectado);
                 }
             }
         }
@@ -81,6 +99,9 @@ public class Eco_Callejon : MonoBehaviour
         temporalColliders.SetActive(true);
 
 
+        postProcesadoEco.SetActive(true);
+
+
         yield return new WaitForSeconds(2f);
         
         
@@ -106,13 +127,36 @@ public class Eco_Callejon : MonoBehaviour
 
     public void CloseEcoImage()
     {
-        temporalColliders.SetActive(false); 
+        audioSource.PlayOneShot(sonidoEcoDesapareciendo);
+        EcoMesh.SetActive(false);
+
+        temporalColliders.SetActive(false);
+        luzEco.SetActive(false);
+        postProcesadoEco.SetActive(false); 
         playerController.SetMovementEnabled(true);
         imagenEco.SetActive(false);
         callejonCamera.enabled=false;
         playerCamera.enabled=true;
 
+
+
+        StartCoroutine(Destroy_Eco_Delay(1f));
+
         pensamientosManager.MostrarPensamiento(pensamientoNyssaPostInteracción);
+    
+        StartCoroutine(StopAudioSource(1f));
+    }
+
+    private IEnumerator Destroy_Eco_Delay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Destroy(EcoMesh);
+    }
+
+    private IEnumerator StopAudioSource(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        audioSource.Pause();
     }
 
 }
