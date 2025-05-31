@@ -5,7 +5,7 @@ using TMPro;
 using DG.Tweening;
 
 /// <summary>
-/// Dice Manager mejorado con feedback visual para bonuses
+/// Dice Manager mejorado con feedback visual para bonuses y display de dificultad
 /// Incluye sistema para mantener textos sin rotación mientras siguen al dado
 /// </summary>
 public class Dice_Manager : MonoBehaviour
@@ -13,6 +13,7 @@ public class Dice_Manager : MonoBehaviour
     [Header("Referencias de la Interfaz")]
     [SerializeField] private TMP_Text diceResultText;
     [SerializeField] private TMP_Text bonusText; // El componente "Bonus" de la captura
+    [SerializeField] private TMP_Text difficultyText; // NUEVO: Texto para mostrar la dificultad
     [SerializeField] private Button throwDiceButton;
     [SerializeField] private GameObject diceObject; // El dado 3D (contenedor principal)
 
@@ -34,6 +35,10 @@ public class Dice_Manager : MonoBehaviour
     [SerializeField] private Color bonusColor = Color.green;
     [SerializeField] private float bonusScaleAnimation = 1.2f;
     [SerializeField] private Ease bonusAnimationEase = Ease.OutBack;
+
+    [Header("Configuración Visual de Dificultad")]
+    [SerializeField] private Color difficultyTextColor = Color.white;
+    [SerializeField] private string difficultyTextPrefix = "DC: "; // Prefijo para el texto de dificultad
 
     [Header("Sistema Legacy (Compatibilidad)")]
     public bool bonus1Activated = false;
@@ -86,6 +91,21 @@ public class Dice_Manager : MonoBehaviour
             }
         }
 
+        // NUEVO: Si no se asignó el texto de dificultad, intentar encontrarlo
+        if (difficultyText == null)
+        {
+            // Buscar por nombre común
+            GameObject difficultyObj = GameObject.Find("Difficulty_Text") ??
+                                     GameObject.Find("DC_Text") ??
+                                     GameObject.Find("Minimum_Number");
+
+            if (difficultyObj != null)
+            {
+                difficultyText = difficultyObj.GetComponent<TMP_Text>();
+                Debug.Log($"Texto de dificultad encontrado automáticamente: {difficultyObj.name}");
+            }
+        }
+
         // NUEVO: Guardar la rotación inicial del modelo y posición del contenedor
         if (diceModelTransform != null)
         {
@@ -106,7 +126,7 @@ public class Dice_Manager : MonoBehaviour
             throwDiceButton.onClick.AddListener(ThrowDice);
         }
 
-        Debug.Log("Dice_Manager inicializado con sistema de feedback de bonus y rotación independiente");
+        Debug.Log("Dice_Manager inicializado con sistema de feedback de bonus, rotación independiente y display de dificultad");
     }
 
     private void SetupInitialUI()
@@ -121,7 +141,26 @@ public class Dice_Manager : MonoBehaviour
         // Configurar texto del resultado
         if (diceResultText != null)
         {
-            diceResultText.text = "0"; // Cambiado de "00" a "0"
+            diceResultText.text = "0";
+        }
+
+        // NUEVO: Configurar texto de dificultad
+        if (difficultyText != null)
+        {
+            difficultyText.color = difficultyTextColor;
+            UpdateDifficultyDisplay();
+        }
+    }
+
+    /// <summary>
+    /// NUEVO: Actualiza el display de dificultad en la interfaz
+    /// </summary>
+    private void UpdateDifficultyDisplay()
+    {
+        if (difficultyText != null)
+        {
+            difficultyText.text = $"{difficultyTextPrefix}{difficultyClass}";
+            Debug.Log($"Dificultad actualizada en UI: {difficultyTextPrefix}{difficultyClass}");
         }
     }
 
@@ -169,6 +208,7 @@ public class Dice_Manager : MonoBehaviour
         Debug.Log($"Resultado base: {baseResult}");
         Debug.Log($"Valor del bonus: {bonusValue}");
         Debug.Log($"Resultado final: {finalResult}");
+        Debug.Log($"Dificultad objetivo: {difficultyClass}"); // NUEVO: Log de la dificultad
 
         // PASO 2: Animación del dado
         yield return StartCoroutine(AnimateDiceRoll());
@@ -291,7 +331,7 @@ public class Dice_Manager : MonoBehaviour
 
         if (diceResultText != null)
         {
-            diceResultText.text = baseResult.ToString(); // Cambiado de ToString("00")
+            diceResultText.text = baseResult.ToString();
 
             // Animación de énfasis en el resultado
             diceResultText.transform.DOPunchScale(Vector3.one * 0.2f, 0.3f, 5, 0.5f);
@@ -361,7 +401,7 @@ public class Dice_Manager : MonoBehaviour
 
             // Actualizar el texto al resultado final
             yield return new WaitForSeconds(0.2f);
-            diceResultText.text = finalResult.ToString(); // Cambiado de ToString("00")
+            diceResultText.text = finalResult.ToString();
 
             // Animación final de énfasis
             diceResultText.transform.DOPunchScale(Vector3.one * 0.4f, 0.5f, 6, 0.8f);
@@ -466,12 +506,44 @@ public class Dice_Manager : MonoBehaviour
     #region Métodos Públicos de Configuración
 
     /// <summary>
-    /// Establece la clase de dificultad para la tirada
+    /// Establece la clase de dificultad para la tirada y actualiza la UI
+    /// MODIFICADO: Ahora actualiza también el display visual
     /// </summary>
     public void SetDifficultyClass(int dc)
     {
         difficultyClass = dc;
+        UpdateDifficultyDisplay(); // NUEVO: Actualizar display cuando cambie la DC
         Debug.Log($"Clase de dificultad establecida: {dc}");
+    }
+
+    /// <summary>
+    /// NUEVO: Obtiene la dificultad actual
+    /// </summary>
+    public int GetDifficultyClass()
+    {
+        return difficultyClass;
+    }
+
+    /// <summary>
+    /// NUEVO: Configura el prefijo del texto de dificultad
+    /// </summary>
+    public void SetDifficultyTextPrefix(string prefix)
+    {
+        difficultyTextPrefix = prefix;
+        UpdateDifficultyDisplay();
+        Debug.Log($"Prefijo de dificultad cambiado a: {prefix}");
+    }
+
+    /// <summary>
+    /// NUEVO: Configura el color del texto de dificultad
+    /// </summary>
+    public void SetDifficultyTextColor(Color color)
+    {
+        difficultyTextColor = color;
+        if (difficultyText != null)
+        {
+            difficultyText.color = color;
+        }
     }
 
     /// <summary>
@@ -488,12 +560,13 @@ public class Dice_Manager : MonoBehaviour
 
     /// <summary>
     /// Resetea la interfaz del dado
+    /// MODIFICADO: Ahora también resetea el display de dificultad
     /// </summary>
     public void ResetUI()
     {
         if (diceResultText != null)
         {
-            diceResultText.text = "0"; // Cambiado de "00"
+            diceResultText.text = "0";
             diceResultText.transform.localScale = Vector3.one;
         }
 
@@ -507,6 +580,9 @@ public class Dice_Manager : MonoBehaviour
         {
             throwDiceButton.interactable = true;
         }
+
+        // NUEVO: Resetear el display de dificultad
+        UpdateDifficultyDisplay();
 
         // NUEVO: Resetear la rotación del modelo del dado y posición del contenedor
         if (diceModelTransform != null)
@@ -528,7 +604,7 @@ public class Dice_Manager : MonoBehaviour
         isRolling = false;
         isWaitingForDialogueContinuation = false;
 
-        Debug.Log("Interfaz del dado reseteada");
+        Debug.Log("Interfaz del dado reseteada con display de dificultad actualizado");
     }
 
     /// <summary>
@@ -587,6 +663,19 @@ public class Dice_Manager : MonoBehaviour
         }
     }
 
+    [ContextMenu("Test Different Difficulties")]
+    public void TestDifferentDifficulties()
+    {
+        if (Application.isPlaying)
+        {
+            // Probar diferentes dificultades
+            int[] testDCs = { 5, 10, 15, 20 };
+            int randomDC = testDCs[Random.Range(0, testDCs.Length)];
+            SetDifficultyClass(randomDC);
+            Debug.Log($"Dificultad de prueba establecida: {randomDC}");
+        }
+    }
+
     [ContextMenu("Debug Dice State")]
     public void DebugDiceState()
     {
@@ -599,6 +688,7 @@ public class Dice_Manager : MonoBehaviour
         Debug.Log($"Esperando continuación de diálogo: {isWaitingForDialogueContinuation}");
         Debug.Log($"BonusManager encontrado: {bonusManager != null}");
         Debug.Log($"DiceModelTransform asignado: {diceModelTransform != null}");
+        Debug.Log($"DifficultyText asignado: {difficultyText != null}"); // NUEVO
         Debug.Log($"Límites de movimiento: X({minBounds.x}, {maxBounds.x}), Y({minBounds.y}, {maxBounds.y})");
 
         if (bonusManager != null)
@@ -610,6 +700,18 @@ public class Dice_Manager : MonoBehaviour
                 Debug.Log($"Nombre del bonus activo: {bonusManager.GetActiveBonusName()}");
             }
         }
+
+        // NUEVO: Debug específico para el display de dificultad
+        if (difficultyText != null)
+        {
+            Debug.Log($"Texto de dificultad actual: '{difficultyText.text}'");
+            Debug.Log($"Prefijo configurado: '{difficultyTextPrefix}'");
+        }
+        else
+        {
+            Debug.LogWarning("difficultyText no está asignado - El display de dificultad no funcionará");
+        }
+
         Debug.Log("==============================");
     }
 

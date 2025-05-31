@@ -1956,8 +1956,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 007e0cbbded5cee4db2c6b5a87c7f552, type: 3}
-  m_Resource: {fileID: 8300000, guid: 007e0cbbded5cee4db2c6b5a87c7f552, type: 3}
+  m_audioClip: {fileID: 8300000, guid: a40ec9a98e69b284fadc5e96e1597677, type: 3}
+  m_Resource: {fileID: 8300000, guid: a40ec9a98e69b284fadc5e96e1597677, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.2
   m_Pitch: 1
@@ -199328,12 +199328,12 @@ PrefabInstance:
         type: 3}
       propertyPath: sonidoEcoDetectado
       value: 
-      objectReference: {fileID: 8300000, guid: d2c6f88dbcd3e7148a7caee27dd3d6a2, type: 3}
+      objectReference: {fileID: 8300000, guid: 7a3dd5248bf1fd342ba4538b4f483e84, type: 3}
     - target: {fileID: 8462810847862383499, guid: 4c57fb7400a89fc4e861e32d41e2a64d,
         type: 3}
       propertyPath: sonidoEcoDesapareciendo
       value: 
-      objectReference: {fileID: 8300000, guid: ad580c0298abb2a43a23d5a99cf34bf0, type: 3}
+      objectReference: {fileID: 8300000, guid: e34220a3702979347b6543cd51563bc6, type: 3}
     - target: {fileID: 8462810847862383499, guid: 4c57fb7400a89fc4e861e32d41e2a64d,
         type: 3}
       propertyPath: onEcoTriggered.m_PersistentCalls.m_Calls.Array.size

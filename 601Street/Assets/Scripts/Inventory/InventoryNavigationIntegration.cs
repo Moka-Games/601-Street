@@ -2,8 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// VERSIÓN SIMPLIFICADA: Integración automática entre Inventory_Manager e InventoryNavigationManager
-/// SIN desactivación de otros sistemas - Solo maneja su propia navegación
+/// VERSIÓN CORREGIDA: Eliminadas todas las desactivaciones de navegación
+/// Solo maneja activación, nunca desactivación
 /// </summary>
 [RequireComponent(typeof(Inventory_Manager))]
 public class InventoryNavigationIntegration : MonoBehaviour
@@ -170,14 +170,13 @@ public class InventoryNavigationIntegration : MonoBehaviour
     }
 
     /// <summary>
-    /// VERSIÓN SIMPLIFICADA: Solo habilita la navegación del inventario sin afectar otros sistemas
+    /// CORREGIDO: Solo habilita la navegación del inventario
     /// </summary>
     private void OnInventoryOpened()
     {
         Debug.Log("Inventario abierto - Habilitando navegación del inventario");
 
-        // CAMBIO IMPORTANTE: Solo habilitar la navegación del inventario
-        // NO desactivar otros sistemas
+        // SOLO ACTIVAR, nunca desactivar otros sistemas
         if (navigationManager != null)
         {
             navigationManager.enabled = true;
@@ -205,17 +204,19 @@ public class InventoryNavigationIntegration : MonoBehaviour
     }
 
     /// <summary>
-    /// VERSIÓN SIMPLIFICADA: Solo deshabilita la navegación del inventario
+    /// CORREGIDO: NO deshabilita navegación al cerrar inventario
     /// </summary>
     private void OnInventoryClosed()
     {
-        Debug.Log("Inventario cerrado - Deshabilitando navegación del inventario");
+        Debug.Log("Inventario cerrado - Manteniendo navegación activa");
 
-        // CAMBIO IMPORTANTE: Solo deshabilitar la navegación del inventario
-        // NO afectar otros sistemas
+        // CORREGIDO: NO desactivar navegación
+        // La navegación permanece activa para evitar problemas
+        // Solo registrar que el inventario se cerró
+
         if (navigationManager != null)
         {
-            navigationManager.enabled = false;
+            Debug.Log("Navegación del inventario mantenida activa para evitar conflictos");
         }
     }
 
@@ -360,7 +361,7 @@ public class InventoryNavigationIntegration : MonoBehaviour
         }
     }
 
-    // Métodos públicos para control manual - SIMPLIFICADOS
+    // CORREGIDO: Métodos públicos solo para activación
     public void EnableInventoryNavigation()
     {
         if (navigationManager != null)
@@ -382,12 +383,11 @@ public class InventoryNavigationIntegration : MonoBehaviour
         }
     }
 
+    // CORREGIDO: DisableInventoryNavigation ya no desactiva
     public void DisableInventoryNavigation()
     {
-        if (navigationManager != null)
-        {
-            navigationManager.enabled = false;
-        }
+        Debug.LogWarning("DisableInventoryNavigation llamado - IGNORADO para prevenir problemas de navegación");
+        // NO hacer nada para evitar desactivaciones problemáticas
     }
 
     public void RefreshInventoryNavigation()
@@ -449,13 +449,13 @@ public class InventoryNavigationIntegration : MonoBehaviour
     [ContextMenu("Debug Integration State")]
     public void DebugIntegrationState()
     {
-        Debug.Log($"=== INVENTORY NAVIGATION INTEGRATION STATE (SIMPLIFIED) ===");
+        Debug.Log($"=== INVENTORY NAVIGATION INTEGRATION STATE (FIXED) ===");
         Debug.Log($"Inventory Manager: {inventoryManager?.name ?? "NULL"}");
         Debug.Log($"Navigation Manager: {navigationManager?.name ?? "NULL"}");
         Debug.Log($"Navigation Manager Enabled: {navigationManager?.enabled}");
         Debug.Log($"Canvas Integration: {canvasIntegration?.name ?? "NULL"}");
         Debug.Log($"Original Inventory State: {originalInventoryState}");
         Debug.Log($"Current Inventory Open: {inventoryManager?.IsInventoryOpen()}");
-        Debug.Log("=== SIN INTERFERENCIA CON OTROS SISTEMAS ===");
+        Debug.Log("=== DESACTIVACIONES ELIMINADAS ===");
     }
 }

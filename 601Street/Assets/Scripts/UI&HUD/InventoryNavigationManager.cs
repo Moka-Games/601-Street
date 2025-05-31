@@ -1,4 +1,4 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,8 +7,8 @@ using UnityEngine.InputSystem;
 using DG.Tweening;
 
 /// <summary>
-/// Sistema de navegaciÛn ESPECÕFICO para el inventario - INDEPENDIENTE de UINavigationManager
-/// Incluye scroll autom·tico y animaciones de pulso
+/// Sistema de navegaci√≥n ESPEC√çFICO para el inventario - INDEPENDIENTE de UINavigationManager
+/// Incluye scroll autom√°tico y animaciones de pulso
 /// </summary>
 public class InventoryNavigationManager : MonoBehaviour
 {
@@ -18,11 +18,11 @@ public class InventoryNavigationManager : MonoBehaviour
     [SerializeField] private ScrollRect noteScrollRect;
     [SerializeField] private ScrollRect objectScrollRect;
 
-    [Header("ConfiguraciÛn de NavegaciÛn")]
+    [Header("Configuraci√≥n de Navegaci√≥n")]
     [SerializeField] private int elementsPerRow = 6;
     [SerializeField] private float navigationDelay = 0.15f;
 
-    [Header("ConfiguraciÛn de Scroll")]
+    [Header("Configuraci√≥n de Scroll")]
     [SerializeField] private float scrollSensitivity = 2f;
     [SerializeField] private float scrollDeadZone = 0.3f;
     [SerializeField] private float autoScrollSpeed = 500f;
@@ -36,7 +36,7 @@ public class InventoryNavigationManager : MonoBehaviour
     [SerializeField] private float animationDuration = 0.2f;
     [SerializeField] private DG.Tweening.Ease animationEase = DG.Tweening.Ease.OutBack;
 
-    [Header("AnimaciÛn de Pulso")]
+    [Header("Animaci√≥n de Pulso")]
     [SerializeField] private bool enablePulseAnimation = true;
     [SerializeField] private float pulseScale = 0.05f;
     [SerializeField] private float pulseDuration = 1.5f;
@@ -92,18 +92,18 @@ public class InventoryNavigationManager : MonoBehaviour
         Objects
     }
 
-    #region InicializaciÛn
+    #region Inicializaci√≥n
 
     private void Awake()
     {
-        // Configurar Input System ESPECÕFICO para inventario
+        // Configurar Input System ESPEC√çFICO para inventario
         InitializeInputSystem();
 
         // Obtener EventSystem
         eventSystem = EventSystem.current;
         if (eventSystem == null)
         {
-            Debug.LogError("InventoryNavigationManager: No se encontrÛ EventSystem");
+            Debug.LogError("InventoryNavigationManager: No se encontr√≥ EventSystem");
         }
 
         // Inicialmente desactivado
@@ -114,7 +114,7 @@ public class InventoryNavigationManager : MonoBehaviour
     {
         playerControls = new PlayerControls();
 
-        // IMPORTANTE: Usar acciones ESPECÕFICAS de UI para el inventario
+        // IMPORTANTE: Usar acciones ESPEC√çFICAS de UI para el inventario
         navigateAction = playerControls.UI.Navigate;
         submitAction = playerControls.UI.Submit;
         scrollAction = playerControls.UI.Scroll_Inventory;
@@ -128,13 +128,13 @@ public class InventoryNavigationManager : MonoBehaviour
 
     private void Start()
     {
-        // Detectar contenedores autom·ticamente si no est·n asignados
+        // Detectar contenedores autom√°ticamente si no est√°n asignados
         DetectContainers();
 
-        // Detectar ScrollRects autom·ticamente
+        // Detectar ScrollRects autom√°ticamente
         DetectScrollRects();
 
-        // Detectar LayoutGroups para organizaciÛn
+        // Detectar LayoutGroups para organizaci√≥n
         DetectLayoutGroups();
     }
 
@@ -149,7 +149,7 @@ public class InventoryNavigationManager : MonoBehaviour
                 objectContainer = inventoryManager.objectContainer;
 
                 if (logNavigationActions)
-                    Debug.Log("InventoryNavigationManager: Contenedores detectados autom·ticamente");
+                    Debug.Log("InventoryNavigationManager: Contenedores detectados autom√°ticamente");
             }
         }
     }
@@ -229,17 +229,17 @@ public class InventoryNavigationManager : MonoBehaviour
 
     #endregion
 
-    #region ActivaciÛn/DesactivaciÛn del Sistema
+    #region Activaci√≥n/Desactivaci√≥n del Sistema
 
     /// <summary>
-    /// Activa el sistema de navegaciÛn del inventario
+    /// Activa el sistema de navegaci√≥n del inventario
     /// </summary>
     public void ActivateInventoryNavigation()
     {
         if (isActive) return;
 
         if (logNavigationActions)
-            Debug.Log("InventoryNavigationManager: Activando navegaciÛn del inventario");
+            Debug.Log("InventoryNavigationManager: Activando navegaci√≥n del inventario");
 
         // Habilitar el sistema
         isActive = true;
@@ -256,32 +256,37 @@ public class InventoryNavigationManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Desactiva el sistema de navegaciÛn del inventario
+    /// Desactiva el sistema de navegaci√≥n del inventario
     /// </summary>
     public void DeactivateInventoryNavigation()
     {
-        if (!isActive) return;
+        Debug.LogWarning("DeactivateInventoryNavigation llamado - IGNORADO para prevenir problemas");
+
+        // CORREGIDO: NO desactivar navegaci√≥n para evitar conflictos
+        // Solo limpiar animaciones y estado local
 
         if (logNavigationActions)
-            Debug.Log("InventoryNavigationManager: Desactivando navegaciÛn del inventario");
+            Debug.Log("InventoryNavigationManager: Manteniendo navegaci√≥n activa para evitar conflictos");
 
-        // Limpiar animaciones
+        // Limpiar animaciones sin desactivar el componente
         CleanupAnimations();
 
-        // Deshabilitar inputs UI
-        playerControls.UI.Disable();
+        // CORREGIDO: NO deshabilitar inputs UI
+        // playerControls.UI.Disable(); ‚Üê ELIMINADO
 
-        // Desactivar el sistema
-        isActive = false;
-        this.enabled = false;
+        // CORREGIDO: NO desactivar el sistema
+        // isActive = false; ‚Üê ELIMINADO
+        // this.enabled = false; ‚Üê ELIMINADO
 
-        // Limpiar selecciÛn
+        // Solo limpiar selecci√≥n local
         ClearSelection();
+
+        Debug.Log("Navegaci√≥n del inventario mantenida activa (solo limpieza local realizada)");
     }
 
     #endregion
 
-    #region GestiÛn de Elementos
+    #region Gesti√≥n de Elementos
 
     /// <summary>
     /// Recopila todos los botones del inventario
@@ -306,7 +311,7 @@ public class InventoryNavigationManager : MonoBehaviour
         if (logNavigationActions)
             Debug.Log($"InventoryNavigationManager: {noteButtons.Count} notas y {objectButtons.Count} objetos recopilados");
 
-        // Resetear Ìndices si es necesario
+        // Resetear √≠ndices si es necesario
         if (currentNoteIndex >= noteButtons.Count)
         {
             currentNoteIndex = 0;
@@ -316,7 +321,7 @@ public class InventoryNavigationManager : MonoBehaviour
             currentObjectIndex = 0;
         }
 
-        // Determinar secciÛn inicial
+        // Determinar secci√≥n inicial
         if (noteButtons.Count > 0)
         {
             currentSection = InventorySection.Notes;
@@ -352,7 +357,7 @@ public class InventoryNavigationManager : MonoBehaviour
 
     #endregion
 
-    #region NavegaciÛn y Scroll
+    #region Navegaci√≥n y Scroll
 
     private void Update()
     {
@@ -373,7 +378,7 @@ public class InventoryNavigationManager : MonoBehaviour
 
     private void UpdateManualScrollMemory()
     {
-        // Verificar si el tiempo de memoria ha expirado para cada secciÛn
+        // Verificar si el tiempo de memoria ha expirado para cada secci√≥n
         if (hasManualScrolledNotes && Time.time - lastManualScrollTimeNotes > manualScrollMemoryTime)
         {
             hasManualScrolledNotes = false;
@@ -397,12 +402,12 @@ public class InventoryNavigationManager : MonoBehaviour
 
         if (Time.time - lastNavigationTime < navigationDelay) return;
 
-        // Si se est· haciendo scroll manual, ignorar navegaciÛn por un momento
+        // Si se est√° haciendo scroll manual, ignorar navegaci√≥n por un momento
         if (isManualScrolling) return;
 
         bool moved = false;
 
-        // NavegaciÛn basada en secciones y grid
+        // Navegaci√≥n basada en secciones y grid
         if (Mathf.Abs(navigationInput.x) > Mathf.Abs(navigationInput.y))
         {
             // Movimiento horizontal
@@ -414,9 +419,9 @@ public class InventoryNavigationManager : MonoBehaviour
         else
         {
             // Movimiento vertical
-            if (navigationInput.y > 0) // Arriba (cambiar de secciÛn o fila)
+            if (navigationInput.y > 0) // Arriba (cambiar de secci√≥n o fila)
                 moved = MoveVertical(-1);
-            else // Abajo (cambiar de secciÛn o fila)
+            else // Abajo (cambiar de secci√≥n o fila)
                 moved = MoveVertical(1);
         }
 
@@ -425,14 +430,14 @@ public class InventoryNavigationManager : MonoBehaviour
             SelectCurrentButton();
             lastNavigationTime = Time.time;
 
-            // Solo hacer auto-scroll si no se ha hecho scroll manual recientemente en la secciÛn actual
+            // Solo hacer auto-scroll si no se ha hecho scroll manual recientemente en la secci√≥n actual
             if (enableAutoScrollToSelected && !isManualScrolling && !HasRecentManualScroll())
             {
                 StartCoroutine(ScrollToSelectedElement());
             }
             else if (logNavigationActions && HasRecentManualScroll())
             {
-                Debug.Log($"Auto-scroll desactivado - scroll manual reciente en secciÛn {currentSection}");
+                Debug.Log($"Auto-scroll desactivado - scroll manual reciente en secci√≥n {currentSection}");
             }
         }
     }
@@ -448,7 +453,7 @@ public class InventoryNavigationManager : MonoBehaviour
 
         int newCol = col + direction;
 
-        // Verificar lÌmites horizontales - NO WRAP AROUND
+        // Verificar l√≠mites horizontales - NO WRAP AROUND
         if (newCol < 0)
         {
             // Si estamos en la primera columna, no moverse
@@ -456,7 +461,7 @@ public class InventoryNavigationManager : MonoBehaviour
         }
         else if (newCol >= elementsPerRow || row * elementsPerRow + newCol >= currentButtons.Count)
         {
-            // Si estamos en la ˙ltima columna o nos pasamos del lÌmite, no moverse
+            // Si estamos en la √∫ltima columna o nos pasamos del l√≠mite, no moverse
             return false;
         }
 
@@ -473,19 +478,19 @@ public class InventoryNavigationManager : MonoBehaviour
         int currentIndex = GetCurrentIndex();
         int newIndex = currentIndex + (direction * elementsPerRow);
 
-        // Verificar si necesitamos cambiar de secciÛn
+        // Verificar si necesitamos cambiar de secci√≥n
         if (newIndex < 0)
         {
-            // Moverse hacia arriba - cambiar a la otra secciÛn si existe
+            // Moverse hacia arriba - cambiar a la otra secci√≥n si existe
             if (currentSection == InventorySection.Objects && noteButtons.Count > 0)
             {
                 currentSection = InventorySection.Notes;
-                // Ir a la ˙ltima fila de las notas, manteniendo la columna
+                // Ir a la √∫ltima fila de las notas, manteniendo la columna
                 int col = currentIndex % elementsPerRow;
                 int lastNoteRow = (noteButtons.Count - 1) / elementsPerRow;
                 int targetIndex = lastNoteRow * elementsPerRow + col;
 
-                // Ajustar si se pasa del lÌmite
+                // Ajustar si se pasa del l√≠mite
                 if (targetIndex >= noteButtons.Count)
                 {
                     targetIndex = noteButtons.Count - 1;
@@ -494,11 +499,11 @@ public class InventoryNavigationManager : MonoBehaviour
                 currentNoteIndex = targetIndex;
                 return true;
             }
-            return false; // No hay secciÛn arriba
+            return false; // No hay secci√≥n arriba
         }
         else if (newIndex >= currentButtons.Count)
         {
-            // Moverse hacia abajo - cambiar a la otra secciÛn si existe
+            // Moverse hacia abajo - cambiar a la otra secci√≥n si existe
             if (currentSection == InventorySection.Notes && objectButtons.Count > 0)
             {
                 currentSection = InventorySection.Objects;
@@ -507,11 +512,11 @@ public class InventoryNavigationManager : MonoBehaviour
                 currentObjectIndex = Mathf.Min(col, objectButtons.Count - 1);
                 return true;
             }
-            return false; // No hay secciÛn abajo
+            return false; // No hay secci√≥n abajo
         }
         else
         {
-            // Movimiento normal dentro de la misma secciÛn
+            // Movimiento normal dentro de la misma secci√≥n
             SetCurrentIndex(newIndex);
             return true;
         }
@@ -528,14 +533,14 @@ public class InventoryNavigationManager : MonoBehaviour
 
         if (Time.time - lastScrollTime < 0.02f) return;
 
-        // Marcar que se est· haciendo scroll manual
+        // Marcar que se est√° haciendo scroll manual
         isManualScrolling = true;
         lastManualScrollTime = Time.time;
 
-        // Marcar memoria de scroll manual para la secciÛn actual
+        // Marcar memoria de scroll manual para la secci√≥n actual
         MarkManualScrollForCurrentSection();
 
-        // Determinar en quÈ secciÛn estamos
+        // Determinar en qu√© secci√≥n estamos
         ScrollRect targetScrollRect = GetScrollRectForSection(currentSection);
 
         if (targetScrollRect != null)
@@ -596,7 +601,7 @@ public class InventoryNavigationManager : MonoBehaviour
 
             if (logNavigationActions)
             {
-                Debug.Log($"Scroll manual aplicado en {currentSection}: {scrollDelta:F4}, nueva posiciÛn: {newPos:F3}");
+                Debug.Log($"Scroll manual aplicado en {currentSection}: {scrollDelta:F4}, nueva posici√≥n: {newPos:F3}");
             }
 
             lastScrollTime = Time.time;
@@ -610,14 +615,14 @@ public class InventoryNavigationManager : MonoBehaviour
             hasManualScrolledNotes = true;
             lastManualScrollTimeNotes = Time.time;
             if (logNavigationActions)
-                Debug.Log("Marcado scroll manual en secciÛn de Notas");
+                Debug.Log("Marcado scroll manual en secci√≥n de Notas");
         }
         else
         {
             hasManualScrolledObjects = true;
             lastManualScrollTimeObjects = Time.time;
             if (logNavigationActions)
-                Debug.Log("Marcado scroll manual en secciÛn de Objetos");
+                Debug.Log("Marcado scroll manual en secci√≥n de Objetos");
         }
     }
 
@@ -690,7 +695,7 @@ public class InventoryNavigationManager : MonoBehaviour
 
         if (scrollRect == null) yield break;
 
-        // Obtener el RectTransform del botÛn seleccionado
+        // Obtener el RectTransform del bot√≥n seleccionado
         RectTransform buttonRect = currentSelectedButton.GetComponent<RectTransform>();
         RectTransform contentRect = scrollRect.content;
         RectTransform viewportRect = scrollRect.viewport;
@@ -709,7 +714,7 @@ public class InventoryNavigationManager : MonoBehaviour
         Vector2 viewportSize = viewportRect.rect.size;
         Vector2 contentSize = contentRect.rect.size;
 
-        // Calcular duraciÛn basada en autoScrollSpeed
+        // Calcular duraci√≥n basada en autoScrollSpeed
         float scrollDistance = 0f;
         float targetPos = 0f;
         float currentPos = 0f;
@@ -727,7 +732,7 @@ public class InventoryNavigationManager : MonoBehaviour
                 .SetEase(Ease.OutQuad);
 
             if (logNavigationActions)
-                Debug.Log($"Auto-scroll HORIZONTAL: distancia={scrollDistance:F1}px, duraciÛn={duration:F2}s");
+                Debug.Log($"Auto-scroll HORIZONTAL: distancia={scrollDistance:F1}px, duraci√≥n={duration:F2}s");
         }
         else if (scrollRect.vertical && contentSize.y > viewportSize.y)
         {
@@ -742,7 +747,7 @@ public class InventoryNavigationManager : MonoBehaviour
                 .SetEase(Ease.OutQuad);
 
             if (logNavigationActions)
-                Debug.Log($"Auto-scroll VERTICAL: distancia={scrollDistance:F1}px, duraciÛn={duration:F2}s");
+                Debug.Log($"Auto-scroll VERTICAL: distancia={scrollDistance:F1}px, duraci√≥n={duration:F2}s");
         }
     }
 
@@ -757,7 +762,7 @@ public class InventoryNavigationManager : MonoBehaviour
         Button button = currentButtons[index];
         if (button == null || !button.gameObject.activeInHierarchy || !button.interactable) return;
 
-        // Actualizar selecciÛn
+        // Actualizar selecci√≥n
         previousSelectedButton = currentSelectedButton;
         currentSelectedButton = button;
 
@@ -768,7 +773,7 @@ public class InventoryNavigationManager : MonoBehaviour
         ApplySelectionAnimations();
 
         if (logNavigationActions)
-            Debug.Log($"InventoryNavigationManager: Seleccionado {button.name} (secciÛn: {currentSection}, Ìndice: {index})");
+            Debug.Log($"InventoryNavigationManager: Seleccionado {button.name} (secci√≥n: {currentSection}, √≠ndice: {index})");
     }
 
     #endregion
@@ -784,14 +789,14 @@ public class InventoryNavigationManager : MonoBehaviour
             currentSelectedButton.interactable)
         {
             if (logNavigationActions)
-                Debug.Log($"InventoryNavigationManager: Ejecutando acciÛn en {currentSelectedButton.name}");
+                Debug.Log($"InventoryNavigationManager: Ejecutando acci√≥n en {currentSelectedButton.name}");
 
             currentSelectedButton.onClick.Invoke();
         }
         else
         {
             if (logNavigationActions)
-                Debug.LogWarning("InventoryNavigationManager: No hay botÛn v·lido seleccionado para Submit");
+                Debug.LogWarning("InventoryNavigationManager: No hay bot√≥n v√°lido seleccionado para Submit");
 
             RefreshInventoryElements();
             SelectCurrentButton();
@@ -820,13 +825,13 @@ public class InventoryNavigationManager : MonoBehaviour
             // Reset inicial
             currentSelectedButton.transform.localScale = Vector3.one;
 
-            // AnimaciÛn de escala inicial
+            // Animaci√≥n de escala inicial
             currentScaleTween = currentSelectedButton.transform
                 .DOScale(Vector3.one * selectedScale, animationDuration)
                 .SetEase(animationEase)
                 .SetUpdate(true)
                 .OnComplete(() => {
-                    // Una vez completada la animaciÛn de escala, iniciar el pulso
+                    // Una vez completada la animaci√≥n de escala, iniciar el pulso
                     if (enablePulseAnimation && currentSelectedButton != null)
                     {
                         StartPulseAnimation();
@@ -839,7 +844,7 @@ public class InventoryNavigationManager : MonoBehaviour
     {
         if (currentSelectedButton == null) return;
 
-        // Configurar animaciÛn de pulso
+        // Configurar animaci√≥n de pulso
         Vector3 baseScale = Vector3.one * selectedScale;
         Vector3 pulseScaleVector = baseScale + (Vector3.one * pulseScale);
 
@@ -850,7 +855,7 @@ public class InventoryNavigationManager : MonoBehaviour
             .SetUpdate(true);
 
         if (logNavigationActions)
-            Debug.Log($"Iniciando animaciÛn de pulso en: {currentSelectedButton.name}");
+            Debug.Log($"Iniciando animaci√≥n de pulso en: {currentSelectedButton.name}");
     }
 
     private void CleanupAnimations()
@@ -920,10 +925,10 @@ public class InventoryNavigationManager : MonoBehaviour
 
     #endregion
 
-    #region MÈtodos P˙blicos
+    #region M√©todos P√∫blicos
 
     /// <summary>
-    /// Fuerza la actualizaciÛn de elementos del inventario
+    /// Fuerza la actualizaci√≥n de elementos del inventario
     /// </summary>
     public void ForceRefreshElements()
     {
@@ -965,7 +970,7 @@ public class InventoryNavigationManager : MonoBehaviour
         enableAutoScrollToSelected = enableAutoScroll;
 
         if (logNavigationActions)
-            Debug.Log($"ConfiguraciÛn de scroll actualizada: Sensitivity={sensitivity}, DeadZone={deadZone}, AutoSpeed={autoScrollSpeed}");
+            Debug.Log($"Configuraci√≥n de scroll actualizada: Sensitivity={sensitivity}, DeadZone={deadZone}, AutoSpeed={autoScrollSpeed}");
     }
 
     /// <summary>
@@ -993,7 +998,7 @@ public class InventoryNavigationManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Resetea la memoria de scroll manual solo para la secciÛn actual
+    /// Resetea la memoria de scroll manual solo para la secci√≥n actual
     /// </summary>
     public void ResetCurrentSectionScrollMemory()
     {
@@ -1002,14 +1007,14 @@ public class InventoryNavigationManager : MonoBehaviour
             hasManualScrolledNotes = false;
             lastManualScrollTimeNotes = 0f;
             if (logNavigationActions)
-                Debug.Log("Memoria de scroll manual reseteada para secciÛn de Notas");
+                Debug.Log("Memoria de scroll manual reseteada para secci√≥n de Notas");
         }
         else
         {
             hasManualScrolledObjects = false;
             lastManualScrollTimeObjects = 0f;
             if (logNavigationActions)
-                Debug.Log("Memoria de scroll manual reseteada para secciÛn de Objetos");
+                Debug.Log("Memoria de scroll manual reseteada para secci√≥n de Objetos");
         }
     }
 
@@ -1036,7 +1041,7 @@ public class InventoryNavigationManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Configura las opciones de animaciÛn de pulso
+    /// Configura las opciones de animaci√≥n de pulso
     /// </summary>
     public void SetPulseSettings(bool enable, float scale, float duration, DG.Tweening.Ease ease)
     {
@@ -1056,7 +1061,7 @@ public class InventoryNavigationManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Verifica si el sistema est· activo
+    /// Verifica si el sistema est√° activo
     /// </summary>
     public bool IsNavigationActive()
     {
@@ -1088,7 +1093,7 @@ public class InventoryNavigationManager : MonoBehaviour
         Debug.Log($"Manual Scroll Memory Time: {manualScrollMemoryTime}s");
         Debug.Log($"Pulse Animation: {enablePulseAnimation}");
 
-        // Debug especÌfico de ScrollRects
+        // Debug espec√≠fico de ScrollRects
         if (noteScrollRect != null)
         {
             Debug.Log($"  Note ScrollRect Details:");
@@ -1158,7 +1163,7 @@ public class InventoryNavigationManager : MonoBehaviour
             if (currentNoteIndex >= noteButtons.Count)
                 currentNoteIndex = 0;
             SelectCurrentButton();
-            Debug.Log("Cambiado a secciÛn de Notas");
+            Debug.Log("Cambiado a secci√≥n de Notas");
         }
     }
 
@@ -1171,7 +1176,7 @@ public class InventoryNavigationManager : MonoBehaviour
             if (currentObjectIndex >= objectButtons.Count)
                 currentObjectIndex = 0;
             SelectCurrentButton();
-            Debug.Log("Cambiado a secciÛn de Objetos");
+            Debug.Log("Cambiado a secci√≥n de Objetos");
         }
     }
 
@@ -1197,16 +1202,16 @@ public class InventoryNavigationManager : MonoBehaviour
 
         if (scrollRect != null)
         {
-            Debug.Log($"Probando scroll manual en secciÛn: {currentSection}");
+            Debug.Log($"Probando scroll manual en secci√≥n: {currentSection}");
             Debug.Log($"ScrollRect: {scrollRect.name}");
             Debug.Log($"Horizontal: {scrollRect.horizontal}, Vertical: {scrollRect.vertical}");
-            Debug.Log($"ConfiguraciÛn actual - Sensitivity: {scrollSensitivity}, Smoothed: {useSmoothedScrolling}, SmoothTime: {scrollSmoothTime}");
+            Debug.Log($"Configuraci√≥n actual - Sensitivity: {scrollSensitivity}, Smoothed: {useSmoothedScrolling}, SmoothTime: {scrollSmoothTime}");
 
             if (scrollRect.horizontal)
             {
                 float currentPos = scrollRect.horizontalNormalizedPosition;
                 float newPos = Mathf.Clamp01(currentPos + 0.2f);
-                Debug.Log($"PosiciÛn horizontal: {currentPos:F3} -> {newPos:F3}");
+                Debug.Log($"Posici√≥n horizontal: {currentPos:F3} -> {newPos:F3}");
 
                 if (useSmoothedScrolling)
                 {
@@ -1222,7 +1227,7 @@ public class InventoryNavigationManager : MonoBehaviour
             {
                 float currentPos = scrollRect.verticalNormalizedPosition;
                 float newPos = Mathf.Clamp01(currentPos - 0.2f);
-                Debug.Log($"PosiciÛn vertical: {currentPos:F3} -> {newPos:F3}");
+                Debug.Log($"Posici√≥n vertical: {currentPos:F3} -> {newPos:F3}");
 
                 if (useSmoothedScrolling)
                 {
@@ -1236,7 +1241,7 @@ public class InventoryNavigationManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"No se encontrÛ ScrollRect para secciÛn: {currentSection}");
+            Debug.LogError($"No se encontr√≥ ScrollRect para secci√≥n: {currentSection}");
         }
     }
 
@@ -1263,12 +1268,12 @@ public class InventoryNavigationManager : MonoBehaviour
     public void TestManualScrollMemory()
     {
         Debug.Log("=== ESTADO DE MEMORIA DE SCROLL MANUAL ===");
-        Debug.Log($"SecciÛn actual: {currentSection}");
-        Debug.Log($"Notas - Manual: {hasManualScrolledNotes}, ⁄ltimo tiempo: {lastManualScrollTimeNotes}");
-        Debug.Log($"Objetos - Manual: {hasManualScrolledObjects}, ⁄ltimo tiempo: {lastManualScrollTimeObjects}");
+        Debug.Log($"Secci√≥n actual: {currentSection}");
+        Debug.Log($"Notas - Manual: {hasManualScrolledNotes}, √öltimo tiempo: {lastManualScrollTimeNotes}");
+        Debug.Log($"Objetos - Manual: {hasManualScrolledObjects}, √öltimo tiempo: {lastManualScrollTimeObjects}");
         Debug.Log($"Tiempo de memoria configurado: {manualScrollMemoryTime}s");
-        Debug.Log($"øScroll manual reciente en secciÛn actual?: {HasRecentManualScroll()}");
-        Debug.Log($"øAuto-scroll activado?: {enableAutoScrollToSelected && !HasRecentManualScroll()}");
+        Debug.Log($"¬øScroll manual reciente en secci√≥n actual?: {HasRecentManualScroll()}");
+        Debug.Log($"¬øAuto-scroll activado?: {enableAutoScrollToSelected && !HasRecentManualScroll()}");
 
         if (HasRecentManualScroll())
         {
@@ -1303,7 +1308,7 @@ public class InventoryNavigationManager : MonoBehaviour
     {
         SetScrollSensitivity(6f);
         SetScrollSmoothing(false);
-        Debug.Log("Velocidad de scroll configurada a: R¡PIDA");
+        Debug.Log("Velocidad de scroll configurada a: R√ÅPIDA");
     }
 
     [ContextMenu("Test Scroll Speed - Very Fast")]
@@ -1311,7 +1316,7 @@ public class InventoryNavigationManager : MonoBehaviour
     {
         SetScrollSensitivity(10f);
         SetScrollSmoothing(false);
-        Debug.Log("Velocidad de scroll configurada a: MUY R¡PIDA");
+        Debug.Log("Velocidad de scroll configurada a: MUY R√ÅPIDA");
     }
 
     [ContextMenu("Toggle Scroll Smoothing")]
@@ -1323,21 +1328,21 @@ public class InventoryNavigationManager : MonoBehaviour
     [ContextMenu("Test Navigation Limits")]
     public void TestNavigationLimits()
     {
-        Debug.Log("=== PRUEBA DE LÕMITES DE NAVEGACI”N ===");
-        Debug.Log($"SecciÛn actual: {currentSection}");
+        Debug.Log("=== PRUEBA DE L√çMITES DE NAVEGACI√ìN ===");
+        Debug.Log($"Secci√≥n actual: {currentSection}");
 
         List<Button> currentButtons = GetCurrentSectionButtons();
         int currentIndex = GetCurrentIndex();
 
-        Debug.Log($"Õndice actual: {currentIndex}/{currentButtons.Count - 1}");
+        Debug.Log($"√çndice actual: {currentIndex}/{currentButtons.Count - 1}");
 
         if (currentButtons.Count > 0)
         {
             int row = currentIndex / elementsPerRow;
             int col = currentIndex % elementsPerRow;
-            Debug.Log($"PosiciÛn en grid: Fila {row}, Columna {col}");
+            Debug.Log($"Posici√≥n en grid: Fila {row}, Columna {col}");
 
-            // Verificar lÌmites
+            // Verificar l√≠mites
             bool canMoveLeft = col > 0;
             bool canMoveRight = col < elementsPerRow - 1 && (row * elementsPerRow + col + 1) < currentButtons.Count;
             bool canMoveUp = currentIndex - elementsPerRow >= 0 || (currentSection == InventorySection.Objects && noteButtons.Count > 0);
@@ -1345,6 +1350,25 @@ public class InventoryNavigationManager : MonoBehaviour
 
             Debug.Log($"Puede moverse - Izquierda: {canMoveLeft}, Derecha: {canMoveRight}, Arriba: {canMoveUp}, Abajo: {canMoveDown}");
         }
+    }
+
+    [ContextMenu("Force Reactivate Navigation")]
+    public void ForceReactivateNavigation()
+    {
+        Debug.Log("Forzando reactivaci√≥n de navegaci√≥n del inventario...");
+
+        isActive = true;
+        this.enabled = true;
+
+        if (playerControls != null)
+        {
+            playerControls.UI.Enable();
+        }
+
+        RefreshInventoryElements();
+        SelectCurrentButton();
+
+        Debug.Log("Navegaci√≥n del inventario reactivada forzosamente");
     }
 
     #endregion
