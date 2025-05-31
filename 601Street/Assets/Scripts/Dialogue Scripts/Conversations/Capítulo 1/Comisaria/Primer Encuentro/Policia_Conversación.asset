@@ -22,16 +22,16 @@ MonoBehaviour:
     content: Could you give me their name, description and any other information
       that might help us?
   - speakerName: Nyssa
-    content: Yes, her name is Umi. She is thin, has brown hair with bangs and is
-      my age.
+    content: Yes, her name is <Bold>(Umi)</Bold>. She is thin, has brown hair with
+      bangs and is my age.
   - speakerName: Police Officer
     content: 'Do you know if she was having problems with anyone or if there was
-      anything unusual in his life lately?
+      <Bold>(anything unusual)</Bold> in his life lately?
 
 '
   - speakerName: Nyssa
-    content: 'No... She had no enemies or bad habits. I don''t understand what could
-      have happened.
+    content: 'No... She had no enemies or bad habits. The last thing I know from
+      her is a <Bold>(mail)</Bold> that she left me before going out of her house.
 
 '
   - speakerName: Police Officer
@@ -52,7 +52,7 @@ MonoBehaviour:
   - speakerName: Nyssa
     content: "Please tell me something!  \n"
   dialogueOptions:
-  - optionText: It is very important to me, please.
+  - optionText: Empathy
     actionId: Option_1
     requiresDiceRoll: 1
     difficultyClass: 1
@@ -61,21 +61,21 @@ MonoBehaviour:
     failureDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     preDiceConversation: {fileID: 11400000, guid: 89d6e4669fc2e144586cd0c16cc576e5,
       type: 2}
-  - optionText: Sharing what you know can help us both.
+  - optionText: Persuasion
     actionId: Option_2
     requiresDiceRoll: 1
     difficultyClass: 1
     nextDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     successDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     failureDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
-    preDiceConversation: {fileID: 11400000, guid: 89d6e4669fc2e144586cd0c16cc576e5,
+    preDiceConversation: {fileID: 11400000, guid: 92b0d9b10fd62774f8b4f24c103660b2,
       type: 2}
-  - optionText: I have the right to know the truth
+  - optionText: Intimidation
     actionId: Option_3
     requiresDiceRoll: 1
     difficultyClass: 1
     nextDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     successDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
     failureDialogue: {fileID: 11400000, guid: 218de39ae9dbe5b4ab70a74e1cd779ff, type: 2}
-    preDiceConversation: {fileID: 11400000, guid: 89d6e4669fc2e144586cd0c16cc576e5,
+    preDiceConversation: {fileID: 11400000, guid: e3709661113743f48b04b67ecd57a0ff,
       type: 2}
