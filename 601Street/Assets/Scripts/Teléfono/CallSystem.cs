@@ -27,7 +27,6 @@ public class CallSystem : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip incomingCallSound;
     [SerializeField] private AudioClip callAcceptedSound;
-    [SerializeField] private AudioClip callRejectedSound;
 
     // Input System
     private PlayerControls playerControls;
@@ -406,48 +405,6 @@ public class CallSystem : MonoBehaviour
         }
     }
 
-    // Rechazar llamada
-    public void RejectCall()
-    {
-        if (!isPopupVisible) return;
-
-        if (audioSource != null)
-        {
-            audioSource.Stop();
-
-            if (callRejectedSound != null)
-            {
-                audioSource.loop = false;
-                audioSource.clip = callRejectedSound;
-                audioSource.PlayOneShot(callRejectedSound);
-                Debug.Log("CallSystem: Reproduciendo sonido de llamada rechazada");
-            }
-        }
-
-        currentCallRejectedEvent?.Invoke();
-        Debug.Log("CallSystem: Evento OnCallRejected invocado");
-
-        // Asegurar que el parámetro callEnded esté reseteado para futuras llamadas
-        if (CallAnimationManager.Instance != null)
-        {
-            CallAnimationManager.Instance.ResetCallEndedParameter();
-            Debug.Log("CallSystem: Parámetro callEnded reseteado tras rechazar llamada");
-        }
-
-        HideCallPopup();
-
-        if (activeCallCoroutine != null)
-        {
-            StopCoroutine(activeCallCoroutine);
-            activeCallCoroutine = null;
-        }
-
-        currentCallConversation = null;
-        isCallActive = false;
-        OnCallStateChanged?.Invoke(false);
-    }
-
-    // Buscar un NPC para la llamada (o crear uno temporal)
     private NPC FindCallerNPC()
     {
         NPC callerNPC = FindAnyObjectByType<PhoneNPC>();

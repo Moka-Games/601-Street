@@ -86,14 +86,6 @@ public class CallUI : MonoBehaviour
                 if (callSystem != null) callSystem.AcceptCall();
             });
         }
-
-        // Configurar botón de rechazar
-        if (rejectCallButton != null)
-        {
-            rejectCallButton.onClick.AddListener(() => {
-                if (callSystem != null) callSystem.RejectCall();
-            });
-        }
     }
 
     /// <summary>
