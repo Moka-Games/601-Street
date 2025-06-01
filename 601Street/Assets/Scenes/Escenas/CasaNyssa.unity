@@ -1123,6 +1123,7 @@ MonoBehaviour:
   detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
+  interactionSound: {fileID: 0}
 --- !u!135 &303076726
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3215,7 +3216,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1057934054
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4218,7 +4219,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: df718fc5da5cf364c9f94cd43f1d0105, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a7e69f622dc932b489f863e499cddd5c, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6677,6 +6678,7 @@ MonoBehaviour:
   detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
+  interactionSound: {fileID: 0}
 --- !u!135 &1943567785
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -7237,6 +7239,7 @@ MonoBehaviour:
   detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
+  interactionSound: {fileID: 0}
 --- !u!114 &2032695343
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7882,6 +7885,7 @@ MonoBehaviour:
   detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
+  interactionSound: {fileID: 0}
 --- !u!114 &2056939754
 MonoBehaviour:
   m_ObjectHideFlags: 0

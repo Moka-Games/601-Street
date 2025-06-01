@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using System.Collections;
+using UnityEngine.Audio;
 
 /// <summary>
 /// Versión final corregida del gestor de inventario donde ToggleInventory funciona como verdadero TOGGLE
@@ -81,7 +82,11 @@ public class Inventory_Manager : MonoBehaviour
     [Header("Navigation System")]
     [SerializeField] private InventoryNavigationManager inventoryNavigation;
 
-    [System.Serializable]
+    [Header("Audio")]
+    [SerializeField] private AudioClip closePrefabSound;
+    private AudioSource audioSource;
+
+        [System.Serializable]
     public class PrefabInteractionData
     {
         public GameObject prefab;
@@ -104,6 +109,8 @@ public class Inventory_Manager : MonoBehaviour
         // Inicializar Input System
         InitializeInputSystem();
     }
+
+
 
     private void InitializeInputSystem()
     {
@@ -173,6 +180,13 @@ public class Inventory_Manager : MonoBehaviour
 
     private void Start()
     {
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        audioSource.volume = 0.25f;
+
         InventoryInterface.SetActive(false);
         popUpParent.SetActive(false);
 
@@ -640,11 +654,18 @@ public class Inventory_Manager : MonoBehaviour
         }
     }
 
+   
     /// <summary>
     /// Cierra el objeto de interacción activo
     /// </summary>
     public void CloseActiveInteractionObject()
     {
+        // Reproducir sonido de cierre
+        if (audioSource != null && closePrefabSound != null)
+        {
+            audioSource.PlayOneShot(closePrefabSound);
+        }
+
         if (activeInteractionObject != null)
         {
             // Buscar el botón de cierre y simular clic para mantener el comportamiento esperado
@@ -668,7 +689,6 @@ public class Inventory_Manager : MonoBehaviour
             }
         }
     }
-
     /// <summary>
     /// Destruye el objeto de interacción activo sin mostrar popup
     /// </summary>

@@ -3,7 +3,7 @@ using UnityEngine.Events;
 using TMPro;
 
 /// <summary>
-/// Versión mejorada del Inventory_Item con limpieza garantizada de indicadores
+/// Versión mejorada del Inventory_Item con limpieza garantizada de indicadores y sistema de audio
 /// </summary>
 public class Inventory_Item : MonoBehaviour
 {
@@ -15,6 +15,14 @@ public class Inventory_Item : MonoBehaviour
     public GameObject interactionPrefab;
     public UnityEvent onItemClick;
     public UnityEvent OnItemInteracted;
+
+    [Header("Configuración de Audio")]
+    [SerializeField] private AudioClip pickupSound;
+    [SerializeField] private float soundVolume = 1f;
+    [SerializeField] private float soundPitch = 1.2f; // Ligeramente más agudo para items
+    [SerializeField] private bool usePositionalAudio = true;
+    [SerializeField] private float audioMaxDistance = 20f;
+    [SerializeField] private bool playInteractionSound = true;
 
     [Header("Configuración de Feedback")]
     public float edgeOffset = 50f;
@@ -415,6 +423,101 @@ public class Inventory_Item : MonoBehaviour
         }
     }
 
+    #region Sistema de Audio
+
+    /// <summary>
+    /// Reproduce el sonido de recogida usando el AudioPlaybackManager
+    /// </summary>
+    private void PlayPickupAudio()
+    {
+        if (!playInteractionSound || pickupSound == null)
+        {
+            if (pickupSound == null)
+                Debug.Log($"No hay clip de audio asignado para la recogida de {gameObject.name}");
+            return;
+        }
+
+        // Verificar que el AudioPlaybackManager esté disponible
+        if (AudioPlaybackManager.Instance == null)
+        {
+            Debug.LogError("AudioPlaybackManager no encontrado. No se puede reproducir el sonido de recogida.");
+            return;
+        }
+
+        // Usar el método específico para pickup sounds
+        AudioPlaybackManager.Instance.PlayPickupSound(
+            pickupSound,
+            transform.position,
+            soundVolume
+        );
+
+        Debug.Log($"Reproduciendo sonido de recogida '{pickupSound.name}' para {gameObject.name}");
+    }
+
+    /// <summary>
+    /// Método público para reproducir sonidos personalizados desde UnityEvents
+    /// </summary>
+    /// <param name="customClip">Clip personalizado a reproducir</param>
+    public void PlayCustomPickupSound(AudioClip customClip)
+    {
+        if (customClip == null) return;
+
+        if (AudioPlaybackManager.Instance != null)
+        {
+            if (usePositionalAudio)
+            {
+                AudioPlaybackManager.Instance.PlaySoundAtPosition(
+                    customClip,
+                    transform.position,
+                    soundVolume,
+                    soundPitch,
+                    2f, // Auto-destrucción más rápida para pickups
+                    true,
+                    audioMaxDistance
+                );
+            }
+            else
+            {
+                AudioPlaybackManager.Instance.PlaySound2D(customClip, soundVolume, soundPitch, 2f);
+            }
+
+            Debug.Log($"Reproduciendo sonido personalizado '{customClip.name}' para {gameObject.name}");
+        }
+    }
+
+    /// <summary>
+    /// Configura los parámetros de audio en tiempo de ejecución
+    /// </summary>
+    /// <param name="volume">Volumen (0-1)</param>
+    /// <param name="pitch">Pitch del sonido</param>
+    /// <param name="maxDistance">Distancia máxima para audio 3D</param>
+    public void SetAudioParameters(float volume, float pitch = 1.2f, float maxDistance = 20f)
+    {
+        soundVolume = Mathf.Clamp01(volume);
+        soundPitch = pitch;
+        audioMaxDistance = maxDistance;
+    }
+
+    /// <summary>
+    /// Configura si el audio debe ser posicional o 2D
+    /// </summary>
+    /// <param name="positional">True para audio 3D, false para 2D</param>
+    public void SetPositionalAudio(bool positional)
+    {
+        usePositionalAudio = positional;
+    }
+
+    /// <summary>
+    /// Habilita o deshabilita la reproducción de sonido al interactuar
+    /// </summary>
+    /// <param name="enable">True para habilitar, false para deshabilitar</param>
+    public void SetPlayInteractionSound(bool enable)
+    {
+        playInteractionSound = enable;
+    }
+
+    #endregion
+
     /// <summary>
     /// Método para procesar la interacción con este objeto
     /// </summary>
@@ -425,6 +528,9 @@ public class Inventory_Item : MonoBehaviour
             Debug.LogError("No hay ItemData asignado a este Inventory_Item: " + gameObject.name);
             return;
         }
+
+        // NUEVO: Reproducir sonido de recogida ANTES de cualquier otra acción
+        PlayPickupAudio();
 
         // Invocar el evento de interacción
         OnItemInteracted?.Invoke();
@@ -553,4 +659,57 @@ public class Inventory_Item : MonoBehaviour
             UpdateFeedbackLogic();
         }
     }
+
+    #region Debug Methods
+
+    [ContextMenu("Test Pickup Sound")]
+    public void TestPickupSoundFromContext()
+    {
+        if (Application.isPlaying && pickupSound != null)
+        {
+            Debug.Log($"Probando sonido de recogida: {pickupSound.name}");
+            PlayPickupAudio();
+        }
+        else if (pickupSound == null)
+        {
+            Debug.LogWarning("No hay clip de audio asignado para probar");
+        }
+        else
+        {
+            Debug.LogWarning("El test solo funciona en modo Play");
+        }
+    }
+
+    [ContextMenu("Debug Audio Settings")]
+    public void DebugAudioSettings()
+    {
+        Debug.Log("=== INVENTORY ITEM AUDIO SETTINGS ===");
+        Debug.Log($"Pickup Sound: {(pickupSound != null ? pickupSound.name : "NULL")}");
+        Debug.Log($"Sound Volume: {soundVolume}");
+        Debug.Log($"Sound Pitch: {soundPitch}");
+        Debug.Log($"Use Positional Audio: {usePositionalAudio}");
+        Debug.Log($"Audio Max Distance: {audioMaxDistance}");
+        Debug.Log($"Play Interaction Sound: {playInteractionSound}");
+        Debug.Log($"AudioPlaybackManager Available: {AudioPlaybackManager.Instance != null}");
+        Debug.Log("=====================================");
+    }
+
+    [ContextMenu("Test Custom Sound")]
+    public void TestCustomSoundFromContext()
+    {
+        if (Application.isPlaying)
+        {
+            // Ejemplo de cómo usar un sonido personalizado
+            // AudioClip customClip = Resources.Load<AudioClip>("CustomPickupSound");
+            // if (customClip != null)
+            //     PlayCustomPickupSound(customClip);
+            Debug.Log("Para probar sonidos personalizados, asigna un AudioClip y llama a PlayCustomPickupSound()");
+        }
+        else
+        {
+            Debug.LogWarning("El test solo funciona en modo Play");
+        }
+    }
 }
+
+    #endregion

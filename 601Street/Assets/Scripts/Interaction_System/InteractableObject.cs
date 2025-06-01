@@ -11,6 +11,7 @@ public interface IInteractable
     bool CanBeInteractedAgain();
     string GetInteractionPrompt();
 }
+
 public class InteractableObject : MonoBehaviour, IInteractable
 {
     [Header("Configuración básica")]
@@ -22,6 +23,14 @@ public class InteractableObject : MonoBehaviour, IInteractable
     [Header("Comportamiento de interacción")]
     [SerializeField] private bool singleUseInteraction = false;
     [SerializeField] private bool disableAfterInteraction = false;
+
+    [Header("Configuración de Audio")]
+    [SerializeField] private AudioClip interactionSound;
+    [SerializeField] private AudioClip secondInteractionSound;
+    [SerializeField] private float soundVolume = 1f;
+    [SerializeField] private float soundPitch = 1f;
+    [SerializeField] private bool usePositionalAudio = true;
+    [SerializeField] private float audioMaxDistance = 30f;
 
     [Header("Detección de Rango")]
     [SerializeField] private float detectionRadius = 5f;
@@ -67,6 +76,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
     // NUEVO: Evento estático para notificar destrucción
     public static System.Action<int> OnObjectDestroyed;
 
+    private AudioPlaybackManager audioPlaybackManager;
     private void Awake()
     {
         // NUEVO: Obtener y almacenar el ID de instancia
@@ -185,12 +195,15 @@ public class InteractableObject : MonoBehaviour, IInteractable
     public virtual void Interact()
     {
         Debug.Log($"Interactuando con objeto: {gameObject.name} (ID: {interactionID})");
+
+        // NUEVO: Reproducir sonido de interacción
+        PlayInteractionAudio(interactionSound);
+
         onInteraction.Invoke();
         objectInteracted = true;
 
         if (singleUseInteraction)
         {
-            // CORREGIDO: Solo ocultar indicadores, no destruirlos aún
             HideFeedbackIndicators();
 
             if (disableAfterInteraction)
@@ -205,6 +218,10 @@ public class InteractableObject : MonoBehaviour, IInteractable
         if (!singleUseInteraction)
         {
             Debug.Log($"Segunda interacción con objeto: {gameObject.name} (ID: {interactionID})");
+
+            // NUEVO: Reproducir sonido de segunda interacción
+            PlayInteractionAudio(secondInteractionSound);
+
             onInteracted.Invoke();
         }
     }
@@ -222,6 +239,86 @@ public class InteractableObject : MonoBehaviour, IInteractable
     public string GetInteractionPrompt()
     {
         return interactionPrompt;
+    }
+
+    #endregion
+
+    #region Sistema de Audio
+
+    /// <summary>
+    /// Reproduce el sonido de interacción usando el AudioPlaybackManager
+    /// </summary>
+    /// <param name="clip">Clip de audio a reproducir</param>
+    private void PlayInteractionAudio(AudioClip clip)
+    {
+        if (clip == null)
+        {
+            Debug.Log($"No hay clip de audio asignado para la interacción con {gameObject.name}");
+            return;
+        }
+
+        // Verificar que el AudioPlaybackManager esté disponible
+        if (AudioPlaybackManager.Instance == null)
+        {
+            Debug.LogError("AudioPlaybackManager no encontrado. No se puede reproducir el sonido de interacción.");
+            return;
+        }
+
+        // Reproducir el sonido en la posición del objeto
+        if (usePositionalAudio)
+        {
+            AudioPlaybackManager.Instance.PlaySoundAtPosition(
+                clip,
+                transform.position,
+                soundVolume,
+                soundPitch,
+                3f, // Auto-destrucción en 3 segundos
+                true, // Audio 3D
+                audioMaxDistance
+            );
+        }
+        else
+        {
+            AudioPlaybackManager.Instance.PlaySound2D(
+                clip,
+                soundVolume,
+                soundPitch,
+                3f // Auto-destrucción en 3 segundos
+            );
+        }
+
+        Debug.Log($"Reproduciendo sonido '{clip.name}' para interacción con {gameObject.name}");
+    }
+
+    /// <summary>
+    /// Método público para reproducir sonidos personalizados desde UnityEvents
+    /// </summary>
+    /// <param name="customClip">Clip personalizado a reproducir</param>
+    public void PlayCustomSound(AudioClip customClip)
+    {
+        PlayInteractionAudio(customClip);
+    }
+
+    /// <summary>
+    /// Configura los parámetros de audio en tiempo de ejecución
+    /// </summary>
+    /// <param name="volume">Volumen (0-1)</param>
+    /// <param name="pitch">Pitch del sonido</param>
+    /// <param name="maxDistance">Distancia máxima para audio 3D</param>
+    public void SetAudioParameters(float volume, float pitch = 1f, float maxDistance = 30f)
+    {
+        soundVolume = Mathf.Clamp01(volume);
+        soundPitch = pitch;
+        audioMaxDistance = maxDistance;
+    }
+
+    /// <summary>
+    /// Configura si el audio debe ser posicional o 2D
+    /// </summary>
+    /// <param name="positional">True para audio 3D, false para 2D</param>
+    public void SetPositionalAudio(bool positional)
+    {
+        usePositionalAudio = positional;
     }
 
     #endregion
@@ -694,7 +791,62 @@ public class InteractableObject : MonoBehaviour, IInteractable
     }
 
     #endregion
+
+    #region Debug Methods
+
+    [ContextMenu("Test Interaction Sound")]
+    public void TestInteractionSoundFromContext()
+    {
+        if (Application.isPlaying && interactionSound != null)
+        {
+            Debug.Log($"Probando sonido de interacción: {interactionSound.name}");
+            PlayInteractionAudio(interactionSound);
+        }
+        else if (interactionSound == null)
+        {
+            Debug.LogWarning("No hay clip de audio asignado para probar");
+        }
+        else
+        {
+            Debug.LogWarning("El test solo funciona en modo Play");
+        }
+    }
+
+    [ContextMenu("Test Second Interaction Sound")]
+    public void TestSecondInteractionSoundFromContext()
+    {
+        if (Application.isPlaying && secondInteractionSound != null)
+        {
+            Debug.Log($"Probando sonido de segunda interacción: {secondInteractionSound.name}");
+            PlayInteractionAudio(secondInteractionSound);
+        }
+        else if (secondInteractionSound == null)
+        {
+            Debug.LogWarning("No hay clip de segunda interacción asignado para probar");
+        }
+        else
+        {
+            Debug.LogWarning("El test solo funciona en modo Play");
+        }
+    }
+
+    [ContextMenu("Debug Audio Settings")]
+    public void DebugAudioSettings()
+    {
+        Debug.Log("=== INTERACTABLE OBJECT AUDIO SETTINGS ===");
+        Debug.Log($"Interaction Sound: {(interactionSound != null ? interactionSound.name : "NULL")}");
+        Debug.Log($"Second Interaction Sound: {(secondInteractionSound != null ? secondInteractionSound.name : "NULL")}");
+        Debug.Log($"Sound Volume: {soundVolume}");
+        Debug.Log($"Sound Pitch: {soundPitch}");
+        Debug.Log($"Use Positional Audio: {usePositionalAudio}");
+        Debug.Log($"Audio Max Distance: {audioMaxDistance}");
+        Debug.Log($"AudioPlaybackManager Available: {AudioPlaybackManager.Instance != null}");
+        Debug.Log("==========================================");
+    }
+
+    #endregion
 }
+
 /// <summary>
 /// Componente auxiliar para manejar los eventos del trigger de detección
 /// </summary>
