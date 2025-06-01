@@ -307,15 +307,15 @@ public class DialogueManager : MonoBehaviour
                     Debug.Log("Asignando contentText a typewriterEffect.textComponent");
                 }
 
-                // Iniciar la animación de escritura
+                // MODIFICADO: Pasar el NPC actual al typewriter effect
                 typewriterEffect.StartTyping(currentDialogue.content, currentNPC);
             }
             else
             {
-                // Si no hay efecto de tipeo, procesamos las etiquetas directamente
+                // MODIFICADO: Si no hay efecto de tipeo, procesamos las etiquetas directamente con el NPC
                 if (contentText != null)
                 {
-                    contentText.text = TextFormatHelper.ProcessTextTags(currentDialogue.content);
+                    contentText.text = TextFormatHelper.ProcessTextTags(currentDialogue.content, currentNPC);
                     contentText.richText = true;
                 }
                 OnTypingComplete();
@@ -778,14 +778,82 @@ public class Dialogue
 
 public static class TextFormatHelper
 {
-    public static string ProcessTextTags(string input)
+    public static string ProcessTextTags(string input, NPC npc = null)
     {
         if (string.IsNullOrEmpty(input))
             return input;
 
         string processed = input;
 
-        // Procesamos las etiquetas personalizadas y las convertimos en etiquetas de TextMeshPro
+        // NUEVO: Procesar etiquetas de animación ANTES que las de formato
+        if (npc != null)
+        {
+            processed = ProcessAnimationTags(processed, npc);
+        }
+
+        // Procesamos las etiquetas de formato existentes
+        processed = ProcessFormatTags(processed);
+
+        return processed;
+    }
+
+    /// <summary>
+    /// NUEVO: Procesa las etiquetas de animación para NPCs
+    /// </summary>
+    private static string ProcessAnimationTags(string input, NPC npc)
+    {
+        if (npc == null) return input;
+
+        string processed = input;
+
+        // Patrón para capturar etiquetas de animación: <animationName>
+        var animationPattern = @"<([a-zA-Z][a-zA-Z0-9_]*?)>";
+
+        var matches = System.Text.RegularExpressions.Regex.Matches(processed, animationPattern);
+
+        foreach (System.Text.RegularExpressions.Match match in matches)
+        {
+            string fullTag = match.Value; // <happy>
+            string animationName = match.Groups[1].Value; // happy
+
+            // Verificar que no sea una etiqueta de formato conocida
+            if (!IsFormatTag(animationName))
+            {
+                Debug.Log($"Ejecutando animación '{animationName}' en NPC {npc.name}");
+
+                // Ejecutar la animación
+                npc.PlayAnimation(animationName);
+
+                // Remover la etiqueta del texto (para que no se muestre)
+                processed = processed.Replace(fullTag, "");
+            }
+        }
+
+        return processed;
+    }
+
+    /// <summary>
+    /// Verifica si una etiqueta es de formato (para evitar conflictos)
+    /// </summary>
+    private static bool IsFormatTag(string tagName)
+    {
+        string[] formatTags = { "Bold", "Italic", "Underline", "Color", "Size", "b", "i", "u", "color", "size" };
+
+        foreach (string formatTag in formatTags)
+        {
+            if (tagName.Equals(formatTag, System.StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Procesa las etiquetas de formato existentes
+    /// </summary>
+    private static string ProcessFormatTags(string input)
+    {
+        string processed = input;
 
         // Negrita: <Bold>(texto)</Bold> -> <b>texto</b>
         processed = System.Text.RegularExpressions.Regex.Replace(

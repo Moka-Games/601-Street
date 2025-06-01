@@ -21,6 +21,20 @@ public class MisionNotificacion : MonoBehaviour
     [SerializeField] private Sprite iconoMisionCompletada;
     [SerializeField] private Sprite iconoObjetivoCompletado;
 
+    [Header("Sistema de Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private bool reproducirSonidos = true;
+
+    [Header("Sonidos de Misiones")]
+    [SerializeField] private AudioClip sonidoNuevaMision;
+    [SerializeField] private AudioClip sonidoMisionCompletada;
+    [SerializeField] private AudioClip sonidoObjetivoCompletado;
+
+    [Header("Configuración de Audio")]
+    [Range(0f, 1f)]
+    [SerializeField] private float volumenSonidos = 1f;
+    [SerializeField] private bool usarAudioSourceDedicado = true;
+
     [Header("Animaciones (Opcional)")]
     [SerializeField] private bool usarAnimaciones = false;
     [SerializeField] private Animator animatorNotificacion;
@@ -37,14 +51,43 @@ public class MisionNotificacion : MonoBehaviour
             panelNotificacion.SetActive(false);
         }
 
+        // Configurar AudioSource si no está asignado
+        ConfigurarAudioSource();
+
         // Suscribirse a eventos
         if (MisionManager.Instance != null)
         {
             MisionManager.Instance.OnMisionCambiada += OnMisionCambiada;
             MisionManager.Instance.OnMisionCompletada += OnMisionCompletada;
+        }
+    }
 
-            // Suscribirse a eventos de objetivos completados si hay misiones con objetivos
-            // Esto lo haremos dinámicamente cuando cambien las misiones
+    private void ConfigurarAudioSource()
+    {
+        if (audioSource == null && usarAudioSourceDedicado)
+        {
+            // Crear un AudioSource dedicado para las notificaciones
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.volume = volumenSonidos;
+
+            Debug.Log("AudioSource creado automáticamente para MisionNotificacion");
+        }
+        else if (audioSource == null && !usarAudioSourceDedicado)
+        {
+            // Buscar un AudioSource en el objeto o sus padres
+            audioSource = GetComponentInParent<AudioSource>();
+
+            if (audioSource == null)
+            {
+                Debug.LogWarning("No se encontró AudioSource. Los sonidos de misiones no se reproducirán.");
+            }
+        }
+
+        // Configurar volumen
+        if (audioSource != null)
+        {
+            audioSource.volume = volumenSonidos;
         }
     }
 
@@ -69,6 +112,9 @@ public class MisionNotificacion : MonoBehaviour
     {
         if (mision != null && mostrarNotificacionNuevaMision)
         {
+            // Reproducir sonido de nueva misión
+            ReproducirSonido(sonidoNuevaMision);
+
             // Mostrar notificación de nueva misión
             MostrarNotificacion($"Nueva misión: {mision.Nombre}", iconoNuevaMision);
 
@@ -85,6 +131,9 @@ public class MisionNotificacion : MonoBehaviour
     {
         if (mostrarNotificacionMisionCompletada)
         {
+            // Reproducir sonido de misión completada
+            ReproducirSonido(sonidoMisionCompletada);
+
             MostrarNotificacion($"Misión completada: {mision.Nombre}", iconoMisionCompletada);
         }
 
@@ -100,7 +149,31 @@ public class MisionNotificacion : MonoBehaviour
     {
         if (mostrarNotificacionObjetivoCompletado)
         {
+            // Reproducir sonido de objetivo completado
+            ReproducirSonido(sonidoObjetivoCompletado);
+
             MostrarNotificacion($"Objetivo completado: {objetivo.descripcion}", iconoObjetivoCompletado);
+        }
+    }
+
+    /// <summary>
+    /// Reproduce un sonido específico
+    /// </summary>
+    private void ReproducirSonido(AudioClip clip)
+    {
+        if (!reproducirSonidos || audioSource == null || clip == null)
+            return;
+
+        try
+        {
+            // Usar PlayOneShot para permitir múltiples sonidos superpuestos
+            audioSource.PlayOneShot(clip, volumenSonidos);
+
+            Debug.Log($"Reproduciendo sonido de misión: {clip.name}");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Error al reproducir sonido de misión: {e.Message}");
         }
     }
 
@@ -115,6 +188,18 @@ public class MisionNotificacion : MonoBehaviour
 
         // Iniciar nueva notificación
         notificacionActiva = StartCoroutine(MostrarNotificacionCoroutine(mensaje, icono));
+    }
+
+    /// <summary>
+    /// Método público para reproducir sonidos personalizados
+    /// </summary>
+    public void ReproducirSonidoPersonalizado(AudioClip clip, float volumen = -1f)
+    {
+        if (clip == null || audioSource == null)
+            return;
+
+        float vol = volumen >= 0f ? volumen : volumenSonidos;
+        audioSource.PlayOneShot(clip, vol);
     }
 
     // Corrutina para mostrar notificación
@@ -180,4 +265,75 @@ public class MisionNotificacion : MonoBehaviour
 
         return 0.5f;
     }
+
+    #region Métodos de Configuración Pública
+
+    /// <summary>
+    /// Habilita o deshabilita la reproducción de sonidos
+    /// </summary>
+    public void SetReproducirSonidos(bool activar)
+    {
+        reproducirSonidos = activar;
+    }
+
+    /// <summary>
+    /// Cambia el volumen de los sonidos de misiones
+    /// </summary>
+    public void SetVolumenSonidos(float volumen)
+    {
+        volumenSonidos = Mathf.Clamp01(volumen);
+
+        if (audioSource != null)
+        {
+            audioSource.volume = volumenSonidos;
+        }
+    }
+
+    /// <summary>
+    /// Cambia el AudioClip para nuevas misiones
+    /// </summary>
+    public void SetSonidoNuevaMision(AudioClip nuevoSonido)
+    {
+        sonidoNuevaMision = nuevoSonido;
+    }
+
+    /// <summary>
+    /// Cambia el AudioClip para misiones completadas
+    /// </summary>
+    public void SetSonidoMisionCompletada(AudioClip nuevoSonido)
+    {
+        sonidoMisionCompletada = nuevoSonido;
+    }
+
+    /// <summary>
+    /// Cambia el AudioClip para objetivos completados
+    /// </summary>
+    public void SetSonidoObjetivoCompletado(AudioClip nuevoSonido)
+    {
+        sonidoObjetivoCompletado = nuevoSonido;
+    }
+
+    #endregion
+
+    #region Métodos de Debug
+
+    [ContextMenu("Test Sonido Nueva Misión")]
+    private void TestSonidoNuevaMision()
+    {
+        ReproducirSonido(sonidoNuevaMision);
+    }
+
+    [ContextMenu("Test Sonido Misión Completada")]
+    private void TestSonidoMisionCompletada()
+    {
+        ReproducirSonido(sonidoMisionCompletada);
+    }
+
+    [ContextMenu("Test Sonido Objetivo Completado")]
+    private void TestSonidoObjetivoCompletado()
+    {
+        ReproducirSonido(sonidoObjetivoCompletado);
+    }
+
+    #endregion
 }

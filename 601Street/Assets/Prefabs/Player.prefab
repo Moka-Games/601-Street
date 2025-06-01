@@ -2293,7 +2293,7 @@ CharacterController:
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.13, z: 0}
+  m_Center: {x: 0, y: 0.07, z: 0}
 --- !u!136 &5886342011672503638
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2380,17 +2380,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pensamientoUI: {fileID: 0}
   pensamientoText: {fileID: 0}
-  configuracionesPorEscena:
-  - nombreEscena: ColegioExterior
-    activarPensamientoInicial: 0
-    pensamientoInicioTexto: I should call Umi
-  - nombreEscena: Colegio
-    activarPensamientoInicial: 1
-    pensamientoInicioTexto: Well, it's getting late...
-  - nombreEscena: CasaExterior
-    activarPensamientoInicial: 1
-    pensamientoInicioTexto: I finally get home...
-  timeBetweenThoughts: 90
   showThoughtFor: 7.5
 --- !u!114 &1840182962850762622
 MonoBehaviour:

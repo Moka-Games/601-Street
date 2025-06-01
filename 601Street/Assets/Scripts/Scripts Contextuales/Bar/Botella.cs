@@ -4,6 +4,7 @@ using UnityEngine.Rendering.PostProcessing;
 public class Botella : MonoBehaviour
 {
     public static bool objectInteracted = false;
+    public GameObject botellaNakamura;
 
     public void OnInteract()
     {
@@ -15,6 +16,7 @@ public class Botella : MonoBehaviour
         if (pensamientosManager != null)
         {
             pensamientosManager.MostrarPensamiento("I should talk to Nakamura again.");
+            botellaNakamura.SetActive(true);
         }
     }
 }

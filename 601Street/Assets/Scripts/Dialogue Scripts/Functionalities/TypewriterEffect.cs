@@ -63,7 +63,7 @@ public class TypewriterEffect : MonoBehaviour
         }
 
         // Procesamos el texto ANTES de iniciar la animación
-        processedText = TextFormatHelper.ProcessTextTags(text);
+        processedText = TextFormatHelper.ProcessTextTags(text, npc);
 
         // Aseguramos que el textComponent existe
         if (textComponent == null)

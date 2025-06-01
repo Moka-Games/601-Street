@@ -28647,7 +28647,7 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -28673,7 +28673,7 @@ PrefabInstance:
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1700969709}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -28682,7 +28682,7 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: 
+      value: OnInteract
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -28707,7 +28707,7 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: GameStateController, Assembly-CSharp
+      value: PersistentDestructible, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -28717,7 +28717,7 @@ PrefabInstance:
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: OnItemInteracted.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
-      value: Nota_Interactuada
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
@@ -28758,6 +28758,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1700969707}
+    - targetCorrespondingSourceObject: {fileID: 7125272824277244258, guid: 0d5500dc99f9c0843bd8767313e23a17,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1700969709}
   m_SourcePrefab: {fileID: 100100000, guid: 0d5500dc99f9c0843bd8767313e23a17, type: 3}
 --- !u!1 &1700969696 stripped
 GameObject:
@@ -28843,6 +28847,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: "Contrase\xF1a-Caja-Colegio"
+--- !u!114 &1700969709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700969696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2145e1093db2596489ae25aee7f98b6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: "Contrase\xF1a-Caja-Colegio"
+  useSceneName: 0
+  customSceneName: ColegioInterior
+  destroyOnStart: 0
+  saveStateOnDestroy: 1
+  logDestructionEvents: 1
+  warningOnNormalDestroy: 1
+  onObjectDestroyed:
+    m_PersistentCalls:
+      m_Calls: []
+  onObjectPersistentlyRemoved:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1701248702
 GameObject:
   m_ObjectHideFlags: 0
@@ -31398,8 +31427,10 @@ MonoBehaviour:
   textoPensamiento: Well, its getting late... I should go home
   activarEnStart: 1
   delayAntesMostrar: 4
-  id: 0
   tiempoMostrar: 5
+  OnPensamientoMostrado:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &1858710010
 Transform:
   m_ObjectHideFlags: 0
@@ -31433,6 +31464,7 @@ MonoBehaviour:
   destroyOnStart: 0
   saveStateOnDestroy: 1
   logDestructionEvents: 1
+  warningOnNormalDestroy: 1
   onObjectDestroyed:
     m_PersistentCalls:
       m_Calls: []

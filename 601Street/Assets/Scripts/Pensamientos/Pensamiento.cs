@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// Componente simplificado de Pensamiento que se activa automáticamente al iniciarse
@@ -22,6 +23,8 @@ public class Pensamiento : MonoBehaviour
 
     // Estado interno
     private bool yaActivado = false;
+
+    public UnityEvent OnPensamientoMostrado;
 
     private void Start()
     {
@@ -111,6 +114,7 @@ public class Pensamiento : MonoBehaviour
             Pensamientos_Manager.Instance.SetShowTime(tiempoOriginal);
         }
 
+        OnPensamientoMostrado.Invoke();
         // Destruir el objeto
         DestruirObjeto();
     }
@@ -121,7 +125,7 @@ public class Pensamiento : MonoBehaviour
     private System.Collections.IEnumerator DestruirDespuesDeMostrar(float tiempoEspera)
     {
         yield return new WaitForSeconds(tiempoEspera + 0.1f); // Esperar un poco más para asegurar
-
+        OnPensamientoMostrado.Invoke();
         // Destruir el objeto
         DestruirObjeto();
     }

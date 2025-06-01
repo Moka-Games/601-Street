@@ -28,16 +28,72 @@ public class NPC : MonoBehaviour
     private float conversationCooldown = 1.5f;
     private float lastInteractionTime = 0f;
     private Collider myCollider;
+
+    private Animator cachedAnimator;
+    private bool animatorSearched = false;
     private void Awake()
     {
+        // Código existente
         animator = GetComponent<Animator>();
         myCollider = GetComponent<Collider>();
+
+        // NUEVO: Buscar el Animator al inicializar
+        FindAnimatorComponent();
 
         // Si es Nakamura, registramos las acciones específicas
         if (isNakamura)
         {
             RegisterNakamuraActions();
         }
+    }
+    private void FindAnimatorComponent()
+    {
+        if (animatorSearched) return;
+
+        // Primero intentar obtenerlo del objeto actual
+        cachedAnimator = GetComponent<Animator>();
+
+        // Si no está en el objeto actual, buscar en el padre
+        if (cachedAnimator == null)
+        {
+            cachedAnimator = GetComponentInParent<Animator>();
+        }
+
+        // Si tampoco está en el padre, buscar en todos los hijos
+        if (cachedAnimator == null)
+        {
+            cachedAnimator = GetComponentInChildren<Animator>();
+        }
+
+        animatorSearched = true;
+
+        if (cachedAnimator != null)
+        {
+            Debug.Log($"Animator encontrado para NPC {gameObject.name} en: {cachedAnimator.gameObject.name}");
+        }
+        else
+        {
+            Debug.LogWarning($"No se encontró Animator para NPC {gameObject.name}");
+        }
+    }
+    public void PlayAnimation(string animationName)
+    {
+        // Verificar si tenemos un NPCAnimationManager
+        NPCAnimationManager animationManager = GetComponent<NPCAnimationManager>();
+        if (animationManager == null)
+        {
+            animationManager = GetComponentInChildren<NPCAnimationManager>();
+        }
+
+        // Si tenemos el manager avanzado, usarlo
+        if (animationManager != null)
+        {
+            animationManager.PlayAnimation(animationName);
+            return;
+        }
+
+        // Fallback al sistema anterior si no hay manager avanzado
+        PlayAnimationFallback(animationName);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -154,13 +210,33 @@ public class NPC : MonoBehaviour
 
     public void PerformEmotion(string emotion)
     {
+        if (cachedAnimator == null)
+        {
+            FindAnimatorComponent();
+            if (cachedAnimator == null)
+            {
+                Debug.LogWarning($"No se puede ejecutar emoción '{emotion}' - No hay Animator en NPC {gameObject.name}");
+                return;
+            }
+        }
+
         switch (emotion)
         {
             case "happy":
-                animator.Play("CharacterArmature_Wave");
+                if (HasAnimatorState("CharacterArmature_Wave"))
+                {
+                    cachedAnimator.Play("CharacterArmature_Wave");
+                }
+                else if (HasAnimatorParameter("Happy", AnimatorControllerParameterType.Trigger))
+                {
+                    cachedAnimator.SetTrigger("Happy");
+                }
                 break;
             case "sad":
-                animator.SetTrigger("Sad");
+                if (HasAnimatorParameter("Sad", AnimatorControllerParameterType.Trigger))
+                {
+                    cachedAnimator.SetTrigger("Sad");
+                }
                 break;
             default:
                 Debug.LogWarning($"Emoción desconocida: {emotion}");
@@ -170,14 +246,30 @@ public class NPC : MonoBehaviour
 
     public void PerformAction(string action)
     {
+        if (cachedAnimator == null)
+        {
+            FindAnimatorComponent();
+            if (cachedAnimator == null)
+            {
+                Debug.LogWarning($"No se puede ejecutar acción '{action}' - No hay Animator en NPC {gameObject.name}");
+                return;
+            }
+        }
+
         switch (action)
         {
             case "think":
-                animator.SetTrigger("Think");
-                Debug.Log("asdasd");
+                if (HasAnimatorParameter("Think", AnimatorControllerParameterType.Trigger))
+                {
+                    cachedAnimator.SetTrigger("Think");
+                    Debug.Log("Trigger Think ejecutado");
+                }
                 break;
             case "shake":
-                animator.SetTrigger("Shake");
+                if (HasAnimatorParameter("Shake", AnimatorControllerParameterType.Trigger))
+                {
+                    cachedAnimator.SetTrigger("Shake");
+                }
                 break;
             default:
                 Debug.LogWarning($"Acción desconocida: {action}");
@@ -220,4 +312,121 @@ public class NPC : MonoBehaviour
             Debug.Log($"Otra conversación del NPC {gameObject.name} ha terminado");
         }
     }
+
+    private bool HasAnimatorParameter(string parameterName, AnimatorControllerParameterType parameterType)
+    {
+        if (cachedAnimator == null || cachedAnimator.runtimeAnimatorController == null)
+            return false;
+
+        foreach (AnimatorControllerParameter parameter in cachedAnimator.parameters)
+        {
+            if (parameter.name == parameterName && parameter.type == parameterType)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// NUEVO: Verifica si el Animator tiene un estado específico
+    /// </summary>
+    private bool HasAnimatorState(string stateName)
+    {
+        if (cachedAnimator == null || cachedAnimator.runtimeAnimatorController == null)
+            return false;
+
+        // Verificar en todas las capas del Animator
+        for (int layerIndex = 0; layerIndex < cachedAnimator.layerCount; layerIndex++)
+        {
+            if (cachedAnimator.HasState(layerIndex, Animator.StringToHash(stateName)))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// NUEVO: Ejecuta animaciones usando los métodos legacy existentes
+    /// </summary>
+    private void ExecuteLegacyAnimation(string animationName)
+    {
+        string lowerAnimationName = animationName.ToLower();
+
+        switch (lowerAnimationName)
+        {
+            case "happy":
+                PerformEmotion("happy");
+                break;
+            case "sad":
+                PerformEmotion("sad");
+                break;
+            case "think":
+                PerformAction("think");
+                break;
+            case "shake":
+                PerformAction("shake");
+                break;
+            case "wave":
+                if (cachedAnimator != null)
+                {
+                    cachedAnimator.Play("CharacterArmature_Wave");
+                }
+                break;
+            default:
+                Debug.LogWarning($"Animación desconocida: {animationName} para NPC {gameObject.name}");
+                break;
+        }
+    }
+
+
+
+    /// <summary>
+    /// NUEVO: Sistema de animaciones fallback (el código anterior)
+    /// </summary>
+    private void PlayAnimationFallback(string animationName)
+    {
+        // Asegurar que tenemos el Animator
+        if (cachedAnimator == null)
+        {
+            FindAnimatorComponent();
+        }
+
+        if (cachedAnimator == null)
+        {
+            Debug.LogWarning($"No se puede reproducir animación '{animationName}' - No hay Animator en NPC {gameObject.name}");
+            return;
+        }
+
+        try
+        {
+            // Intentar reproducir la animación
+            // Primero verificar si existe como trigger
+            if (HasAnimatorParameter(animationName, AnimatorControllerParameterType.Trigger))
+            {
+                Debug.Log($"Ejecutando trigger '{animationName}' en NPC {gameObject.name}");
+                cachedAnimator.SetTrigger(animationName);
+            }
+            // Si no es un trigger, intentar como estado directo
+            else if (HasAnimatorState(animationName))
+            {
+                Debug.Log($"Reproduciendo estado '{animationName}' en NPC {gameObject.name}");
+                cachedAnimator.Play(animationName);
+            }
+            // Si no existe, intentar los métodos legacy
+            else
+            {
+                Debug.Log($"Usando método legacy para animación '{animationName}' en NPC {gameObject.name}");
+                ExecuteLegacyAnimation(animationName);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Error al reproducir animación '{animationName}' en NPC {gameObject.name}: {e.Message}");
+        }
+    }
+
 }
