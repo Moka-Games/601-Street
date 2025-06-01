@@ -312,7 +312,8 @@ public class BonusManager : MonoBehaviour
 
             // Animación de aparición
             activeBonusIndicator.transform.localScale = Vector3.zero;
-            activeBonusIndicator.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
+            //activeBonusIndicator.transform.DOScale(400f, 380).SetEase(Ease.OutBack);
+            activeBonusIndicator.transform.localScale = new Vector3(400, 400, 400);
         }
 
         if (activeBonusValueText != null)
@@ -320,7 +321,7 @@ public class BonusManager : MonoBehaviour
             activeBonusValueText.text = $"+{activeBonus.bonusValue}";
 
             // Efecto de pulso sutil
-            activeBonusValueText.transform.DOPunchScale(Vector3.one * 0.1f, 0.4f, 4, 0.5f);
+            //activeBonusValueText.transform.DOPunchScale(Vector3.one * 0.1f, 0.4f, 4, 0.5f);
         }
 
         Debug.Log($"Indicador de bonus activo mostrado: +{activeBonus.bonusValue}");
