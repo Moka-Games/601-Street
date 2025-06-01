@@ -20,9 +20,6 @@ public class Eco_Callejon : MonoBehaviour
     public float raycastDistance = 10f;
 
     public Transform ecoLookAt;
-    public string pensamientoNyssaPostInteracción;
-
-    private Pensamientos_Manager pensamientosManager;
     private PlayerController playerController;
 
     private CinemachineFreeLook playerCamera;
@@ -52,7 +49,6 @@ public class Eco_Callejon : MonoBehaviour
         audioSource.volume = audioSource_Volume;
 
         playerCamera = FindAnyObjectByType<CinemachineFreeLook>();
-        pensamientosManager = FindAnyObjectByType<Pensamientos_Manager>();
         playerController = FindAnyObjectByType<PlayerController>();
 
         callejonCamera.enabled = false;
@@ -142,7 +138,6 @@ public class Eco_Callejon : MonoBehaviour
 
         StartCoroutine(Destroy_Eco_Delay(1f));
 
-        pensamientosManager.MostrarPensamiento(pensamientoNyssaPostInteracción);
     
         StartCoroutine(StopAudioSource(1f));
     }

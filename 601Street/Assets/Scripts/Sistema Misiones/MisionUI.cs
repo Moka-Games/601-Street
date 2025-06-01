@@ -25,6 +25,7 @@ public class MisionUI : MonoBehaviour
     private bool panelVisible = false;
     private Coroutine animacionCoroutine;
 
+
     private void Awake()
     {
         // Asegurarnos de que el panel esté oculto inicialmente
