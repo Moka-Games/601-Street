@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 // Gestor principal de misiones (MonoBehaviour)
 public class MisionManager : MonoBehaviour
@@ -47,6 +48,10 @@ public class MisionManager : MonoBehaviour
     
     [Header("Depuración")]
     [SerializeField] private bool mostrarOrigenLlamadas = true;
+
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip misionIniciada_Sound;
+
     private void Awake()
     {
         // Singleton setup
@@ -117,6 +122,7 @@ public class MisionManager : MonoBehaviour
     // Iniciar una misión específica
     public bool IniciarMision(Mision mision)
     {
+
         if (mision == null)
         {
             Debug.LogError("Se intentу iniciar una misiуn nula.");
@@ -156,7 +162,7 @@ public class MisionManager : MonoBehaviour
             // Reactivar el evento para futuras misiones
             OnMisionCompletada += ManejarCompletadoInterno;
         }
-
+        audioSource.PlayOneShot(misionIniciada_Sound);
         // Establecer la nueva misiуn actual
         misionActual = mision;
         misionActual.IniciarMision();
