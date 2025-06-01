@@ -1119,11 +1119,16 @@ MonoBehaviour:
       m_Calls: []
   singleUseInteraction: 0
   disableAfterInteraction: 0
+  interactionSound: {fileID: 0}
+  secondInteractionSound: {fileID: 0}
+  soundVolume: 1
+  soundPitch: 1
+  usePositionalAudio: 1
+  audioMaxDistance: 30
   detectionRadius: 5
   detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
-  interactionSound: {fileID: 0}
 --- !u!135 &303076726
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3216,7 +3221,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1057934054
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6674,11 +6679,16 @@ MonoBehaviour:
       m_Calls: []
   singleUseInteraction: 0
   disableAfterInteraction: 0
+  interactionSound: {fileID: 0}
+  secondInteractionSound: {fileID: 0}
+  soundVolume: 1
+  soundPitch: 1
+  usePositionalAudio: 1
+  audioMaxDistance: 30
   detectionRadius: 5
   detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
-  interactionSound: {fileID: 0}
 --- !u!135 &1943567785
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -7235,11 +7245,16 @@ MonoBehaviour:
       m_Calls: []
   singleUseInteraction: 0
   disableAfterInteraction: 0
+  interactionSound: {fileID: 0}
+  secondInteractionSound: {fileID: 0}
+  soundVolume: 1
+  soundPitch: 1
+  usePositionalAudio: 1
+  audioMaxDistance: 30
   detectionRadius: 5
   detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
-  interactionSound: {fileID: 0}
 --- !u!114 &2032695343
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7881,11 +7896,16 @@ MonoBehaviour:
       m_Calls: []
   singleUseInteraction: 0
   disableAfterInteraction: 0
+  interactionSound: {fileID: 0}
+  secondInteractionSound: {fileID: 0}
+  soundVolume: 1
+  soundPitch: 1
+  usePositionalAudio: 1
+  audioMaxDistance: 30
   detectionRadius: 5
   detectionTriggerName: DetectionTrigger
   edgeOffset: 50
   objectInteracted: 0
-  interactionSound: {fileID: 0}
 --- !u!114 &2056939754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8618,6 +8638,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  pickupSound: {fileID: 0}
+  soundVolume: 1
+  soundPitch: 1.2
+  usePositionalAudio: 1
+  audioMaxDistance: 20
+  playInteractionSound: 1
   edgeOffset: 50
   detectionCollider: {fileID: 1363304978}
 --- !u!54 &6878170232025778814

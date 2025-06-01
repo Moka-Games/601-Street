@@ -3636,6 +3636,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
+      propertyPath: pickupSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 69bb1e78c232ce343b3a6703ce7de7cf, type: 3}
+    - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
+        type: 3}
       propertyPath: detectionCollider
       value: 
       objectReference: {fileID: 330349951}
@@ -4750,7 +4755,7 @@ PrefabInstance:
         type: 3}
       propertyPath: pickupSound
       value: 
-      objectReference: {fileID: 8300000, guid: c10283bb8d282864ca498062e9487c3e, type: 3}
+      objectReference: {fileID: 8300000, guid: 4e6240c6a76f752418dbddb4a9d20b01, type: 3}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: interactionSound
@@ -29190,7 +29195,7 @@ PrefabInstance:
         type: 3}
       propertyPath: pickupSound
       value: 
-      objectReference: {fileID: 8300000, guid: c10283bb8d282864ca498062e9487c3e, type: 3}
+      objectReference: {fileID: 8300000, guid: 4e6240c6a76f752418dbddb4a9d20b01, type: 3}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: interactionSound
