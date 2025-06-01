@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6064972215524283525}
   - component: {fileID: 4327903618117422825}
   - component: {fileID: 3222675118234800223}
+  - component: {fileID: 6458928422713785891}
   m_Layer: 6
   m_Name: Bonus_Base
   m_TagString: Untagged
@@ -94,6 +95,7 @@ MonoBehaviour:
   collectionEffect: {fileID: 0}
   collectionSound: {fileID: 8300000, guid: cd29c0d992b5783488e9c103e3148557, type: 3}
   showDebugMessages: 1
+  bonus_Mesh: {fileID: 0}
 --- !u!114 &4327903618117422825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,6 +135,30 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6458928422713785891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 496757632745989771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2145e1093db2596489ae25aee7f98b6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: Bonus-Comisaria
+  useSceneName: 0
+  customSceneName: ComisariaInterior
+  destroyOnStart: 0
+  saveStateOnDestroy: 1
+  logDestructionEvents: 1
+  onObjectDestroyed:
+    m_PersistentCalls:
+      m_Calls: []
+  onObjectPersistentlyRemoved:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3954479823001623173
 GameObject:
   m_ObjectHideFlags: 0

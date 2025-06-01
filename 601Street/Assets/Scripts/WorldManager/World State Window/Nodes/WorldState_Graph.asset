@@ -192,7 +192,7 @@ MonoBehaviour:
     position:
       serializedVersion: 2
       x: 1128.875
-      y: 690.6406
+      y: 691.6406
       width: 200
       height: 150
     activeObjectIDs:
@@ -203,6 +203,7 @@ MonoBehaviour:
     - Guardia_Secta
     - Guardia_Fracaso
     - Puzzle-Parque
+    - Ganzua-Secta
     connectedNodeIDs:
     - "Cap\xEDtulo-2-Completado"
     isInitialNode: 0
@@ -245,7 +246,7 @@ MonoBehaviour:
     position:
       serializedVersion: 2
       x: 657.9375
-      y: 806.78516
+      y: 807.78516
       width: 200
       height: 150
     activeObjectIDs:
@@ -254,6 +255,7 @@ MonoBehaviour:
     - Guardia_Secta
     connectedNodeIDs:
     - Post-Fracaso-Sectario
+    - Post-Secta
     isInitialNode: 0
     misionAsociada: {fileID: 11400000, guid: 8b6f9fb6621749144ab7a172a89ed342, type: 2}
     misionDelay: 0
@@ -261,8 +263,8 @@ MonoBehaviour:
     name: Post Fracaso Sectario
     position:
       serializedVersion: 2
-      x: 899.9375
-      y: 806.78516
+      x: 911.9375
+      y: 856.78516
       width: 200
       height: 150
     activeObjectIDs:
@@ -354,4 +356,6 @@ MonoBehaviour:
     toNodeID: Juego-Completado
   - fromNodeID: Riku-Universidad-Exito
     toNodeID: Juego-Completado
+  - fromNodeID: Riku-Fracaso
+    toNodeID: Post-Secta
   initialNodeID: InitialState_Colegio

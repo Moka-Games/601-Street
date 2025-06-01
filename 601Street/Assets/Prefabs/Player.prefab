@@ -2234,8 +2234,6 @@ GameObject:
   - component: {fileID: 5886342011672503638}
   - component: {fileID: 7637152430803431070}
   - component: {fileID: 3754790435304779438}
-  - component: {fileID: 7680374519244501293}
-  - component: {fileID: 469594727604519882}
   - component: {fileID: 1840182962850762622}
   - component: {fileID: 2516588390418131743}
   - component: {fileID: 6466127986077581566}
@@ -2394,34 +2392,6 @@ MonoBehaviour:
     pensamientoInicioTexto: I finally get home...
   timeBetweenThoughts: 90
   showThoughtFor: 7.5
---- !u!114 &7680374519244501293
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5831046738247469719}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89e9c3cdc3eb15849856af55fdc56cdf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  empatia: 0
-  persuasion: 0
-  intimidacion: 0
---- !u!114 &469594727604519882
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5831046738247469719}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c50b911b7b9ec6343b2ab805812c67f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cordura: 0
 --- !u!114 &1840182962850762622
 MonoBehaviour:
   m_ObjectHideFlags: 0

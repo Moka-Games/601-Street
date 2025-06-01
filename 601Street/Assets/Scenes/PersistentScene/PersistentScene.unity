@@ -2711,6 +2711,7 @@ MonoBehaviour:
   createNavigationManagerIfMissing: 1
   autoRegisterAllSystems: 1
   debugOutput: 1
+  protectUINavigationManagers: 1
 --- !u!4 &1513638149
 Transform:
   m_ObjectHideFlags: 0
@@ -5467,9 +5468,6 @@ MonoBehaviour:
   blockPlayerDuringInteraction: 1
   blockCameraDuringInteraction: 1
   freezeCameraOnInventoryOpen: 1
-  activeInteractionObject: {fileID: 0}
-  isNewlyAddedItem: 0
-  lastAddedItemName: 
   inventoryNavigation: {fileID: 953174614}
 --- !u!114 &1808981684
 MonoBehaviour:
@@ -5525,8 +5523,7 @@ MonoBehaviour:
   autoSetupOnStart: 1
   detectionDelay: 0.1
   logDebugInfo: 1
-  enableGamepadNavigation: 1
-  navigationDelay: 0.5
+  submitCooldown: 0.3
 --- !u!114 &1808981690
 MonoBehaviour:
   m_ObjectHideFlags: 0
