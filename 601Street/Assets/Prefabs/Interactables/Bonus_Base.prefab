@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6064972215524283525}
   - component: {fileID: 4327903618117422825}
   - component: {fileID: 6458928422713785891}
+  - component: {fileID: 8478871242482986213}
   m_Layer: 6
   m_Name: Bonus_Base
   m_TagString: Untagged
@@ -28,14 +29,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 496757632745989771}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.313, y: 3.262, z: 17.143}
+  m_LocalRotation: {x: -0, y: 0.6752466, z: -0, w: 0.7375921}
+  m_LocalPosition: {x: 4.527, y: 3.203, z: 17.162}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6744440675003258262}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 84.947, z: 0}
 --- !u!114 &3041951732959857947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69,7 +70,13 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   singleUseInteraction: 1
-  disableAfterInteraction: 1
+  disableAfterInteraction: 0
+  interactionSound: {fileID: 0}
+  secondInteractionSound: {fileID: 0}
+  soundVolume: 1
+  soundPitch: 1
+  usePositionalAudio: 1
+  audioMaxDistance: 30
   detectionRadius: 2.5
   detectionTriggerName: DetectionTrigger
   edgeOffset: 50
@@ -94,7 +101,7 @@ MonoBehaviour:
   collectionEffect: {fileID: 0}
   collectionSound: {fileID: 8300000, guid: cd29c0d992b5783488e9c103e3148557, type: 3}
   showDebugMessages: 1
-  bonus_Mesh: {fileID: 0}
+  bonus_Mesh: {fileID: 6256275742103146284}
 --- !u!114 &4327903618117422825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,7 +116,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   floatAmplitude: 0.5
   floatDuration: 2
-  rotationAmplitude: 15
+  rotationAmplitude: 10
   rotationDuration: 3
   scaleAmplitude: 0.1
   scaleDuration: 1.5
@@ -139,6 +146,29 @@ MonoBehaviour:
   onObjectPersistentlyRemoved:
     m_PersistentCalls:
       m_Calls: []
+--- !u!136 &8478871242482986213
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 496757632745989771}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2.7016468
+  m_Direction: 1
+  m_Center: {x: 0.37, y: -0.02619948, z: 0.39}
 --- !u!1 &3954479823001623173
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,7 +213,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 1, g: 0.8156863, b: 0, a: 1}
-  m_Intensity: 107.42958
+  m_Intensity: 42971.832
   m_Range: 1.5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -235,7 +265,7 @@ Light:
   m_ShadowRadius: 0
   m_ShadowAngle: 0
   m_LightUnit: 2
-  m_LuxAtDistance: 1.5
+  m_LuxAtDistance: 30
   m_EnableSpotReflector: 1
 --- !u!114 &8975674310368169791
 MonoBehaviour:
@@ -390,6 +420,7 @@ GameObject:
   - component: {fileID: 6744440675003258262}
   - component: {fileID: 7653527380413962803}
   - component: {fileID: 5607612466207665913}
+  - component: {fileID: 7381417522237902328}
   m_Layer: 0
   m_Name: FBX_Bonus
   m_TagString: Untagged
@@ -406,7 +437,7 @@ Transform:
   m_GameObject: {fileID: 6256275742103146284}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.33, y: 0, z: 0.29}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -466,3 +497,25 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &7381417522237902328
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6256275742103146284}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4493585093827132993, guid: 2ac3a6b2bdde6cb40a75cbba7eb09ab3, type: 3}

@@ -505,7 +505,7 @@ public class InventoryNavigationIntegration : MonoBehaviour
                 Debug.LogWarning($"Error al hacer debug de navegación: {e.Message}");
             }
         }
-    }
+    } 
 
     [ContextMenu("Force Refresh Navigation")]
     public void ForceRefreshNavigation()

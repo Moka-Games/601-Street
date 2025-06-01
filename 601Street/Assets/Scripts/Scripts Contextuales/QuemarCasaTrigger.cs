@@ -10,10 +10,12 @@ public class QuemarCasaTrigger : MonoBehaviour
         panelNegro.SetActive(true);
         CámaraSecuencia.SetActive(true);
         VFXFuego.SetActive(true);
+        print("Quemando la casa");
     }
 
     public void NoQuemarCasa()
     {
+        print("No quemando la casa");
         panelNegro.SetActive(false);
         CámaraSecuencia.SetActive(false);
         VFXFuego.SetActive(false);
