@@ -3,7 +3,8 @@ using UnityEngine.Events;
 using TMPro;
 
 /// <summary>
-/// Versión mejorada del Inventory_Item con limpieza garantizada de indicadores y sistema de audio
+/// Versión mejorada del Inventory_Item con limpieza garantizada de indicadores, sistema de audio
+/// y evento para configurar funciones al cerrar el prefab de interacción
 /// </summary>
 public class Inventory_Item : MonoBehaviour
 {
@@ -16,9 +17,13 @@ public class Inventory_Item : MonoBehaviour
     public UnityEvent onItemClick;
     public UnityEvent OnItemInteracted;
 
+    [Header("Evento de Cierre de Prefab")]
+    [Tooltip("Evento que se ejecuta cuando se cierra el prefab de interacción asociado a este ítem")]
+    public UnityEvent OnPrefabClosed;
+
     [Header("Configuración de Audio")]
     [SerializeField] private AudioClip pickupSound;
-    [SerializeField] private float soundVolume;
+    [SerializeField] private float soundVolume = 1f;
     [SerializeField] private float soundPitch = 1.2f; // Ligeramente más agudo para items
     [SerializeField] private bool usePositionalAudio = true;
     [SerializeField] private float audioMaxDistance = 20f;
@@ -59,6 +64,12 @@ public class Inventory_Item : MonoBehaviour
             detectionCollider.radius = 3.0f;
             detectionCollider.isTrigger = true;
         }
+
+        // NUEVO: Inicializar el evento si es null
+        if (OnPrefabClosed == null)
+        {
+            OnPrefabClosed = new UnityEvent();
+        }
     }
 
     private void Start()
@@ -89,7 +100,72 @@ public class Inventory_Item : MonoBehaviour
             Debug.Log($"Inicialización de prompt para {gameObject.name}: '{interactionPrompt}'");
         }
 
+        // NUEVO: Registrar este ítem en el Inventory_Manager para eventos de cierre
+        RegisterForCloseEvents();
+
         isInitialized = true;
+
+
+    }
+
+    /// <summary>
+    /// NUEVO: Registra este ítem para recibir notificaciones de cierre de prefab
+    /// </summary>
+    private void RegisterForCloseEvents()
+    {
+        if (Inventory_Manager.Instance != null)
+        {
+            // Registrar este ítem para recibir eventos de cierre
+            Inventory_Manager.Instance.RegisterItemForCloseEvents(this);
+            Debug.Log($"Ítem {gameObject.name} registrado para eventos de cierre de prefab");
+        }
+        else
+        {
+            Debug.LogWarning($"No se pudo registrar {gameObject.name} para eventos de cierre - Inventory_Manager no encontrado");
+        }
+    }
+
+    /// <summary>
+    /// NUEVO: Método llamado por el Inventory_Manager cuando se cierra el prefab asociado a este ítem
+    /// </summary>
+    public void OnPrefabClosedInternal(ItemData closedItemData)
+    {
+        // Verificar si el prefab cerrado corresponde a este ítem
+        if (itemData != null && closedItemData != null && itemData == closedItemData)
+        {
+            Debug.Log($"Prefab cerrado para ítem: {itemData.itemName}");
+
+            // Ejecutar el evento configurado en el inspector
+            OnPrefabClosed?.Invoke();
+        }
+    }
+
+    /// <summary>
+    /// NUEVO: Método público para añadir listeners al evento de cierre desde código
+    /// </summary>
+    public void AddPrefabCloseListener(UnityAction action)
+    {
+        if (OnPrefabClosed == null)
+        {
+            OnPrefabClosed = new UnityEvent();
+        }
+        OnPrefabClosed.AddListener(action);
+    }
+
+    /// <summary>
+    /// NUEVO: Método público para remover listeners del evento de cierre desde código
+    /// </summary>
+    public void RemovePrefabCloseListener(UnityAction action)
+    {
+        OnPrefabClosed?.RemoveListener(action);
+    }
+
+    /// <summary>
+    /// NUEVO: Método público para limpiar todos los listeners del evento de cierre
+    /// </summary>
+    public void ClearPrefabCloseListeners()
+    {
+        OnPrefabClosed?.RemoveAllListeners();
     }
 
     /// <summary>
@@ -627,6 +703,12 @@ public class Inventory_Item : MonoBehaviour
     /// </summary>
     private void OnDestroy()
     {
+        // NUEVO: Desregistrar del Inventory_Manager antes de destruir
+        if (Inventory_Manager.Instance != null)
+        {
+            Inventory_Manager.Instance.UnregisterItemForCloseEvents(this);
+        }
+
         // DESTRUIR indicadores completamente porque el objeto se está destruyendo
         if (UIFeedbackManager.Instance != null && indicatorsCreated)
         {
@@ -680,6 +762,20 @@ public class Inventory_Item : MonoBehaviour
         }
     }
 
+    [ContextMenu("Test Prefab Close Event")]
+    public void TestPrefabCloseEventFromContext()
+    {
+        if (Application.isPlaying)
+        {
+            Debug.Log($"Probando evento de cierre de prefab para {gameObject.name}");
+            OnPrefabClosed?.Invoke();
+        }
+        else
+        {
+            Debug.LogWarning("El test solo funciona en modo Play");
+        }
+    }
+
     [ContextMenu("Debug Audio Settings")]
     public void DebugAudioSettings()
     {
@@ -694,22 +790,18 @@ public class Inventory_Item : MonoBehaviour
         Debug.Log("=====================================");
     }
 
-    [ContextMenu("Test Custom Sound")]
-    public void TestCustomSoundFromContext()
+    [ContextMenu("Debug Close Event Settings")]
+    public void DebugCloseEventSettings()
     {
-        if (Application.isPlaying)
+        Debug.Log("=== INVENTORY ITEM CLOSE EVENT SETTINGS ===");
+        Debug.Log($"OnPrefabClosed is null: {OnPrefabClosed == null}");
+        if (OnPrefabClosed != null)
         {
-            // Ejemplo de cómo usar un sonido personalizado
-            // AudioClip customClip = Resources.Load<AudioClip>("CustomPickupSound");
-            // if (customClip != null)
-            //     PlayCustomPickupSound(customClip);
-            Debug.Log("Para probar sonidos personalizados, asigna un AudioClip y llama a PlayCustomPickupSound()");
+            Debug.Log($"OnPrefabClosed listener count: {OnPrefabClosed.GetPersistentEventCount()}");
         }
-        else
-        {
-            Debug.LogWarning("El test solo funciona en modo Play");
-        }
+        Debug.Log($"Item registered for close events: {Inventory_Manager.Instance != null && Inventory_Manager.Instance.IsItemRegisteredForCloseEvents(this)}");
+        Debug.Log("==========================================");
     }
-}
 
     #endregion
+}
