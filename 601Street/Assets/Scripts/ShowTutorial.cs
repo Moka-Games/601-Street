@@ -17,6 +17,8 @@ public class ShowTutorial : MonoBehaviour
 
     public void ShowTutorial_()
     {
+
+
         // Verificar si este ID de tutorial ya se ha mostrado
         if (shownTutorialIDs.Contains(tutorialID))
         {
@@ -31,6 +33,8 @@ public class ShowTutorial : MonoBehaviour
         {
             instantiatedTutorial = Instantiate(tutorial_To_Show);
             print($"Tutorial con ID '{tutorialID}' instanciado por primera vez");
+            FreezeScript freezeScript = FindAnyObjectByType<FreezeScript>();
+            freezeScript.FreezeMovement_And_Camera();
         }
         else
         {

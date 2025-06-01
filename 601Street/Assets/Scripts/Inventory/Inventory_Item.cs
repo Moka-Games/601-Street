@@ -130,13 +130,32 @@ public class Inventory_Item : MonoBehaviour
     /// </summary>
     public void OnPrefabClosedInternal(ItemData closedItemData)
     {
-        // Verificar si el prefab cerrado corresponde a este ítem
-        if (itemData != null && closedItemData != null && itemData == closedItemData)
-        {
-            Debug.Log($"Prefab cerrado para ítem: {itemData.itemName}");
+        Debug.Log($"OnPrefabClosedInternal llamado para {gameObject.name}");
+        Debug.Log($"Comparando: Mi ItemData ({(itemData != null ? itemData.itemName : "NULL")}) con el cerrado ({(closedItemData != null ? closedItemData.itemName : "NULL")})");
 
-            // Ejecutar el evento configurado en el inspector
-            OnPrefabClosed?.Invoke();
+        // Verificar si el prefab cerrado corresponde a este ítem
+        if (itemData != null && closedItemData != null)
+        {
+            bool isSameItem = itemData == closedItemData;
+            bool isSameName = itemData.itemName == closedItemData.itemName;
+
+            Debug.Log($"¿Mismo objeto?: {isSameItem}, ¿Mismo nombre?: {isSameName}");
+
+            if (isSameItem || isSameName)
+            {
+                Debug.Log($"¡EVENTO DETECTADO! Prefab cerrado para ítem: {itemData.itemName}");
+
+                // Verificar si el evento existe antes de invocarlo
+                if (OnPrefabClosed != null)
+                {
+                    Debug.Log($"Invocando evento OnPrefabClosed con {OnPrefabClosed.GetPersistentEventCount()} listeners");
+                    OnPrefabClosed.Invoke();
+                }
+                else
+                {
+                    Debug.LogWarning($"OnPrefabClosed es null para {gameObject.name}");
+                }
+            }
         }
     }
 
@@ -436,7 +455,19 @@ public class Inventory_Item : MonoBehaviour
             }
         }
     }
-
+    public void ForceInvokeOnPrefabClosed()
+    {
+        Debug.Log($"Forzando invocación de OnPrefabClosed para {gameObject.name}");
+        if (OnPrefabClosed != null)
+        {
+            OnPrefabClosed.Invoke();
+            Debug.Log("OnPrefabClosed invocado forzosamente");
+        }
+        else
+        {
+            Debug.LogWarning("No se puede invocar OnPrefabClosed porque es null");
+        }
+    }
     private void SetUIPosition(RectTransform rectTransform, Vector2 screenPosition)
     {
         if (hudCanvas == null || rectTransform == null)
