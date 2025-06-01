@@ -5,13 +5,13 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using System.Collections;
-using UnityEngine.Audio;
 
 /// <summary>
 /// Versión final corregida del gestor de inventario donde ToggleInventory funciona como verdadero TOGGLE
 /// - ToggleInventory puede abrir Y cerrar el inventario
 /// - Cancel está completamente eliminado del sistema de inventario
 /// - La cámara se congela automáticamente al abrir el inventario y se descongela al cerrarlo
+/// - Sistema de eventos para notificar cuando se cierran prefabs de interacción
 /// </summary>
 public class Inventory_Manager : MonoBehaviour
 {
@@ -49,6 +49,10 @@ public class Inventory_Manager : MonoBehaviour
     [Tooltip("Si está marcado, la cámara se congelará automáticamente al abrir el inventario")]
     public bool freezeCameraOnInventoryOpen = true;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip closePrefabSound;
+    private AudioSource audioSource;
+
     // Input System - CAMBIO IMPORTANTE: Mantenemos ambas referencias activas
     private PlayerControls playerControls;
     private InputAction toggleInventoryGameplay; // Para cuando está cerrado
@@ -66,6 +70,10 @@ public class Inventory_Manager : MonoBehaviour
     private List<ItemData> inventoryItems = new List<ItemData>();
     private Dictionary<ItemData, PrefabInteractionData> itemInteractions = new Dictionary<ItemData, PrefabInteractionData>();
 
+    // NUEVO: Sistema de registro de ítems para eventos de cierre
+    private List<Inventory_Item> registeredItems = new List<Inventory_Item>();
+    private ItemData currentlyOpenItemData = null; // Rastrea qué ítem tiene el prefab abierto actualmente
+
     // Control de estado
     private bool inventoryOpened = false;
     private float lastPickUpTime = -100f;
@@ -82,11 +90,7 @@ public class Inventory_Manager : MonoBehaviour
     [Header("Navigation System")]
     [SerializeField] private InventoryNavigationManager inventoryNavigation;
 
-    [Header("Audio")]
-    [SerializeField] private AudioClip closePrefabSound;
-    private AudioSource audioSource;
-
-        [System.Serializable]
+    [System.Serializable]
     public class PrefabInteractionData
     {
         public GameObject prefab;
@@ -109,8 +113,6 @@ public class Inventory_Manager : MonoBehaviour
         // Inicializar Input System
         InitializeInputSystem();
     }
-
-
 
     private void InitializeInputSystem()
     {
@@ -176,6 +178,9 @@ public class Inventory_Manager : MonoBehaviour
         }
 
         playerControls?.Dispose();
+
+        // NUEVO: Limpiar lista de ítems registrados
+        registeredItems.Clear();
     }
 
     private void Start()
@@ -218,6 +223,96 @@ public class Inventory_Manager : MonoBehaviour
         if (cameraScript == null)
             Debug.LogWarning("No se encontró Camera_Script en la escena. No se podrá congelar la cámara automáticamente.");
     }
+
+    #region Sistema de Eventos de Cierre de Prefabs
+
+    /// <summary>
+    /// NUEVO: Registra un ítem para recibir eventos de cierre de prefab
+    /// </summary>
+    /// <param name="item">El Inventory_Item que se registra</param>
+    public void RegisterItemForCloseEvents(Inventory_Item item)
+    {
+        if (item != null && !registeredItems.Contains(item))
+        {
+            registeredItems.Add(item);
+            Debug.Log($"Ítem {item.gameObject.name} registrado para eventos de cierre de prefab");
+        }
+    }
+
+    /// <summary>
+    /// NUEVO: Desregistra un ítem de los eventos de cierre de prefab
+    /// </summary>
+    /// <param name="item">El Inventory_Item que se desregistra</param>
+    public void UnregisterItemForCloseEvents(Inventory_Item item)
+    {
+        if (item != null && registeredItems.Contains(item))
+        {
+            registeredItems.Remove(item);
+            Debug.Log($"Ítem {item.gameObject.name} desregistrado de eventos de cierre de prefab");
+        }
+    }
+
+    /// <summary>
+    /// NUEVO: Verifica si un ítem está registrado para eventos de cierre
+    /// </summary>
+    /// <param name="item">El Inventory_Item a verificar</param>
+    /// <returns>True si está registrado, false en caso contrario</returns>
+    public bool IsItemRegisteredForCloseEvents(Inventory_Item item)
+    {
+        return item != null && registeredItems.Contains(item);
+    }
+
+    /// <summary>
+    /// NUEVO: Notifica a todos los ítems registrados que se ha cerrado un prefab
+    /// </summary>
+    /// <param name="closedItemData">Los datos del ítem cuyo prefab se cerró</param>
+    private void NotifyPrefabClosed(ItemData closedItemData)
+    {
+        if (closedItemData == null)
+        {
+            Debug.LogWarning("Intentando notificar cierre para un ItemData null");
+            return;
+        }
+
+        Debug.Log($"¡NOTIFICANDO CIERRE DE PREFAB PARA ÍTEM: {closedItemData.itemName}!");
+        Debug.Log($"Ítems registrados: {registeredItems.Count}");
+
+        // Crear una copia de la lista para evitar problemas si se modifica durante la iteración
+        var itemsCopy = new List<Inventory_Item>(registeredItems);
+        int notifiedCount = 0;
+
+        foreach (var item in itemsCopy)
+        {
+            if (item != null)
+            {
+                try
+                {
+                    Debug.Log($"Notificando a ítem: {item.gameObject.name}, ItemData: {(item.itemData != null ? item.itemData.itemName : "NULL")}");
+                    item.OnPrefabClosedInternal(closedItemData);
+                    notifiedCount++;
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"Error al notificar cierre de prefab a {item.gameObject.name}: {e.Message}");
+                }
+            }
+        }
+
+        Debug.Log($"Notificación completada: {notifiedCount} ítems notificados");
+
+        // Limpiar ítems nulos de la lista
+        CleanupRegisteredItems();
+    }
+
+    /// <summary>
+    /// NUEVO: Limpia ítems nulos de la lista de registrados
+    /// </summary>
+    private void CleanupRegisteredItems()
+    {
+        registeredItems.RemoveAll(item => item == null);
+    }
+
+    #endregion
 
     /// <summary>
     /// Callback ÚNICO para ToggleInventory - funciona tanto para abrir como cerrar
@@ -323,6 +418,7 @@ public class Inventory_Manager : MonoBehaviour
             Debug.Log("Navegación del inventario activada con delay");
         }
     }
+
     /// <summary>
     /// Cierra el inventario
     /// </summary>
@@ -410,6 +506,12 @@ public class Inventory_Manager : MonoBehaviour
         {
             popUpParent.SetActive(false);
         }
+
+        // NUEVO: Limpiar periódicamente ítems nulos de la lista de registrados
+        if (Time.frameCount % 300 == 0) // Cada 5 segundos aprox a 60fps
+        {
+            CleanupRegisteredItems();
+        }
     }
 
     /// <summary>
@@ -476,8 +578,12 @@ public class Inventory_Manager : MonoBehaviour
     /// <summary>
     /// Muestra el prefab de interacción para un ítem recién añadido
     /// </summary>
+    // Añadir en ShowInteractionForNewItem para asegurar que se rastrea correctamente el ítem
     public void ShowInteractionForNewItem(GameObject prefab, string itemName)
     {
+        // Buscar el ItemData correspondiente a este ítem
+        ItemData correspondingItemData = inventoryItems.Find(item => item.itemName == itemName);
+
         // Cerrar cualquier interacción activa primero
         if (activeInteractionObject != null)
         {
@@ -488,12 +594,14 @@ public class Inventory_Manager : MonoBehaviour
         isNewlyAddedItem = true;
         lastAddedItemName = itemName;
 
+        // NUEVO: Asignar el ItemData correspondiente
+        currentlyOpenItemData = correspondingItemData;
+
         // Instanciar el prefab
         activeInteractionObject = InstantiateInteractionPrefab(prefab, itemName, true);
 
-        Debug.Log($"Mostrando prefab de interacción para el ítem recién añadido: {itemName}");
+        Debug.Log($"Mostrando prefab de interacción para el ítem recién añadido: {itemName} (ItemData: {(currentlyOpenItemData != null ? "asignado" : "NULL")})");
     }
-
     private void InstantiateItemInUI(ItemData item)
     {
         // Determinar el contenedor y plantilla apropiados según el tipo de ítem
@@ -503,7 +611,6 @@ public class Inventory_Manager : MonoBehaviour
         // Instanciar el elemento UI
         GameObject newItemUI = Instantiate(template, parentContainer);
         StartCoroutine(RefreshUISetupDelayed());
-
 
         // Configurar imagen
         Image itemImage = newItemUI.GetComponent<Image>();
@@ -544,6 +651,7 @@ public class Inventory_Manager : MonoBehaviour
         StartCoroutine(NotifyNavigationChanges());
         StartCoroutine(RefreshUISetupDelayed());
     }
+
     private IEnumerator NotifyNavigationChanges()
     {
         yield return new WaitForEndOfFrame();
@@ -561,6 +669,7 @@ public class Inventory_Manager : MonoBehaviour
 
     /// <summary>
     /// Método llamado cuando se hace clic en un ítem del inventario
+    /// MODIFICADO: Ahora rastrea qué ítem se está abriendo
     /// </summary>
     private void OnItemClicked(ItemData item)
     {
@@ -587,6 +696,9 @@ public class Inventory_Manager : MonoBehaviour
             // Marcar que NO es un ítem recién añadido (viene del inventario)
             isNewlyAddedItem = false;
 
+            // NUEVO: Marcar qué ítem tiene el prefab abierto actualmente
+            currentlyOpenItemData = item;
+
             // Instanciar nuevo objeto interactivo
             activeInteractionObject = InstantiateInteractionPrefab(interactionData.prefab, item.itemName, false);
 
@@ -606,8 +718,6 @@ public class Inventory_Manager : MonoBehaviour
         GameObject instance = Instantiate(prefab, prefabContainer);
         EventSystemManager.OnUIContentInstantiated();
 
-
-
         // Configurar botón de cierre si existe
         SetupCloseButton(instance, itemName, isNewItem);
 
@@ -622,6 +732,7 @@ public class Inventory_Manager : MonoBehaviour
 
     /// <summary>
     /// Configura el botón de cierre en el objeto interactivo
+    /// MODIFICADO: Ahora también maneja la notificación de eventos de cierre
     /// </summary>
     private void SetupCloseButton(GameObject interactionObject, string itemName, bool isNewItem)
     {
@@ -634,6 +745,14 @@ public class Inventory_Manager : MonoBehaviour
             closeButton.onClick.RemoveAllListeners();
             closeButton.onClick.AddListener(() => {
                 bool wasNewItem = isNewlyAddedItem;
+                ItemData itemToNotify = currentlyOpenItemData; // Capturar el ítem antes de limpiar
+
+                // CRÍTICO: Notificar ANTES de destruir el objeto activo
+                if (!wasNewItem && itemToNotify != null)
+                {
+                    NotifyPrefabClosed(itemToNotify);
+                    Debug.Log($"Evento de cierre notificado directamente desde botón para: {itemToNotify.itemName}");
+                }
 
                 // Destruir el objeto activo
                 DestroyActiveInteractionObject();
@@ -643,7 +762,6 @@ public class Inventory_Manager : MonoBehaviour
                 {
                     DisplayPopUp(lastAddedItemName + " added");
                 }
-                // No mostrar ningún popup para objetos del inventario
             });
 
             Debug.Log($"Botón de cierre configurado para {itemName}");
@@ -653,33 +771,43 @@ public class Inventory_Manager : MonoBehaviour
             Debug.LogWarning($"No se encontró botón de cierre en el prefab para {itemName}");
         }
     }
-
-   
     /// <summary>
     /// Cierra el objeto de interacción activo
+    /// MODIFICADO: Ahora también maneja la notificación de eventos de cierre
     /// </summary>
     public void CloseActiveInteractionObject()
     {
-        // Reproducir sonido de cierre
-        if (audioSource != null && closePrefabSound != null)
-        {
-            audioSource.PlayOneShot(closePrefabSound);
-        }
-
         if (activeInteractionObject != null)
         {
+            // Capturar referencias antes de cualquier operación
+            ItemData itemToNotify = currentlyOpenItemData;
+            bool wasNewItem = isNewlyAddedItem;
+
             // Buscar el botón de cierre y simular clic para mantener el comportamiento esperado
             Button closeButton = FindButtonInChildren(activeInteractionObject, "Close_Interacted_Button");
 
             if (closeButton != null)
             {
+                // IMPORTANTE: Notificar ANTES de invocar el onClick para asegurar que se reciba el evento
+                if (!wasNewItem && itemToNotify != null)
+                {
+                    NotifyPrefabClosed(itemToNotify);
+                    Debug.Log($"Evento de cierre notificado para: {itemToNotify.itemName}");
+                }
+
                 closeButton.onClick.Invoke();
             }
             else
             {
                 // Si no hay botón, destruir directamente
-                bool wasNewItem = isNewlyAddedItem;
                 DestroyActiveInteractionObject();
+
+                // Notificar que se cerró el prefab (solo si no era un ítem nuevo)
+                if (!wasNewItem && itemToNotify != null)
+                {
+                    NotifyPrefabClosed(itemToNotify);
+                    Debug.Log($"Evento de cierre notificado para: {itemToNotify.itemName}");
+                }
 
                 // Si era un ítem nuevo, mostrar popup
                 if (wasNewItem)
@@ -691,6 +819,7 @@ public class Inventory_Manager : MonoBehaviour
     }
     /// <summary>
     /// Destruye el objeto de interacción activo sin mostrar popup
+    /// MODIFICADO: Ahora limpia también la referencia del ítem abierto
     /// </summary>
     private void DestroyActiveInteractionObject()
     {
@@ -699,6 +828,9 @@ public class Inventory_Manager : MonoBehaviour
             Destroy(activeInteractionObject);
             activeInteractionObject = null;
             isNewlyAddedItem = false;
+
+            // NUEVO: Limpiar la referencia del ítem abierto
+            currentlyOpenItemData = null;
 
             // Desbloquear al jugador y la cámara de la interacción
             UnblockPlayerAndCameraFromInteraction();
@@ -842,7 +974,6 @@ public class Inventory_Manager : MonoBehaviour
     /// <summary>
     /// Método público para forzar el cierre del inventario desde otros sistemas
     /// </summary>
-    /// 
     public void ForceCloseInventory()
     {
         if (inventoryOpened)
@@ -851,6 +982,7 @@ public class Inventory_Manager : MonoBehaviour
             CloseInventory();
         }
     }
+
     private IEnumerator RefreshUISetupDelayed()
     {
         yield return new WaitForEndOfFrame();
@@ -865,5 +997,62 @@ public class Inventory_Manager : MonoBehaviour
         EventSystemManager.OnUIContentInstantiated();
     }
 
+    #region Debug Methods
 
+    [ContextMenu("Debug Close Events System")]
+    public void DebugCloseEventsSystem()
+    {
+        Debug.Log("=== SISTEMA DE EVENTOS DE CIERRE ===");
+        Debug.Log($"Ítems registrados: {registeredItems.Count}");
+        Debug.Log($"Ítem actualmente abierto: {(currentlyOpenItemData != null ? currentlyOpenItemData.itemName : "NINGUNO")}");
+        Debug.Log($"Objeto de interacción activo: {(activeInteractionObject != null ? activeInteractionObject.name : "NINGUNO")}");
+        Debug.Log($"Es ítem recién añadido: {isNewlyAddedItem}");
+
+        if (registeredItems.Count > 0)
+        {
+            Debug.Log("--- ÍTEMS REGISTRADOS ---");
+            for (int i = 0; i < registeredItems.Count; i++)
+            {
+                var item = registeredItems[i];
+                if (item != null)
+                {
+                    Debug.Log($"[{i}] {item.gameObject.name} - ItemData: {(item.itemData != null ? item.itemData.itemName : "NULL")}");
+                }
+                else
+                {
+                    Debug.Log($"[{i}] NULL ITEM (será limpiado)");
+                }
+            }
+        }
+        Debug.Log("====================================");
+    }
+
+    [ContextMenu("Test Close Event Notification")]
+    public void TestCloseEventNotification()
+    {
+        if (Application.isPlaying && currentlyOpenItemData != null)
+        {
+            Debug.Log($"Probando notificación de cierre para: {currentlyOpenItemData.itemName}");
+            NotifyPrefabClosed(currentlyOpenItemData);
+        }
+        else if (Application.isPlaying)
+        {
+            Debug.LogWarning("No hay ítem abierto actualmente para probar");
+        }
+        else
+        {
+            Debug.LogWarning("El test solo funciona en modo Play");
+        }
+    }
+
+    [ContextMenu("Force Cleanup Registered Items")]
+    public void ForceCleanupRegisteredItems()
+    {
+        int beforeCount = registeredItems.Count;
+        CleanupRegisteredItems();
+        int afterCount = registeredItems.Count;
+        Debug.Log($"Limpieza de ítems registrados: {beforeCount} -> {afterCount} (eliminados: {beforeCount - afterCount})");
+    }
+
+    #endregion
 }

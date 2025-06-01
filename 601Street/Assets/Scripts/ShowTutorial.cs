@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class ShowTutorial : MonoBehaviour
 {
     [Header("Tutorial Configuration")]
-    public GameObject tutorial_To_Show;
+    public GameObject tutorial_To_Show; // Ahora debe ser un prefab, no un objeto de la escena
 
     [Header("Tutorial ID")]
     [Tooltip("ID único para este tutorial. Si ya se mostró un tutorial con este ID, no se mostrará de nuevo.")]
@@ -12,6 +12,8 @@ public class ShowTutorial : MonoBehaviour
 
     // Diccionario estático para registrar qué IDs de tutorial se han mostrado
     private static HashSet<string> shownTutorialIDs = new HashSet<string>();
+
+    private GameObject instantiatedTutorial; 
 
     public void ShowTutorial_()
     {
@@ -27,12 +29,12 @@ public class ShowTutorial : MonoBehaviour
 
         if (tutorial_To_Show != null)
         {
-            tutorial_To_Show.SetActive(true);
-            print($"Tutorial con ID '{tutorialID}' mostrado por primera vez");
+            instantiatedTutorial = Instantiate(tutorial_To_Show);
+            print($"Tutorial con ID '{tutorialID}' instanciado por primera vez");
         }
         else
         {
-            print($"Tutorial con ID '{tutorialID}' no se puede mostrar - GameObject no asignado");
+            print($"Tutorial con ID '{tutorialID}' no se puede instanciar - Prefab no asignado");
         }
     }
 
@@ -69,12 +71,12 @@ public class ShowTutorial : MonoBehaviour
     {
         if (tutorial_To_Show != null)
         {
-            tutorial_To_Show.SetActive(true);
-            print($"Tutorial con ID '{tutorialID}' mostrado forzosamente (ignorando estado previo)");
+            instantiatedTutorial = Instantiate(tutorial_To_Show);
+            print($"Tutorial con ID '{tutorialID}' instanciado forzosamente (ignorando estado previo)");
         }
         else
         {
-            print($"Tutorial con ID '{tutorialID}' no se puede mostrar - GameObject no asignado");
+            print($"Tutorial con ID '{tutorialID}' no se puede instanciar - Prefab no asignado");
         }
     }
 
