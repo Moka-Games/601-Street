@@ -1108,6 +1108,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraToFind: {fileID: 0}
+  planeDistance: 0.8
 --- !u!1001 &462352490
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4499,6 +4500,10 @@ MonoBehaviour:
   missingTwoObjectsMessage: You need 2 more items.
   missingOneObjectMessage: You need 1 more items.
   puzzleCompletedMessage: Puzzle completed!
+  dropHeight: 2
+  animationDuration: 1
+  delayBetweenObjects: 0.2
+  dropEase: 30
   OnPuzzleCompleted:
     m_PersistentCalls:
       m_Calls:
@@ -4539,6 +4544,12 @@ MonoBehaviour:
           m_BoolArgument: 1
         m_CallState: 2
   OnShowMessage:
+    m_PersistentCalls:
+      m_Calls: []
+  OnObjectsPlacementStarted:
+    m_PersistentCalls:
+      m_Calls: []
+  OnObjectsPlacementCompleted:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1950975816 stripped
@@ -5779,7 +5790,7 @@ Transform:
   m_GameObject: {fileID: 8101561194635000793}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: 2.7736297, y: 8.780184, z: 5.820769}
+  m_LocalPosition: {x: 1.81, y: 8.780184, z: 5.820769}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8634,7 +8645,7 @@ MeshCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
@@ -9227,6 +9238,12 @@ MonoBehaviour:
       m_Calls: []
   singleUseInteraction: 0
   disableAfterInteraction: 0
+  interactionSound: {fileID: 0}
+  secondInteractionSound: {fileID: 0}
+  soundVolume: 1
+  soundPitch: 1
+  usePositionalAudio: 1
+  audioMaxDistance: 30
   detectionRadius: 5
   detectionTriggerName: DetectionTrigger
   edgeOffset: 50
@@ -9620,7 +9637,7 @@ MeshCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30

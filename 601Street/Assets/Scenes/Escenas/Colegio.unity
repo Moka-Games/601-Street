@@ -4753,9 +4753,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
+      propertyPath: soundPitch
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
+        type: 3}
       propertyPath: pickupSound
       value: 
       objectReference: {fileID: 8300000, guid: 4e6240c6a76f752418dbddb4a9d20b01, type: 3}
+    - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
+        type: 3}
+      propertyPath: soundVolume
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8532003786964051582, guid: 0d5500dc99f9c0843bd8767313e23a17,
         type: 3}
       propertyPath: interactionSound

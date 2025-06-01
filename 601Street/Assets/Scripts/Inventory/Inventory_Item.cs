@@ -18,7 +18,7 @@ public class Inventory_Item : MonoBehaviour
 
     [Header("Configuración de Audio")]
     [SerializeField] private AudioClip pickupSound;
-    [SerializeField] private float soundVolume = 1f;
+    [SerializeField] private float soundVolume;
     [SerializeField] private float soundPitch = 1.2f; // Ligeramente más agudo para items
     [SerializeField] private bool usePositionalAudio = true;
     [SerializeField] private float audioMaxDistance = 20f;

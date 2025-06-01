@@ -2,8 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// VERSIÓN COMPLETAMENTE CORREGIDA: ELIMINADAS TODAS las desactivaciones de navegación
-/// Solo maneja activación, NUNCA desactivación de ningún sistema de navegación
+/// VERSIÓN CORREGIDA: Solución completa al problema de navegación del inventario
+/// - Elimina todas las desactivaciones de navegación
+/// - Mantiene consistencia entre sistemas de navegación
+/// - Corrige el problema de cierre de prefabs con el mando
 /// </summary>
 [RequireComponent(typeof(Inventory_Manager))]
 public class InventoryNavigationIntegration : MonoBehaviour
@@ -76,6 +78,13 @@ public class InventoryNavigationIntegration : MonoBehaviour
         }
 
         SetupNavigationEvents();
+
+        // NUEVO: Configurar el componente InventoryCanvasIntegration
+        if (canvasIntegration != null)
+        {
+            // Asegurarnos de que el canvasIntegration esté activado
+            canvasIntegration.enabled = true;
+        }
 
         Debug.Log("Integración de navegación configurada correctamente - TODOS los sistemas permanecen activos");
     }
@@ -153,7 +162,17 @@ public class InventoryNavigationIntegration : MonoBehaviour
         if (inventoryManager == null) return;
 
         bool currentInventoryState = inventoryManager.IsInventoryOpen();
+        bool hasActiveInteraction = inventoryManager.HasActiveInteractionObject();
 
+        // NUEVO: Comprobar si hay un objeto de interacción activo
+        // Si hay un objeto de interacción activo, activar el InventoryCanvasIntegration
+        if (hasActiveInteraction && canvasIntegration != null && !canvasIntegration.IsNavigationActive())
+        {
+            canvasIntegration.ForceActivateCanvasNavigation();
+            Debug.Log("Detectado objeto de interacción - Activando navegación de canvas");
+        }
+
+        // NUEVO: Comprobar si el inventario ha cambiado de estado
         if (currentInventoryState != originalInventoryState)
         {
             originalInventoryState = currentInventoryState;
@@ -190,7 +209,7 @@ public class InventoryNavigationIntegration : MonoBehaviour
                     resetMethod.Invoke(navigationManager, null);
                 }
 
-                var refreshMethod = navigationManager.GetType().GetMethod("ForceRefresh");
+                var refreshMethod = navigationManager.GetType().GetMethod("ForceRefreshElements");
                 if (refreshMethod != null)
                 {
                     refreshMethod.Invoke(navigationManager, null);
@@ -277,6 +296,30 @@ public class InventoryNavigationIntegration : MonoBehaviour
     private void OnNavigationElementSubmitted(Button submittedButton)
     {
         Debug.Log($"Elemento confirmado por navegación: {submittedButton.name}");
+
+        // NUEVO: Comprobar si después de la acción hay un objeto de interacción activo
+        // y si es así, activar la navegación del canvas
+        if (inventoryManager.HasActiveInteractionObject() && canvasIntegration != null)
+        {
+            // Pequeño delay para dar tiempo a que se instancie el prefab
+            StartCoroutine(ActivateCanvasNavigationDelayed());
+        }
+    }
+
+    /// <summary>
+    /// NUEVO: Activa la navegación del canvas con un pequeño delay
+    /// </summary>
+    private System.Collections.IEnumerator ActivateCanvasNavigationDelayed()
+    {
+        // Esperar un poco para asegurar que el prefab está completamente instanciado
+        yield return new WaitForSeconds(0.2f);
+
+        // Si sigue habiendo un objeto de interacción activo, activar la navegación
+        if (inventoryManager.HasActiveInteractionObject())
+        {
+            canvasIntegration.ForceActivateCanvasNavigation();
+            Debug.Log("Navegación de canvas activada para objeto de interacción");
+        }
     }
 
     private void OnNavigationSectionChangedReflection(object newSection)
@@ -376,7 +419,7 @@ public class InventoryNavigationIntegration : MonoBehaviour
 
             try
             {
-                var refreshMethod = navigationManager.GetType().GetMethod("ForceRefresh");
+                var refreshMethod = navigationManager.GetType().GetMethod("ForceRefreshElements");
                 if (refreshMethod != null)
                 {
                     refreshMethod.Invoke(navigationManager, null);
@@ -408,7 +451,7 @@ public class InventoryNavigationIntegration : MonoBehaviour
         {
             try
             {
-                var refreshMethod = navigationManager.GetType().GetMethod("ForceRefresh");
+                var refreshMethod = navigationManager.GetType().GetMethod("ForceRefreshElements");
                 if (refreshMethod != null)
                 {
                     refreshMethod.Invoke(navigationManager, null);
@@ -418,6 +461,18 @@ public class InventoryNavigationIntegration : MonoBehaviour
             {
                 Debug.LogWarning($"Error al refrescar navegación: {e.Message}");
             }
+        }
+    }
+
+    /// <summary>
+    /// NUEVO: Activa manualmente la navegación del canvas para objetos de interacción
+    /// </summary>
+    public void ActivateCanvasNavigationForPrefab()
+    {
+        if (canvasIntegration != null && inventoryManager.HasActiveInteractionObject())
+        {
+            canvasIntegration.ForceActivateCanvasNavigation();
+            Debug.Log("Navegación de canvas activada manualmente para objeto de interacción");
         }
     }
 
@@ -458,6 +513,12 @@ public class InventoryNavigationIntegration : MonoBehaviour
         RefreshInventoryNavigation();
     }
 
+    [ContextMenu("Force Activate Canvas Navigation")]
+    public void ForceActivateCanvasNavigationFromMenu()
+    {
+        ActivateCanvasNavigationForPrefab();
+    }
+
     [ContextMenu("Debug Integration State")]
     public void DebugIntegrationState()
     {
@@ -466,8 +527,10 @@ public class InventoryNavigationIntegration : MonoBehaviour
         Debug.Log($"Navigation Manager: {navigationManager?.name ?? "NULL"}");
         Debug.Log($"Navigation Manager Enabled: {navigationManager?.enabled}");
         Debug.Log($"Canvas Integration: {canvasIntegration?.name ?? "NULL"}");
+        Debug.Log($"Canvas Integration Active: {canvasIntegration?.IsNavigationActive()}");
         Debug.Log($"Original Inventory State: {originalInventoryState}");
         Debug.Log($"Current Inventory Open: {inventoryManager?.IsInventoryOpen()}");
+        Debug.Log($"Has Active Interaction: {inventoryManager?.HasActiveInteractionObject()}");
         Debug.Log("=== TODAS LAS DESACTIVACIONES COMPLETAMENTE ELIMINADAS ===");
         Debug.Log("=== TODOS LOS SISTEMAS DE NAVEGACIÓN PERMANECEN SIEMPRE ACTIVOS ===");
     }
