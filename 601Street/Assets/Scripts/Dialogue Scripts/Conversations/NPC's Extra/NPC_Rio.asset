@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 281b790b0324bdb49aca9bbad878a09c, type: 3}
+  m_Name: NPC_Rio
+  m_EditorClassIdentifier: 
+  actionId: 
+  dialogues:
+  - speakerName: ???
+    content: You shouldn't be walking around the city at this time of night. Several
+      kids  have gone missing recently.
+  - speakerName: ???
+    content: Go home and don't go back to that school for a while, it seems to be
+      cursed.
+  dialogueOptions: []
