@@ -8599,6 +8599,7 @@ GameObject:
   - component: {fileID: 504575327}
   - component: {fileID: 504575332}
   - component: {fileID: 504575331}
+  - component: {fileID: 504575333}
   m_Layer: 0
   m_Name: PuertaDespacho
   m_TagString: Untagged
@@ -8736,6 +8737,32 @@ MonoBehaviour:
   listenOnlyWhenActive: 0
   useTransition: 0
   transitionDuration: 0.5
+--- !u!114 &504575333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 504575326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2145e1093db2596489ae25aee7f98b6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: Puerta-Despacho-Comisaria
+  useSceneName: 0
+  customSceneName: ComisariaInterior
+  destroyOnStart: 0
+  saveStateOnDestroy: 1
+  logDestructionEvents: 1
+  sceneChangeGracePeriod: 1
+  requireExplicitDestruction: 0
+  onObjectDestroyed:
+    m_PersistentCalls:
+      m_Calls: []
+  onObjectPersistentlyRemoved:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &506736316
 GameObject:
   m_ObjectHideFlags: 0
@@ -25121,12 +25148,12 @@ PrefabInstance:
     - target: {fileID: 5942450752863399121, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
       propertyPath: OnUnlocked.m_PersistentCalls.m_Calls.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5942450752863399121, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
       propertyPath: OnUnlocked.m_PersistentCalls.m_Calls.Array.data[3].m_Mode
-      value: 6
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5942450752863399121, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
@@ -25137,7 +25164,7 @@ PrefabInstance:
         type: 3}
       propertyPath: OnUnlocked.m_PersistentCalls.m_Calls.Array.data[3].m_Target
       value: 
-      objectReference: {fileID: 504575326}
+      objectReference: {fileID: 504575333}
     - target: {fileID: 5942450752863399121, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
       propertyPath: OnUnlocked.m_PersistentCalls.m_Calls.Array.data[3].m_CallState
@@ -25146,12 +25173,12 @@ PrefabInstance:
     - target: {fileID: 5942450752863399121, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
       propertyPath: OnUnlocked.m_PersistentCalls.m_Calls.Array.data[3].m_MethodName
-      value: SetActive
+      value: DestroyPersistently
       objectReference: {fileID: 0}
     - target: {fileID: 5942450752863399121, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
       propertyPath: OnUnlocked.m_PersistentCalls.m_Calls.Array.data[3].m_TargetAssemblyTypeName
-      value: UnityEngine.GameObject, UnityEngine
+      value: PersistentDestructible, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 5942450752863399121, guid: 10526014e2aca84438494ef6cb3d8e67,
         type: 3}
