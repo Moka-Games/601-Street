@@ -1,29 +1,42 @@
-using Cinemachine;
+Ôªøusing Cinemachine;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Animations.Rigging;
 
 public class NPC : MonoBehaviour
 {
     public int npcId;
-    public Conversation conversation;           // ConversaciÛn normal
-    public Conversation achievementConversation; // ConversaciÛn si se logra alg˙n objetivo
-    public Conversation funnyConversation;      // ConversaciÛn despuÈs de haber interactuado una vez
+    public Conversation conversation;           // Conversaci√≥n normal
+    public Conversation achievementConversation; // Conversaci√≥n si se logra alg√∫n objetivo
+    public Conversation funnyConversation;      // Conversaci√≥n despu√©s de haber interactuado una vez
 
-    [Header("Di·logo especial para la botella")]
+    [Header("Di√°logo especial para la botella")]
     public bool isNakamura = false;                // Marcar si este NPC es Nakamura
-    public Conversation conversacionDespuesDeInteraccion; // ConversaciÛn despuÈs de interactuar con la botella
-    public string pensamientoFalloTirada = "Parece que Nakamura no est· dispuesto a hablar. Quiz·s si le doy algo de beber...";
+    public Conversation conversacionDespuesDeInteraccion; // Conversaci√≥n despu√©s de interactuar con la botella
+    public string pensamientoFalloTirada = "Parece que Nakamura no est√° dispuesto a hablar. Quiz√°s si le doy algo de beber...";
 
     private bool tiradaFallada = false;
     public bool hasInteracted = false; // Cambiado de static a instancia para tracking individual
     public bool singleInteraction = false;
     private Animator animator;
 
+    [Header("Animation Rigging - Look At System")]
+    [SerializeField] private MultiAimConstraint lookAtConstraint; // Referencia directa al constraint
+    [SerializeField] private Transform lookAtTarget; // El objeto pre-configurado que act√∫a como target
+    [SerializeField] private bool autoFindConstraint = true; // Buscar autom√°ticamente el constraint
+    [SerializeField] private string constraintName = "HeadAim"; // Nombre del constraint a buscar
+    [SerializeField] private float lookAtTransitionDuration = 0.5f; // Duraci√≥n de la transici√≥n
+    [SerializeField] private bool moveLookAtTarget = true; // Activar/desactivar el movimiento del target
+
+    private Transform playerLookAtTarget; // El objeto "NPC_LookAt" del jugador
+    private Vector3 originalTargetPosition; // Posici√≥n original del target
+    private bool isLookingAtPlayer = false;
+    private Coroutine lookAtTransitionCoroutine;
 
     public UnityEvent OnConversationEnded;
 
-    [Header("Control de InteracciÛn")]
+    [Header("Control de Interacci√≥n")]
     private bool isInConversation = false;
     private float conversationCooldown = 1.5f;
     private float lastInteractionTime = 0f;
@@ -31,21 +44,414 @@ public class NPC : MonoBehaviour
 
     private Animator cachedAnimator;
     private bool animatorSearched = false;
+
     private void Awake()
     {
-        // CÛdigo existente
+        // C√≥digo existente
         animator = GetComponent<Animator>();
         myCollider = GetComponent<Collider>();
 
         // NUEVO: Buscar el Animator al inicializar
         FindAnimatorComponent();
 
-        // Si es Nakamura, registramos las acciones especÌficas
+        // NUEVO: Configurar el sistema de Look At
+        SetupLookAtSystem();
+
+        // Si es Nakamura, registramos las acciones espec√≠ficas
         if (isNakamura)
         {
             RegisterNakamuraActions();
         }
     }
+
+    private void SetupLookAtSystem()
+    {
+        // Buscar el jugador y su componente NPC_LookAt
+        FindPlayerLookAtTarget();
+
+        // Buscar el constraint si est√° habilitado
+        if (autoFindConstraint && lookAtConstraint == null)
+        {
+            FindLookAtConstraint();
+        }
+
+        // NUEVO: Guardar la posici√≥n original del target si existe
+        if (lookAtTarget != null)
+        {
+            originalTargetPosition = lookAtTarget.localPosition;
+            Debug.Log($"Posici√≥n original del target guardada: {originalTargetPosition}");
+        }
+
+        if (lookAtConstraint != null && lookAtTarget != null)
+        {
+            Debug.Log($"Sistema Look At configurado para NPC {gameObject.name}");
+            Debug.Log($"Constraint: {lookAtConstraint.gameObject.name}");
+            Debug.Log($"Target: {lookAtTarget.name}");
+        }
+        else
+        {
+            Debug.LogWarning($"Sistema Look At incompleto para NPC {gameObject.name}. " +
+                           $"Constraint: {(lookAtConstraint != null ? "OK" : "FALTA")} | " +
+                           $"Target: {(lookAtTarget != null ? "OK" : "FALTA")}");
+        }
+    }
+
+    private void FindPlayerLookAtTarget()
+    {
+        // Buscar el jugador por tag
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            Debug.Log($"Jugador encontrado: {player.name}");
+
+            // Buscar el componente "NPC_LookAt" en el jugador y sus hijos
+            Transform lookAtTransform = FindChildRecursive(player.transform, "NPC_LookAt");
+
+            if (lookAtTransform != null)
+            {
+                playerLookAtTarget = lookAtTransform;
+                Debug.Log($"Target Look At encontrado para {gameObject.name}: {playerLookAtTarget.name} en la ruta: {GetGameObjectPath(playerLookAtTarget.gameObject)}");
+            }
+            else
+            {
+                Debug.LogWarning($"No se encontr√≥ el objeto 'NPC_LookAt' en el jugador {player.name} o sus hijos para NPC {gameObject.name}");
+
+                // Debug: Mostrar todos los hijos del jugador para diagn√≥stico
+                Debug.Log("=== HIJOS DEL JUGADOR ===");
+                LogAllChildren(player.transform, 0);
+                Debug.Log("=== FIN HIJOS DEL JUGADOR ===");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"No se encontr√≥ jugador con tag 'Player' para NPC {gameObject.name}");
+        }
+    }
+
+    /// <summary>
+    /// NUEVO: Busca un hijo de forma recursiva por nombre
+    /// </summary>
+    private Transform FindChildRecursive(Transform parent, string childName)
+    {
+        // Verificar hijos directos primero
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Transform child = parent.GetChild(i);
+            if (child.name.Equals(childName, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return child;
+            }
+        }
+
+        // Buscar en nietos recursivamente
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Transform child = parent.GetChild(i);
+            Transform result = FindChildRecursive(child, childName);
+            if (result != null)
+            {
+                return result;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// NUEVO: Obtiene la ruta completa de un GameObject en la jerarqu√≠a
+    /// </summary>
+    private string GetGameObjectPath(GameObject obj)
+    {
+        string path = obj.name;
+        Transform parent = obj.transform.parent;
+
+        while (parent != null)
+        {
+            path = parent.name + "/" + path;
+            parent = parent.parent;
+        }
+
+        return path;
+    }
+
+    /// <summary>
+    /// NUEVO: Muestra todos los hijos para debug
+    /// </summary>
+    private void LogAllChildren(Transform parent, int depth)
+    {
+        string indent = new string(' ', depth * 2);
+        Debug.Log($"{indent}- {parent.name}");
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            LogAllChildren(parent.GetChild(i), depth + 1);
+        }
+    }
+
+    /// <summary>
+    /// NUEVO: M√©todo para forzar la b√∫squeda del target manualmente
+    /// </summary>
+    [ContextMenu("Force Find Player Target")]
+    public void ForceFindPlayerTarget()
+    {
+        Debug.Log("=== B√öSQUEDA FORZADA DEL TARGET DEL JUGADOR ===");
+        FindPlayerLookAtTarget();
+
+        if (playerLookAtTarget != null)
+        {
+            Debug.Log($"‚úÖ Target encontrado: {playerLookAtTarget.name}");
+        }
+        else
+        {
+            Debug.LogError("‚ùå Target NO encontrado");
+        }
+        Debug.Log("=== FIN B√öSQUEDA FORZADA ===");
+    }
+
+    /// <summary>
+    /// NUEVO: M√©todo para configurar manualmente el target del jugador
+    /// </summary>
+    public void SetPlayerLookAtTarget(Transform target)
+    {
+        playerLookAtTarget = target;
+        Debug.Log($"Target del jugador configurado manualmente para {gameObject.name}: {target.name}");
+    }
+
+    private void FindLookAtConstraint()
+    {
+        // Buscar primero en el propio objeto
+        lookAtConstraint = GetComponent<MultiAimConstraint>();
+
+        if (lookAtConstraint == null)
+        {
+            // Buscar en los hijos por nombre
+            lookAtConstraint = GetComponentInChildren<MultiAimConstraint>();
+
+            // Si hay m√∫ltiples, intentar encontrar el correcto por nombre
+            if (lookAtConstraint == null && !string.IsNullOrEmpty(constraintName))
+            {
+                MultiAimConstraint[] constraints = GetComponentsInChildren<MultiAimConstraint>();
+                foreach (var constraint in constraints)
+                {
+                    if (constraint.gameObject.name.Contains(constraintName))
+                    {
+                        lookAtConstraint = constraint;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (lookAtConstraint != null)
+        {
+            Debug.Log($"MultiAimConstraint encontrado para {gameObject.name}: {lookAtConstraint.gameObject.name}");
+        }
+    }
+
+    /// <summary>
+    /// NUEVO: Activar el sistema de Look At hacia el jugador
+    /// </summary>
+    public void StartLookingAtPlayer()
+    {
+        if (!moveLookAtTarget)
+        {
+            Debug.Log($"Movimiento del target deshabilitado para {gameObject.name}");
+            return;
+        }
+
+        if (lookAtConstraint == null || lookAtTarget == null || playerLookAtTarget == null)
+        {
+            Debug.LogWarning($"No se puede activar Look At para {gameObject.name} - " +
+                           $"Constraint: {(lookAtConstraint != null ? "OK" : "FALTA")}, " +
+                           $"LookAtTarget: {(lookAtTarget != null ? "OK" : "FALTA")}, " +
+                           $"PlayerTarget: {(playerLookAtTarget != null ? "OK" : "FALTA")}");
+            return;
+        }
+
+        if (isLookingAtPlayer) return; // Ya est√° mirando al jugador
+
+        // Detener cualquier transici√≥n anterior
+        if (lookAtTransitionCoroutine != null)
+        {
+            StopCoroutine(lookAtTransitionCoroutine);
+        }
+
+        // SOLO mover el target pre-configurado a la posici√≥n del jugador
+        lookAtTarget.position = playerLookAtTarget.position;
+
+        // Iniciar la transici√≥n suave del weight
+        lookAtTransitionCoroutine = StartCoroutine(TransitionLookAtWeight(0f, 1f));
+        isLookingAtPlayer = true;
+
+        Debug.Log($"{gameObject.name} comenz√≥ a mirar al jugador - Target movido a {playerLookAtTarget.position}");
+    }
+
+    /// <summary>
+    /// NUEVO: Desactivar el sistema de Look At
+    /// </summary>
+    public void StopLookingAtPlayer()
+    {
+        if (!moveLookAtTarget || lookAtConstraint == null || lookAtTarget == null || !isLookingAtPlayer)
+        {
+            return;
+        }
+
+        // Detener cualquier transici√≥n anterior
+        if (lookAtTransitionCoroutine != null)
+        {
+            StopCoroutine(lookAtTransitionCoroutine);
+        }
+
+        // Iniciar la transici√≥n para devolver el target a su posici√≥n original
+        lookAtTransitionCoroutine = StartCoroutine(StopLookAtAndReturnTarget());
+        isLookingAtPlayer = false;
+
+        Debug.Log($"{gameObject.name} dej√≥ de mirar al jugador");
+    }
+
+    /// <summary>
+    /// NUEVO: Corrutina para detener el Look At y devolver el target
+    /// </summary>
+    private IEnumerator StopLookAtAndReturnTarget()
+    {
+        // Primero hacer la transici√≥n del weight a 0
+        float elapsed = 0f;
+        float startWeight = lookAtConstraint.weight;
+
+        while (elapsed < lookAtTransitionDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / lookAtTransitionDuration;
+
+            // Usar una curva suave para la transici√≥n
+            float smoothT = Mathf.SmoothStep(0f, 1f, t);
+            float currentWeight = Mathf.Lerp(startWeight, 0f, smoothT);
+
+            lookAtConstraint.weight = currentWeight;
+
+            yield return null;
+        }
+
+        // Asegurar que llegue exactamente a 0
+        lookAtConstraint.weight = 0f;
+
+        // Devolver el target a su posici√≥n original
+        if (lookAtTarget != null)
+        {
+            lookAtTarget.localPosition = originalTargetPosition;
+            Debug.Log($"Target devuelto a la posici√≥n original: {originalTargetPosition}");
+        }
+
+        lookAtTransitionCoroutine = null;
+    }
+
+    /// <summary>
+    /// Corrutina para transici√≥n suave del peso del constraint
+    /// </summary>
+    private IEnumerator TransitionLookAtWeight(float fromWeight, float toWeight)
+    {
+        float elapsed = 0f;
+
+        while (elapsed < lookAtTransitionDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / lookAtTransitionDuration;
+
+            // Usar una curva suave para la transici√≥n
+            float smoothT = Mathf.SmoothStep(0f, 1f, t);
+            float currentWeight = Mathf.Lerp(fromWeight, toWeight, smoothT);
+
+            lookAtConstraint.weight = currentWeight;
+
+            yield return null;
+        }
+
+        // Asegurar que llegue exactamente al valor final
+        lookAtConstraint.weight = toWeight;
+
+        lookAtTransitionCoroutine = null;
+    }
+
+    /// <summary>
+    /// NUEVO: M√©todo p√∫blico para configurar manualmente el constraint
+    /// </summary>
+    public void SetLookAtConstraint(MultiAimConstraint constraint)
+    {
+        lookAtConstraint = constraint;
+        Debug.Log($"Constraint Look At configurado manualmente para {gameObject.name}: {constraint.gameObject.name}");
+    }
+
+    /// <summary>
+    /// NUEVO: M√©todo p√∫blico para configurar manualmente el target del NPC
+    /// </summary>
+    public void SetLookAtTarget(Transform target)
+    {
+        lookAtTarget = target;
+        if (target != null)
+        {
+            originalTargetPosition = target.localPosition;
+            Debug.Log($"Target Look At configurado manualmente para {gameObject.name}: {target.name}");
+        }
+    }
+
+    /// <summary>
+    /// NUEVO: M√©todo p√∫blico para verificar si el sistema est√° configurado
+    /// </summary>
+    public bool IsLookAtSystemReady()
+    {
+        // Si no tenemos el target del jugador, intentar buscarlo de nuevo
+        if (playerLookAtTarget == null)
+        {
+            Debug.Log($"Target del jugador no encontrado para {gameObject.name}, intentando buscar de nuevo...");
+            FindPlayerLookAtTarget();
+        }
+
+        bool isReady = lookAtConstraint != null && lookAtTarget != null && playerLookAtTarget != null;
+
+        if (!isReady)
+        {
+            Debug.LogWarning($"Sistema Look At para {gameObject.name}: " +
+                           $"Constraint: {(lookAtConstraint != null ? "‚úÖ" : "‚ùå")} | " +
+                           $"NPC Target: {(lookAtTarget != null ? "‚úÖ" : "‚ùå")} | " +
+                           $"Player Target: {(playerLookAtTarget != null ? "‚úÖ" : "‚ùå")}");
+        }
+
+        return isReady;
+    }
+
+    /// <summary>
+    /// NUEVO: M√©todo para probar el movimiento del target
+    /// </summary>
+    [ContextMenu("Test Target Movement")]
+    public void TestTargetMovement()
+    {
+        if (!IsLookAtSystemReady())
+        {
+            Debug.LogError("Sistema Look At no est√° listo");
+            return;
+        }
+
+        Debug.Log("=== PROBANDO MOVIMIENTO DEL TARGET ===");
+        Debug.Log($"Posici√≥n original del target: {originalTargetPosition}");
+        Debug.Log($"Posici√≥n actual del target: {lookAtTarget.localPosition}");
+        Debug.Log($"Posici√≥n del jugador: {playerLookAtTarget.position}");
+
+        // Mover a la posici√≥n del jugador
+        lookAtTarget.position = playerLookAtTarget.position;
+        Debug.Log($"Target movido a la posici√≥n del jugador: {lookAtTarget.position}");
+
+        // Esperar y devolver
+        StartCoroutine(TestReturnAfterDelay());
+    }
+
+    private IEnumerator TestReturnAfterDelay()
+    {
+        yield return new WaitForSeconds(3f);
+        lookAtTarget.localPosition = originalTargetPosition;
+        Debug.Log($"Target devuelto a la posici√≥n original: {lookAtTarget.localPosition}");
+        Debug.Log("=== FIN PRUEBA DE MOVIMIENTO ===");
+    }
+
     private void FindAnimatorComponent()
     {
         if (animatorSearched) return;
@@ -53,13 +459,13 @@ public class NPC : MonoBehaviour
         // Primero intentar obtenerlo del objeto actual
         cachedAnimator = GetComponent<Animator>();
 
-        // Si no est· en el objeto actual, buscar en el padre
+        // Si no est√° en el objeto actual, buscar en el padre
         if (cachedAnimator == null)
         {
             cachedAnimator = GetComponentInParent<Animator>();
         }
 
-        // Si tampoco est· en el padre, buscar en todos los hijos
+        // Si tampoco est√° en el padre, buscar en todos los hijos
         if (cachedAnimator == null)
         {
             cachedAnimator = GetComponentInChildren<Animator>();
@@ -73,9 +479,10 @@ public class NPC : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"No se encontrÛ Animator para NPC {gameObject.name}");
+            Debug.LogWarning($"No se encontr√≥ Animator para NPC {gameObject.name}");
         }
     }
+
     public void PlayAnimation(string animationName)
     {
         // Verificar si tenemos un NPCAnimationManager
@@ -98,7 +505,7 @@ public class NPC : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Verificar si podemos iniciar una nueva conversaciÛn
+        // Verificar si podemos iniciar una nueva conversaci√≥n
         if (isInConversation || Time.time - lastInteractionTime < conversationCooldown)
         {
             return;
@@ -107,7 +514,7 @@ public class NPC : MonoBehaviour
         if (!other.CompareTag("Player"))
             return;
 
-        // Verificar tambiÈn si el DialogueManager ya est· en una conversaciÛn
+        // Verificar tambi√©n si el DialogueManager ya est√° en una conversaci√≥n
         if (DialogueManager.Instance != null && DialogueManager.Instance.IsInConversation())
         {
             return;
@@ -128,21 +535,21 @@ public class NPC : MonoBehaviour
         }
         else if (!hasInteracted && !singleInteraction)
         {
-            // InteracciÛn normal (m˙ltiples interacciones permitidas)
+            // Interacci√≥n normal (m√∫ltiples interacciones permitidas)
             DialogueManager.Instance.StartConversation(conversation, this);
         }
         else if (hasInteracted && !singleInteraction)
         {
-            // Segunda+ interacciÛn cuando se permiten m˙ltiples interacciones
+            // Segunda+ interacci√≥n cuando se permiten m√∫ltiples interacciones
             DialogueManager.Instance.StartConversation(funnyConversation, this);
         }
         else if (!hasInteracted && singleInteraction)
         {
-            // Primera y ˙nica interacciÛn cuando singleInteraction es true
+            // Primera y √∫nica interacci√≥n cuando singleInteraction es true
             DialogueManager.Instance.StartConversation(conversation, this);
         }
         // Nota: Eliminamos el caso "else if (hasInteracted && singleInteraction)" 
-        // porque ahora est· manejado por el return temprano arriba
+        // porque ahora est√° manejado por el return temprano arriba
     }
 
     private void HandleNakamuraConversation()
@@ -151,7 +558,7 @@ public class NPC : MonoBehaviour
         if (Botella.objectInteracted)
         {
             DialogueManager.Instance.StartConversation(conversacionDespuesDeInteraccion, this);
-            // Opcionalmente, resetear la variable si es una interacciÛn ˙nica
+            // Opcionalmente, resetear la variable si es una interacci√≥n √∫nica
             Botella.objectInteracted = false;
         }
         // Si ha fallado la tirada previamente pero no ha interactuado con la botella
@@ -159,7 +566,7 @@ public class NPC : MonoBehaviour
         {
             DialogueManager.Instance.StartConversation(funnyConversation, this);
         }
-        // Primera interacciÛn, mostramos la conversaciÛn normal
+        // Primera interacci√≥n, mostramos la conversaci√≥n normal
         else
         {
             DialogueManager.Instance.StartConversation(conversation, this);
@@ -172,17 +579,17 @@ public class NPC : MonoBehaviour
         ActionController actionController = ActionController.Instance;
         if (actionController != null)
         {
-            // AcciÛn para el resultado de la tirada
+            // Acci√≥n para el resultado de la tirada
             actionController.RegisterAction("NakamuraTirada", new DialogueAction(
-                // AcciÛn est·ndar (sin tirada)
+                // Acci√≥n est√°ndar (sin tirada)
                 () => {
-                    Debug.Log("Comenzando conversaciÛn con Nakamura");
+                    Debug.Log("Comenzando conversaci√≥n con Nakamura");
                 },
-                // AcciÛn de Èxito
+                // Acci√≥n de √©xito
                 () => {
                     Debug.Log("Tirada exitosa con Nakamura");
                 },
-                // AcciÛn de fracaso
+                // Acci√≥n de fracaso
                 () => {
                     Debug.Log("Tirada fallida con Nakamura");
                     tiradaFallada = true;
@@ -199,13 +606,13 @@ public class NPC : MonoBehaviour
     public void SetInteracted()
     {
         hasInteracted = true;
-        Debug.Log("ConversaciÛn Terminada - NPC marcado como interactuado: " + gameObject.name);
+        Debug.Log("Conversaci√≥n Terminada - NPC marcado como interactuado: " + gameObject.name);
     }
 
     public void SetNOTInteracted()
     {
         hasInteracted = false;
-        Debug.Log("Estado de interacciÛn reiniciado - NPC: " + gameObject.name);
+        Debug.Log("Estado de interacci√≥n reiniciado - NPC: " + gameObject.name);
     }
 
     public void PerformEmotion(string emotion)
@@ -215,7 +622,7 @@ public class NPC : MonoBehaviour
             FindAnimatorComponent();
             if (cachedAnimator == null)
             {
-                Debug.LogWarning($"No se puede ejecutar emociÛn '{emotion}' - No hay Animator en NPC {gameObject.name}");
+                Debug.LogWarning($"No se puede ejecutar emoci√≥n '{emotion}' - No hay Animator en NPC {gameObject.name}");
                 return;
             }
         }
@@ -239,7 +646,7 @@ public class NPC : MonoBehaviour
                 }
                 break;
             default:
-                Debug.LogWarning($"EmociÛn desconocida: {emotion}");
+                Debug.LogWarning($"Emoci√≥n desconocida: {emotion}");
                 break;
         }
     }
@@ -251,7 +658,7 @@ public class NPC : MonoBehaviour
             FindAnimatorComponent();
             if (cachedAnimator == null)
             {
-                Debug.LogWarning($"No se puede ejecutar acciÛn '{action}' - No hay Animator en NPC {gameObject.name}");
+                Debug.LogWarning($"No se puede ejecutar acci√≥n '{action}' - No hay Animator en NPC {gameObject.name}");
                 return;
             }
         }
@@ -272,16 +679,20 @@ public class NPC : MonoBehaviour
                 }
                 break;
             default:
-                Debug.LogWarning($"AcciÛn desconocida: {action}");
+                Debug.LogWarning($"Acci√≥n desconocida: {action}");
                 break;
         }
     }
+
     public void EndCurrentConversation()
     {
         isInConversation = false;
         lastInteractionTime = Time.time;
 
-        // Opcionalmente, deshabilitar temporalmente el collider para evitar reactivaciÛn
+        // NUEVO: Detener el Look At cuando termine la conversaci√≥n
+        StopLookingAtPlayer();
+
+        // Opcionalmente, deshabilitar temporalmente el collider para evitar reactivaci√≥n
         StartCoroutine(TemporarilyDisableCollider());
     }
 
@@ -294,22 +705,23 @@ public class NPC : MonoBehaviour
             myCollider.enabled = true;
         }
     }
+
     public void ConversationEnded(Conversation endedConversation)
     {
-        // Verificar si la conversaciÛn que terminÛ es la principal
+        // Verificar si la conversaci√≥n que termin√≥ es la principal
         if (endedConversation == conversation)
         {
-            Debug.Log($"La conversaciÛn principal del NPC {gameObject.name} ha terminado");
+            Debug.Log($"La conversaci√≥n principal del NPC {gameObject.name} ha terminado");
 
-            // Marcar como interactuado al finalizar la conversaciÛn principal
+            // Marcar como interactuado al finalizar la conversaci√≥n principal
             SetInteracted();
 
-            // Invocar el evento solo si la conversaciÛn terminada es la principal
+            // Invocar el evento solo si la conversaci√≥n terminada es la principal
             OnConversationEnded?.Invoke();
         }
         else
         {
-            Debug.Log($"Otra conversaciÛn del NPC {gameObject.name} ha terminado");
+            Debug.Log($"Otra conversaci√≥n del NPC {gameObject.name} ha terminado");
         }
     }
 
@@ -330,7 +742,7 @@ public class NPC : MonoBehaviour
     }
 
     /// <summary>
-    /// NUEVO: Verifica si el Animator tiene un estado especÌfico
+    /// NUEVO: Verifica si el Animator tiene un estado espec√≠fico
     /// </summary>
     private bool HasAnimatorState(string stateName)
     {
@@ -350,7 +762,7 @@ public class NPC : MonoBehaviour
     }
 
     /// <summary>
-    /// NUEVO: Ejecuta animaciones usando los mÈtodos legacy existentes
+    /// NUEVO: Ejecuta animaciones usando los m√©todos legacy existentes
     /// </summary>
     private void ExecuteLegacyAnimation(string animationName)
     {
@@ -377,15 +789,13 @@ public class NPC : MonoBehaviour
                 }
                 break;
             default:
-                Debug.LogWarning($"AnimaciÛn desconocida: {animationName} para NPC {gameObject.name}");
+                Debug.LogWarning($"Animaci√≥n desconocida: {animationName} para NPC {gameObject.name}");
                 break;
         }
     }
 
-
-
     /// <summary>
-    /// NUEVO: Sistema de animaciones fallback (el cÛdigo anterior)
+    /// NUEVO: Sistema de animaciones fallback (el c√≥digo anterior)
     /// </summary>
     private void PlayAnimationFallback(string animationName)
     {
@@ -397,13 +807,13 @@ public class NPC : MonoBehaviour
 
         if (cachedAnimator == null)
         {
-            Debug.LogWarning($"No se puede reproducir animaciÛn '{animationName}' - No hay Animator en NPC {gameObject.name}");
+            Debug.LogWarning($"No se puede reproducir animaci√≥n '{animationName}' - No hay Animator en NPC {gameObject.name}");
             return;
         }
 
         try
         {
-            // Intentar reproducir la animaciÛn
+            // Intentar reproducir la animaci√≥n
             // Primero verificar si existe como trigger
             if (HasAnimatorParameter(animationName, AnimatorControllerParameterType.Trigger))
             {
@@ -416,17 +826,16 @@ public class NPC : MonoBehaviour
                 Debug.Log($"Reproduciendo estado '{animationName}' en NPC {gameObject.name}");
                 cachedAnimator.Play(animationName);
             }
-            // Si no existe, intentar los mÈtodos legacy
+            // Si no existe, intentar los m√©todos legacy
             else
             {
-                Debug.Log($"Usando mÈtodo legacy para animaciÛn '{animationName}' en NPC {gameObject.name}");
+                Debug.Log($"Usando m√©todo legacy para animaci√≥n '{animationName}' en NPC {gameObject.name}");
                 ExecuteLegacyAnimation(animationName);
             }
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Error al reproducir animaciÛn '{animationName}' en NPC {gameObject.name}: {e.Message}");
+            Debug.LogError($"Error al reproducir animaci√≥n '{animationName}' en NPC {gameObject.name}: {e.Message}");
         }
     }
-
 }

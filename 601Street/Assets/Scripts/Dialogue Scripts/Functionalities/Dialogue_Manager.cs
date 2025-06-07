@@ -68,8 +68,13 @@ public class DialogueManager : MonoBehaviour
     [Header("Navigation Integration")]
     [SerializeField] private UINavigationManager uiNavigationManager;
 
+    [Header("Look At System Integration")]
+    [SerializeField] private bool enableLookAtSystem = true; // Activar/desactivar el sistema
+    [SerializeField] private float lookAtDelay = 0.2f; // Pequeño delay antes de activar el Look At
+
     private bool isInPreDiceConversation = false;
     private PendingDiceRollData pendingDiceRoll = null;
+
     void Awake()
     {
         if (Instance == null)
@@ -210,6 +215,12 @@ public class DialogueManager : MonoBehaviour
             Debug.Log("Movimiento del jugador pausado durante la conversación");
         }
 
+        // NUEVO: Activar el sistema Look At del NPC
+        if (enableLookAtSystem && currentNPC != null)
+        {
+            StartCoroutine(ActivateLookAtWithDelay());
+        }
+
         npcCamera = null;
         if (currentNPC != null)
         {
@@ -270,6 +281,30 @@ public class DialogueManager : MonoBehaviour
 
         // Pequeño delay para asegurar que la UI esté completamente activa antes de mostrar el diálogo
         StartCoroutine(DelayedShowDialogue());
+    }
+
+    /// <summary>
+    /// NUEVO: Activar el Look At del NPC con un pequeño delay
+    /// </summary>
+    private IEnumerator ActivateLookAtWithDelay()
+    {
+        // Esperar un poco para que el NPC esté preparado
+        yield return new WaitForSeconds(lookAtDelay);
+
+        if (currentNPC != null)
+        {
+            // Verificar si el NPC tiene el sistema Look At configurado
+            if (currentNPC.IsLookAtSystemReady())
+            {
+                currentNPC.StartLookingAtPlayer();
+                Debug.Log($"Look At activado para {currentNPC.name}");
+            }
+            else
+            {
+                Debug.LogWarning($"Sistema Look At no está listo para {currentNPC.name}. " +
+                               "Verifica que tenga un MultiAimConstraint configurado.");
+            }
+        }
     }
 
     private IEnumerator DelayedShowDialogue()
@@ -534,6 +569,13 @@ public class DialogueManager : MonoBehaviour
             ActionController.Instance.InvokeAction(currentConversation.actionId);
         }
 
+        // NUEVO: Desactivar el Look At del NPC antes de terminar
+        if (enableLookAtSystem && currentNPC != null)
+        {
+            currentNPC.StopLookingAtPlayer();
+            Debug.Log($"Look At desactivado para {currentNPC.name}");
+        }
+
         // Desactivar la cámara del NPC si está activa
         if (npcCamera != null)
         {
@@ -573,10 +615,7 @@ public class DialogueManager : MonoBehaviour
 
         Debug.Log("Conversación finalizada - Cooldown iniciado");
     }
-    
 
-    // NUEVO: Método separado para ejecutar la tirada de dados
-    
     public void OnTypingComplete()
     {
         isTyping = false;
@@ -758,6 +797,24 @@ public class DialogueManager : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// NUEVO: Método público para configurar el sistema Look At
+    /// </summary>
+    public void SetLookAtSystemEnabled(bool enabled)
+    {
+        enableLookAtSystem = enabled;
+        Debug.Log($"Sistema Look At {(enabled ? "habilitado" : "deshabilitado")} en DialogueManager");
+    }
+
+    /// <summary>
+    /// NUEVO: Método público para configurar el delay del Look At
+    /// </summary>
+    public void SetLookAtDelay(float delay)
+    {
+        lookAtDelay = Mathf.Max(0f, delay);
+        Debug.Log($"Delay del Look At configurado a {lookAtDelay} segundos");
+    }
 }
 
 [System.Serializable]
@@ -768,6 +825,7 @@ public class PendingDiceRollData
     public Conversation originalConversation; // NUEVO: Guardar la conversación original
     public NPC originalNPC; // NUEVO: Guardar el NPC original
 }
+
 [System.Serializable]
 public class Dialogue
 {
